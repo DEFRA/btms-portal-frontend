@@ -186,3 +186,65 @@ information providers in the public sector to license the use and re-use of thei
 licence.
 
 It is designed to encourage use and re-use of information freely and flexibly, with only a few conditions.
+
+---
+
+just include home page & no about ?
+
+- Yes
+- no gov service has an about
+
+---
+
+- no server directory?
+
+src/routes ( OK )
+src/views ( OK )
+
+src/models ( Joi schema ) ??? maybe used on a case-by-case basis
+
+- server ? for front-end is okay to remove
+- for back-end there may be some value in having the server directory
+
+---
+
+test code located under tests folder in src / ?
+test can be excluded easily and categorised if they are all bunched together
+-> Try match most repositories for test folder location
+
+---
+
+## no controller.js
+
+remove the controller
+check the defra repositories
+
+---
+
+remove any typescript from devDependencies and any typescript specific code
+
+- take away
+
+---
+
+leave client and config directories as is (OK)
+
+---
+
+strip back dependencies lodash ( OK )
+
+## routing
+
+use a plugin ?
+or just invoke server.route once with an array ?
+rather than invoking in each plugin
+
+server.route vs server.register for routing
+
+- only export route not wrapped as a plugin
+
+## helpers rename to utils ?
+
+is pino the correct logger library
+
+hapi-pino rather than pino

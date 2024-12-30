@@ -2,6 +2,7 @@ ARG PARENT_VERSION=latest-22
 ARG PORT=3000
 ARG PORT_DEBUG=9229
 
+# Development
 FROM defradigital/node-development:${PARENT_VERSION} AS development
 
 ENV TZ="Europe/London"
@@ -21,8 +22,7 @@ RUN npm run build
 
 CMD [ "npm", "run", "dev" ]
 
-FROM development AS production_build
-
+# Production
 ENV NODE_ENV=production
 
 RUN npm run build
@@ -43,9 +43,9 @@ USER node
 ARG PARENT_VERSION
 LABEL uk.gov.defra.ffc.parent-image=defradigital/node:${PARENT_VERSION}
 
-COPY --from=production_build /home/node/package*.json ./
-COPY --from=production_build /home/node/.server ./.server/
-COPY --from=production_build /home/node/.public/ ./.public/
+COPY --from=development /home/node/package*.json ./
+COPY --from=development /home/node/.server ./.server/
+COPY --from=development /home/node/.public/ ./.public/
 
 RUN npm ci --omit=dev  --ignore-scripts
 

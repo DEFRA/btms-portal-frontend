@@ -43,7 +43,6 @@ updates:
           - 'jest-*'
           - 'nodemon'
           - 'npm-run-all'
-          - 'lodash'
           - 'source-map-loader'
           - 'sass-*'
           - 'postcss-*'
