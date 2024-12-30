@@ -10,7 +10,7 @@ import { home } from '~/src/routes/home.js'
 export const router = {
   plugin: {
     name: 'router',
-    async register(server) {
+    async register (server) {
       await server.register([inert])
 
       const appSpecificRoutes = [home]

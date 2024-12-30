@@ -13,7 +13,7 @@ import { createLogger } from '~/src/utils/logger.js'
  * @param {number} value
  * @returns {Promise<void>}
  */
-export async function metricsCounter(metricName, value = 1) {
+export async function metricsCounter (metricName, value = 1) {
   const isMetricsEnabled = config.get('isMetricsEnabled')
 
   if (!isMetricsEnabled) {

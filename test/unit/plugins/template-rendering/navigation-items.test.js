@@ -3,7 +3,7 @@ import { getNavigationItems } from '~/src/config/navigation-items.js'
 /**
  * @param {Partial<Request>} [testPath]
  */
-function createMockRequest(testPath) {
+function createMockRequest (testPath) {
   return { path: testPath }
 }
 

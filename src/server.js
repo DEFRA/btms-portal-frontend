@@ -6,7 +6,7 @@ import { plugins } from '~/src/plugins/index.js'
 import { catchAll } from '~/src/utils/errors.js'
 import { getCacheEngine } from '~/src/utils/caching/cache-engine.js'
 
-export async function createServer() {
+export async function createServer () {
   const server = hapi.server({
     port: config.get('port'),
     routes: {

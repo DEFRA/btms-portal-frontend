@@ -18,7 +18,7 @@ let webpackManifest
 /**
  * @param {Request | null} request
  */
-export function context(request) {
+export function context (request) {
   if (!webpackManifest) {
     try {
       webpackManifest = JSON.parse(readFileSync(manifestPath, 'utf-8'))
@@ -37,7 +37,7 @@ export function context(request) {
     /**
      * @param {string} asset
      */
-    getAssetPath(asset) {
+    getAssetPath (asset) {
       const webpackAssetPath = webpackManifest?.[asset]
       return `${assetPath}/${webpackAssetPath ?? asset}`
     }

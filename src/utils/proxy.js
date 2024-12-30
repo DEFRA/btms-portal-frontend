@@ -18,7 +18,7 @@ const logger = createLogger()
  * Provide ProxyAgent and HttpsProxyAgent when http/s proxy url config has been set
  * @returns {Proxy|null}
  */
-function provideProxy() {
+function provideProxy () {
   const proxyUrl = config.get('httpsProxy') ?? config.get('httpProxy')
 
   if (!proxyUrl) {
@@ -51,7 +51,7 @@ function provideProxy() {
  * @param {RequestInit} options
  * @returns {Promise}
  */
-function proxyFetch(url, options) {
+function proxyFetch (url, options) {
   const proxy = provideProxy()
 
   if (!proxy) {

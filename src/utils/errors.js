@@ -3,7 +3,7 @@ import { constants as httpConstants } from 'http2'
 /**
  * @param {number} statusCode
  */
-function statusCodeMessage(statusCode) {
+function statusCodeMessage (statusCode) {
   switch (statusCode) {
     case httpConstants.HTTP_STATUS_NOT_FOUND:
       return 'Page not found'
@@ -22,7 +22,7 @@ function statusCodeMessage(statusCode) {
  * @param { Request } request
  * @param { ResponseToolkit } h
  */
-export function catchAll(request, h) {
+export function catchAll (request, h) {
   const { response } = request
 
   if (!('isBoom' in response)) {

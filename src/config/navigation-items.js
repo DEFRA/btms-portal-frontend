@@ -1,7 +1,7 @@
 /**
  * @param {Partial<Request> | null} request
  */
-export function getNavigationItems(request) {
+export function getNavigationItems (request) {
   return [
     {
       text: 'Home',
