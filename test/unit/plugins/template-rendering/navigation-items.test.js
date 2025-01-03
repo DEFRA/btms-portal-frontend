@@ -1,4 +1,4 @@
-import { getNavigationItems } from '~/src/config/navigation-items.js'
+import { getNavigationItems } from '../../../../src/config/navigation-items.js'
 
 /**
  * @param {Partial<Request>} [testPath]

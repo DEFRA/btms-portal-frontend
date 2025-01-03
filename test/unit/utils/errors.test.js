@@ -1,6 +1,6 @@
-import { createServer } from '~/src/server.js'
+import { createServer } from '../../../src/server.js'
 import { constants as httpConstants } from 'http2'
-import { catchAll } from '~/src/utils/errors.js'
+import { catchAll } from '../../../src/utils/errors.js'
 
 describe('#errors', () => {
   /** @type {Server} */

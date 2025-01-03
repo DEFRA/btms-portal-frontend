@@ -1,10 +1,10 @@
 import path from 'path'
 import hapi from '@hapi/hapi'
 
-import { config } from '~/src/config/config.js'
-import { plugins } from '~/src/plugins/index.js'
-import { catchAll } from '~/src/utils/errors.js'
-import { getCacheEngine } from '~/src/utils/caching/cache-engine.js'
+import { config } from './config/config.js'
+import { plugins } from './plugins/index.js'
+import { catchAll } from './utils/errors.js'
+import { getCacheEngine } from './utils/caching/cache-engine.js'
 
 export async function createServer () {
   const server = hapi.server({
@@ -52,5 +52,5 @@ export async function createServer () {
 }
 
 /**
- * @import {Engine} from '~/src/server/common/helpers/session-cache/cache-engine.js'
+ * @import {Engine} from './src/server/common/helpers/session-cache/cache-engine.js'
  */

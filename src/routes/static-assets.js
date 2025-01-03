@@ -1,5 +1,5 @@
 import { constants as httpConstants } from 'http2'
-import { config } from '~/src/config/config.js'
+import { config } from '../config/config.js'
 
 export const staticAssetRoutes = [
   {

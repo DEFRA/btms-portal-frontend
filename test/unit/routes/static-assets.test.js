@@ -1,5 +1,5 @@
 import { constants as httpConstants } from 'http2'
-import { startServer } from '~/src/utils/start-server.js'
+import { startServer } from '../../../src/utils/start-server.js'
 
 describe('#serveStaticFiles', () => {
   let server

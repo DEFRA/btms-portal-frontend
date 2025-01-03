@@ -43,8 +43,10 @@ services:
 
 ################################################################################
 
-  your-frontend:
-    build: ./
+  btms-portal-frontend:
+    build: 
+      context: .
+      target: development
     ports:
       - '3000:3000'
       - '9229:9229'
@@ -66,6 +68,9 @@ services:
       USE_SINGLE_INSTANCE_CACHE: true
     networks:
       - cdp-tenant
+    volumes:
+      - ./src:/home/node/src
+      - ./package.json:/home/node/package.json
 
   # your-backend:
   #   image: defradigital/your-backend:${YOUR_BACKEND_VERSION:-latest}

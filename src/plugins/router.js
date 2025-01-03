@@ -1,8 +1,8 @@
 import inert from '@hapi/inert'
 
-import { health } from '~/src/routes/health.js'
-import { staticAssetRoutes } from '~/src/routes/static-assets.js'
-import { home } from '~/src/routes/home.js'
+import { health } from '../routes/health.js'
+import { staticAssetRoutes } from '../routes/static-assets.js'
+import { home } from '../routes/home.js'
 
 /**
  * @satisfies {ServerRegisterPluginObject<void>}

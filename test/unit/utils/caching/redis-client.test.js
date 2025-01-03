@@ -1,7 +1,7 @@
 import { Cluster, Redis } from 'ioredis'
 
-import { config } from '~/src/config/config.js'
-import { buildRedisClient } from '~/src/utils/caching/redis-client.js'
+import { config } from '../../../../src/config/config.js'
+import { buildRedisClient } from '../../../../src/utils/caching/redis-client.js'
 
 jest.mock('ioredis', () => ({
   ...jest.requireActual('ioredis'),

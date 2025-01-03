@@ -1,4 +1,4 @@
-import { formatDate } from '~/src/plugins/template-renderer/filters/format-date.js'
+import { formatDate } from '../../../../../src/plugins/template-renderer/filters/format-date.js'
 
 describe('#formatDate', () => {
   beforeAll(() => {

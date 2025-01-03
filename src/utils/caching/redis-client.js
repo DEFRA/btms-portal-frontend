@@ -1,6 +1,6 @@
 import { Cluster, Redis } from 'ioredis'
 
-import { createLogger } from '~/src/utils/logger.js'
+import { createLogger } from '../logger.js'
 
 /**
  * @typedef {object} RedisConfig

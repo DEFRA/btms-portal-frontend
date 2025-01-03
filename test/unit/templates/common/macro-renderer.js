@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url'
 import path from 'path'
 import nunjucks from 'nunjucks'
 import { load } from 'cheerio'
-import * as filters from '~/src/plugins/template-renderer/filters/filters.js'
+import * as filters from '../../../../src/plugins/template-renderer/filters/filters.js'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const nunjucksTestEnv = nunjucks.configure(

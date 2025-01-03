@@ -1,9 +1,9 @@
 import path from 'node:path'
 import { readFileSync } from 'node:fs'
 
-import { config } from '~/src/config/config.js'
-import { createLogger } from '~/src/utils/logger.js'
-import { getNavigationItems } from '~/src/config/navigation-items.js'
+import { config } from '../../config/config.js'
+import { createLogger } from '../../utils/logger.js'
+import { getNavigationItems } from '../../config/navigation-items.js'
 
 const logger = createLogger()
 const assetPath = config.get('assetPath')

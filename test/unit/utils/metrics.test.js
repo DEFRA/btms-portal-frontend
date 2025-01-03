@@ -1,7 +1,7 @@
 import { StorageResolution, Unit } from 'aws-embedded-metrics'
 
-import { config } from '~/src/config/config.js'
-import { metricsCounter } from '~/src/utils/metrics.js'
+import { config } from '../../../src/config/config.js'
+import { metricsCounter } from '../../../src/utils/metrics.js'
 
 const mockPutMetric = jest.fn()
 const mockFlush = jest.fn()

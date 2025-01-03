@@ -1,4 +1,4 @@
-import { getTrustStoreCerts } from '~/src/plugins/secure-context/get-trust-store-certs.js'
+import { getTrustStoreCerts } from '../../../../src/plugins/secure-context/get-trust-store-certs.js'
 
 describe('#getTrustStoreCerts', () => {
   const mockProcessEnvWithCerts = {

@@ -1,4 +1,4 @@
-import { formatCurrency } from '~/src/plugins/template-renderer/filters/format-currency.js'
+import { formatCurrency } from '../../../../../src/plugins/template-renderer/filters/format-currency.js'
 
 describe('#formatCurrency', () => {
   describe('With defaults', () => {
