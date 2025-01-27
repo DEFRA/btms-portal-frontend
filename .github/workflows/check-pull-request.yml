@@ -24,11 +24,11 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: |
-          npm ci
-          npm run build
-          npm run lint
-          npm test
+          run: |
+            npm ci
+            npm run build
+            npm run lint
+            npm test
 
       - name: Test Docker Image Build
         run: |
@@ -36,9 +36,9 @@ jobs:
           docker build --no-cache --tag cdp-node-frontend-template .
           exit $?
 
-#      - name: SonarCloud Scan
-#        if: github.actor != 'dependabot[bot]'
-#        uses: SonarSource/sonarcloud-github-action@master
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: SonarCloud Scan
+        if: github.actor != 'dependabot[bot]'
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
