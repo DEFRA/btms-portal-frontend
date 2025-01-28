@@ -24,11 +24,11 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: |
-          npm ci
-          npm run build
-          npm run lint
-          npm test
+          run: |
+            npm ci
+            npm run build
+            npm run lint
+            npm test
 
       - name: Test Docker Image Build
         run: |
