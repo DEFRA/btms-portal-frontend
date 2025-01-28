@@ -22,13 +22,8 @@ function statusCodeMessage (statusCode) {
  * @param { Request } request
  * @param { ResponseToolkit } h
  */
-export function catchAll (request, h) {
-  const { response } = request
-
-  if (!('isBoom' in response)) {
-    return h.continue
-  }
-
+export function serveFriendlyErrorPage (request, h) {
+  const response = request.response
   const statusCode = response.output.statusCode
   const errorMessage = statusCodeMessage(statusCode)
 

@@ -3,7 +3,7 @@ import hapi from '@hapi/hapi'
 
 import { config } from './config/config.js'
 import { plugins } from './plugins/index.js'
-import { catchAll } from './utils/errors.js'
+import { serveFriendlyErrorPage } from './utils/errors.js'
 import { getCacheEngine } from './utils/caching/cache-engine.js'
 
 export async function createServer () {
@@ -46,7 +46,12 @@ export async function createServer () {
   })
   await server.register(plugins)
 
-  server.ext('onPreResponse', catchAll)
+  server.ext('onPreResponse', (request, h) => {
+    if (!request.response.isBoom) {
+      return h.continue
+    }
+    return serveFriendlyErrorPage(request, h)
+  })
 
   return server
 }

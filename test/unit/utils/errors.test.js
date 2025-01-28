@@ -1,6 +1,6 @@
 import { createServer } from '../../../src/server.js'
 import { constants as httpConstants } from 'http2'
-import { catchAll } from '../../../src/utils/errors.js'
+import { serveFriendlyErrorPage } from '../../../src/utils/errors.js'
 
 describe('#errors', () => {
   /** @type {Server} */
@@ -28,7 +28,7 @@ describe('#errors', () => {
   })
 })
 
-describe('#catchAll', () => {
+describe('#serveFriendlyErrorPage', () => {
   const mockErrorLogger = jest.fn()
   const mockStack = 'Mock error stack'
   const errorPage = 'error'
@@ -50,7 +50,7 @@ describe('#catchAll', () => {
   }
 
   test('Should provide expected "Not Found" page', () => {
-    catchAll(mockRequest(httpConstants.HTTP_STATUS_NOT_FOUND), mockToolkit)
+    serveFriendlyErrorPage(mockRequest(httpConstants.HTTP_STATUS_NOT_FOUND), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
@@ -64,7 +64,7 @@ describe('#catchAll', () => {
   })
 
   test('Should provide expected "Forbidden" page', () => {
-    catchAll(mockRequest(httpConstants.HTTP_STATUS_FORBIDDEN), mockToolkit)
+    serveFriendlyErrorPage(mockRequest(httpConstants.HTTP_STATUS_FORBIDDEN), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
@@ -78,7 +78,7 @@ describe('#catchAll', () => {
   })
 
   test('Should provide expected "Unauthorized" page', () => {
-    catchAll(mockRequest(httpConstants.HTTP_STATUS_UNAUTHORIZED), mockToolkit)
+    serveFriendlyErrorPage(mockRequest(httpConstants.HTTP_STATUS_UNAUTHORIZED), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
@@ -92,7 +92,7 @@ describe('#catchAll', () => {
   })
 
   test('Should provide expected "Bad Request" page', () => {
-    catchAll(mockRequest(httpConstants.HTTP_STATUS_BAD_REQUEST), mockToolkit)
+    serveFriendlyErrorPage(mockRequest(httpConstants.HTTP_STATUS_BAD_REQUEST), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
@@ -106,7 +106,7 @@ describe('#catchAll', () => {
   })
 
   test('Should provide expected default page', () => {
-    catchAll(mockRequest(httpConstants.HTTP_STATUS_TEAPOT), mockToolkit)
+    serveFriendlyErrorPage(mockRequest(httpConstants.HTTP_STATUS_TEAPOT), mockToolkit)
 
     expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
     expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
@@ -120,7 +120,7 @@ describe('#catchAll', () => {
   })
 
   test('Should provide expected "Something went wrong" page and log error for internalServerError', () => {
-    catchAll(
+    serveFriendlyErrorPage(
       mockRequest(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR),
       mockToolkit
     )
