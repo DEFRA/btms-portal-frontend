@@ -13,7 +13,7 @@ describe('#serveHomePage', () => {
       await server.stop({ timeout: 0 })
     })
 
-    test('Should respond as healthy', async () => {
+    test('Should respond with home page', async () => {
       const { statusCode, payload } = await server.inject({
         method: 'GET',
         url: '/'
