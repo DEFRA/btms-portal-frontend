@@ -1,9 +1,6 @@
 import { constants as httpConstants } from 'http2'
 
-/**
- * @param {number} statusCode
- */
-function statusCodeMessage (statusCode) {
+const getErrorMessage = (statusCode) => {
   switch (statusCode) {
     case httpConstants.HTTP_STATUS_NOT_FOUND:
       return 'Page not found'
@@ -18,14 +15,10 @@ function statusCodeMessage (statusCode) {
   }
 }
 
-/**
- * @param { Request } request
- * @param { ResponseToolkit } h
- */
-export function serveFriendlyErrorPage (request, h) {
+const serveFriendlyErrorPage = (request, h) => {
   const response = request.response
   const statusCode = response.output.statusCode
-  const errorMessage = statusCodeMessage(statusCode)
+  const errorMessage = getErrorMessage(statusCode)
 
   if (statusCode >= httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR) {
     request.logger.error(response?.stack)
@@ -39,7 +32,16 @@ export function serveFriendlyErrorPage (request, h) {
     })
     .code(statusCode)
 }
-
-/**
- * @import { Request, ResponseToolkit } from '@hapi/hapi'
- */
+export const errorPage = {
+  plugin: {
+    name: 'error-page',
+    register: (server) => {
+      server.ext('onPreResponse', (request, h) => {
+        if (!request.response.isBoom) {
+          return h.continue
+        }
+        return serveFriendlyErrorPage(request, h)
+      })
+    }
+  }
+}

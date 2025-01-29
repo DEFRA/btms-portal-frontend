@@ -5,6 +5,7 @@ import { sessionManager } from './session-manager.js'
 import { requestTracing } from './request-tracing.js'
 import { router } from './router.js'
 import { pulse } from './pulse.js'
+import { errorPage } from './error-page.js'
 
 export const plugins = [
   requestLogger,
@@ -13,5 +14,6 @@ export const plugins = [
   pulse,
   sessionManager,
   vision,
-  router
+  router,
+  errorPage
 ]
