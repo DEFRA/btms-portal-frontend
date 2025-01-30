@@ -5,7 +5,7 @@ import { config } from '../../../src/config/config.js'
 import { provideProxy, proxyFetch } from '../../../src/utils/proxy.js'
 
 const mockLoggerDebug = jest.fn()
-jest.mock('~/src/utils/logger.js', () => ({
+jest.mock('../../../src/utils/logger.js', () => ({
   createLogger: () => ({ debug: (...args) => mockLoggerDebug(...args) })
 }))
 

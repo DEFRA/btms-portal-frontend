@@ -3,7 +3,6 @@ import hapi from '@hapi/hapi'
 
 import { config } from './config/config.js'
 import { plugins } from './plugins/index.js'
-import { catchAll } from './utils/errors.js'
 import { getCacheEngine } from './utils/caching/cache-engine.js'
 
 export async function createServer () {
@@ -45,8 +44,6 @@ export async function createServer () {
     }
   })
   await server.register(plugins)
-
-  server.ext('onPreResponse', catchAll)
 
   return server
 }

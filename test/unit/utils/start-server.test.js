@@ -15,7 +15,7 @@ jest.mock('hapi-pino', () => ({
   },
   name: 'mock-hapi-pino'
 }))
-jest.mock('~/src/utils/logger.js', () => ({
+jest.mock('../../../src/utils/logger.js', () => ({
   createLogger: () => ({
     info: (...args) => mockLoggerInfo(...args),
     error: (...args) => mockLoggerError(...args)
@@ -33,8 +33,8 @@ describe('#startServer', () => {
     process.env = { ...PROCESS_ENV }
     process.env.PORT = '3097' // Set to obscure port to avoid conflicts
 
-    createServerImport = await import('~/src/server.js')
-    startServerImport = await import('~/src/utils/start-server.js')
+    createServerImport = await import('../../../src/server.js')
+    startServerImport = await import('../../../src/utils/start-server.js')
 
     createServerSpy = jest.spyOn(createServerImport, 'createServer')
     hapiServerSpy = jest.spyOn(hapi, 'server')

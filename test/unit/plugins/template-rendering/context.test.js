@@ -5,7 +5,7 @@ jest.mock('node:fs', () => ({
   ...jest.requireActual('node:fs'),
   readFileSync: () => mockReadFileSync()
 }))
-jest.mock('~/src/utils/logger.js', () => ({
+jest.mock('../../../../src/utils/logger.js', () => ({
   createLogger: () => ({ error: (...args) => mockLoggerError(...args) })
 }))
 
@@ -17,7 +17,7 @@ describe('#context', () => {
     let contextImport
 
     beforeAll(async () => {
-      contextImport = await import('~/src/plugins/template-renderer/context.js')
+      contextImport = await import('../../../../src/plugins/template-renderer/context.js')
     })
 
     beforeEach(() => {
@@ -68,7 +68,7 @@ describe('#context', () => {
     let contextImport
 
     beforeAll(async () => {
-      contextImport = await import('~/src/plugins/template-renderer/context.js')
+      contextImport = await import('../../../../src/plugins/template-renderer/context.js')
     })
 
     beforeEach(() => {
@@ -93,7 +93,7 @@ describe('#context cache', () => {
     let contextImport
 
     beforeAll(async () => {
-      contextImport = await import('~/src/plugins/template-renderer/context.js')
+      contextImport = await import('../../../../src/plugins/template-renderer/context.js')
     })
 
     beforeEach(() => {

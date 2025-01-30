@@ -21,7 +21,6 @@ import { createLogger } from '../logger.js'
  * @returns {Cluster | Redis}
  */
 export function buildRedisClient (redisConfig) {
-  const logger = createLogger()
   const port = 6379
   const db = 0
   const keyPrefix = redisConfig.keyPrefix
@@ -68,11 +67,11 @@ export function buildRedisClient (redisConfig) {
   }
 
   redisClient.on('connect', () => {
-    logger.info('Connected to Redis server')
+    createLogger().info('Connected to Redis server')
   })
 
   redisClient.on('error', (error) => {
-    logger.error(`Redis connection error ${error}`)
+    createLogger().error(`Redis connection error ${error}`)
   })
 
   return redisClient
