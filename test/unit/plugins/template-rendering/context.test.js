@@ -1,5 +1,6 @@
 const mockReadFileSync = jest.fn()
 const mockLoggerError = jest.fn()
+const expectedServiceName = 'Border Trade Matching Service'
 
 jest.mock('node:fs', () => ({
   ...jest.requireActual('node:fs'),
@@ -42,7 +43,7 @@ describe('#context', () => {
             url: '/'
           }
         ],
-        serviceName: 'btms-portal-frontend',
+        serviceName: expectedServiceName,
         serviceUrl: '/'
       })
     })
@@ -126,7 +127,7 @@ describe('#context cache', () => {
             url: '/'
           }
         ],
-        serviceName: 'btms-portal-frontend',
+        serviceName: expectedServiceName,
         serviceUrl: '/'
       })
     })

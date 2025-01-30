@@ -2,11 +2,10 @@
 
 {# Import GOVUK components globally #}
 {% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 
 {# Import custom components globally #}
 {% from "common/heading/macro.njk" import appHeading %}
-
-{% set mainClasses = "app-main-wrapper" %}
 
 {% block head %}
   <link href="{{ getAssetPath('stylesheets/application.scss') }}" rel="stylesheet">
@@ -14,21 +13,29 @@
 
 {% block header %}
   {{ govukHeader({
-    homepageUrl: "https://www.gov.uk/",
+    homepageUrl: "/",
     classes: "app-header",
     containerClasses: "govuk-width-container",
     serviceName: serviceName,
     serviceUrl: serviceUrl,
     useTudorCrown: true
   }) }}
-  {% include "common/navigation/navigation.njk" %}
-{% endblock %}
+  {% endblock %}
 
 {% block pageTitle %}
   {{ pageTitle }} | {{ serviceName }}
 {% endblock %}
 
+
+<p>tal test</p>
+
 {% block beforeContent %}
+  {{ govukPhaseBanner({
+    tag: {
+      text: "Draft"
+    },
+    html: 'This is an initial design and is subject to change once user research analysis is complete.'
+  }) }}
   {% if breadcrumbs.length > 1 %}
     {{ govukBreadcrumbs({
       items: breadcrumbs

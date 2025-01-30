@@ -11,7 +11,7 @@ const isProduction = process.env.NODE_ENV === 'production'
 const isTest = process.env.NODE_ENV === 'test'
 const isDevelopment = process.env.NODE_ENV === 'development'
 
-export const config = convict({
+const config = convict({
   serviceVersion: {
     doc: 'The service version, this variable is injected into your docker container in CDP environments',
     format: String,
@@ -40,7 +40,7 @@ export const config = convict({
   serviceName: {
     doc: 'Applications Service Name',
     format: String,
-    default: 'btms-portal-frontend'
+    default: 'Border Trade Matching Service'
   },
   root: {
     doc: 'Project root',
@@ -222,7 +222,29 @@ export const config = convict({
       default: 'x-cdp-request-id',
       env: 'TRACING_HEADER'
     }
+  },
+  btmsApi: {
+    baseUrl: {
+      doc: 'BTMS (backend) API base URL.',
+      format: String,
+      default: 'http://localhost:9080/api',
+      env: 'BTMS_API_BASE_URL'
+    },
+    username: {
+      doc: 'BTMS (backend) API username for authentication.',
+      format: String,
+      default: 'BtmsFrontend',
+      env: 'BTMS_API_USERNAME'
+    },
+    password: {
+      doc: 'BTMS (backend) API password for authentication.',
+      format: String,
+      default: 'a498HnJ79A5G',
+      env: 'BTMS_API_PASSWORD'
+    }
   }
 })
 
 config.validate({ allowed: 'strict' })
+
+export { config }

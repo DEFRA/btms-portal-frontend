@@ -1,0 +1,20 @@
+@use "govuk-frontend" as *;
+
+.app-summary-card-wrapper {
+  margin-bottom: govuk-spacing(6);
+}
+
+.app-customs-declaration-summary {
+  background-color: govuk-colour('light-grey');
+  .govuk-summary-list__row {
+    border-bottom: none;
+  }
+}
+
+.app-customs-declaration-summary-card {
+  margin-bottom: govuk-spacing(1);
+}
+
+.app-commodity-summary-card {
+  margin-bottom: 0;
+}

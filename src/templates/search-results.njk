@@ -1,0 +1,154 @@
+{% extends 'layout.njk' %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <span class="govuk-caption-xl">Search results for</span>
+      <h1 class="govuk-heading-xl">{{ searchTerm }}</h1>
+      <h2 class="govuk-heading-l">Customs declaration details</h1>
+
+      {% for customsDeclaration in customsDeclarations %}
+
+      {{ govukSummaryList({
+        classes: "app-customs-declaration-summary",
+        rows: [
+          {
+            key: {
+              text: "MRN"
+            },
+            value: {
+              text: customsDeclaration.movementReferenceNumber
+            }
+          },
+          {
+            key: {
+              text: "Status"
+            },
+            value: {
+              text: customsDeclaration.customsDeclarationStatus
+            }
+          },
+          {
+            key: {
+              text: "Last updated"
+            },
+            value: {
+              text: customsDeclaration.lastUpdated
+            }
+          }
+        ]
+      }) }}
+
+      {% set tableRows = [] %}
+      {% for commodity in customsDeclaration.commodities %}
+          {% set tableRows = (tableRows.push([{ text: commodity.itemNumber }, { text: commodity.commodityCode }, { text: commodity.commodityDesc }, { text: commodity.weightOrQuantity }, {text: commodity.documents | join(", ") }, { text: "Yes" if commodity.matchStatus.isMatched else "No" }, { html: commodity.decisions | join("<br/>")}]), tableRows) %}
+      {% endfor %}
+
+      {{ govukTable({
+          classes: "govuk-table--small-text-until-tablet",
+          head: [
+            {
+              text: "Item number"
+            },
+            {
+              text: "Commodity code"
+            },
+            {
+              text: "Description"
+            },
+            {
+              text: "Quantity / Weight"
+            },
+            {
+              text: "CHED reference"
+            },
+            {
+              text: "Match"
+            },
+            {
+              text: "Decision (authority)"
+            }
+          ],
+          rows: tableRows
+      }) }}
+
+
+{% endfor %}
+
+<h2 class="govuk-heading-l">IPAFFS notification (CHED) details</h2>
+{% for preNotification in preNotifications %}
+
+ {{ govukSummaryList({
+        classes: "app-customs-declaration-summary",
+        rows: [
+          {
+            key: {
+              "text": "CHED Reference"
+            },
+            value: {
+              "text": preNotification.chedRef
+            }
+          },
+          {
+            key: {
+              text: "CHED Status"
+            },
+            value: {
+              text: preNotification.status
+            }
+          },
+          {
+            key: {
+              text: "Last updated"
+            },
+            value: {
+              text: preNotification.lastUpdated
+            }
+          },
+          {
+            key: {
+              text: "Authorities"
+            },
+            value: {
+              text: preNotification.authorities | join(", ")
+            }
+          }
+        ]
+      }) }}
+
+      {% set tableRows = [] %}
+      {% for commodity in preNotification.commodities %}
+          {% set tableRows = (tableRows.push([{ text: commodity.itemNumber }, { text: commodity.commodityCode }, { text: commodity.commodityDesc }, { text: commodity.weightOrQuantity }, { text: commodity.decision + ' (' + preNotification.authorities | join(", ") + ')'}]), tableRows) %}
+      {% endfor %}
+
+      {{ govukTable({
+                classes: "govuk-table--small-text-until-tablet",
+                head: [
+                  {
+                    text: "Item number"
+                  },
+                  {
+                    text: "Commodity code"
+                  },
+                  {
+                    text: "Description"
+                  },
+                  {
+                    text: "Quantity / Weight"
+                  },
+                  {
+                    text: "Decision (authority)"
+                  }
+                ],
+                rows: tableRows
+            }) }}
+
+{% else %}
+<p class="govuk-body">No pre-notifications found for this customs declaration.</p>
+{% endfor %}
+    </div>
+  </div>
+
+{% endblock %}
