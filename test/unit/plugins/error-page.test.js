@@ -1,10 +1,12 @@
 import Boom from '@hapi/boom'
 import { createServer } from '../../../src/server.js'
 import { constants as httpConstants } from 'http2'
+import { config } from '../../../src/config/config.js'
 
 describe('#errors', () => {
   /** @type {Server} */
   let server
+  const serviceName = config.get('serviceName')
 
   beforeAll(async () => {
     server = await createServer()
@@ -22,7 +24,7 @@ describe('#errors', () => {
     })
 
     expect(result).toEqual(
-      expect.stringContaining('Page not found | btms-portal-frontend')
+      expect.stringContaining(`Page not found | ${serviceName}`)
     )
     expect(statusCode).toBe(httpConstants.HTTP_STATUS_NOT_FOUND)
   })
@@ -41,7 +43,7 @@ describe('#errors', () => {
     })
 
     expect(result).toEqual(
-      expect.stringContaining('Something went wrong | btms-portal-frontend')
+      expect.stringContaining(`Something went wrong | ${serviceName}`)
     )
     expect(statusCode).toBe(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
   })
@@ -60,7 +62,7 @@ describe('#errors', () => {
     })
 
     expect(payload).toEqual(
-      expect.stringContaining('Bad Request | btms-portal-frontend')
+      expect.stringContaining(`Bad Request | ${serviceName}`)
     )
     expect(statusCode).toBe(httpConstants.HTTP_STATUS_BAD_REQUEST)
   })
@@ -79,7 +81,7 @@ describe('#errors', () => {
     })
 
     expect(payload).toEqual(
-      expect.stringContaining('Forbidden | btms-portal-frontend')
+      expect.stringContaining(`Forbidden | ${serviceName}`)
     )
     expect(statusCode).toBe(httpConstants.HTTP_STATUS_FORBIDDEN)
   })
@@ -98,7 +100,7 @@ describe('#errors', () => {
     })
 
     expect(payload).toEqual(
-      expect.stringContaining('Unauthorized | btms-portal-frontend')
+      expect.stringContaining(`Unauthorized | ${serviceName}`)
     )
     expect(statusCode).toBe(httpConstants.HTTP_STATUS_UNAUTHORIZED)
   })

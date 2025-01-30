@@ -20,7 +20,7 @@ describe('#serveHomePage', () => {
       })
 
       expect(statusCode).toBe(httpConstants.HTTP_STATUS_OK)
-      expect(payload).toEqual(expect.stringContaining('Home | btms-portal-frontend'))
+      expect(payload).toEqual(expect.stringContaining('Home | Border Trade Matching Service'))
     })
   })
 })
