@@ -14,7 +14,7 @@ jest.mock('ioredis', () => ({
 }))
 jest.mock('@hapi/catbox-redis')
 jest.mock('@hapi/catbox-memory')
-jest.mock('~/src/utils/logger.js', () => ({
+jest.mock('../../../../src/utils/logger.js', () => ({
   createLogger: () => ({
     info: (...args) => mockLoggerInfo(...args),
     error: (...args) => mockLoggerError(...args)

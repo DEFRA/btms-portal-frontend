@@ -9,13 +9,15 @@ describe('#loggerOptions', () => {
   test('mixin should return empty object when the retrieved tracedId is not truthy', () => {
     getTraceId.mockReturnValue(null)
     const mixinOutput = loggerOptions.mixin()
+    expect(getTraceId).toHaveBeenCalled()
     expect(mixinOutput).toEqual({})
   })
 
-  test('mixin should return object with traceId when the retrieved traceId is truthy', () => {
+  test('Should return object with traceId', () => {
     const traceId = 'test-trace-id'
     getTraceId.mockReturnValue(traceId)
     const mixinOutput = loggerOptions.mixin()
+    expect(getTraceId).toHaveBeenCalled()
     expect(mixinOutput).toEqual({ trace: { id: traceId } })
   })
 })

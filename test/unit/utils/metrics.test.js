@@ -14,7 +14,7 @@ jest.mock('aws-embedded-metrics', () => ({
     flush: mockFlush
   })
 }))
-jest.mock('~/src/utils/logger.js', () => ({
+jest.mock('../../../src/utils/logger.js', () => ({
   createLogger: () => ({ error: (...args) => mockLoggerError(...args) })
 }))
 
