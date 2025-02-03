@@ -1,3 +1,16 @@
+const CHED_REF_NUMERIC_IDENTIFIER_INDEX = 3
+const DATE_FORMAT = 'd MMMM yyyy, HH:mm'
+
+// PHA: Port Health Authority
+const authorities = {
+  ANIMAL_PLANT_HEALTH_AGENCY: 'APHA',
+  HORTICULTURAL_MARKETING_INSPECTORATE: 'HMI',
+  PHA_FOODS_NOT_ANIMAL_ORIGIN: 'PHA - FNAO',
+  PHA_ILLEGAL_UNREPORTED_UNREGULATED: 'PHA - IUU',
+  PHA_PRODUCTS_OF_ANIMAL_ORIGIN: 'PHA - POAO',
+  PLANT_HEALTH_SEEDS_INSPECTORATE: 'PHSI'
+}
+
 const decisionCodeDescriptions = {
   C01: 'Customs Freight Simplified Procedures (CFSP)',
   C02: 'No Inspection Required',
@@ -21,26 +34,26 @@ const decisionCodeDescriptions = {
   X00: 'No Match'
 }
 const checkCodeToAuthorityMapping = {
-  H218: 'HMI',
-  H219: 'PHSI',
-  H220: 'HMI',
-  H221: 'APHA',
-  H222: 'PHA - POAO',
-  H223: 'PHA - FNAO',
-  H224: 'PHA - IUU'
+  H218: authorities.HORTICULTURAL_MARKETING_INSPECTORATE,
+  H219: authorities.PLANT_HEALTH_SEEDS_INSPECTORATE,
+  H220: authorities.HORTICULTURAL_MARKETING_INSPECTORATE,
+  H221: authorities.ANIMAL_PLANT_HEALTH_AGENCY,
+  H222: authorities.PHA_PRODUCTS_OF_ANIMAL_ORIGIN,
+  H223: authorities.PHA_FOODS_NOT_ANIMAL_ORIGIN,
+  H224: authorities.PHA_ILLEGAL_UNREPORTED_UNREGULATED
 }
 
 const documentCodeToAuthorityMapping = {
-  C640: 'APHA',
-  N852: 'PHA - FNAO',
-  C678: 'PHA - FNAO',
-  N853: 'PHA - POAO',
-  C673: 'PHA - IUU',
-  C641: 'PHA - IUU',
-  N851: 'PHSI',
-  C633: 'PHSI',
-  9115: 'PHSI',
-  N002: 'HMI'
+  C640: authorities.ANIMAL_PLANT_HEALTH_AGENCY,
+  N852: authorities.PHA_FOODS_NOT_ANIMAL_ORIGIN,
+  C678: authorities.PHA_FOODS_NOT_ANIMAL_ORIGIN,
+  N853: authorities.PHA_PRODUCTS_OF_ANIMAL_ORIGIN,
+  C673: authorities.PHA_ILLEGAL_UNREPORTED_UNREGULATED,
+  C641: authorities.PHA_ILLEGAL_UNREPORTED_UNREGULATED,
+  N851: authorities.PLANT_HEALTH_SEEDS_INSPECTORATE,
+  C633: authorities.PLANT_HEALTH_SEEDS_INSPECTORATE,
+  9115: authorities.PLANT_HEALTH_SEEDS_INSPECTORATE,
+  N002: authorities.HORTICULTURAL_MARKETING_INSPECTORATE
 }
 
 const chedStatusDescriptions = {
@@ -72,5 +85,7 @@ export {
   chedDecisionDescriptions,
   chedStatusDescriptions,
   decisionCodeDescriptions,
-  documentCodeToAuthorityMapping
+  documentCodeToAuthorityMapping,
+  CHED_REF_NUMERIC_IDENTIFIER_INDEX,
+  DATE_FORMAT
 }

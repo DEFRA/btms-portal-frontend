@@ -2,8 +2,8 @@ import { format } from 'date-fns'
 import {
   chedStatusDescriptions,
   chedDecisionDescriptions,
-  documentCodeToAuthorityMapping
-} from './constants.js'
+  documentCodeToAuthorityMapping, DATE_FORMAT
+} from './model-constants.js'
 
 const getAuthorities = (documentCodes) => {
   if (documentCodes?.length) {
@@ -28,9 +28,11 @@ const getDecision = (preNotification) => {
 const getCommodityDescription = (commodity) => {
   if (commodity?.speciesName?.length) {
     return commodity.speciesName
-  } else if (commodity?.commodityDescription?.length) {
+  }
+  if (commodity?.commodityDescription?.length) {
     return commodity.commodityDescription
-  } else if (commodity?.complementName?.length) {
+  }
+  if (commodity?.complementName?.length) {
     return commodity.complementName
   }
   return ''
@@ -60,7 +62,7 @@ export const createPreNotificationModel = (sourcePreNotification, relatedDocumen
       }
     }),
     decision: getDecision(sourcePreNotification),
-    lastUpdated: format(new Date(sourcePreNotification.updatedSource), 'd MMMM yyyy, hh:mm'),
+    lastUpdated: format(new Date(sourcePreNotification.updatedSource), DATE_FORMAT),
     status: getStatus(sourcePreNotification.status)
   }
 }

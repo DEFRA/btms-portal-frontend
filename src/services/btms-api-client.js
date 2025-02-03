@@ -38,6 +38,7 @@ const getPreNotificationByChedRef = async (chedRef) => {
 
 const getPreNotificationsByChedRefs = async (chedRefs) => {
   try {
+    // TODO: check if the kitsu-core npm package can be used to create the query string
     const formattedChedRefs = chedRefs.map(ref => `%27${ref}%27`).join(',')
     return await invokeApi(`/import-notifications?filter=any(id,${formattedChedRefs})`)
   } catch (err) {
@@ -48,6 +49,7 @@ const getPreNotificationsByChedRefs = async (chedRefs) => {
 
 const getCustomsDeclarationsByMovementRefNums = async (movementRefNumbers) => {
   try {
+    // TODO: check if the kitsu-core npm package can be used to create the query string
     const formattedMovementRefNumbers = movementRefNumbers.map(ref => `%27${ref}%27`).join(',')
     return await invokeApi(`/movements?filter=any(id,${formattedMovementRefNumbers})`)
   } catch (err) {

@@ -6,16 +6,33 @@
 
 .app-customs-declaration-summary {
   background-color: govuk-colour('light-grey');
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive columns */
+  padding: govuk-spacing(3) 0;
+  margin: 0;
 
   .govuk-summary-list__row {
     border-bottom: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-left: govuk-spacing(2);
+
+    .govuk-summary-list__key {
+      width: inherit;
+      margin: 0;
+      padding: 0;
+      @include govuk-font-size($size: 16);
+    }
+
+    .govuk-summary-list__value {
+      padding-bottom: 0;
+      padding-top: govuk-spacing(1);
+      @include govuk-font-size($size: 16);
+    }
   }
 }
 
-.app-customs-declaration-summary-card {
-  margin-bottom: govuk-spacing(1);
-}
-
-.app-commodity-summary-card {
-  margin-bottom: 0;
+.app-import-commodities {
+  @include govuk-font-size($size: 16);
 }

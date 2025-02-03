@@ -1,10 +1,5 @@
 import inert from '@hapi/inert'
-
-import { health } from '../routes/health.js'
-import { staticAssetRoutes } from '../routes/static-assets.js'
-import { home } from '../routes/home.js'
-import { search } from '../routes/search.js'
-import { searchResult } from '../routes/search-result.js'
+import routes from '../routes/index.js'
 
 /**
  * @satisfies {ServerRegisterPluginObject<void>}
@@ -14,13 +9,7 @@ export const router = {
     name: 'router',
     async register (server) {
       await server.register([inert])
-
-      const appSpecificRoutes = [
-        home,
-        ...search,
-        searchResult]
-
-      server.route([health, ...staticAssetRoutes].concat(appSpecificRoutes))
+      server.route(routes)
     }
   }
 }

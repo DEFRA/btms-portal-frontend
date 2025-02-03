@@ -1,8 +1,8 @@
 import {
   getPreNotificationByChedRef,
   getCustomsDeclarationByMovementRefNum,
-
-  getPreNotificationsByChedRefs, getCustomsDeclarationsByMovementRefNums
+  getPreNotificationsByChedRefs,
+  getCustomsDeclarationsByMovementRefNums
 } from './btms-api-client.js'
 
 const searchPatterns = {
@@ -22,9 +22,10 @@ const isChedReference = (input) => {
 }
 
 const createArray = (data) => {
-  return data
-    ? Array.isArray(data) ? data : [data]
-    : []
+  if (!data) {
+    return []
+  }
+  return Array.isArray(data) ? data : [data]
 }
 
 const createSearchResult = (searchTerm, searchType, rawCustomsDeclarations, rawPreNotifications) => {
@@ -37,7 +38,7 @@ const getRelatedPreNotifications = async (customsDeclaration) => {
   if (customsDeclaration.data?.notifications?.data?.length) {
     const relatedChedReferences = customsDeclaration.data.notifications.data
       .map(r => r.id)
-    return await getPreNotificationsByChedRefs(relatedChedReferences)
+    return getPreNotificationsByChedRefs(relatedChedReferences)
   }
   return []
 }
@@ -46,7 +47,7 @@ const getRelatedCustomsDeclarations = async (preNotification) => {
   if (preNotification.data?.movements?.data?.length) {
     const relatedCustomsDeclarationMrns = preNotification.data.movements.data
       .map(m => m.id)
-    return await getCustomsDeclarationsByMovementRefNums(relatedCustomsDeclarationMrns)
+    return getCustomsDeclarationsByMovementRefNums(relatedCustomsDeclarationMrns)
   }
   return []
 }
@@ -74,6 +75,5 @@ const performSearch = async (searchTerm) => {
 }
 
 export {
-  performSearch,
-  searchTypes
+  performSearch
 }

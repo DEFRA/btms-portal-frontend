@@ -1,15 +1,12 @@
-import { performSearch } from '../services/search-service.js'
+import { performSearch } from '../services/index.js'
 import { createSearchResultsModel } from '../models/index.js'
-
+import { paths, queryStringParams } from './route-constants.js'
 export const searchResult = {
   method: 'GET',
-  path: '/search-result',
+  path: paths.SEARCH_RESULT,
   handler: async (_request, h) => {
-    const searchResult = await performSearch(_request.query.searchTerm)
-    const model = createSearchResultsModel(searchResult)
-    return h.view('search-results', {
-      pageTitle: 'Search result - Border Trade Matching Service',
-      ...model
-    })
+    const searchResults = await performSearch(_request.query[queryStringParams.SEARCH_TERM])
+    const model = createSearchResultsModel(searchResults)
+    return h.view('search-results', { ...model })
   }
 }

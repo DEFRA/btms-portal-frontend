@@ -1,12 +1,12 @@
 import Boom from '@hapi/boom'
 import { createServer } from '../../../src/server.js'
 import { constants as httpConstants } from 'http2'
-import { config } from '../../../src/config/config.js'
+import { config, configKeys } from '../../../src/config/config.js'
 
 describe('#errors', () => {
   /** @type {Server} */
   let server
-  const serviceName = config.get('serviceName')
+  const serviceName = config.get(configKeys.SERVICE_NAME)
 
   beforeAll(async () => {
     server = await createServer()
@@ -24,7 +24,7 @@ describe('#errors', () => {
     })
 
     expect(result).toEqual(
-      expect.stringContaining(`Page not found | ${serviceName}`)
+      expect.stringContaining(`Page not found - ${serviceName}`)
     )
     expect(statusCode).toBe(httpConstants.HTTP_STATUS_NOT_FOUND)
   })
@@ -43,7 +43,7 @@ describe('#errors', () => {
     })
 
     expect(result).toEqual(
-      expect.stringContaining(`Something went wrong | ${serviceName}`)
+      expect.stringContaining(`Something went wrong - ${serviceName}`)
     )
     expect(statusCode).toBe(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
   })
@@ -62,7 +62,7 @@ describe('#errors', () => {
     })
 
     expect(payload).toEqual(
-      expect.stringContaining(`Bad Request | ${serviceName}`)
+      expect.stringContaining(`Bad Request - ${serviceName}`)
     )
     expect(statusCode).toBe(httpConstants.HTTP_STATUS_BAD_REQUEST)
   })
@@ -81,7 +81,7 @@ describe('#errors', () => {
     })
 
     expect(payload).toEqual(
-      expect.stringContaining(`Forbidden | ${serviceName}`)
+      expect.stringContaining(`Forbidden - ${serviceName}`)
     )
     expect(statusCode).toBe(httpConstants.HTTP_STATUS_FORBIDDEN)
   })
@@ -100,7 +100,7 @@ describe('#errors', () => {
     })
 
     expect(payload).toEqual(
-      expect.stringContaining(`Unauthorized | ${serviceName}`)
+      expect.stringContaining(`Unauthorized - ${serviceName}`)
     )
     expect(statusCode).toBe(httpConstants.HTTP_STATUS_UNAUTHORIZED)
   })

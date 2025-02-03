@@ -1,5 +1,6 @@
 import { startServer } from '../../../src/utils/start-server.js'
 import { constants as httpConstants } from 'http2'
+import { config, configKeys } from '../../../src/config/config.js'
 
 describe('#serveHomePage', () => {
   let server
@@ -20,7 +21,7 @@ describe('#serveHomePage', () => {
       })
 
       expect(statusCode).toBe(httpConstants.HTTP_STATUS_OK)
-      expect(payload).toEqual(expect.stringContaining('Home | Border Trade Matching Service'))
+      expect(payload).toEqual(expect.stringContaining(`Home - ${config.get(configKeys.SERVICE_NAME)}`))
     })
   })
 })

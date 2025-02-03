@@ -1,8 +1,9 @@
 import { createCustomsDeclarationModel } from './customs-declaration-model.js'
 import { createPreNotificationModel } from './pre-notification-model.js'
+import { CHED_REF_NUMERIC_IDENTIFIER_INDEX } from './model-constants.js'
 
 const getRelatedDocumentCodes = (customsDeclarations, chedReferenceNum) => {
-  const numericChedRef = chedReferenceNum.split('.')[3]
+  const numericChedRef = chedReferenceNum.split('.')[CHED_REF_NUMERIC_IDENTIFIER_INDEX]
   return (customsDeclarations?.length)
     ? customsDeclarations.flatMap(cd => {
       const docCodes = cd.items?.flatMap(i => i.documents)

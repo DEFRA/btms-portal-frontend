@@ -1,5 +1,9 @@
 import { format } from 'date-fns'
-import { decisionCodeDescriptions, checkCodeToAuthorityMapping } from './constants.js'
+import {
+  decisionCodeDescriptions,
+  checkCodeToAuthorityMapping,
+  CHED_REF_NUMERIC_IDENTIFIER_INDEX, DATE_FORMAT
+} from './model-constants.js'
 
 const hasDesiredPrefix = (decisionCode, desiredPrefix) => {
   return decisionCode?.length && decisionCode.toLowerCase().startsWith(desiredPrefix)
@@ -22,7 +26,7 @@ const isReleaseDecisionCode = (decisionCode) => {
 
 const getDecisionDescription = (decisionCode) => {
   const decisionDetail = decisionCode?.length ? decisionCodeDescriptions[decisionCode] : ''
-  let decisionHighLevelDesc = null
+  let decisionHighLevelDesc
   if (isReleaseDecisionCode(decisionCode)) {
     decisionHighLevelDesc = 'Release'
   } else if (isRefusalDecisionCode(decisionCode)) {
@@ -31,12 +35,19 @@ const getDecisionDescription = (decisionCode) => {
     decisionHighLevelDesc = 'Data error'
   } else if (isHoldDecisionCode(decisionCode)) {
     decisionHighLevelDesc = 'Hold'
-  } else if (isNoMatchDecisionCode(decisionCode)) {
-    decisionHighLevelDesc = 'No match'
+  } else {
+    decisionHighLevelDesc = null
   }
-  return decisionDetail?.length && decisionHighLevelDesc?.length
-    ? `${decisionHighLevelDesc} - ${decisionDetail}`
-    : 'Unknown'
+  if (decisionDetail?.length && decisionHighLevelDesc?.length) {
+    return `${decisionHighLevelDesc} - ${decisionDetail}`
+  }
+  if (decisionHighLevelDesc?.length) {
+    return decisionHighLevelDesc
+  }
+  if (decisionDetail?.length) {
+    return decisionDetail
+  }
+  return 'Unknown'
 }
 
 const getAuthorityByCheckCode = (checkCode) => {
@@ -47,13 +58,17 @@ const getCustomsDeclarationStatus = (commodities) => {
   if (commodities?.length) {
     if (commodities.some(c => c.checks.some(chk => isErrorDecisionCode(chk.decisionCode)))) {
       return 'Data error'
-    } else if (commodities.some(c => c.checks.some(chk => isRefusalDecisionCode(chk.decisionCode)))) {
+    }
+    if (commodities.some(c => c.checks.some(chk => isRefusalDecisionCode(chk.decisionCode)))) {
       return 'Refusal'
-    } else if (commodities.some(c => c.checks.some(chk => isNoMatchDecisionCode(chk.decisionCode)))) {
+    }
+    if (commodities.some(c => c.checks.some(chk => isNoMatchDecisionCode(chk.decisionCode)))) {
       return 'No match'
-    } else if (commodities.some(c => c.checks.some(chk => isHoldDecisionCode(chk.decisionCode)))) {
+    }
+    if (commodities.some(c => c.checks.some(chk => isHoldDecisionCode(chk.decisionCode)))) {
       return 'Hold'
-    } else if (commodities.every(c => c.checks.every(chk => isReleaseDecisionCode(chk.decisionCode)))) {
+    }
+    if (commodities.every(c => c.checks.every(chk => isReleaseDecisionCode(chk.decisionCode)))) {
       return 'Released'
     }
   }
@@ -61,8 +76,9 @@ const getCustomsDeclarationStatus = (commodities) => {
 }
 
 const getMatchStatus = (commodity, customsDeclaration) => {
+  // example pre-notification reference: CHEDD.GB.2024.1234567
   const relatedPreNotifications = customsDeclaration.notifications?.data?.length
-    ? customsDeclaration.notifications.data.map(n => n.id.split('.')[3])
+    ? customsDeclaration.notifications.data.map(n => n.id.split('.')[CHED_REF_NUMERIC_IDENTIFIER_INDEX])
     : []
   const allDocReferences = commodity.documents
     .filter(d => d.documentReference)
@@ -70,27 +86,29 @@ const getMatchStatus = (commodity, customsDeclaration) => {
   if (!relatedPreNotifications.length) {
     return { isMatched: false, unmatchedDocRefs: allDocReferences }
   }
-  const unmatchedDocRefs = allDocReferences.filter(docRef => !relatedPreNotifications.includes(docRef.split('.')[1]))
+  // example document reference: GBCHD2024.1234567
+  const docRefNumericIdentifierIndex = 1
+  const unmatchedDocRefs = allDocReferences.filter(docRef =>
+    !relatedPreNotifications.includes(docRef.split('.')[docRefNumericIdentifierIndex]))
   return { isMatched: !unmatchedDocRefs.length, unmatchedDocRefs }
 }
 export const createCustomsDeclarationModel = (sourceCustomsDeclaration) => {
   return {
     movementReferenceNumber: sourceCustomsDeclaration.entryReference,
     customsDeclarationStatus: getCustomsDeclarationStatus(sourceCustomsDeclaration.items),
-    lastUpdated: format(new Date(sourceCustomsDeclaration.updatedSource), 'd MMMM yyyy, hh:mm'),
+    lastUpdated: format(new Date(sourceCustomsDeclaration.updatedSource), DATE_FORMAT),
     commodities: sourceCustomsDeclaration.items?.length
       ? sourceCustomsDeclaration.items.map(i => {
         return {
           itemNumber: i.itemNumber,
           commodityCode: i.taricCommodityCode,
           commodityDesc: i.goodsDescription,
-          weightOrQuantity: i.itemSupplementaryUnits ? i.itemSupplementaryUnits : (i.itemNetMass ?? ''),
+          weightOrQuantity: i.itemNetMass && i.itemNetMass !== '0' ? i.itemNetMass : (i.itemSupplementaryUnits ?? ''),
           matchStatus: getMatchStatus(i, sourceCustomsDeclaration),
           documents: i.documents.map(d => d.documentReference),
           decisions: i.checks.map(c => `${getDecisionDescription(c.decisionCode)} (${getAuthorityByCheckCode(c.checkCode)})`)
         }
       })
-      : [],
-    relatedPreNotifications: sourceCustomsDeclaration.relatedPreNotifications
+      : []
   }
 }
