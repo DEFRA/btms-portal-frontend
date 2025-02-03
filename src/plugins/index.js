@@ -7,7 +7,7 @@ import { router } from './router.js'
 import { pulse } from './pulse.js'
 import { errorPage } from './error-page.js'
 
-export const plugins = [
+export default [
   requestLogger,
   requestTracing,
   secureContext,

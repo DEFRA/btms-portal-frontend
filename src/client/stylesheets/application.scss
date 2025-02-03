@@ -1,6 +1,18 @@
-@use "govuk-frontend";
+@use "govuk-frontend" as *;
 
 @use "variables";
 @use "core";
 @use "heading";
 @use "navigation";
+@use "app-search";
+@use "app-search-result";
+
+.app-width-container--wide {
+    @include govuk-width-container(1200px);
+}
+
+.app-header {
+  .govuk-width-container {
+    @include govuk-width-container(1200px);
+  }
+}

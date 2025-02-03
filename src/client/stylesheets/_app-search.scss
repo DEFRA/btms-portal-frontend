@@ -1,0 +1,31 @@
+@use "govuk-frontend" as *;
+
+.app-search-wrapper {
+  padding: govuk-spacing(7);
+  background-color: govuk-colour("light-grey");
+}
+
+.app-search-wrapper .govuk-button {
+  margin-bottom: 0;
+}
+
+.app-search-wrapper .govuk-hint .govuk-list {
+  color: inherit;
+}
+
+.app-search-wrapper-submit-button {
+  background-color: govuk-colour("blue");
+  border: none;
+}
+
+.app-search-wrapper-submit-button button {
+  background-color: transparent;
+  cursor: pointer;
+  border: none;
+}
+
+.app-search-wrapper-submit-button svg {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 2;
+}
