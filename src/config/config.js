@@ -237,13 +237,13 @@ const config = convict({
     username: {
       doc: 'BTMS (backend) API username for authentication.',
       format: String,
-      default: 'BtmsFrontend',
+      default: '',
       env: 'BTMS_API_USERNAME'
     },
     password: {
       doc: 'BTMS (backend) API password for authentication.',
       format: String,
-      default: 'a498HnJ79A5G',
+      default: '',
       env: 'BTMS_API_PASSWORD'
     }
   }
