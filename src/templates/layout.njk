@@ -17,7 +17,7 @@
   {{ govukHeader({
     homepageUrl: "/",
     classes: "app-header",
-    containerClasses: "govuk-width-container",
+    containerClasses: containerClasses,
     serviceName: serviceName,
     serviceUrl: serviceUrl,
     useTudorCrown: true
@@ -46,6 +46,7 @@
 
 {% block footer %}
   {{ govukFooter({
+    containerClasses: containerClasses,
     meta: {
       items: [
         {

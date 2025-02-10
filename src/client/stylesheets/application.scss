@@ -10,9 +10,3 @@
 .app-width-container--wide {
     @include govuk-width-container(1200px);
 }
-
-.app-header {
-  .govuk-width-container {
-    @include govuk-width-container(1200px);
-  }
-}

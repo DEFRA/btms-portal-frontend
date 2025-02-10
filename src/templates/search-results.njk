@@ -75,8 +75,8 @@
           ],
           rows: tableRows
       }) }}
-
-
+{% else %}
+<p class="govuk-body">No customs declarations found.</p>
 {% endfor %}
 
 <h2 class="govuk-heading-m">IPAFFS notification (CHED) details</h2>
@@ -148,7 +148,7 @@
             }) }}
 
 {% else %}
-<p class="govuk-body">No pre-notifications found for this customs declaration.</p>
+<p class="govuk-body">No pre-notifications found.</p>
 {% endfor %}
     </div>
   </div>
