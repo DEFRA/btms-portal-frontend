@@ -4,16 +4,8 @@ import {
   getPreNotificationsByChedRefs,
   getCustomsDeclarationsByMovementRefNums
 } from './btms-api-client.js'
+import { searchPatterns, searchTypes } from './search-constants.js'
 
-const searchPatterns = {
-  CHED_REF: /^CHED([ADP]|P{2})\.GB\.2\d{3}\.\d{6,}$/,
-  MOVEMENT_REF: /^\d{2}[A-Z]{2}[A-z0-9]{14}$/
-}
-
-const searchTypes = {
-  CUSTOMS_DECLARATION: 'customs-declaration',
-  PRE_NOTIFICATION: 'pre-notification'
-}
 const isMovementReferenceNumber = (input) => {
   return input?.length && searchPatterns.MOVEMENT_REF.test(input.toUpperCase())
 }
@@ -29,13 +21,13 @@ const createArray = (data) => {
 }
 
 const createSearchResult = (searchTerm, searchType, rawCustomsDeclarations, rawPreNotifications) => {
-  const customsDeclarations = createArray(rawCustomsDeclarations.data)
-  const preNotifications = createArray(rawPreNotifications.data)
+  const customsDeclarations = createArray(rawCustomsDeclarations?.data)
+  const preNotifications = createArray(rawPreNotifications?.data)
   return { searchTerm, searchType, customsDeclarations, preNotifications }
 }
 
 const getRelatedPreNotifications = async (customsDeclaration) => {
-  if (customsDeclaration.data?.notifications?.data?.length) {
+  if (customsDeclaration?.data?.notifications?.data?.length) {
     const relatedChedReferences = customsDeclaration.data.notifications.data
       .map(r => r.id)
     return getPreNotificationsByChedRefs(relatedChedReferences)
@@ -43,13 +35,27 @@ const getRelatedPreNotifications = async (customsDeclaration) => {
   return []
 }
 
-const getRelatedCustomsDeclarations = async (preNotification) => {
-  if (preNotification.data?.movements?.data?.length) {
-    const relatedCustomsDeclarationMrns = preNotification.data.movements.data
-      .map(m => m.id)
-    return getCustomsDeclarationsByMovementRefNums(relatedCustomsDeclarationMrns)
+const getRelatedCustomsDeclarations = async (rawPreNotificationSearchResult) => {
+  const preNotifications = createArray(rawPreNotificationSearchResult.data)
+  if (preNotifications.length) {
+    const relatedCustomsDeclarationMrns = preNotifications
+      .filter(pn => pn.movements?.data?.length)
+      .flatMap(pn => pn.movements.data.map(m => m.id))
+    if (relatedCustomsDeclarationMrns.length) {
+      return getCustomsDeclarationsByMovementRefNums(relatedCustomsDeclarationMrns)
+    }
   }
   return []
+}
+
+const searchPreNotifications = async (searchTerm, searchType, searchTermToDisplay) => {
+  const rawPreNotification = await getPreNotificationByChedRef(searchTerm)
+  const relatedCustomsDeclarations = await getRelatedCustomsDeclarations(rawPreNotification)
+  return createSearchResult(
+    searchTermToDisplay?.length ? searchTermToDisplay : searchTerm,
+    searchType,
+    relatedCustomsDeclarations,
+    rawPreNotification)
 }
 
 const performSearch = async (searchTerm) => {
@@ -61,17 +67,11 @@ const performSearch = async (searchTerm) => {
       searchTypes.CUSTOMS_DECLARATION,
       rawCustomsDeclaration,
       relatedPreNotifications)
-  } else if (isChedReference(searchTerm)) {
-    const rawPreNotification = await getPreNotificationByChedRef(searchTerm)
-    const relatedCustomsDeclarations = await getRelatedCustomsDeclarations(rawPreNotification)
-    return createSearchResult(
-      searchTerm,
-      searchTypes.PRE_NOTIFICATION,
-      relatedCustomsDeclarations,
-      rawPreNotification)
-  } else {
-    throw new Error(`Unexpected searchTerm encountered: ${searchTerm}`)
   }
+  if (isChedReference(searchTerm)) {
+    return searchPreNotifications(searchTerm, searchTypes.PRE_NOTIFICATION)
+  }
+  return createSearchResult(searchTerm, null, [], [])
 }
 
 export {

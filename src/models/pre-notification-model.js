@@ -57,8 +57,7 @@ export const createPreNotificationModel = (sourcePreNotification, relatedDocumen
         itemNumber: c.complementId,
         commodityCode: c.commodityId,
         commodityDesc: getCommodityDescription(c),
-        weightOrQuantity: getWeightOrQuantity(c),
-        decision: getDecision(sourcePreNotification)
+        weightOrQuantity: getWeightOrQuantity(c)
       }
     }),
     decision: getDecision(sourcePreNotification),

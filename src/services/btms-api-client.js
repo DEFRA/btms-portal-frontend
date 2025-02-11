@@ -3,6 +3,10 @@ import { config } from '../config/config.js'
 import { createLogger } from '../utils/logger.js'
 import { deserialise } from 'kitsu-core'
 const logger = createLogger()
+const apiResources = {
+  CUSTOMS_DECLARATIONS: 'movements',
+  PRE_NOTIFICATIONS: 'import-notifications'
+}
 const createCredentials = () => {
   const username = config.get('btmsApi.username')
   const pwd = config.get('btmsApi.password')
@@ -11,7 +15,7 @@ const createCredentials = () => {
 
 const invokeApi = async (url) => {
   const basicAuthCredentials = createCredentials()
-  const { /* res, */ payload } = await Wreck.get(`${config.get('btmsApi.baseUrl')}${url}`, {
+  const { payload } = await Wreck.get(`${config.get('btmsApi.baseUrl')}${url}`, {
     headers: { Authorization: `Basic ${basicAuthCredentials}` },
     json: 'strict'
   })
@@ -20,7 +24,7 @@ const invokeApi = async (url) => {
 
 const getCustomsDeclarationByMovementRefNum = async (movementReferenceNum) => {
   try {
-    return await invokeApi(`/movements/${movementReferenceNum}`)
+    return await invokeApi(`/${apiResources.CUSTOMS_DECLARATIONS}/${movementReferenceNum}`)
   } catch (err) {
     logger.error(err)
     return null
@@ -29,7 +33,7 @@ const getCustomsDeclarationByMovementRefNum = async (movementReferenceNum) => {
 
 const getPreNotificationByChedRef = async (chedRef) => {
   try {
-    return await invokeApi(`/import-notifications/${chedRef}`)
+    return await invokeApi(`/${apiResources.PRE_NOTIFICATIONS}/${chedRef}`)
   } catch (err) {
     logger.error(err)
     return null
@@ -38,9 +42,8 @@ const getPreNotificationByChedRef = async (chedRef) => {
 
 const getPreNotificationsByChedRefs = async (chedRefs) => {
   try {
-    // TODO: check if the kitsu-core npm package can be used to create the query string
     const formattedChedRefs = chedRefs.map(ref => `%27${ref}%27`).join(',')
-    return await invokeApi(`/import-notifications?filter=any(id,${formattedChedRefs})`)
+    return await invokeApi(`/${apiResources.PRE_NOTIFICATIONS}?filter=any(id,${formattedChedRefs})`)
   } catch (err) {
     logger.error(err)
     return null
@@ -49,9 +52,8 @@ const getPreNotificationsByChedRefs = async (chedRefs) => {
 
 const getCustomsDeclarationsByMovementRefNums = async (movementRefNumbers) => {
   try {
-    // TODO: check if the kitsu-core npm package can be used to create the query string
     const formattedMovementRefNumbers = movementRefNumbers.map(ref => `%27${ref}%27`).join(',')
-    return await invokeApi(`/movements?filter=any(id,${formattedMovementRefNumbers})`)
+    return await invokeApi(`/${apiResources.CUSTOMS_DECLARATIONS}?filter=any(id,${formattedMovementRefNumbers})`)
   } catch (err) {
     logger.error(err)
     return null
