@@ -1,16 +1,25 @@
 import {
-  getPreNotificationByChedRef,
   getCustomsDeclarationByMovementRefNum,
-  getPreNotificationsByChedRefs,
-  getCustomsDeclarationsByMovementRefNums
+  getCustomsDeclarationsByMovementRefNums,
+  getPreNotificationByChedRef,
+  getPreNotificationByPartialChedRef,
+  getPreNotificationsByChedRefs
+
 } from './btms-api-client.js'
-import { searchPatterns, searchTypes } from './search-constants.js'
+import { CDS_CHED_REF_PREFIX, searchPatterns, searchTypes } from './search-constants.js'
 
 const isMovementReferenceNumber = (input) => {
   return input?.length && searchPatterns.MOVEMENT_REF.test(input.toUpperCase())
 }
 const isChedReference = (input) => {
   return input?.length && searchPatterns.CHED_REF.test(input.toUpperCase())
+}
+const isCdsChedReference = (input) => {
+  return input?.length && searchPatterns.CDS_CHED_REF.test(input.toUpperCase())
+}
+const isPartialChedReference = (input) => {
+  return (input?.length && searchPatterns.PARTIAL_CHED_REF.test(input.toUpperCase())) ||
+    (input?.length && searchPatterns.NUMERIC_ONLY_CHED_REF.test(input.toUpperCase()))
 }
 
 const createArray = (data) => {
@@ -36,7 +45,7 @@ const getRelatedPreNotifications = async (customsDeclaration) => {
 }
 
 const getRelatedCustomsDeclarations = async (rawPreNotificationSearchResult) => {
-  const preNotifications = createArray(rawPreNotificationSearchResult.data)
+  const preNotifications = createArray(rawPreNotificationSearchResult?.data)
   if (preNotifications.length) {
     const relatedCustomsDeclarationMrns = preNotifications
       .filter(pn => pn.movements?.data?.length)
@@ -49,7 +58,14 @@ const getRelatedCustomsDeclarations = async (rawPreNotificationSearchResult) => 
 }
 
 const searchPreNotifications = async (searchTerm, searchType, searchTermToDisplay) => {
-  const rawPreNotification = await getPreNotificationByChedRef(searchTerm)
+  let rawPreNotification
+  if (searchType === searchTypes.PRE_NOTIFICATION) {
+    rawPreNotification = await getPreNotificationByChedRef(searchTerm)
+  } else if (searchType === searchTypes.PRE_NOTIFICATION_PARTIAL_REF) {
+    rawPreNotification = await getPreNotificationByPartialChedRef(searchTerm)
+  } else {
+    throw new Error(`Unexpected searchType encountered: ${searchType}`)
+  }
   const relatedCustomsDeclarations = await getRelatedCustomsDeclarations(rawPreNotification)
   return createSearchResult(
     searchTermToDisplay?.length ? searchTermToDisplay : searchTerm,
@@ -58,18 +74,29 @@ const searchPreNotifications = async (searchTerm, searchType, searchTermToDispla
     rawPreNotification)
 }
 
+const searchCustomsDeclarations = async (searchTerm) => {
+  const rawCustomsDeclaration = await getCustomsDeclarationByMovementRefNum(searchTerm)
+  const relatedPreNotifications = await getRelatedPreNotifications(rawCustomsDeclaration)
+  return createSearchResult(
+    searchTerm,
+    searchTypes.CUSTOMS_DECLARATION,
+    rawCustomsDeclaration,
+    relatedPreNotifications)
+}
+
 const performSearch = async (searchTerm) => {
   if (isMovementReferenceNumber(searchTerm)) {
-    const rawCustomsDeclaration = await getCustomsDeclarationByMovementRefNum(searchTerm)
-    const relatedPreNotifications = await getRelatedPreNotifications(rawCustomsDeclaration)
-    return createSearchResult(
-      searchTerm,
-      searchTypes.CUSTOMS_DECLARATION,
-      rawCustomsDeclaration,
-      relatedPreNotifications)
+    return searchCustomsDeclarations(searchTerm)
   }
   if (isChedReference(searchTerm)) {
     return searchPreNotifications(searchTerm, searchTypes.PRE_NOTIFICATION)
+  }
+  if (isCdsChedReference(searchTerm)) {
+    const chedPartialRef = searchTerm.substring(CDS_CHED_REF_PREFIX.length)
+    return searchPreNotifications(chedPartialRef, searchTypes.PRE_NOTIFICATION_PARTIAL_REF, searchTerm)
+  }
+  if (isPartialChedReference(searchTerm)) {
+    return searchPreNotifications(searchTerm, searchTypes.PRE_NOTIFICATION_PARTIAL_REF)
   }
   return createSearchResult(searchTerm, null, [], [])
 }
