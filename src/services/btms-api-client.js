@@ -40,6 +40,15 @@ const getPreNotificationByChedRef = async (chedRef) => {
   }
 }
 
+const getPreNotificationByPartialChedRef = async (chedRef) => {
+  try {
+    return await invokeApi(`/${apiResources.PRE_NOTIFICATIONS}?filter=endsWith(id,%27${chedRef}%27)`)
+  } catch (err) {
+    logger.error(err)
+    return null
+  }
+}
+
 const getPreNotificationsByChedRefs = async (chedRefs) => {
   try {
     const formattedChedRefs = chedRefs.map(ref => `%27${ref}%27`).join(',')
@@ -64,5 +73,6 @@ export {
   getCustomsDeclarationByMovementRefNum,
   getCustomsDeclarationsByMovementRefNums,
   getPreNotificationsByChedRefs,
-  getPreNotificationByChedRef
+  getPreNotificationByChedRef,
+  getPreNotificationByPartialChedRef
 }

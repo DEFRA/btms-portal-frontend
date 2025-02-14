@@ -4,7 +4,8 @@ import {
   getCustomsDeclarationByMovementRefNum,
   getCustomsDeclarationsByMovementRefNums,
   getPreNotificationsByChedRefs,
-  getPreNotificationByChedRef
+  getPreNotificationByChedRef,
+  getPreNotificationByPartialChedRef
 } from '../../../src/services/btms-api-client.js'
 
 const mockLogError = jest.fn()
@@ -65,6 +66,12 @@ describe('btms-api-client', () => {
       makeAssertions(result, `/import-notifications/${testChedRef}`)
     })
 
+    test('should retrieve pre-notification by partial CHED ref successfully', async () => {
+      const result = await getPreNotificationByPartialChedRef(testChedRef)
+
+      makeAssertions(result, `/import-notifications?filter=endsWith(id,%27${testChedRef}%27)`)
+    })
+
     test('should retrieve multiple pre-notifications successfully', async () => {
       const result = await getPreNotificationsByChedRefs([testChedRef, anotherTestChedRef])
 
@@ -101,6 +108,12 @@ describe('btms-api-client', () => {
 
     test('should handle errors when retrieving a pre-notification by CHED reference', async () => {
       const result = await getPreNotificationByChedRef(testChedRef)
+
+      makeAssertions(result)
+    })
+
+    test('should handle errors when retrieving a pre-notification by partial CHED reference', async () => {
+      const result = await getPreNotificationByPartialChedRef(testChedRef)
 
       makeAssertions(result)
     })

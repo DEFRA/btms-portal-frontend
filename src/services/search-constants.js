@@ -12,7 +12,10 @@ const searchTypes = {
   PRE_NOTIFICATION_PARTIAL_REF: 'partial-ref-pre-notification'
 }
 
+const CDS_CHED_REF_PREFIX = 'GBCHD'
+
 export {
+  CDS_CHED_REF_PREFIX,
   searchPatterns,
   searchTypes
 }
