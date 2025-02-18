@@ -26,7 +26,6 @@ export const search = [{
         })
       }),
       failAction: async (_request, h) => {
-        console.log('fail action triggered')
         return h.view(
           viewTemplate,
           { searchTerm: _request.payload.searchTerm, isValid: false }).takeover()

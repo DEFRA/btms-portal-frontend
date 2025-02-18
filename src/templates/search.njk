@@ -10,7 +10,7 @@
     <div class="govuk-grid-column-full">
       <form method="post" class="app-search-wrapper">
         {{ govukInput({
-        errorMessage: isValid == false if { text: "Enter a valid MRN or CHED", id: "search-term-error" } else undefined,
+        errorMessage: { text: "You must enter a valid MRN or CHED" } if isValid == false,
         label: {
           text: heading,
           classes: "govuk-label--l",
