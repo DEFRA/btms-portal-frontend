@@ -22,6 +22,15 @@ const isPartialChedReference = (input) => {
     (input?.length && searchPatterns.NUMERIC_ONLY_CHED_REF.test(input.toUpperCase()))
 }
 
+const isValidSearchTerm = (input) => {
+  if (input?.length) {
+    return Object.keys(searchPatterns).some((searchPatternsKey) => {
+      return searchPatterns[searchPatternsKey].test(input.toUpperCase())
+    })
+  }
+  return false
+}
+
 const createArray = (data) => {
   if (!data) {
     return []
@@ -102,5 +111,6 @@ const performSearch = async (searchTerm) => {
 }
 
 export {
+  isValidSearchTerm,
   performSearch
 }
