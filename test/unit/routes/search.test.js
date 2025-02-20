@@ -45,59 +45,28 @@ describe('#serveSearchPage', () => {
       expect(headers.location).toContain(`${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${testChedRef}`)
     })
 
-    test('Should return search page with invalid search term error when search term is empty', async () => {
-      isValidSearchTerm.mockReturnValue(false)
-
-      const emptySearchTerm = ''
-      const { statusCode, request } = await server.inject({
-        method: 'POST',
-        url: paths.SEARCH,
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        payload: `searchTerm=${emptySearchTerm}`
-      })
-
-      expect(statusCode).toBe(httpConstants.HTTP_STATUS_OK)
-      expect(request.response.source.template).toBe('search')
-      expect(request.response.source.context.searchTerm).toBe(emptySearchTerm)
-      expect(request.response.source.context.isValid).toBeFalsy()
-      expect(request.response.source.context.errorCode).toBe('INVALID_SEARCH_TERM')
-    })
-
-    test('Should return search page with invalid search term error when search term is not a valid MRN or CHED', async () => {
-      isValidSearchTerm.mockReturnValue(false)
-
-      const invalidSearchTerm = 'FOO'
-      const { statusCode, request } = await server.inject({
-        method: 'POST',
-        url: paths.SEARCH,
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        payload: `searchTerm=${invalidSearchTerm}`
-      })
-
-      expect(statusCode).toBe(httpConstants.HTTP_STATUS_OK)
-      expect(request.response.source.template).toBe('search')
-      expect(request.response.source.context.searchTerm).toBe(invalidSearchTerm)
-      expect(request.response.source.context.isValid).toBeFalsy()
-      expect(request.response.source.context.errorCode).toBe('INVALID_SEARCH_TERM')
-    })
-
-    test('Should return search page with search term not found error when search has no results', async () => {
-      isValidSearchTerm.mockReturnValue(true)
+    test.each([
+      { searchTerm: '', validSearchTerm: false, expectedValidSearchTermCall: false, expectedErrorCode: 'INVALID_SEARCH_TERM' },
+      { searchTerm: 'FOO', validSearchTerm: false, expectedValidSearchTermCall: true, expectedErrorCode: 'INVALID_SEARCH_TERM' },
+      { searchTerm: 'CHEDP.GB.2024.1234567', validSearchTerm: true, expectedValidSearchTermCall: true, expectedErrorCode: 'SEARCH_TERM_NOT_FOUND' }
+    ])('Should return search page with error', async ({ searchTerm, validSearchTerm, expectedValidSearchTermCall, expectedErrorCode }) => {
+      isValidSearchTerm.mockReturnValue(validSearchTerm)
       hasSearchResult.mockReturnValue(false)
 
-      const testChedRef = 'CHEDP.GB.2024.1234567'
       const { statusCode, request } = await server.inject({
         method: 'POST',
         url: paths.SEARCH,
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        payload: `searchTerm=${testChedRef}`
+        payload: `searchTerm=${searchTerm}`
       })
 
+      expectedValidSearchTermCall ? expect(isValidSearchTerm).toHaveBeenCalledWith(searchTerm) : expect(isValidSearchTerm).not.toHaveBeenCalled()
+      validSearchTerm ? expect(hasSearchResult).toHaveBeenCalledWith(searchTerm) : expect(hasSearchResult).not.toHaveBeenCalled()
       expect(statusCode).toBe(httpConstants.HTTP_STATUS_OK)
       expect(request.response.source.template).toBe('search')
-      expect(request.response.source.context.searchTerm).toBe(testChedRef)
+      expect(request.response.source.context.searchTerm).toBe(searchTerm)
       expect(request.response.source.context.isValid).toBeFalsy()
-      expect(request.response.source.context.errorCode).toBe('SEARCH_TERM_NOT_FOUND')
+      expect(request.response.source.context.errorCode).toBe(expectedErrorCode)
     })
   })
 })

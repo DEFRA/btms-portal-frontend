@@ -38,9 +38,9 @@ export const search = [{
   },
   handler: async (_request, h) => {
     const searchTerm = _request.payload.searchTerm
-    const searchTermFound = await hasSearchResult(searchTerm)
+    const searchTermHasResults = await hasSearchResult(searchTerm)
 
-    if (!searchTermFound) {
+    if (!searchTermHasResults) {
       return h.view(
         viewTemplate,
         { searchTerm: _request.payload.searchTerm, isValid: false, errorCode: SEARCH_TERM_NOT_FOUND })
