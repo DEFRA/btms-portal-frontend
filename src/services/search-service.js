@@ -31,6 +31,11 @@ const isValidSearchTerm = (input) => {
   return false
 }
 
+const hasSearchResult = async (searchTerm) => {
+  const searchResult = await performSearch(searchTerm) // TODO: cache search results in performSearch()
+  return searchResult.customsDeclarations.length || searchResult.preNotifications.length
+}
+
 const createArray = (data) => {
   if (!data) {
     return []
@@ -112,5 +117,6 @@ const performSearch = async (searchTerm) => {
 
 export {
   isValidSearchTerm,
+  hasSearchResult,
   performSearch
 }

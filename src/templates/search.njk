@@ -2,6 +2,11 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
+{% set errors = {
+  "INVALID_SEARCH_TERM": "You must enter a valid MRN or CHED",
+  "SEARCH_TERM_NOT_FOUND": "This MRN or CHED reference cannot be found"
+} %}
+
 {% set pageTitle = "Search" %}
 {% set heading = "Search by MRN or CHED" %}
 
@@ -10,7 +15,7 @@
     <div class="govuk-grid-column-full">
       <form method="post" class="app-search-wrapper">
         {{ govukInput({
-        errorMessage: { text: "You must enter a valid MRN or CHED" } if isValid == false,
+        errorMessage: { text: errors[errorCode] } if isValid == false,
         label: {
           text: heading,
           classes: "govuk-label--l",

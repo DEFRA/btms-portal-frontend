@@ -1,5 +1,7 @@
-import { performSearch } from './search-service.js'
+import { performSearch, isValidSearchTerm, hasSearchResult } from './search-service.js'
 
 export {
-  performSearch
+  performSearch,
+  isValidSearchTerm,
+  hasSearchResult
 }

@@ -5,7 +5,7 @@ import {
   getCustomsDeclarationsByMovementRefNums,
   getPreNotificationByPartialChedRef
 } from '../../../src/services/btms-api-client.js'
-import { performSearch } from '../../../src/services/index.js'
+import { performSearch, isValidSearchTerm, hasSearchResult } from '../../../src/services/index.js'
 import { searchTypes } from '../../../src/services/search-constants.js'
 
 jest.mock('../../../src/services/btms-api-client.js')
@@ -118,6 +118,61 @@ describe('search-service', () => {
         preNotifications: []
       })
       expect(getCustomsDeclarationByMovementRefNum).toHaveBeenCalledWith(testMrn)
+    })
+  })
+
+  describe('isValidSearchTerm', () => {
+    test.each([
+      { searchTerm: 'CHEDP.GB.2024.4450758', expectedResult: true },
+      { searchTerm: 'GBCHD2024.1234567', expectedResult: true },
+      { searchTerm: '2024.1234567', expectedResult: true },
+      { searchTerm: '1234567', expectedResult: true },
+      { searchTerm: '24GB6T3HFCIZV1HAR9', expectedResult: true },
+      { searchTerm: '', expectedResult: false },
+      { searchTerm: undefined, expectedResult: false },
+      { searchTerm: '25GB0P0T2', expectedResult: false }
+    ])('$searchTerm should return $expectedResult', async ({ searchTerm, expectedResult }) => {
+      const result = await isValidSearchTerm(searchTerm)
+
+      expect(result).toBe(expectedResult)
+    })
+  })
+
+  describe('hasSearchResult', () => {
+    test('should return true if search contains customs declaration', async () => {
+      getCustomsDeclarationByMovementRefNum.mockReturnValue(searchByMovementRefsNumResult)
+      getPreNotificationsByChedRefs.mockReturnValue(null)
+
+      const result = await hasSearchResult(testMrn)
+
+      expect(result).toBeTruthy()
+    })
+
+    test('should return true if search contains pre notification', async () => {
+      getPreNotificationByChedRef.mockReturnValue(searchByChedRefResult)
+      getCustomsDeclarationsByMovementRefNums.mockReturnValue(null)
+
+      const result = await hasSearchResult(testChedRef)
+
+      expect(result).toBeTruthy()
+    })
+
+    test('should return false if search contains no customs declaration or related pre notifications', async () => {
+      getCustomsDeclarationByMovementRefNum.mockReturnValue(null)
+      getPreNotificationsByChedRefs.mockReturnValue(null)
+
+      const result = await hasSearchResult(testMrn)
+
+      expect(result).toBeFalsy()
+    })
+
+    test('should return false if search contains no pre notification or related customs declarations', async () => {
+      getPreNotificationByChedRef.mockReturnValue(null)
+      getCustomsDeclarationsByMovementRefNums.mockReturnValue(null)
+
+      const result = await hasSearchResult(testChedRef)
+
+      expect(result).toBeFalsy()
     })
   })
 })
