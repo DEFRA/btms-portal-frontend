@@ -29,7 +29,7 @@ export const search = [{
     auth: false,
     validate: {
       payload: validSearchTermSchema,
-      failAction: async (_request, h, err) => {
+      failAction: async (_request, h, _err) => {
         return h.view(
           viewTemplate,
           { searchTerm: _request.payload.searchTerm, isValid: false, errorCode: INVALID_SEARCH_TERM }).takeover()
