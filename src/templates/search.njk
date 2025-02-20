@@ -2,6 +2,11 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
+{% set errors = {
+  "INVALID_SEARCH_TERM": "You must enter a valid MRN or CHED",
+  "SEARCH_TERM_NOT_FOUND": "This MRN or CHED reference cannot be found"
+} %}
+
 {% set pageTitle = "Search" %}
 {% set heading = "Search by MRN or CHED" %}
 
@@ -10,10 +15,11 @@
     <div class="govuk-grid-column-full">
       <form method="post" class="app-search-wrapper">
         {{ govukInput({
+        errorMessage: { text: errors[errorCode] } if isValid == false,
         label: {
-            text: heading,
-            classes: "govuk-label--l",
-            isPageHeading: true
+          text: heading,
+          classes: "govuk-label--l",
+          isPageHeading: true
         },
         id: "search-term",
         name: "searchTerm",
@@ -25,7 +31,8 @@
         suffix: {
           classes: "app-search-wrapper-submit-button",
           html: "<button id=\"btn-search\" type=\"submit\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><circle cx=\"10\" cy=\"10\" r=\"8\" stroke=\"#ffffff\" stroke-width=\"2\"></circle><line x1=\"15\" y1=\"15\" x2=\"22\" y2=\"22\" stroke=\"#ffffff\" stroke-width=\"2\"></line></svg></button>"
-        }
+        },
+        value: searchTerm
         }) }}
       </form>
     </div>

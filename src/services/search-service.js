@@ -22,6 +22,20 @@ const isPartialChedReference = (input) => {
     (input?.length && searchPatterns.NUMERIC_ONLY_CHED_REF.test(input.toUpperCase()))
 }
 
+const isValidSearchTerm = (input) => {
+  if (input?.length) {
+    return Object.keys(searchPatterns).some((searchPatternsKey) => {
+      return searchPatterns[searchPatternsKey].test(input.toUpperCase())
+    })
+  }
+  return false
+}
+
+const hasSearchResult = async (searchTerm) => {
+  const searchResult = await performSearch(searchTerm) // TODO: cache search results in performSearch()
+  return searchResult.customsDeclarations.length || searchResult.preNotifications.length
+}
+
 const createArray = (data) => {
   if (!data) {
     return []
@@ -102,5 +116,7 @@ const performSearch = async (searchTerm) => {
 }
 
 export {
+  isValidSearchTerm,
+  hasSearchResult,
   performSearch
 }
