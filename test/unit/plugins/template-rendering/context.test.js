@@ -1,3 +1,5 @@
+import { createAuthedUser } from '../../utils/session-helper.js'
+
 const mockReadFileSync = jest.fn()
 const mockLoggerError = jest.fn()
 const expectedServiceName = 'Border Trade Matching Service'
@@ -15,24 +17,31 @@ describe('#context', () => {
   let contextResult
 
   describe('When webpack manifest file read succeeds', () => {
-    let contextImport
+    let contextImport, authedUser
 
     beforeAll(async () => {
       contextImport = await import('../../../../src/plugins/template-renderer/context.js')
+
+      authedUser = createAuthedUser()
+
+      mockRequest.getUserSession = () => {
+        return authedUser
+      }
     })
 
-    beforeEach(() => {
+    beforeEach(async () => {
       // Return JSON string
       mockReadFileSync.mockReturnValue(`{
         "application.js": "javascripts/application.js",
         "stylesheets/application.scss": "stylesheets/application.css"
       }`)
 
-      contextResult = contextImport.context(mockRequest)
+      contextResult = await contextImport.context(mockRequest)
     })
 
     test('Should provide expected context', () => {
       expect(contextResult).toEqual({
+        authedUser,
         assetPath: '/public/assets',
         breadcrumbs: [],
         getAssetPath: expect.any(Function),
@@ -91,20 +100,26 @@ describe('#context cache', () => {
   let contextResult
 
   describe('Webpack manifest file cache', () => {
-    let contextImport
+    let contextImport, authedUser
 
     beforeAll(async () => {
       contextImport = await import('../../../../src/plugins/template-renderer/context.js')
+
+      authedUser = createAuthedUser()
+
+      mockRequest.getUserSession = () => {
+        return authedUser
+      }
     })
 
-    beforeEach(() => {
+    beforeEach(async () => {
       // Return JSON string
       mockReadFileSync.mockReturnValue(`{
         "application.js": "javascripts/application.js",
         "stylesheets/application.scss": "stylesheets/application.css"
       }`)
 
-      contextResult = contextImport.context(mockRequest)
+      contextResult = await contextImport.context(mockRequest)
     })
 
     test('Should read file', () => {
@@ -117,6 +132,7 @@ describe('#context cache', () => {
 
     test('Should provide expected context', () => {
       expect(contextResult).toEqual({
+        authedUser,
         assetPath: '/public/assets',
         breadcrumbs: [],
         getAssetPath: expect.any(Function),
