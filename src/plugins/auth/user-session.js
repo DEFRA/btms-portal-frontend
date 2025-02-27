@@ -46,7 +46,7 @@ async function updateUserSession (request, refreshedSession) {
     expiresAt: expiresAt.toISOString()
   })
 
-  return await request.getUserSession()
+  return request.getUserSession()
 }
 
 export { removeUserSession, updateUserSession }

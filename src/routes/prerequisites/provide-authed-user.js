@@ -1,5 +1,5 @@
 const provideAuthedUser = {
-  method: async (request) => await request.getUserSession(),
+  method: async (request) => request.getUserSession(),
   assign: 'authedUser'
 }
 

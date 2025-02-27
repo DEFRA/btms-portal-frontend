@@ -67,7 +67,7 @@ const sessionCookie = {
         },
         keepAlive: true,
         validate: async (request, session) => {
-          return await validateSession(server, request, session)
+          return validateSession(server, request, session)
         }
       })
 

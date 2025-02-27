@@ -21,7 +21,7 @@ async function refreshAccessToken (request) {
 
   request.logger.info('Access token expired, refreshing...')
 
-  return await Wreck.post(authedUser.tokenUrl, {
+  return Wreck.post(authedUser.tokenUrl, {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Cache-Control': 'no-cache'
