@@ -4,6 +4,9 @@ import { paths, queryStringParams } from './route-constants.js'
 export const searchResult = {
   method: 'GET',
   path: paths.SEARCH_RESULT,
+  options: {
+    auth: 'session'
+  },
   handler: async (_request, h) => {
     const searchResults = await performSearch(_request.query[queryStringParams.SEARCH_TERM])
     const model = createSearchResultsModel(searchResults)

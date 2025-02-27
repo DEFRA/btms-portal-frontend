@@ -18,6 +18,9 @@ const validSearchTermSchema = Joi.object({
 export const search = [{
   method: 'GET',
   path: paths.SEARCH,
+  options: {
+    auth: 'session'
+  },
   handler: (_request, h) => {
     return h.view(viewTemplate)
   }
@@ -26,7 +29,7 @@ export const search = [{
   method: 'POST',
   path: paths.SEARCH,
   options: {
-    auth: false,
+    auth: 'session',
     validate: {
       payload: validSearchTermSchema,
       failAction: async (_request, h, _err) => {

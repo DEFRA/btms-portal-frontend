@@ -3,16 +3,18 @@ import { isValidSearchTerm, hasSearchResult } from '../../../src/services/search
 import { constants as httpConstants } from 'http2'
 import { config, configKeys } from '../../../src/config/config.js'
 import { paths, queryStringParams } from '../../../src/routes/route-constants.js'
+import { setupAuthedUserSession } from '../utils/session-helper.js'
 
 jest.mock('../../../src/services/search-service.js')
 
 describe('#serveSearchPage', () => {
-  let server
+  let server, userSession
 
-  describe('When secure context is disabled', () => {
+  describe('When authenticated', () => {
     beforeEach(async () => {
       jest.clearAllMocks()
       server = await startServer()
+      userSession = await setupAuthedUserSession(server)
     })
 
     afterEach(async () => {
@@ -22,7 +24,11 @@ describe('#serveSearchPage', () => {
     test('Should respond with search page', async () => {
       const { statusCode, payload } = await server.inject({
         method: 'GET',
-        url: paths.SEARCH
+        url: paths.SEARCH,
+        auth: {
+          strategy: 'defra-id',
+          credentials: userSession
+        }
       })
 
       expect(statusCode).toBe(httpConstants.HTTP_STATUS_OK)
@@ -38,7 +44,11 @@ describe('#serveSearchPage', () => {
         method: 'POST',
         url: paths.SEARCH,
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        payload: `searchTerm=${testChedRef}`
+        payload: `searchTerm=${testChedRef}`,
+        auth: {
+          strategy: 'defra-id',
+          credentials: userSession
+        }
       })
 
       expect(statusCode).toBe(httpConstants.HTTP_STATUS_FOUND)
@@ -57,7 +67,11 @@ describe('#serveSearchPage', () => {
         method: 'POST',
         url: paths.SEARCH,
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        payload: `searchTerm=${searchTerm}`
+        payload: `searchTerm=${searchTerm}`,
+        auth: {
+          strategy: 'defra-id',
+          credentials: userSession
+        }
       })
 
       expectedValidSearchTermCall ? expect(isValidSearchTerm).toHaveBeenCalledWith(searchTerm) : expect(isValidSearchTerm).not.toHaveBeenCalled()
@@ -67,6 +81,27 @@ describe('#serveSearchPage', () => {
       expect(request.response.source.context.searchTerm).toBe(searchTerm)
       expect(request.response.source.context.isValid).toBeFalsy()
       expect(request.response.source.context.errorCode).toBe(expectedErrorCode)
+    })
+  })
+
+  describe('When not authenticated', () => {
+    beforeEach(async () => {
+      jest.clearAllMocks()
+      server = await startServer()
+    })
+
+    afterEach(async () => {
+      await server.stop({ timeout: 0 })
+    })
+
+    test('Should respond with unauthorized', async () => {
+      const { statusCode, payload } = await server.inject({
+        method: 'GET',
+        url: paths.SEARCH
+      })
+
+      expect(statusCode).toBe(httpConstants.HTTP_STATUS_UNAUTHORIZED)
+      expect(payload).toEqual(expect.stringContaining(`Unauthorized - ${config.get(configKeys.SERVICE_NAME)}`))
     })
   })
 })

@@ -19,7 +19,10 @@ export function getCacheEngine (engine) {
   if (engine === 'redis') {
     logger.info('Using Redis session cache')
     const redisClient = buildRedisClient(config.get('redis'))
-    return new CatboxRedis({ client: redisClient })
+    return new CatboxRedis({
+      client: redisClient,
+      segment: 'session'
+    })
   }
 
   if (config.get('isProduction')) {
@@ -29,5 +32,7 @@ export function getCacheEngine (engine) {
   }
 
   logger.info('Using Catbox Memory session cache')
-  return new CatboxMemory()
+  return new CatboxMemory({
+    segment: 'session'
+  })
 }
