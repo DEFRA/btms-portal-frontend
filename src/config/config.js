@@ -258,27 +258,27 @@ const config = convict({
       oidcConfigurationUrl: {
         doc: 'DEFRA ID OIDC Configuration URL',
         format: String,
-        env: 'DEFRA_ID_OIDC_CONFIGURATION_URL',
+        env: 'AUTH_DEFRA_ID_OIDC_CONFIGURATION_URL',
         default:
           'https://dcidmtest.b2clogin.com/dcidmtest.onmicrosoft.com/b2c_1a_cui_signin_stub/.well-known/openid-configuration'
       },
       serviceId: {
         doc: 'DEFRA ID Service ID',
         format: String,
-        env: 'DEFRA_ID_SERVICE_ID',
+        env: 'AUTH_DEFRA_ID_SERVICE_ID',
         default: 'd7d72b79-9c62-ee11-8df0-000d3adf7047'
       },
       clientId: {
         doc: 'DEFRA ID Client ID',
         format: String,
-        env: 'DEFRA_ID_CLIENT_ID',
+        env: 'AUTH_DEFRA_ID_CLIENT_ID',
         default: '2fb0d715-affa-4bf1-836e-44a464e3fbea'
       },
       clientSecret: {
         doc: 'DEFRA ID Client Secret',
         format: String,
         sensitive: true,
-        env: 'DEFRA_ID_CLIENT_SECRET',
+        env: 'AUTH_DEFRA_ID_CLIENT_SECRET',
         default: ''
       }
     }
