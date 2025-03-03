@@ -1,4 +1,5 @@
 import { createAuthedUser } from '../../utils/session-helper.js'
+import { getUserSession } from '../../../../src/auth/user-session.js'
 
 const mockReadFileSync = jest.fn()
 const mockLoggerError = jest.fn()
@@ -12,6 +13,10 @@ jest.mock('../../../../src/utils/logger.js', () => ({
   createLogger: () => ({ error: (...args) => mockLoggerError(...args) })
 }))
 
+jest.mock('../../../../src/auth/user-session.js', () => ({
+  getUserSession: jest.fn()
+}))
+
 describe('#context', () => {
   const mockRequest = { path: '/' }
   let contextResult
@@ -23,10 +28,7 @@ describe('#context', () => {
       contextImport = await import('../../../../src/plugins/template-renderer/context.js')
 
       authedUser = createAuthedUser()
-
-      mockRequest.getUserSession = () => {
-        return authedUser
-      }
+      getUserSession.mockReturnValue(authedUser)
     })
 
     beforeEach(async () => {
@@ -37,6 +39,14 @@ describe('#context', () => {
       }`)
 
       contextResult = await contextImport.context(mockRequest)
+    })
+
+    test('Should read file', () => {
+      expect(mockReadFileSync).toHaveBeenCalled()
+    })
+
+    test('Should use cache', () => {
+      expect(mockReadFileSync).not.toHaveBeenCalled()
     })
 
     test('Should provide expected context', () => {
@@ -91,61 +101,6 @@ describe('#context', () => {
       expect(mockLoggerError).toHaveBeenCalledWith(
         'Webpack assets-manifest.json not found'
       )
-    })
-  })
-})
-
-describe('#context cache', () => {
-  const mockRequest = { path: '/' }
-  let contextResult
-
-  describe('Webpack manifest file cache', () => {
-    let contextImport, authedUser
-
-    beforeAll(async () => {
-      contextImport = await import('../../../../src/plugins/template-renderer/context.js')
-
-      authedUser = createAuthedUser()
-
-      mockRequest.getUserSession = () => {
-        return authedUser
-      }
-    })
-
-    beforeEach(async () => {
-      // Return JSON string
-      mockReadFileSync.mockReturnValue(`{
-        "application.js": "javascripts/application.js",
-        "stylesheets/application.scss": "stylesheets/application.css"
-      }`)
-
-      contextResult = await contextImport.context(mockRequest)
-    })
-
-    test('Should read file', () => {
-      expect(mockReadFileSync).toHaveBeenCalled()
-    })
-
-    test('Should use cache', () => {
-      expect(mockReadFileSync).not.toHaveBeenCalled()
-    })
-
-    test('Should provide expected context', () => {
-      expect(contextResult).toEqual({
-        authedUser,
-        assetPath: '/public/assets',
-        breadcrumbs: [],
-        getAssetPath: expect.any(Function),
-        navigation: [
-          {
-            isActive: true,
-            text: 'Home',
-            url: '/'
-          }
-        ],
-        serviceName: expectedServiceName,
-        serviceUrl: '/'
-      })
     })
   })
 })

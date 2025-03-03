@@ -1,12 +1,12 @@
 import { paths } from './route-constants.js'
 
-export const login = {
+export const signIn = {
   method: 'GET',
-  path: paths.LOGIN,
+  path: paths.SIGN_IN,
   options: {
     auth: 'defra-id'
   },
   handler: async (_request, h) => {
-    return h.redirect('/search')
+    return h.redirect(paths.SEARCH)
   }
 }

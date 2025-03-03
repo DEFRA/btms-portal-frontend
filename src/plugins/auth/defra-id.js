@@ -1,11 +1,11 @@
 import Wreck from '@hapi/wreck'
 import jwt from '@hapi/jwt'
 import bell from '@hapi/bell'
-import { deserialise } from 'kitsu-core'
+import { paths } from '../../routes/route-constants.js'
 
-import { config } from '../../config/config.js'
+import { config, configKeys } from '../../config/config.js'
 
-const authConfig = config.get('auth')
+const authConfig = config.get('auth.defraId')
 const sessionConfig = config.get('session')
 
 const getDefraIdAuthConfig = async (oidcConfigurationUrl) => {
@@ -13,18 +13,18 @@ const getDefraIdAuthConfig = async (oidcConfigurationUrl) => {
     json: 'strict'
   })
 
-  return deserialise(payload)
+  return payload
 }
 
 const defraId = {
   plugin: {
     name: 'defra-id',
     register: async (server) => {
-      const oidcConfigurationUrl = authConfig.defraId.oidcConfigurationUrl
-      const serviceId = authConfig.defraId.serviceId
-      const clientId = authConfig.defraId.clientId
-      const clientSecret = authConfig.defraId.clientSecret
-      const authCallbackUrl = config.get('appBaseUrl') + '/signin-oidc'
+      const oidcConfigurationUrl = authConfig.oidcConfigurationUrl
+      const serviceId = authConfig.serviceId
+      const clientId = authConfig.clientId
+      const clientSecret = authConfig.clientSecret
+      const authCallbackUrl = config.get(configKeys.APP_BASE_URL) + paths.AUTH_DEFRA_ID_CALLBACK
 
       await server.register(bell)
 
@@ -32,7 +32,7 @@ const defraId = {
 
       server.auth.strategy('defra-id', 'bell', {
         location: (request) => {
-          request.yar.flash('referrer', '/search')
+          request.yar.flash('referrer', paths.SEARCH)
 
           return authCallbackUrl
         },
@@ -41,8 +41,9 @@ const defraId = {
           protocol: 'oauth2',
           useParamsAuth: true,
           auth: oidcConf.authorization_endpoint,
+          pkce: 'S256',
           token: oidcConf.token_endpoint,
-          scope: ['openid', 'offline_access'],
+          scope: ['openid'],
           profile: async function (credentials, params, _get) {
             const payload = jwt.token.decode(credentials.token).decoded.payload
             const displayName = [payload.firstName, payload.lastName]

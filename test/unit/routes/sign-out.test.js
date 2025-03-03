@@ -2,18 +2,14 @@ import { startServer } from '../../../src/utils/start-server.js'
 import { setupAuthedUserSession } from '../utils/session-helper.js'
 import { paths } from '../../../src/routes/route-constants.js'
 import { constants as httpConstants } from 'http2'
-import { getUserSession } from '../../../src/plugins/auth/get-user-session.js'
-import { dropUserSession } from '../../../src/plugins/auth/drop-user-session.js'
+import { getUserSession, dropUserSession } from '../../../src/auth/user-session.js'
 
-jest.mock('../../../src/plugins/auth/get-user-session.js', () => ({
-  getUserSession: jest.fn()
-}))
-
-jest.mock('../../../src/plugins/auth/drop-user-session.js', () => ({
+jest.mock('../../../src/auth/user-session.js', () => ({
+  getUserSession: jest.fn(),
   dropUserSession: jest.fn()
 }))
 
-describe('#logout', () => {
+describe('#signOut', () => {
   describe('When accessed with no active session', () => {
     let server
 
@@ -30,7 +26,7 @@ describe('#logout', () => {
     test('Should redirect to landing page', async () => {
       const { statusCode, headers } = await server.inject({
         method: 'GET',
-        url: paths.LOGOUT
+        url: paths.SIGN_OUT
       })
 
       expect(statusCode).toBe(httpConstants.HTTP_STATUS_FOUND)
@@ -55,10 +51,10 @@ describe('#logout', () => {
       await server.stop({ timeout: 0 })
     })
 
-    test('Should redirect to signin provider logout flow', async () => {
+    test('Should redirect to signin provider signOut flow', async () => {
       const { statusCode, headers } = await server.inject({
         method: 'GET',
-        url: paths.LOGOUT
+        url: paths.SIGN_OUT
       })
 
       expect(statusCode).toBe(httpConstants.HTTP_STATUS_FOUND)

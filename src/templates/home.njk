@@ -5,8 +5,7 @@
 
 {% block content %}
   {{ appHeading({
-    text: heading,
-    caption: "Lorem ipsum..."
+    text: heading
   }) }}
 
   <div class="govuk-grid-row">
@@ -17,14 +16,14 @@
             User <strong>{{ authedUser.displayName }}</strong> is authenticated
           </p>
           <p>
-            <a href="https://your-account.cpdev.cui.defra.gov.uk/management">Manage account</a> - <a href="/logout">Sign out</a>
+            <a href="https://your-account.cpdev.cui.defra.gov.uk/management">Manage account</a> - <a href={{ signOutUrl }}>Sign out</a>
           </p>
         {% else %}
           <p>
             User is not authenticated!
           </p>
           <p>
-            <a id="login-link" href="/login">LOGIN</a>
+            <a id="login-link" href={{ signInUrl }}>LOGIN</a>
           </p>
         {% endif %}
       </div>

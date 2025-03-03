@@ -3,7 +3,7 @@ import { createAuthedUser } from '../utils/session-helper.js'
 import { paths } from '../../../src/routes/route-constants.js'
 import { constants as httpConstants } from 'http2'
 
-describe('#login', () => {
+describe('#signIn', () => {
   describe('When accessed following successful signin', () => {
     let server, userSession
 
@@ -19,7 +19,7 @@ describe('#login', () => {
     test('Should redirect to search page', async () => {
       const { statusCode, headers } = await server.inject({
         method: 'GET',
-        url: paths.LOGIN,
+        url: paths.SIGN_IN,
         auth: {
           strategy: 'defra-id',
           credentials: userSession

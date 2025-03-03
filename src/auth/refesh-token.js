@@ -1,12 +1,15 @@
 import Wreck from '@hapi/wreck'
 import Querystring from 'querystring'
+import { createLogger } from '../utils/logger.js'
 
-import { config } from '../../config/config.js'
+import { config } from '../config/config.js'
+import { getUserSession } from './user-session.js'
 
 const authConfig = config.get('auth')
+const logger = createLogger()
 
 async function refreshAccessToken (request) {
-  const authedUser = await request.getUserSession()
+  const authedUser = await getUserSession(request)
   const refreshToken = authedUser?.refreshToken ?? null
   const clientId = authConfig.defraId.clientId
   const clientSecret = authConfig.defraId.clientSecret
@@ -16,10 +19,10 @@ async function refreshAccessToken (request) {
     client_secret: clientSecret,
     grant_type: 'refresh_token',
     refresh_token: refreshToken,
-    scope: `${clientId} openid offline_access`
+    scope: `${clientId} openid`
   }
 
-  request.logger.info('Access token expired, refreshing...')
+  logger.info('Access token expired, refreshing...')
 
   return Wreck.post(authedUser.tokenUrl, {
     headers: {

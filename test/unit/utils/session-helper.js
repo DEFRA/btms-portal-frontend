@@ -1,22 +1,22 @@
 import { addSeconds } from 'date-fns'
-import { v4 as uuidv4 } from 'uuid'
 import jwt from '@hapi/jwt'
 import { config } from '../../../src/config/config.js'
 
 const authConfig = config.get('auth')
 const sessionConfig = config.get('session')
 
-export const setupAuthedUserSession = async (server) => {
-  const authedUser = createAuthedUser()
+export const setupAuthedUserSession = async (server, expiresAt) => {
+  const authedUser = createAuthedUser(expiresAt)
 
   await server.app.cache.set(authedUser.sessionId, authedUser)
 
   return authedUser
 }
 
-export const createAuthedUser = () => {
+export const createAuthedUser = (expiresAt) => {
   const expiresInSeconds = sessionConfig.cache.ttl / 1000
   const authedUserProfile = createUserProfile()
+  authedUserProfile.expiresAt = expiresAt ?? authedUserProfile.expiresAt
 
   const dummyToken = createDummyToken(authedUserProfile, expiresInSeconds)
 
@@ -59,16 +59,16 @@ function createUserProfile (sessionId) {
   const expiresAt = addSeconds(new Date(), expiresInSeconds)
 
   return {
-    id: uuidv4(),
-    correlationId: uuidv4(),
-    sessionId: sessionId ?? uuidv4(),
-    contactId: uuidv4(),
+    id: crypto.randomUUID(),
+    correlationId: crypto.randomUUID(),
+    sessionId: sessionId ?? crypto.randomUUID(),
+    contactId: crypto.randomUUID(),
     serviceId: authConfig.defraId.serviceId,
     firstName: 'Test',
     lastName: 'User',
     displayName: 'Test User',
     email: 'test.user@btms-portal-frontend-unit-test.com',
-    uniqueReference: uuidv4(),
+    uniqueReference: crypto.randomUUID(),
     loa: 1,
     aal: 1,
     enrolmentCount: 1,

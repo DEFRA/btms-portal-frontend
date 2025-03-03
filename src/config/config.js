@@ -12,7 +12,8 @@ const isTest = process.env.NODE_ENV === 'test'
 const isDevelopment = process.env.NODE_ENV === 'development'
 
 const configKeys = {
-  SERVICE_NAME: 'serviceName'
+  SERVICE_NAME: 'serviceName',
+  APP_BASE_URL: 'appBaseUrl'
 }
 
 const config = convict({
@@ -30,7 +31,7 @@ const config = convict({
     env: 'NODE_ENV'
   },
   appBaseUrl: {
-    doc: 'Application base URL for after we login',
+    doc: 'Application base URL for after we signIn',
     format: String,
     default: 'http://localhost:3000',
     env: 'APP_BASE_URL'
