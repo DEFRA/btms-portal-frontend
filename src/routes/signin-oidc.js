@@ -8,7 +8,7 @@ export const signinOidc = {
     auth: 'defra-id'
   },
   handler: async (_request, h) => {
-    if (_request.auth.isAuthenticated) {
+    if (_request.auth?.isAuthenticated) {
       const sessionId = crypto.randomUUID()
 
       await setUserSession(_request, sessionId)
