@@ -1,12 +1,9 @@
-/**
- * Sets up the route used for the home page.
- * These routes are registered in src/plugins/router.js.
- */
+import { paths } from './route-constants.js'
 
 export const home = {
   method: 'GET',
-  path: '/',
+  path: paths.LANDING,
   handler: (_request, h) => {
-    return h.view('home')
+    return h.view('home', { signInUrl: paths.SIGN_IN, signOutUrl: paths.SIGN_OUT })
   }
 }

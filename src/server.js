@@ -9,6 +9,9 @@ export async function createServer () {
   const server = hapi.server({
     port: config.get('port'),
     routes: {
+      auth: {
+        mode: 'try'
+      },
       validate: {
         options: {
           abortEarly: false
@@ -43,6 +46,13 @@ export async function createServer () {
       strictHeader: false
     }
   })
+
+  server.app.cache = server.cache({
+    cache: 'session',
+    expiresIn: config.get('session.cache.ttl'),
+    segment: 'session'
+  })
+
   await server.register(plugins)
 
   return server
