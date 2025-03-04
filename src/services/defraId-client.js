@@ -6,33 +6,33 @@ import Querystring from 'querystring'
 
 const logger = createLogger()
 
-const getAgents = () => {
+const provideWreck = () => {
   const proxyUrl = config.get('httpsProxy') ?? config.get('httpProxy')
 
   if (!proxyUrl) {
     logger.info('No proxy configuration set')
-    return Wreck.agents
+    return Wreck
   }
 
   logger.info(`Configured Proxy: ${proxyUrl}`)
 
   const httpsAgent = new HttpsProxyAgent(proxyUrl)
 
-  const agents = {
-    https: httpsAgent,
-    http: httpsAgent,
-    httpsAllowUnauthorized: httpsAgent
-  }
+  const proxiedWreck = Wreck.defaults({
+    agents: {
+      https: httpsAgent,
+      http: httpsAgent,
+      httpsAllowUnauthorized: httpsAgent
+    }
+  })
 
-  return agents
+  return proxiedWreck
 }
 
-Wreck.defaults({
-  agents: getAgents()
-})
-
 const getDefraIdAuthConfig = async (oidcConfigurationUrl) => {
-  const { payload } = await Wreck.get(oidcConfigurationUrl, {
+  const wreck = provideWreck()
+
+  const { payload } = await wreck.get(oidcConfigurationUrl, {
     json: 'strict'
   })
 
@@ -40,7 +40,9 @@ const getDefraIdAuthConfig = async (oidcConfigurationUrl) => {
 }
 
 const getDefraIdRefreshToken = async (refreshUrl, params) => {
-  return Wreck.post(refreshUrl, {
+  const wreck = provideWreck()
+
+  return wreck.post(refreshUrl, {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Cache-Control': 'no-cache'
@@ -50,7 +52,6 @@ const getDefraIdRefreshToken = async (refreshUrl, params) => {
 }
 
 export {
-  getAgents,
   getDefraIdAuthConfig,
   getDefraIdRefreshToken
 }
