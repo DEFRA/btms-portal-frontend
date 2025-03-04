@@ -63,7 +63,7 @@ describe('#signinOidc', () => {
       const mockRedirect = jest.fn()
 
       const mockRequest = {
-        server: server,
+        server,
         yar: {
           flash: (referrer) => {
             return paths.SEARCH
