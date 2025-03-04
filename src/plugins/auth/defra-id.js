@@ -1,20 +1,11 @@
-import Wreck from '@hapi/wreck'
 import jwt from '@hapi/jwt'
 import bell from '@hapi/bell'
 import { paths } from '../../routes/route-constants.js'
-
 import { config, configKeys } from '../../config/config.js'
+import { getDefraIdAuthConfig } from '../../services/defraId-client.js'
 
 const authConfig = config.get('auth.defraId')
 const sessionConfig = config.get('session')
-
-const getDefraIdAuthConfig = async (oidcConfigurationUrl) => {
-  const { payload } = await Wreck.get(oidcConfigurationUrl, {
-    json: 'strict'
-  })
-
-  return payload
-}
 
 const defraId = {
   plugin: {
