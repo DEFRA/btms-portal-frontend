@@ -40,7 +40,7 @@ describe('#refreshToken', () => {
       getUserSession.mockReturnValue(authedUser)
 
       const request = {
-        logger: logger
+        logger
       }
 
       await refreshAccessToken(request)

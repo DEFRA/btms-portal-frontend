@@ -28,7 +28,7 @@ describe('#userSession', () => {
 
     test('Should set session in cache', async () => {
       const request = {
-        server: server,
+        server,
         auth: {
           isAuthenticated: true,
           credentials: {
@@ -64,7 +64,7 @@ describe('#userSession', () => {
 
     test('Should drop and clear the session and cookie', async () => {
       const request = {
-        server: server,
+        server,
         state: {
           userSession: {
             sessionId: authedUser.sessionId
@@ -98,7 +98,7 @@ describe('#userSession', () => {
       const refreshedToken = createRefreshedToken()
 
       const request = {
-        server: server,
+        server,
         state: {
           userSession: {
             sessionId: originalCachedSession.sessionId
@@ -150,7 +150,7 @@ describe('#userSession', () => {
       userSession = await setupAuthedUserSession(server)
 
       const request = {
-        server: server,
+        server,
         state: {
           userSession: {
             sessionId: userSession.sessionId
@@ -175,7 +175,7 @@ describe('#userSession', () => {
       userSession = await setupAuthedUserSession(server, new Date().toISOString())
 
       const request = {
-        server: server,
+        server,
         state: {
           userSession: {
             sessionId: userSession.sessionId
@@ -214,7 +214,7 @@ describe('#userSession', () => {
       userSession = await setupAuthedUserSession(server, new Date().toISOString())
 
       const request = {
-        server: server,
+        server,
         state: {
           userSession: {
             sessionId: userSession.sessionId
