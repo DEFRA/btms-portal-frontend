@@ -1,17 +1,16 @@
 import { refreshAccessToken } from '../../../src/auth/refesh-token.js'
 import { createAuthedUser } from '../utils/session-helper.js'
 import { createLogger } from '../../../src/utils/logger.js'
-import Querystring from 'querystring'
 import { config } from '../../../src/config/config.js'
 import { getUserSession } from '../../../src/auth/user-session.js'
 
-const mockPost = jest.fn()
+const mockGetDefraIdRefreshToken = jest.fn()
 const mockLoggerInfo = jest.fn()
 
 const authConfig = config.get('auth')
 
-jest.mock('@hapi/wreck', () => ({
-  post: (...args) => mockPost(...args)
+jest.mock('../../../src/services/defraId-client.js', () => ({
+  getDefraIdRefreshToken: (...args) => mockGetDefraIdRefreshToken(...args)
 }))
 
 jest.mock('../../../src/utils/logger.js', () => ({
@@ -44,23 +43,15 @@ describe('#refreshToken', () => {
         logger: logger
       }
 
-      const expectedPayload = Querystring.stringify({
+      await refreshAccessToken(request)
+
+      expect(mockGetDefraIdRefreshToken).toHaveBeenCalledTimes(1)
+      expect(mockGetDefraIdRefreshToken).toHaveBeenCalledWith(authedUser.tokenUrl, expect.objectContaining({
         client_id: clientId,
         client_secret: clientSecret,
         grant_type: 'refresh_token',
         refresh_token: authedUser.refreshToken,
         scope: `${clientId} openid`
-      })
-
-      await refreshAccessToken(request)
-
-      expect(mockPost).toHaveBeenCalledTimes(1)
-      expect(mockPost).toHaveBeenCalledWith(authedUser.tokenUrl, expect.objectContaining({
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Cache-Control': 'no-cache'
-        },
-        payload: expectedPayload
       }))
     })
   })

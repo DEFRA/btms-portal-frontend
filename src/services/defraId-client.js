@@ -2,6 +2,7 @@ import Wreck from '@hapi/wreck'
 import { config } from '../config/config.js'
 import { createLogger } from '../utils/logger.js'
 import { HttpsProxyAgent } from 'https-proxy-agent'
+import Querystring from 'querystring'
 
 const logger = createLogger()
 
@@ -38,7 +39,18 @@ const getDefraIdAuthConfig = async (oidcConfigurationUrl) => {
   return payload
 }
 
+const getDefraIdRefreshToken = async (refreshUrl, params) => {
+  return Wreck.post(refreshUrl, {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Cache-Control': 'no-cache'
+    },
+    payload: Querystring.stringify(params)
+  })
+}
+
 export {
   getAgents,
-  getDefraIdAuthConfig
+  getDefraIdAuthConfig,
+  getDefraIdRefreshToken
 }

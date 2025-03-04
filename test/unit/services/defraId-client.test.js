@@ -1,7 +1,8 @@
 import Wreck from '@hapi/wreck'
-import { getAgents, getDefraIdAuthConfig } from '../../../src/services/defraId-client.js'
+import { getAgents, getDefraIdAuthConfig, getDefraIdRefreshToken } from '../../../src/services/defraId-client.js'
 import { config } from '../../../src/config/config.js'
 import { HttpsProxyAgent } from 'https-proxy-agent'
+import Querystring from 'querystring'
 
 jest.mock('@hapi/wreck', () => {
   const originalWreck = jest.requireActual('@hapi/wreck')
@@ -9,6 +10,7 @@ jest.mock('@hapi/wreck', () => {
   return {
     defaults: jest.fn(),
     get: jest.fn(),
+    post: jest.fn(),
     agents: originalWreck.agents
   }
 })
@@ -20,6 +22,7 @@ jest.mock('../../../src/utils/logger.js', () => ({
 }))
 
 const oidcConfigUrl = 'https://some-oidc-configuration-endpoint'
+const oidcRefreshUrl = 'https://some-token-refresh-endpoint'
 
 describe('#defraIdClient', () => {
   beforeEach(() => {
@@ -36,6 +39,33 @@ describe('#defraIdClient', () => {
         oidcConfigUrl,
         expect.objectContaining({
           json: 'strict'
+        })
+      )
+    })
+  })
+
+  describe('#getDefraIdRefreshToken', () => {
+    test('Should call wreck post', async () => {
+      const params = {
+        client_id: 'some-client-id',
+        client_secret: 'some-client-secret',
+        grant_type: 'refresh_token',
+        refresh_token: 'some-refresh-token',
+        scope: 'some-client-id openid'
+      }
+
+      await getDefraIdRefreshToken(oidcRefreshUrl, params)
+
+      const expectedPayload = Querystring.stringify(params)
+
+      expect(Wreck.post).toHaveBeenCalledWith(
+        oidcRefreshUrl,
+        expect.objectContaining({
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Cache-Control': 'no-cache'
+          },
+          payload: expectedPayload
         })
       )
     })

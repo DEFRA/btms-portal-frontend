@@ -1,9 +1,8 @@
-import Wreck from '@hapi/wreck'
-import Querystring from 'querystring'
 import { createLogger } from '../utils/logger.js'
 
 import { config } from '../config/config.js'
 import { getUserSession } from './user-session.js'
+import { getDefraIdRefreshToken } from '../services/defraId-client.js'
 
 const authConfig = config.get('auth')
 const logger = createLogger()
@@ -24,13 +23,7 @@ async function refreshAccessToken (request) {
 
   logger.info('Access token expired, refreshing...')
 
-  return Wreck.post(authedUser.tokenUrl, {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Cache-Control': 'no-cache'
-    },
-    payload: Querystring.stringify(params)
-  })
+  return getDefraIdRefreshToken(authedUser.tokenUrl, params)
 }
 
 export { refreshAccessToken }
