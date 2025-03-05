@@ -5,9 +5,11 @@ import { config, configKeys } from '../../config/config.js'
 import { getDefraIdAuthConfig } from '../../services/defraId-client.js'
 import { HttpsProxyAgent } from 'https-proxy-agent'
 import Wreck from '@hapi/wreck'
+import { createLogger } from '../../utils/logger.js'
 
 const authConfig = config.get('auth.defraId')
 const sessionConfig = config.get('session')
+const logger = createLogger()
 
 const configureProxy = () => {
   const proxyUrl = config.get('httpsProxy') ?? config.get('httpProxy')
@@ -50,6 +52,8 @@ const defraId = {
           token: oidcConf.token_endpoint,
           scope: ['openid'],
           profile: async function (credentials, params, _get) {
+            logger.info(credentials)
+
             const payload = jwt.token.decode(credentials.token).decoded.payload
             const displayName = [payload.firstName, payload.lastName]
               .filter((part) => part)
