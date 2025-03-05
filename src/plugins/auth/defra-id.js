@@ -3,10 +3,23 @@ import bell from '@hapi/bell'
 import { paths } from '../../routes/route-constants.js'
 import { config, configKeys } from '../../config/config.js'
 import { getDefraIdAuthConfig } from '../../services/defraId-client.js'
+import { HttpsProxyAgent } from 'https-proxy-agent'
+import Wreck from '@hapi/wreck'
 
 const authConfig = config.get('auth.defraId')
 const sessionConfig = config.get('session')
 
+const configureProxy = () => {
+  const proxyUrl = config.get('httpsProxy') ?? config.get('httpProxy')
+
+  if (proxyUrl) {
+    const httpsAgent = new HttpsProxyAgent(proxyUrl)
+
+    Wreck.agents.http = httpsAgent
+    Wreck.agents.https = httpsAgent
+    Wreck.agents.httpsAllowUnauthorized = httpsAgent
+  }
+}
 const defraId = {
   plugin: {
     name: 'defra-id',
@@ -20,6 +33,8 @@ const defraId = {
       await server.register(bell)
 
       const oidcConf = await getDefraIdAuthConfig(oidcConfigurationUrl)
+
+      configureProxy()
 
       server.auth.strategy('defra-id', 'bell', {
         location: (request) => {
