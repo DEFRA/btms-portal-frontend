@@ -32,7 +32,6 @@ const defraId = {
           protocol: 'oauth2',
           useParamsAuth: true,
           auth: oidcConf.authorization_endpoint,
-          pkce: 'S256',
           token: oidcConf.token_endpoint,
           scope: ['openid'],
           profile: async function (credentials, params, _get) {
