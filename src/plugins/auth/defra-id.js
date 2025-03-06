@@ -50,6 +50,7 @@ const defraId = {
           useParamsAuth: true,
           auth: oidcConf.authorization_endpoint,
           token: oidcConf.token_endpoint,
+          pkce: 'S256',
           scope: authConfig.scopes,
           profile: async function (credentials, params, _get) {
             logger.info(`CREDENTIALS: ${credentials}`)
