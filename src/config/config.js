@@ -281,6 +281,13 @@ const config = convict({
         sensitive: true,
         env: 'AUTH_DEFRA_ID_CLIENT_SECRET',
         default: ''
+      },
+      scopes: {
+        doc: 'DEFRA ID Scopes',
+        format: Array,
+        sensitive: true,
+        env: 'AUTH_DEFRA_ID_SCOPES',
+        default: ['openid', 'offline_access']
       }
     }
   }
