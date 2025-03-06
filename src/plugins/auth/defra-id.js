@@ -3,25 +3,10 @@ import bell from '@hapi/bell'
 import { paths } from '../../routes/route-constants.js'
 import { config, configKeys } from '../../config/config.js'
 import { getDefraIdAuthConfig } from '../../services/defraId-client.js'
-import { HttpsProxyAgent } from 'https-proxy-agent'
-import Wreck from '@hapi/wreck'
-import { createLogger } from '../../utils/logger.js'
 
 const authConfig = config.get('auth.defraId')
 const sessionConfig = config.get('session')
-const logger = createLogger()
 
-const configureProxy = () => {
-  const proxyUrl = config.get('httpsProxy') ?? config.get('httpProxy')
-
-  if (proxyUrl) {
-    const httpsAgent = new HttpsProxyAgent(proxyUrl)
-
-    Wreck.agents.http = httpsAgent
-    Wreck.agents.https = httpsAgent
-    Wreck.agents.httpsAllowUnauthorized = httpsAgent
-  }
-}
 const defraId = {
   plugin: {
     name: 'defra-id',
@@ -35,8 +20,6 @@ const defraId = {
       await server.register(bell)
 
       const oidcConf = await getDefraIdAuthConfig(oidcConfigurationUrl)
-
-      configureProxy()
 
       server.auth.strategy('defra-id', 'bell', {
         location: (request) => {
@@ -53,8 +36,9 @@ const defraId = {
           pkce: 'S256',
           scope: authConfig.scopes,
           profile: async function (credentials, params, _get) {
-            logger.info(`CREDENTIALS: ${credentials}`)
-            logger.info(`PARAMS: ${params}`)
+            if (!credentials?.token) {
+              throw new Error('Defra ID Auth Access Token not present. Unable to retrieve profile.')
+            }
 
             const payload = jwt.token.decode(credentials.token).decoded.payload
             const displayName = [payload.firstName, payload.lastName]

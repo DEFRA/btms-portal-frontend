@@ -86,7 +86,7 @@ async function validateUserSession (server, request, session) {
       return { isValid: false }
     }
 
-    const refreshAccessTokenJson = await response.json()
+    const refreshAccessTokenJson = await response.json
     const updatedSession = await updateUserSession(
       request,
       refreshAccessTokenJson

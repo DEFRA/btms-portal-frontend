@@ -1,8 +1,9 @@
 import { refreshAccessToken } from '../../../src/auth/refesh-token.js'
 import { createAuthedUser } from '../utils/session-helper.js'
 import { createLogger } from '../../../src/utils/logger.js'
-import { config } from '../../../src/config/config.js'
+import { config, configKeys } from '../../../src/config/config.js'
 import { getUserSession } from '../../../src/auth/user-session.js'
+import { paths } from '../../../src/routes/route-constants.js'
 
 const mockGetDefraIdRefreshToken = jest.fn()
 const mockLoggerInfo = jest.fn()
@@ -36,6 +37,7 @@ describe('#refreshToken', () => {
       const authedUser = createAuthedUser()
       const clientId = authConfig.defraId.clientId
       const clientSecret = authConfig.defraId.clientSecret
+      const redirectUri = config.get(configKeys.APP_BASE_URL) + paths.AUTH_DEFRA_ID_CALLBACK
 
       getUserSession.mockReturnValue(authedUser)
 
@@ -51,7 +53,8 @@ describe('#refreshToken', () => {
         client_secret: clientSecret,
         grant_type: 'refresh_token',
         refresh_token: authedUser.refreshToken,
-        scope: `${clientId} openid`
+        scope: 'openid offline_access',
+        redirect_uri: redirectUri
       }))
     })
   })

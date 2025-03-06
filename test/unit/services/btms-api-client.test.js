@@ -14,7 +14,13 @@ jest.mock('../../../src/utils/logger.js', () => ({
     error: (...args) => mockLogError(...args)
   })
 }))
-jest.mock('@hapi/wreck')
+jest.mock('@hapi/wreck', () => ({
+  defaults: jest.fn().mockReturnValue({
+    get: jest.fn(),
+    post: jest.fn()
+  })
+}))
+
 jest.mock('kitsu-core', () => ({
   deserialise: jest.fn()
 }))
@@ -31,7 +37,7 @@ describe('btms-api-client', () => {
     const makeAssertions = (result, expectedApiInvocationEndpoint) => {
       expect(result).toEqual(testApiResponse)
       expect(deserialise).toHaveBeenCalledWith(testApiResponse)
-      expect(Wreck.get).toHaveBeenCalledWith(
+      expect(Wreck.defaults({}).get).toHaveBeenCalledWith(
         `https://btms-api-base-url-for-unit-tests/api${expectedApiInvocationEndpoint}`,
         {
           headers: { Authorization: 'Basic dXNyLW5hbWUtZm9yLXVuaXQtdGVzdHM6cHdkLWZvci11bml0LXRlc3Rz' },
@@ -40,7 +46,7 @@ describe('btms-api-client', () => {
     }
 
     beforeAll(() => {
-      Wreck.get.mockResolvedValue({ payload: testApiResponse })
+      Wreck.defaults({}).get.mockResolvedValue({ payload: testApiResponse })
       deserialise.mockReturnValue(testApiResponse)
     })
 
@@ -87,7 +93,7 @@ describe('btms-api-client', () => {
     }
 
     beforeAll(() => {
-      Wreck.get.mockRejectedValue(testError)
+      Wreck.defaults({}).get.mockRejectedValue(testError)
     })
 
     afterAll(() => {

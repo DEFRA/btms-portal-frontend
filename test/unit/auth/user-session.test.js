@@ -202,13 +202,11 @@ describe('#userSession', () => {
 
       refreshAccessToken.mockReturnValue({
         ok: true,
-        json: () => {
-          return {
-            id_token: refreshedToken,
-            access_token: refreshedToken,
-            refresh_token: refreshedToken,
-            expires_in: sessionConfig.cache.ttl / 1000
-          }
+        json: {
+          id_token: refreshedToken,
+          access_token: refreshedToken,
+          refresh_token: refreshedToken,
+          expires_in: sessionConfig.cache.ttl / 1000
         }
       })
       userSession = await setupAuthedUserSession(server, new Date().toISOString())

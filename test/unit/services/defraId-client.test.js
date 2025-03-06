@@ -1,16 +1,11 @@
 import Wreck from '@hapi/wreck'
 import { getDefraIdAuthConfig, getDefraIdRefreshToken } from '../../../src/services/defraId-client.js'
-import { config } from '../../../src/config/config.js'
-import Querystring from 'querystring'
+
+const mockPost = jest.fn()
 
 jest.mock('@hapi/wreck', () => ({
-  ...jest.requireActual('@hapi/wreck'),
   get: jest.fn().mockReturnValue({}),
-  post: jest.fn(),
-  defaults: jest.fn().mockReturnValue({
-    get: jest.fn().mockReturnValue({}),
-    post: jest.fn()
-  })
+  post: (...args) => mockPost(...args)
 }))
 
 jest.mock('../../../src/utils/logger.js', () => ({
@@ -34,82 +29,76 @@ describe('#defraIdClient', () => {
         })
       )
     })
-
-    describe('#When HTTP Proxy URL is defined', () => {
-      afterAll(() => {
-        config.set('httpProxy', null)
-        config.set('httpsProxy', null)
-      })
-
-      test.each([
-        { httpProxyUrl: 'http://some-proxy', httpsProxyUrl: null },
-        { httpProxyUrl: null, httpsProxyUrl: 'http://some-proxy' }
-      ])('Should use proxied agents', async ({ httpProxyUrl, httpsProxyUrl }) => {
-        config.set('httpProxy', httpProxyUrl)
-        config.set('httpsProxy', httpsProxyUrl)
-
-        await getDefraIdAuthConfig(oidcConfigUrl)
-
-        expect(Wreck.defaults).toHaveBeenCalledWith({
-          agents: {
-            https: expect.objectContaining({ connectOpts: expect.objectContaining({ host: 'some-proxy' }) }),
-            http: expect.objectContaining({ connectOpts: expect.objectContaining({ host: 'some-proxy' }) }),
-            httpsAllowUnauthorized: expect.objectContaining({ connectOpts: expect.objectContaining({ host: 'some-proxy' }) })
-          }
-        })
-      })
-    })
   })
 
   describe('#getDefraIdRefreshToken', () => {
-    test('Should call wreck post', async () => {
+    test('Should return ok response', async () => {
+      mockPost.mockReturnValue({
+        res: {
+          statusCode: 200
+        },
+        payload: '{ "access_token": "FOO" }'
+      })
+
       const params = {
         client_id: 'some-client-id',
         client_secret: 'some-client-secret',
         grant_type: 'refresh_token',
         refresh_token: 'some-refresh-token',
-        scope: 'some-client-id openid'
+        scope: 'some-client-id openid',
+        redirect_uri: 'http://some-uri'
       }
 
-      await getDefraIdRefreshToken(oidcRefreshUrl, params)
+      const result = await getDefraIdRefreshToken(oidcRefreshUrl, params)
 
-      const expectedPayload = Querystring.stringify(params)
-
-      expect(Wreck.post).toHaveBeenCalledWith(
+      expect(mockPost).toHaveBeenCalledWith(
         oidcRefreshUrl,
         expect.objectContaining({
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Cache-Control': 'no-cache'
           },
-          payload: expectedPayload
+          payload: 'client_id=some-client-id&client_secret=some-client-secret&grant_type=refresh_token&refresh_token=some-refresh-token&scope=some-client-id%20openid&redirect_uri=http%3A%2F%2Fsome-uri'
         })
       )
+      expect(result.ok).toBeTruthy()
+      expect(result.json).toEqual(expect.objectContaining({
+        access_token: 'FOO'
+      }))
     })
 
-    describe('#When HTTP Proxy URL is defined', () => {
-      afterAll(() => {
-        config.set('httpProxy', null)
-        config.set('httpsProxy', null)
+    test('Should return not ok response', async () => {
+      mockPost.mockReturnValue({
+        res: {
+          statusCode: 500
+        }
       })
 
-      test.each([
-        { httpProxyUrl: 'http://some-proxy', httpsProxyUrl: null },
-        { httpProxyUrl: null, httpsProxyUrl: 'http://some-proxy' }
-      ])('Should use proxied agents', async ({ httpProxyUrl, httpsProxyUrl }) => {
-        config.set('httpProxy', httpProxyUrl)
-        config.set('httpsProxy', httpsProxyUrl)
+      const params = {
+        client_id: 'some-client-id',
+        client_secret: 'some-client-secret',
+        grant_type: 'refresh_token',
+        refresh_token: 'some-refresh-token',
+        scope: 'some-client-id openid',
+        redirect_uri: 'http://some-uri'
+      }
 
-        await getDefraIdRefreshToken(oidcConfigUrl)
+      const result = await getDefraIdRefreshToken(oidcRefreshUrl, params)
 
-        expect(Wreck.defaults).toHaveBeenCalledWith({
-          agents: {
-            https: expect.objectContaining({ connectOpts: expect.objectContaining({ host: 'some-proxy' }) }),
-            http: expect.objectContaining({ connectOpts: expect.objectContaining({ host: 'some-proxy' }) }),
-            httpsAllowUnauthorized: expect.objectContaining({ connectOpts: expect.objectContaining({ host: 'some-proxy' }) })
-          }
+      expect(mockPost).toHaveBeenCalledWith(
+        oidcRefreshUrl,
+        expect.objectContaining({
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Cache-Control': 'no-cache'
+          },
+          payload: 'client_id=some-client-id&client_secret=some-client-secret&grant_type=refresh_token&refresh_token=some-refresh-token&scope=some-client-id%20openid&redirect_uri=http%3A%2F%2Fsome-uri'
         })
-      })
+      )
+      expect(result.ok).toBeFalsy()
+      expect(result).toEqual(expect.not.objectContaining({
+        json: expect.anything()
+      }))
     })
   })
 })
