@@ -1,5 +1,6 @@
 import Wreck from '@hapi/wreck'
 import Querystring from 'querystring'
+import { constants as httpConstants } from 'http2'
 
 const getDefraIdAuthConfig = async (oidcConfigurationUrl) => {
   const { payload } = await Wreck.get(oidcConfigurationUrl, {
@@ -18,7 +19,7 @@ const getDefraIdRefreshToken = async (refreshUrl, params) => {
     payload: Querystring.stringify(params)
   })
 
-  if (res.statusCode === 200) {
+  if (res.statusCode === httpConstants.HTTP_STATUS_OK) {
     const jsonResponse = JSON.parse(payload.toString())
 
     if (jsonResponse) {
