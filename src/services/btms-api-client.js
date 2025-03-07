@@ -7,6 +7,8 @@ const apiResources = {
   CUSTOMS_DECLARATIONS: 'movements',
   PRE_NOTIFICATIONS: 'import-notifications'
 }
+const wreck = Wreck.defaults({})
+
 const createCredentials = () => {
   const username = config.get('btmsApi.username')
   const pwd = config.get('btmsApi.password')
@@ -15,7 +17,7 @@ const createCredentials = () => {
 
 const invokeApi = async (url) => {
   const basicAuthCredentials = createCredentials()
-  const { payload } = await Wreck.get(`${config.get('btmsApi.baseUrl')}${url}`, {
+  const { payload } = await wreck.get(`${config.get('btmsApi.baseUrl')}${url}`, {
     headers: { Authorization: `Basic ${basicAuthCredentials}` },
     json: 'strict'
   })
