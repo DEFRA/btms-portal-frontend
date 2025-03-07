@@ -27,7 +27,7 @@ async function refreshAccessToken (request) {
 
   logger.info('Access token expired, refreshing...')
 
-  return await getDefraIdRefreshToken(authedUser.tokenUrl, params)
+  return getDefraIdRefreshToken(authedUser.tokenUrl, params)
 }
 
 export { refreshAccessToken }
