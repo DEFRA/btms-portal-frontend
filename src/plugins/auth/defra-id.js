@@ -1,8 +1,8 @@
-import jwt from '@hapi/jwt'
 import bell from '@hapi/bell'
 import { paths } from '../../routes/route-constants.js'
 import { config, configKeys } from '../../config/config.js'
 import { getDefraIdAuthConfig } from '../../services/defraId-client.js'
+import { supplyProfileFunc } from './utils/profile-provider.js'
 
 const authConfig = config.get('auth.defraId')
 const sessionConfig = config.get('session')
@@ -35,39 +35,7 @@ const defraId = {
           token: oidcConf.token_endpoint,
           pkce: 'S256',
           scope: authConfig.scopes,
-          profile: async function (credentials, params, _get) {
-            if (!credentials?.token) {
-              throw new Error('Defra ID Auth Access Token not present. Unable to retrieve profile.')
-            }
-
-            const payload = jwt.token.decode(credentials.token).decoded.payload
-            const displayName = [payload.firstName, payload.lastName]
-              .filter((part) => part)
-              .join(' ')
-
-            credentials.profile = {
-              id: payload.sub,
-              correlationId: payload.correlationId,
-              sessionId: payload.sessionId,
-              contactId: payload.contactId,
-              serviceId: payload.serviceId,
-              firstName: payload.firstName,
-              lastName: payload.lastName,
-              displayName,
-              email: payload.email,
-              uniqueReference: payload.uniqueReference,
-              loa: payload.loa,
-              aal: payload.aal,
-              enrolmentCount: payload.enrolmentCount,
-              enrolmentRequestCount: payload.enrolmentRequestCount,
-              currentRelationshipId: payload.currentRelationshipId,
-              relationships: payload.relationships,
-              roles: payload.roles,
-              idToken: params.id_token,
-              tokenUrl: oidcConf.token_endpoint,
-              logoutUrl: oidcConf.end_session_endpoint
-            }
-          }
+          profile: await supplyProfileFunc(oidcConf)
         },
         password: sessionConfig.cookie.password,
         clientId,
