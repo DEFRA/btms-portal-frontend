@@ -1,6 +1,9 @@
 import Wreck from '@hapi/wreck'
 import Querystring from 'querystring'
 import { constants as httpConstants } from 'http2'
+import { createLogger } from '../utils/logger.js'
+
+const logger = createLogger()
 
 const getDefraIdAuthConfig = async (oidcConfigurationUrl) => {
   const { payload } = await Wreck.get(oidcConfigurationUrl, {
@@ -20,13 +23,20 @@ const getDefraIdRefreshToken = async (refreshUrl, params) => {
   })
 
   if (res.statusCode === httpConstants.HTTP_STATUS_OK) {
-    const jsonResponse = JSON.parse(payload.toString())
+    try {
+      const jsonResponse = JSON.parse(payload.toString())
 
-    if (jsonResponse) {
-      return {
-        ok: true,
-        json: jsonResponse
+      if (jsonResponse?.access_token &&
+        jsonResponse?.expires_in &&
+        jsonResponse?.id_token &&
+        jsonResponse?.refresh_token) {
+        return {
+          ok: true,
+          json: jsonResponse
+        }
       }
+    } catch (e) {
+      logger.error('Response from Defra ID refresh call contains invalid JSON payload.')
     }
   }
 
