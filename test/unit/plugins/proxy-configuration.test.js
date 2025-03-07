@@ -1,8 +1,8 @@
-import { proxyConfiguration } from '../../../src/plugins/proxy-configuration.js'
+import { wreckProxyConfiguration } from '../../../src/plugins/wreck-proxy-configuration.js'
 import { config } from '../../../src/config/config.js'
 import Wreck from '@hapi/wreck'
 
-describe('#proxyConfiguration', () => {
+describe('#wreckProxyConfiguration', () => {
   beforeEach(() => {
     jest.resetModules()
   })
@@ -20,7 +20,7 @@ describe('#proxyConfiguration', () => {
       config.set('httpProxy', httpProxyUrl)
       config.set('httpsProxy', httpsProxyUrl)
 
-      proxyConfiguration.plugin.register()
+      wreckProxyConfiguration.plugin.register()
 
       expect(Wreck.agents).toEqual(
         expect.objectContaining({
@@ -35,7 +35,7 @@ describe('#proxyConfiguration', () => {
     test('Should use default agents', async () => {
       const Wreck = await import('@hapi/wreck')
 
-      proxyConfiguration.plugin.register()
+      wreckProxyConfiguration.plugin.register()
 
       expect(Wreck.agents).toEqual(
         expect.objectContaining({

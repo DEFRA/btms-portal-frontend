@@ -1,7 +1,7 @@
 import bell from '@hapi/bell'
 import { paths } from '../../routes/route-constants.js'
 import { config, configKeys } from '../../config/config.js'
-import { getDefraIdAuthConfig } from '../../services/defraId-client.js'
+import { getDefraIdAuthConfig } from '../../auth/defraId-client.js'
 import { supplyProfileFunc } from './utils/profile-provider.js'
 
 const authConfig = config.get('auth.defraId')

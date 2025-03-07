@@ -2,9 +2,9 @@ import Wreck from '@hapi/wreck'
 import { config } from '../config/config.js'
 import { HttpsProxyAgent } from 'https-proxy-agent'
 
-const proxyConfiguration = {
+const wreckProxyConfiguration = {
   plugin: {
-    name: 'proxy-configuration',
+    name: 'wreck-proxy-configuration',
     register: () => {
       const proxyUrl = config.get('httpsProxy') ?? config.get('httpProxy')
 
@@ -19,4 +19,4 @@ const proxyConfiguration = {
   }
 }
 
-export { proxyConfiguration }
+export { wreckProxyConfiguration }

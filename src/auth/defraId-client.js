@@ -36,7 +36,7 @@ const getDefraIdRefreshToken = async (refreshUrl, params) => {
         }
       }
     } catch (e) {
-      logger.error('Response from Defra ID refresh call contains invalid JSON payload.')
+      logger.error(e, 'Response from Defra ID refresh call contains invalid JSON payload.')
     }
   }
 

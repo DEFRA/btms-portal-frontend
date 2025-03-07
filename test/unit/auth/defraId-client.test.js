@@ -1,5 +1,5 @@
 import Wreck from '@hapi/wreck'
-import { getDefraIdAuthConfig, getDefraIdRefreshToken } from '../../../src/services/defraId-client.js'
+import { getDefraIdAuthConfig, getDefraIdRefreshToken } from '../../../src/auth/defraId-client.js'
 
 const mockPost = jest.fn()
 

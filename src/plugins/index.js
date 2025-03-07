@@ -8,7 +8,7 @@ import { requestTracing } from './request-tracing.js'
 import { router } from './router.js'
 import { pulse } from './pulse.js'
 import { errorPage } from './error-page.js'
-import { proxyConfiguration } from './proxy-configuration.js'
+import { wreckProxyConfiguration } from './wreck-proxy-configuration.js'
 
 export default [
   requestLogger,
@@ -16,7 +16,7 @@ export default [
   secureContext,
   pulse,
   sessionManager,
-  proxyConfiguration,
+  wreckProxyConfiguration,
   defraId,
   sessionCookie,
   vision,
