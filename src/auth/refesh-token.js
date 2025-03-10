@@ -2,7 +2,7 @@ import { createLogger } from '../utils/logger.js'
 
 import { config, configKeys } from '../config/config.js'
 import { getUserSession } from './user-session.js'
-import { getDefraIdRefreshToken } from './defraId-client.js'
+import { getDefraIdRefreshToken } from './defra-id-client.js'
 import { paths } from '../routes/route-constants.js'
 
 const authConfig = config.get('auth.defraId')

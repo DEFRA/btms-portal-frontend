@@ -2,7 +2,7 @@ import { defraIdAuthProvider } from '../../../src/auth/defra-id-auth-provider.js
 import expect from 'expect'
 import jwt from '@hapi/jwt'
 
-jest.mock('../../../src/auth/defraId-client.js', () => ({
+jest.mock('../../../src/auth/defra-id-client.js', () => ({
   getDefraIdAuthConfig: jest.fn().mockReturnValue({
     authorization_endpoint: 'http://some-auth-endpoint',
     token_endpoint: 'http://some-token-endpoint',

@@ -1,4 +1,4 @@
-import { getDefraIdAuthConfig } from './defraId-client.js'
+import { getDefraIdAuthConfig } from './defra-id-client.js'
 import { config } from '../config/config.js'
 import jwt from '@hapi/jwt'
 

@@ -10,7 +10,7 @@ const mockLoggerInfo = jest.fn()
 
 const authConfig = config.get('auth')
 
-jest.mock('../../../src/auth/defraId-client.js', () => ({
+jest.mock('../../../src/auth/defra-id-client.js', () => ({
   getDefraIdRefreshToken: (...args) => mockGetDefraIdRefreshToken(...args)
 }))
 
