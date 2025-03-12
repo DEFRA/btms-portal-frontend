@@ -14,6 +14,7 @@ const defraId = {
       const clientId = authConfig.clientId
       const clientSecret = authConfig.clientSecret
       const authCallbackUrl = config.get(configKeys.APP_BASE_URL) + paths.AUTH_DEFRA_ID_CALLBACK
+      const provider = await defraIdAuthProvider()
 
       await server.register(bell)
 
@@ -23,7 +24,7 @@ const defraId = {
 
           return authCallbackUrl
         },
-        provider: await defraIdAuthProvider(),
+        provider: provider,
         password: sessionConfig.cookie.password,
         clientId,
         clientSecret,
