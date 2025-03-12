@@ -14,8 +14,8 @@ describe('#wreckProxyConfiguration', () => {
     })
 
     test.each([
-      { httpProxyUrl: 'http://some-proxy', httpsProxyUrl: null },
-      { httpProxyUrl: null, httpsProxyUrl: 'http://some-proxy' }
+      { httpProxyUrl: 'https://some-proxy', httpsProxyUrl: null },
+      { httpProxyUrl: null, httpsProxyUrl: 'https://some-proxy' }
     ])('Should use proxied agents', async ({ httpProxyUrl, httpsProxyUrl }) => {
       config.set('httpProxy', httpProxyUrl)
       config.set('httpsProxy', httpsProxyUrl)

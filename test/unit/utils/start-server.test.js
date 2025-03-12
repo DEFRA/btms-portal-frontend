@@ -22,6 +22,10 @@ jest.mock('../../../src/utils/logger.js', () => ({
   })
 }))
 
+// jest.mock('../../../src/auth/defra-id-auth-provider.js', () => ({
+//   defraIdAuthProvider: jest.fn()
+// }))
+
 describe('#startServer', () => {
   const PROCESS_ENV = process.env
   let createServerSpy
