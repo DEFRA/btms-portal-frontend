@@ -24,7 +24,7 @@ const defraId = {
 
           return authCallbackUrl
         },
-        provider: provider,
+        provider,
         password: sessionConfig.cookie.password,
         clientId,
         clientSecret,
