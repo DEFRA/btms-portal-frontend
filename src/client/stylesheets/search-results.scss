@@ -1,0 +1,42 @@
+$error-color: #d4351c;
+$tooltip-background-color: #f3f2f1;
+$tooltip-box-shadow-color: rgba(0, 0, 0, 0.3);
+
+.mrn {
+  .error {
+    color: $error-color;
+  }
+
+  .govuk-tag--red.message {
+    text-decoration: underline dotted;
+    text-underline-position: under;
+    cursor: help;
+  }
+
+  .tooltip {
+    visibility: hidden;
+    position: absolute;
+    padding: 10px;
+    width: 300px;
+    z-index: 9999;
+    background-color: $tooltip-background-color;
+    box-shadow: 2px 2px 8px $tooltip-box-shadow-color;
+    display: block;
+  }
+
+  .govuk-table__cell:has(.tooltip) {
+    cursor: help;
+  }
+
+  .govuk-table__cell:hover .tooltip,
+  .govuk-table__cell:focus .tooltip,
+  .tooltip-container:hover .tooltip,
+  .tooltip-container:focus .tooltip {
+    visibility: visible;
+  }
+
+  .govuk-table__cell, .mrn .tooltip-container {
+    position: relative;
+    overflow: visible;
+  }
+}

@@ -2,6 +2,37 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 
+{% macro customsDeclarationCHEDReferences(documents, unmatchedDocRefs) %}
+  {% if documents %}
+    <ul class="govuk-list">
+      {% for document in documents %}
+        {% if document in unmatchedDocRefs %}
+          <li class="error">{{ document }}</li>
+        {% else %}
+          <li>{{ document }}</li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endmacro %}
+
+{% macro customsDeclarationMatchStatus(isMatched, unmatchedDocRefs) %}
+  {% if isMatched %}
+    <strong class="govuk-tag govuk-tag--green">Yes</strong>
+  {% else %}
+    <span>
+      <strong class="govuk-tag govuk-tag--red message">No</strong>
+    </span>
+    <span class="tooltip" role="tooltip">The following CHED reference from the customs declaration cannot be found. Check the CHED reference on the customs declaration<br/>
+      <br/>{{ unmatchedDocRefs | join("<br/>") | safe }}</span>
+  {% endif %}
+{% endmacro %}
+
+{% block head %}
+  {{ super() }}
+  <link href="{{ getAssetPath('stylesheets/search-results.scss') }}" rel="stylesheet">
+{% endblock %}
+
 {% set pageTitle = "Search result" %}
 
 {% block content %}
@@ -45,11 +76,18 @@
 
       {% set tableRows = [] %}
       {% for commodity in customsDeclaration.commodities %}
-          {% set tableRows = (tableRows.push([{ text: commodity.itemNumber }, { text: commodity.commodityCode }, { text: commodity.commodityDesc }, { text: commodity.weightOrQuantity }, {text: commodity.documents | join(", ") }, { text: "Yes" if commodity.matchStatus.isMatched else "No" }, { html: commodity.decisions | join("<br/>")}]), tableRows) %}
+          {% set tableRows = (tableRows.push([
+          { text: commodity.itemNumber },
+          { text: commodity.commodityCode },
+          { text: commodity.commodityDesc },
+          { text: commodity.weightOrQuantity },
+          { html: customsDeclarationCHEDReferences(commodity.documents, commodity.matchStatus.unmatchedDocRefs) },
+          { html: customsDeclarationMatchStatus(commodity.matchStatus.isMatched, commodity.matchStatus.unmatchedDocRefs) },
+          { html: commodity.decisions | join("<br/>")}]), tableRows) %}
       {% endfor %}
 
       {{ govukTable({
-          classes: "govuk-table--small-text-until-tablet app-import-commodities",
+          classes: "govuk-table--small-text-until-tablet app-import-commodities mrn",
           head: [
             {
               text: "Item number"
