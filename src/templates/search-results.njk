@@ -1,13 +1,14 @@
 {% extends 'layout.njk' %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
 
 {% macro customsDeclarationCHEDReferences(documents, unmatchedDocRefs) %}
   {% if documents %}
     <ul class="govuk-list">
       {% for document in documents %}
         {% if document in unmatchedDocRefs %}
-          <li class="error">{{ document }}</li>
+          <li class="app-import-commodities__ched-ref--unmatched">{{ document }}</li>
         {% else %}
           <li>{{ document }}</li>
         {% endif %}
@@ -18,20 +19,13 @@
 
 {% macro customsDeclarationMatchStatus(isMatched, unmatchedDocRefs) %}
   {% if isMatched %}
-    <strong class="govuk-tag govuk-tag--green">Yes</strong>
+    {{ govukTag({ text: "Yes", classes: "govuk-tag--green" }) }}
   {% else %}
-    <span>
-      <strong class="govuk-tag govuk-tag--red message">No</strong>
-    </span>
-    <span class="tooltip" role="tooltip">The following CHED reference from the customs declaration cannot be found. Check the CHED reference on the customs declaration<br/>
-      <br/>{{ unmatchedDocRefs | join("<br/>") | safe }}</span>
+    {{ govukTag({ text: "No", classes: "govuk-tag--red app-import-commodities__match--no" }) }}
+    <p class="app-import-commodities__match--no-tooltip" role="tooltip">The following CHED reference from the customs declaration cannot be found. Check the CHED reference on the customs declaration<br/>
+      <br/>{{ unmatchedDocRefs | join("<br/>") | safe }}</p>
   {% endif %}
 {% endmacro %}
-
-{% block head %}
-  {{ super() }}
-  <link href="{{ getAssetPath('stylesheets/search-results.scss') }}" rel="stylesheet">
-{% endblock %}
 
 {% set pageTitle = "Search result" %}
 
@@ -87,7 +81,7 @@
       {% endfor %}
 
       {{ govukTable({
-          classes: "govuk-table--small-text-until-tablet app-import-commodities mrn",
+          classes: "govuk-table--small-text-until-tablet app-import-commodities",
           head: [
             {
               text: "Item number"

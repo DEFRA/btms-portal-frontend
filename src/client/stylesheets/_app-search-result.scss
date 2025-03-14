@@ -35,4 +35,40 @@
 
 .app-import-commodities {
   @include govuk-font-size($size: 16);
+
+  &__ched-ref--unmatched {
+    color: $govuk-error-colour;
+  }
+
+  &__match--no {
+    text-decoration: underline dotted;
+    text-underline-position: under;
+    cursor: help;
+  }
+
+  &__match--no-tooltip {
+    visibility: hidden;
+    position: absolute;
+    padding: govuk-spacing(2);
+    width: 15em;
+    z-index: 9999;
+    background-color: govuk-colour("light-grey");
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .govuk-table__cell:has(&__match--no-tooltip) {
+    cursor: help;
+  }
+
+  .govuk-table__cell:hover &__match--no-tooltip,
+  .govuk-table__cell:focus &__match--no-tooltip,
+  .tooltip-container:hover &__match--no-tooltip,
+  .tooltip-container:focus &__match--no-tooltip {
+    visibility: visible;
+  }
+
+  .govuk-table__cell, .tooltip-container {
+    position: relative;
+    overflow: visible;
+  }
 }

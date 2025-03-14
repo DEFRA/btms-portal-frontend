@@ -39,7 +39,7 @@ describe('Search Results', () => {
 
       expect($renderedTemplate.html()).not.toContain('class="error"')
       expect($renderedTemplate.html()).toContain('<li>GBCHD2024.5286242</li>')
-      expect($renderedTemplate.html()).toContain('<strong class="govuk-tag govuk-tag--green">Yes</strong>')
+      expect($renderedTemplate.html()).toContain('<strong class="govuk-tag govuk-tag--green">')
       expect($renderedTemplate.html()).not.toContain('class="govuk-tag govuk-tag--red')
       expect($renderedTemplate.html()).not.toContain('<span class="tooltip" role="tooltip">')
     })
@@ -51,10 +51,10 @@ describe('Search Results', () => {
 
       $renderedTemplate = renderTemplate('search-results.njk', viewContext)
 
-      expect($renderedTemplate.html()).toContain('<li class="error">GBCHD2024.5286242</li>')
+      expect($renderedTemplate.html()).toContain('<li class="app-import-commodities__ched-ref--unmatched">GBCHD2024.5286242</li>')
       expect($renderedTemplate.html()).toContain('<li>GBCHD2024.5313986</li>')
-      expect($renderedTemplate.html()).toContain('<strong class="govuk-tag govuk-tag--red message">No</strong>')
-      expect($renderedTemplate.html()).toContain('<span class="tooltip" role="tooltip">')
+      expect($renderedTemplate.html()).toContain('<strong class="govuk-tag govuk-tag--red app-import-commodities__match--no">')
+      expect($renderedTemplate.html()).toContain('<p class="app-import-commodities__match--no-tooltip" role="tooltip">')
     })
   })
 })
