@@ -36,6 +36,10 @@
 .app-import-commodities {
   @include govuk-font-size($size: 16);
 
+  &__ched-ref--documents-list {
+    margin-bottom: 0;
+  }
+
   &__ched-ref--unmatched {
     color: $govuk-error-colour;
   }
