@@ -1,6 +1,31 @@
 {% extends 'layout.njk' %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+
+{% macro customsDeclarationCHEDReferences(documents, unmatchedDocRefs) %}
+  {% if documents %}
+    <ul class="govuk-list app-import-commodities__ched-ref--documents-list">
+      {% for document in documents %}
+        {% if document in unmatchedDocRefs %}
+          <li class="app-import-commodities__ched-ref--unmatched">{{ document }}</li>
+        {% else %}
+          <li>{{ document }}</li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endmacro %}
+
+{% macro customsDeclarationMatchStatus(isMatched, unmatchedDocRefs) %}
+  {% if isMatched %}
+    {{ govukTag({ text: "Yes", classes: "govuk-tag--green" }) }}
+  {% else %}
+    {{ govukTag({ text: "No", classes: "govuk-tag--red app-import-commodities__match--no" }) }}
+    <p class="app-import-commodities__match--no-tooltip" role="tooltip">The following CHED reference from the customs declaration cannot be found. Check the CHED reference on the customs declaration<br/>
+      <br/>{{ unmatchedDocRefs | join("<br/>") | safe }}</p>
+  {% endif %}
+{% endmacro %}
 
 {% set pageTitle = "Search result" %}
 
@@ -45,7 +70,14 @@
 
       {% set tableRows = [] %}
       {% for commodity in customsDeclaration.commodities %}
-          {% set tableRows = (tableRows.push([{ text: commodity.itemNumber }, { text: commodity.commodityCode }, { text: commodity.commodityDesc }, { text: commodity.weightOrQuantity }, {text: commodity.documents | join(", ") }, { text: "Yes" if commodity.matchStatus.isMatched else "No" }, { html: commodity.decisions | join("<br/>")}]), tableRows) %}
+          {% set tableRows = (tableRows.push([
+          { text: commodity.itemNumber },
+          { text: commodity.commodityCode },
+          { text: commodity.commodityDesc },
+          { text: commodity.weightOrQuantity },
+          { html: customsDeclarationCHEDReferences(commodity.documents, commodity.matchStatus.unmatchedDocRefs) },
+          { html: customsDeclarationMatchStatus(commodity.matchStatus.isMatched, commodity.matchStatus.unmatchedDocRefs) },
+          { html: commodity.decisions | join("<br/>")}]), tableRows) %}
       {% endfor %}
 
       {{ govukTable({
