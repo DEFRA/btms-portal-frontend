@@ -27,6 +27,13 @@
   {% endif %}
 {% endmacro %}
 
+{% macro commodityDescription(commodityDesc, maxLength) %}
+  {{ commodityDesc | truncate(maxLength, true) }}
+  {% if commodityDesc | length > maxLength %}
+    <p class="app-import-commodities__description--tooltip" role="tooltip">{{ commodityDesc }}</p>
+  {% endif %}
+{% endmacro %}
+
 {% set pageTitle = "Search result" %}
 
 {% block content %}
@@ -73,7 +80,7 @@
           {% set tableRows = (tableRows.push([
           { text: commodity.itemNumber },
           { text: commodity.commodityCode },
-          { text: commodity.commodityDesc },
+          { text: commodityDescription(commodity.commodityDesc, 24) },
           { text: commodity.weightOrQuantity },
           { html: customsDeclarationCHEDReferences(commodity.documents, commodity.matchStatus.unmatchedDocRefs) },
           { html: customsDeclarationMatchStatus(commodity.matchStatus.isMatched, commodity.matchStatus.unmatchedDocRefs) },
@@ -154,7 +161,12 @@
 
       {% set tableRows = [] %}
       {% for commodity in preNotification.commodities %}
-          {% set tableRows = (tableRows.push([{ text: commodity.itemNumber }, { text: commodity.commodityCode }, { text: commodity.commodityDesc }, { text: commodity.weightOrQuantity }, { text: preNotification.decision + ' (' + preNotification.authorities | join(", ") + ')'}]), tableRows) %}
+          {% set tableRows = (tableRows.push([
+          { text: commodity.itemNumber },
+          { text: commodity.commodityCode },
+          { text: commodityDescription(commodity.commodityDesc, 50) },
+          { text: commodity.weightOrQuantity },
+          { text: preNotification.decision + ' (' + preNotification.authorities | join(", ") + ')'}]), tableRows) %}
       {% endfor %}
 
       {{ govukTable({

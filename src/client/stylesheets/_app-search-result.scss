@@ -56,7 +56,8 @@
     cursor: help;
   }
 
-  &__match--no-tooltip {
+  &__match--no-tooltip,
+  &__description--tooltip {
     visibility: hidden;
     position: absolute;
     padding: govuk-spacing(2);
@@ -66,14 +67,23 @@
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
   }
 
-  .govuk-table__cell:has(&__match--no-tooltip) {
+  &__description--tooltip {
+    width: 20em;
+  }
+
+  .govuk-table__cell:has(&__match--no-tooltip),
+  .govuk-table__cell:has(&__description--tooltip) {
     cursor: help;
   }
 
   .govuk-table__cell:hover &__match--no-tooltip,
   .govuk-table__cell:focus &__match--no-tooltip,
   .tooltip-container:hover &__match--no-tooltip,
-  .tooltip-container:focus &__match--no-tooltip {
+  .tooltip-container:focus &__match--no-tooltip,
+  .govuk-table__cell:hover &__description--tooltip,
+  .govuk-table__cell:focus &__description--tooltip,
+  .tooltip-container:hover &__description--tooltip,
+  .tooltip-container:focus &__description--tooltip {
     visibility: visible;
   }
 
