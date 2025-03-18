@@ -30,7 +30,7 @@
 {% macro commodityDescription(commodityDesc, maxLength) %}
   {{ commodityDesc | truncate(maxLength, true) }}
   {% if commodityDesc | length > maxLength %}
-    <p class="app-import-commodities__description--tooltip" role="tooltip">{{ commodityDesc }}</p>
+    <div class="app-import-commodities__description--tooltip" role="tooltip">{{ commodityDesc }}</div>
   {% endif %}
 {% endmacro %}
 

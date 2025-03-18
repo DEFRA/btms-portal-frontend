@@ -1,7 +1,7 @@
 import { renderTemplate } from './template.test.helper.js'
 import { searchTypes } from '../../../src/services/search-constants.js'
 
-function createViewContext (documents, isMatched, unmatchedDocRefs, preNotificationCommodityDesc, customsDeclarationCommodityDesc) {
+function createViewContext (documents, isMatched, unmatchedDocRefs, preNotificationCommodityDesc = 'CHILLI PEPPERS', customsDeclarationCommodityDesc = 'CHILLI PEPPERS') {
   return {
     searchTerm: 'mrn-reference',
     searchType: searchTypes.CUSTOMS_DECLARATION,
@@ -14,7 +14,7 @@ function createViewContext (documents, isMatched, unmatchedDocRefs, preNotificat
         {
           itemNumber: 12074014,
           commodityCode: '0909',
-          commodityDesc: preNotificationCommodityDesc ?? 'CHILLI PEPPERS',
+          commodityDesc: preNotificationCommodityDesc,
           weightOrQuantity: 16120
         }
       ],
@@ -28,7 +28,7 @@ function createViewContext (documents, isMatched, unmatchedDocRefs, preNotificat
         {
           itemNumber: 1,
           commodityCode: '302499000',
-          commodityDesc: customsDeclarationCommodityDesc ?? 'CHILLI PEPPERS',
+          commodityDesc: customsDeclarationCommodityDesc,
           weightOrQuantity: 3471,
           documents,
           matchStatus: {
@@ -81,7 +81,7 @@ describe('Search Results', () => {
       expect($renderedTemplate.html()).toContain('A short MRN description')
       expect($renderedTemplate.html()).toContain('A short CHED description')
       expect($renderedTemplate.html()).not.toContain('...')
-      expect($renderedTemplate.html()).not.toContain('<p class="app-import-commodities__description--tooltip" role="tooltip">')
+      expect($renderedTemplate.html()).not.toContain('<div class="app-import-commodities__description--tooltip" role="tooltip">')
     })
   })
 
@@ -97,8 +97,8 @@ describe('Search Results', () => {
 
       expect($renderedTemplate.html()).toContain('A long MRN description t...')
       expect($renderedTemplate.html()).toContain('A long CHED description that should be truncated a...')
-      expect($renderedTemplate.html()).toContain('<p class="app-import-commodities__description--tooltip" role="tooltip">A long MRN description that should be truncated and displayed in full inside a tooltip</p>')
-      expect($renderedTemplate.html()).toContain('<p class="app-import-commodities__description--tooltip" role="tooltip">A long CHED description that should be truncated and displayed in full inside a tooltip</p>')
+      expect($renderedTemplate.html()).toContain('<div class="app-import-commodities__description--tooltip" role="tooltip">A long MRN description that should be truncated and displayed in full inside a tooltip</div>')
+      expect($renderedTemplate.html()).toContain('<div class="app-import-commodities__description--tooltip" role="tooltip">A long CHED description that should be truncated and displayed in full inside a tooltip</div>')
     })
   })
 })
