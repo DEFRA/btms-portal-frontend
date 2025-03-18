@@ -54,6 +54,13 @@
     text-decoration: underline dotted;
     text-underline-position: under;
     cursor: help;
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+
+  &__match--yes {
+    font-size: 1rem;
+    line-height: 1.25;
   }
 
   &__match--no-tooltip,
@@ -65,6 +72,8 @@
     z-index: 9999;
     background-color: govuk-colour("light-grey");
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    font-size: 1rem;
+    line-height: 1.25;
   }
 
   &__description--tooltip {

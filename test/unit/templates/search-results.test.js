@@ -53,7 +53,7 @@ describe('Search Results', () => {
 
       expect($renderedTemplate.html()).not.toContain('class="error"')
       expect($renderedTemplate.html()).toContain('<li>GBCHD2024.5286242</li>')
-      expect($renderedTemplate.html()).toContain('<strong class="govuk-tag govuk-tag--green">')
+      expect($renderedTemplate.html()).toContain('<strong class="govuk-tag govuk-tag--green app-import-commodities__match--yes">')
       expect($renderedTemplate.html()).not.toContain('class="govuk-tag govuk-tag--red')
       expect($renderedTemplate.html()).not.toContain('<span class="tooltip" role="tooltip">')
     })

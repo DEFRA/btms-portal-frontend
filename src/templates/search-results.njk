@@ -19,10 +19,10 @@
 
 {% macro customsDeclarationMatchStatus(isMatched, unmatchedDocRefs) %}
   {% if isMatched %}
-    {{ govukTag({ text: "Yes", classes: "govuk-tag--green" }) }}
+    {{ govukTag({ text: "Yes", classes: "govuk-tag--green app-import-commodities__match--yes" }) }}
   {% else %}
     {{ govukTag({ text: "No", classes: "govuk-tag--red app-import-commodities__match--no" }) }}
-    <p class="app-import-commodities__match--no-tooltip" role="tooltip">The following CHED reference from the customs declaration cannot be found. Check the CHED reference on the customs declaration<br/>
+    <p class="app-import-commodities__match--no-tooltip" role="tooltip">The following CHED reference from the customs declaration cannot be found. Check the CHED reference on the customs declaration:<br/>
       <br/>{{ unmatchedDocRefs | join("<br/>") | safe }}</p>
   {% endif %}
 {% endmacro %}
