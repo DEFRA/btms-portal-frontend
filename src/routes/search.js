@@ -22,7 +22,8 @@ export const search = [{
     auth: 'session'
   },
   handler: (_request, h) => {
-    return h.view(viewTemplate)
+    const searchError = _request.yar.flash('searchError')?.at(0) ?? {}
+    return h.view(viewTemplate, searchError)
   }
 },
 {
@@ -33,9 +34,11 @@ export const search = [{
     validate: {
       payload: validSearchTermSchema,
       failAction: async (_request, h, _err) => {
-        return h.view(
-          viewTemplate,
-          { searchTerm: _request.payload.searchTerm, isValid: false, errorCode: INVALID_SEARCH_TERM }).takeover()
+        _request.yar.flash(
+          'searchError',
+          { searchTerm: _request.payload.searchTerm, isValid: false, errorCode: INVALID_SEARCH_TERM })
+
+        return h.redirect(paths.SEARCH).takeover()
       }
     }
   },
@@ -44,9 +47,11 @@ export const search = [{
     const searchTermHasResults = await hasSearchResult(searchTerm)
 
     if (!searchTermHasResults) {
-      return h.view(
-        viewTemplate,
+      _request.yar.flash(
+        'searchError',
         { searchTerm: _request.payload.searchTerm, isValid: false, errorCode: SEARCH_TERM_NOT_FOUND })
+
+      return h.redirect(paths.SEARCH)
     }
     return h.redirect(`${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${searchTerm}`)
   }
