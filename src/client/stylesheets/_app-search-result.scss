@@ -54,9 +54,17 @@
     text-decoration: underline dotted;
     text-underline-position: under;
     cursor: help;
+    font-size: 1rem;
+    line-height: 1.25;
   }
 
-  &__match--no-tooltip {
+  &__match--yes {
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+
+  &__match--no-tooltip,
+  &__description--tooltip {
     visibility: hidden;
     position: absolute;
     padding: govuk-spacing(2);
@@ -64,16 +72,27 @@
     z-index: 9999;
     background-color: govuk-colour("light-grey");
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    font-size: 1rem;
+    line-height: 1.25;
   }
 
-  .govuk-table__cell:has(&__match--no-tooltip) {
+  &__description--tooltip {
+    width: 20em;
+  }
+
+  .govuk-table__cell:has(&__match--no-tooltip),
+  .govuk-table__cell:has(&__description--tooltip) {
     cursor: help;
   }
 
   .govuk-table__cell:hover &__match--no-tooltip,
   .govuk-table__cell:focus &__match--no-tooltip,
   .tooltip-container:hover &__match--no-tooltip,
-  .tooltip-container:focus &__match--no-tooltip {
+  .tooltip-container:focus &__match--no-tooltip,
+  .govuk-table__cell:hover &__description--tooltip,
+  .govuk-table__cell:focus &__description--tooltip,
+  .tooltip-container:hover &__description--tooltip,
+  .tooltip-container:focus &__description--tooltip {
     visibility: visible;
   }
 

@@ -19,11 +19,18 @@
 
 {% macro customsDeclarationMatchStatus(isMatched, unmatchedDocRefs) %}
   {% if isMatched %}
-    {{ govukTag({ text: "Yes", classes: "govuk-tag--green" }) }}
+    {{ govukTag({ text: "Yes", classes: "govuk-tag--green app-import-commodities__match--yes" }) }}
   {% else %}
     {{ govukTag({ text: "No", classes: "govuk-tag--red app-import-commodities__match--no" }) }}
-    <p class="app-import-commodities__match--no-tooltip" role="tooltip">The following CHED reference from the customs declaration cannot be found. Check the CHED reference on the customs declaration<br/>
+    <p class="app-import-commodities__match--no-tooltip" role="tooltip">The following CHED reference from the customs declaration cannot be found. Check the CHED reference on the customs declaration:<br/>
       <br/>{{ unmatchedDocRefs | join("<br/>") | safe }}</p>
+  {% endif %}
+{% endmacro %}
+
+{% macro commodityDescription(commodityDesc, maxLength) %}
+  {{ commodityDesc | truncate(maxLength, true) }}
+  {% if commodityDesc | length > maxLength %}
+    <div class="app-import-commodities__description--tooltip" role="tooltip">{{ commodityDesc }}</div>
   {% endif %}
 {% endmacro %}
 
@@ -73,7 +80,7 @@
           {% set tableRows = (tableRows.push([
           { text: commodity.itemNumber },
           { text: commodity.commodityCode },
-          { text: commodity.commodityDesc },
+          { text: commodityDescription(commodity.commodityDesc, 24) },
           { text: commodity.weightOrQuantity },
           { html: customsDeclarationCHEDReferences(commodity.documents, commodity.matchStatus.unmatchedDocRefs) },
           { html: customsDeclarationMatchStatus(commodity.matchStatus.isMatched, commodity.matchStatus.unmatchedDocRefs) },
@@ -154,7 +161,12 @@
 
       {% set tableRows = [] %}
       {% for commodity in preNotification.commodities %}
-          {% set tableRows = (tableRows.push([{ text: commodity.itemNumber }, { text: commodity.commodityCode }, { text: commodity.commodityDesc }, { text: commodity.weightOrQuantity }, { text: preNotification.decision + ' (' + preNotification.authorities | join(", ") + ')'}]), tableRows) %}
+          {% set tableRows = (tableRows.push([
+          { text: commodity.itemNumber },
+          { text: commodity.commodityCode },
+          { text: commodityDescription(commodity.commodityDesc, 50) },
+          { text: commodity.weightOrQuantity },
+          { text: preNotification.decision + ' (' + preNotification.authorities | join(", ") + ')'}]), tableRows) %}
       {% endfor %}
 
       {{ govukTable({
