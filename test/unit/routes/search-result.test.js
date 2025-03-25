@@ -51,6 +51,17 @@ describe('#serveSearchResultsPage', () => {
       expect(statusCode).toBe(httpConstants.HTTP_STATUS_OK)
       expect(payload).toEqual(expect.stringContaining(`Search result - ${config.get(configKeys.SERVICE_NAME)}`))
     })
+
+    describe('#When route is requested', () => {
+      test('Should return non caching headers', async () => {
+        const { headers } = await server.inject({
+          method: 'GET',
+          url: paths.SEARCH_RESULT
+        })
+
+        expect(headers['cache-control']).toEqual('no-store')
+      })
+    })
   })
 
   describe('When not authenticated', () => {

@@ -76,11 +76,23 @@ describe('#serveSearchPage', () => {
 
       expectedValidSearchTermCall ? expect(isValidSearchTerm).toHaveBeenCalledWith(searchTerm) : expect(isValidSearchTerm).not.toHaveBeenCalled()
       validSearchTerm ? expect(hasSearchResult).toHaveBeenCalledWith(searchTerm) : expect(hasSearchResult).not.toHaveBeenCalled()
-      expect(statusCode).toBe(httpConstants.HTTP_STATUS_OK)
-      expect(request.response.source.template).toBe('search')
-      expect(request.response.source.context.searchTerm).toBe(searchTerm)
-      expect(request.response.source.context.isValid).toBeFalsy()
-      expect(request.response.source.context.errorCode).toBe(expectedErrorCode)
+      expect(statusCode).toBe(httpConstants.HTTP_STATUS_FOUND)
+      expect(request.response.headers.location).toBe('/search')
+      const searchError = request.yar.flash('searchError')?.at(0) ?? {}
+      expect(searchError.searchTerm).toEqual(searchTerm)
+      expect(searchError.isValid).toBeFalsy()
+      expect(searchError.errorCode).toBe(expectedErrorCode)
+    })
+
+    describe('#When route is requested', () => {
+      test('Should return non caching headers', async () => {
+        const { headers } = await server.inject({
+          method: 'GET',
+          url: paths.SEARCH
+        })
+
+        expect(headers['cache-control']).toEqual('no-store')
+      })
     })
   })
 

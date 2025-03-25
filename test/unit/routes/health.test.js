@@ -4,15 +4,15 @@ import { constants as httpConstants } from 'http2'
 describe('#serveHealthEndpoint', () => {
   let server
 
+  beforeEach(async () => {
+    server = await startServer()
+  })
+
+  afterEach(async () => {
+    await server.stop({ timeout: 0 })
+  })
+
   describe('When secure context is disabled', () => {
-    beforeEach(async () => {
-      server = await startServer()
-    })
-
-    afterEach(async () => {
-      await server.stop({ timeout: 0 })
-    })
-
     test('Should respond as healthy', async () => {
       const { statusCode, payload } = await server.inject({
         method: 'GET',

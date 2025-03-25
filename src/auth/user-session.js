@@ -15,7 +15,7 @@ async function setUserSession (request, sessionId) {
     refreshToken: request.auth.credentials.refreshToken,
     expiresIn: expiresInMilliSeconds,
     expiresAt: expiresAt.toISOString()
-  })
+  }, expiresInMilliSeconds)
 }
 
 function removeUserSession (request) {
@@ -61,7 +61,7 @@ async function updateUserSession (request, refreshedSession) {
     refreshToken: refreshedSession.refresh_token,
     expiresIn: expiresInMilliSeconds,
     expiresAt: expiresAt.toISOString()
-  })
+  }, expiresInMilliSeconds)
 
   return getUserSession(request)
 }

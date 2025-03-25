@@ -1,5 +1,5 @@
 import Joi from 'joi'
-import { paths, queryStringParams } from './route-constants.js'
+import { CACHE_CONTROL_NO_STORE, paths, queryStringParams } from './route-constants.js'
 import { isValidSearchTerm, hasSearchResult } from '../services/search-service.js'
 
 const viewTemplate = 'search'
@@ -19,10 +19,12 @@ export const search = [{
   method: 'GET',
   path: paths.SEARCH,
   options: {
-    auth: 'session'
+    auth: 'session',
+    cache: CACHE_CONTROL_NO_STORE
   },
   handler: (_request, h) => {
-    return h.view(viewTemplate)
+    const searchError = _request.yar.flash('searchError')?.at(0) ?? {}
+    return h.view(viewTemplate, searchError)
   }
 },
 {
@@ -30,12 +32,15 @@ export const search = [{
   path: paths.SEARCH,
   options: {
     auth: 'session',
+    cache: CACHE_CONTROL_NO_STORE,
     validate: {
       payload: validSearchTermSchema,
       failAction: async (_request, h, _err) => {
-        return h.view(
-          viewTemplate,
-          { searchTerm: _request.payload.searchTerm, isValid: false, errorCode: INVALID_SEARCH_TERM }).takeover()
+        _request.yar.flash(
+          'searchError',
+          { searchTerm: _request.payload.searchTerm, isValid: false, errorCode: INVALID_SEARCH_TERM })
+
+        return h.redirect(paths.SEARCH).takeover()
       }
     }
   },
@@ -44,9 +49,11 @@ export const search = [{
     const searchTermHasResults = await hasSearchResult(searchTerm)
 
     if (!searchTermHasResults) {
-      return h.view(
-        viewTemplate,
+      _request.yar.flash(
+        'searchError',
         { searchTerm: _request.payload.searchTerm, isValid: false, errorCode: SEARCH_TERM_NOT_FOUND })
+
+      return h.redirect(paths.SEARCH)
     }
     return h.redirect(`${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${searchTerm}`)
   }
