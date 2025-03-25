@@ -3,6 +3,7 @@ import { requestLogger } from './request-logger.js'
 import { secureContext } from './secure-context/secure-context.js'
 import { sessionManager } from './session-manager.js'
 import { defraId } from './auth/defra-id.js'
+import { entraId } from './auth/entra-id.js'
 import { sessionCookie } from './auth/session-cookie.js'
 import { requestTracing } from './request-tracing.js'
 import { router } from './router.js'
@@ -18,6 +19,7 @@ export default [
   sessionManager,
   wreckProxyConfiguration,
   defraId,
+  entraId,
   sessionCookie,
   vision,
   router,

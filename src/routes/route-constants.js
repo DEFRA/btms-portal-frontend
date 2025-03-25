@@ -2,6 +2,8 @@ const paths = {
   HEALTH: '/health',
   LANDING: '/',
   AUTH_DEFRA_ID_CALLBACK: '/signin-oidc',
+  AUTH_ENTRA_ID_CALLBACK: '/signin-oidc-entra',
+  SIGN_IN_INTERNAL: '/sign-in-internal',
   SIGN_IN: '/sign-in',
   SIGN_OUT: '/sign-out',
   SEARCH: '/search',
