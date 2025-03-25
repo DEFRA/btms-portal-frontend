@@ -1,7 +1,6 @@
 import Joi from 'joi'
-import { paths, queryStringParams } from './route-constants.js'
+import { CACHE_CONTROL_NO_STORE, paths, queryStringParams } from './route-constants.js'
 import { isValidSearchTerm, hasSearchResult } from '../services/search-service.js'
-import { noCache } from './cache-constants.js'
 
 const viewTemplate = 'search'
 const INVALID_SEARCH_TERM = 'INVALID_SEARCH_TERM'
@@ -21,7 +20,7 @@ export const search = [{
   path: paths.SEARCH,
   options: {
     auth: 'session',
-    cache: noCache
+    cache: CACHE_CONTROL_NO_STORE
   },
   handler: (_request, h) => {
     const searchError = _request.yar.flash('searchError')?.at(0) ?? {}
@@ -33,7 +32,7 @@ export const search = [{
   path: paths.SEARCH,
   options: {
     auth: 'session',
-    cache: noCache,
+    cache: CACHE_CONTROL_NO_STORE,
     validate: {
       payload: validSearchTermSchema,
       failAction: async (_request, h, _err) => {

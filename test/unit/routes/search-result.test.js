@@ -59,7 +59,7 @@ describe('#serveSearchResultsPage', () => {
           url: paths.SEARCH_RESULT
         })
 
-        expect(headers['cache-control']).toEqual('no-store, no-cache, must-revalidate, max-age=0')
+        expect(headers['cache-control']).toEqual('no-store')
       })
     })
   })

@@ -12,7 +12,13 @@ const queryStringParams = {
   SEARCH_TERM: 'searchTerm'
 }
 
+const CACHE_CONTROL_NO_STORE = {
+  privacy: 'default',
+  otherwise: 'no-store'
+}
+
 export {
   paths,
-  queryStringParams
+  queryStringParams,
+  CACHE_CONTROL_NO_STORE
 }
