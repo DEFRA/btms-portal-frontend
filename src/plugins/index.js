@@ -9,7 +9,6 @@ import { router } from './router.js'
 import { pulse } from './pulse.js'
 import { errorPage } from './error-page.js'
 import { wreckProxyConfiguration } from './wreck-proxy-configuration.js'
-import { cacheControl } from './cache-control.js'
 
 export default [
   requestLogger,
@@ -22,6 +21,5 @@ export default [
   sessionCookie,
   vision,
   router,
-  errorPage,
-  cacheControl
+  errorPage
 ]

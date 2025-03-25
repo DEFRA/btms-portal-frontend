@@ -1,11 +1,13 @@
 import { paths } from './route-constants.js'
 import { setUserSession } from '../auth/user-session.js'
+import { noCache } from './cache-constants.js'
 
 export const signinOidc = {
   method: ['GET', 'POST'],
   path: paths.AUTH_DEFRA_ID_CALLBACK,
   options: {
-    auth: 'defra-id'
+    auth: 'defra-id',
+    cache: noCache
   },
   handler: async (_request, h) => {
     if (_request.auth?.isAuthenticated) {

@@ -83,6 +83,17 @@ describe('#serveSearchPage', () => {
       expect(searchError.isValid).toBeFalsy()
       expect(searchError.errorCode).toBe(expectedErrorCode)
     })
+
+    describe('#When route is requested', () => {
+      test('Should return non caching headers', async () => {
+        const { headers } = await server.inject({
+          method: 'GET',
+          url: paths.SEARCH
+        })
+
+        expect(headers['cache-control']).toEqual('no-store, no-cache, must-revalidate, max-age=0')
+      })
+    })
   })
 
   describe('When not authenticated', () => {

@@ -1,10 +1,14 @@
 import { paths } from './route-constants.js'
 import { config, configKeys } from '../config/config.js'
 import { dropUserSession, getUserSession } from '../auth/user-session.js'
+import { noCache } from './cache-constants.js'
 
 export const signOut = {
   method: 'GET',
   path: paths.SIGN_OUT,
+  options: {
+    cache: noCache
+  },
   handler: async (_request, h) => {
     const authedUser = await getUserSession(_request)
 
