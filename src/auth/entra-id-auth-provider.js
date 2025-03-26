@@ -1,14 +1,14 @@
-import { getDefraIdAuthConfig } from './defra-id-client.js'
+import { getEntraIdAuthConfig } from './entra-id-client.js'
 import { config } from '../config/config.js'
 import jwt from '@hapi/jwt'
 
-export const defraIdAuthProvider = async () => {
-  const authConfig = config.get('auth.defraId')
+export const entraIdAuthProvider = async () => {
+  const authConfig = config.get('auth.entraId')
   const oidcConfigurationUrl = authConfig.oidcConfigurationUrl
-  const oidcConf = await getDefraIdAuthConfig(oidcConfigurationUrl)
+  const oidcConf = await getEntraIdAuthConfig(oidcConfigurationUrl)
 
   return {
-    name: 'defra-id',
+    name: 'entra-id',
     protocol: 'oauth2',
     useParamsAuth: true,
     auth: oidcConf.authorization_endpoint,
@@ -18,7 +18,7 @@ export const defraIdAuthProvider = async () => {
     profile: async function (credentials, params, _get) {
       if (!credentials?.token) {
         throw new Error(
-          'Defra ID Auth Access Token not present. Unable to retrieve profile.')
+          'Entra ID Auth Access Token not present. Unable to retrieve profile.')
       }
 
       const payload = jwt.token.decode(credentials.token).decoded.payload
@@ -26,28 +26,18 @@ export const defraIdAuthProvider = async () => {
         .filter((part) => part)
         .join(' ')
 
+      // What info do we get back from Entra? Need to refactor this and Defra ID provider, so we only use the claims properties that are relevant
       credentials.profile = {
         id: payload.sub,
-        correlationId: payload.correlationId,
-        sessionId: payload.sessionId,
-        contactId: payload.contactId,
-        serviceId: payload.serviceId,
         firstName: payload.firstName,
         lastName: payload.lastName,
         displayName,
         email: payload.email,
-        uniqueReference: payload.uniqueReference,
-        loa: payload.loa,
-        aal: payload.aal,
-        enrolmentCount: payload.enrolmentCount,
-        enrolmentRequestCount: payload.enrolmentRequestCount,
-        currentRelationshipId: payload.currentRelationshipId,
-        relationships: payload.relationships,
         roles: payload.roles,
         idToken: params.id_token,
         tokenUrl: oidcConf.token_endpoint,
         logoutUrl: oidcConf.end_session_endpoint,
-        internal: false // Need to store this somewhere in unauthenticated session storage?
+        internal: true // Need to store this somewhere in unauthenticated session storage?
       }
     }
   }
