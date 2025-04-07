@@ -1,4 +1,3 @@
-import 'dotenv/config'
 import process from 'node:process'
 import { createLogger } from './utils/logger.js'
 import { startServer } from './utils/start-server.js'
