@@ -105,7 +105,7 @@ export const createCustomsDeclarationModel = (sourceCustomsDeclaration) => {
           commodityDesc: i.goodsDescription,
           weightOrQuantity: i.itemNetMass && i.itemNetMass !== '0' ? i.itemNetMass : (i.itemSupplementaryUnits ?? ''),
           matchStatus: getMatchStatus(i, sourceCustomsDeclaration),
-          documents: i.documents.map(d => d.documentReference),
+          documents: [...new Set(i.documents.map(d => d.documentReference))],
           decisions: i.checks.map(c => `${getDecisionDescription(c.decisionCode)} (${getAuthorityByCheckCode(c.checkCode)})`)
         }
       })

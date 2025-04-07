@@ -59,9 +59,7 @@ describe('#defraIdAuthProvider', () => {
         }
       )
 
-      const credentials = {
-        token: token
-      }
+      const credentials = { token }
 
       await provider.profile(credentials, { id_token: 'test-id-token' }, {})
 
