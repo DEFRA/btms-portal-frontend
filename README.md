@@ -160,6 +160,11 @@ A local environment with:
 docker compose up --build -d
 ```
 
+### Environment variable overrides
+For local development some environment variables can to be added to a `.env` file at the route of the project, (this will be ignored by Git). These will then be picked up by Convict in [src/config/config.js](src/config/config.js).
+
+An example can be taken from [.env.example](.env.example).
+
 ### Dependabot
 
 We have added an example dependabot configuration file to the repository. You can enable it by renaming

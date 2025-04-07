@@ -1,3 +1,5 @@
+process.env.TZ = 'GMT'
+
 /**
  * @type {Config}
  */
