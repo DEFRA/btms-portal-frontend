@@ -80,12 +80,23 @@ const chedDecisionDescriptions = {
   NonAcceptable: 'Non acceptable'
 }
 
+const finalStateMappings = {
+  Cleared: 'Released',
+  CancelledAfterArrival: 'Cancelled',
+  CancelledWhilePreLodged: 'Cancelled',
+  Destroyed: 'Destroyed',
+  Seized: 'Seized',
+  ReleasedToKingsWarehouse: 'Released to warehouse',
+  TransferredToMss: 'Transferred to MSS'
+}
+
 export {
   checkCodeToAuthorityMapping,
   chedDecisionDescriptions,
   chedStatusDescriptions,
   decisionCodeDescriptions,
   documentCodeToAuthorityMapping,
+  finalStateMappings,
   CHED_REF_NUMERIC_IDENTIFIER_INDEX,
   DATE_FORMAT
 }

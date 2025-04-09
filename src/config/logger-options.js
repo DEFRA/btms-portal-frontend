@@ -7,7 +7,7 @@ const serviceName = config.get('serviceName')
 const serviceVersion = config.get('serviceVersion')
 
 /**
- * @type {{ecs: Omit<LoggerOptions, "mixin"|"transport">, "pino-pretty": {transport: {target: string}}}}
+ * @type {{ecs: Omit<LoggerOptions, "mixin"|"transport">, "pino-pretty": LoggerOptions}}
  */
 const formatters = {
   ecs: {
@@ -16,7 +16,15 @@ const formatters = {
       serviceName
     })
   },
-  'pino-pretty': { transport: { target: 'pino-pretty' } }
+  'pino-pretty': {
+    transport: {
+      target: 'pino-pretty',
+      options: {
+        singleLine: true,
+        colorize: true
+      }
+    }
+  }
 }
 
 /**
