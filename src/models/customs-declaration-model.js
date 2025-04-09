@@ -75,20 +75,18 @@ const getCustomsDeclarationStatus = (commodities) => {
   return 'Unknown'
 }
 
-const getMatchStatus = (commodity, customsDeclaration) => {
+const getMatchStatus = (documentReferences, customsDeclaration) => {
   // example pre-notification reference: CHEDD.GB.2024.1234567
   const relatedPreNotifications = customsDeclaration.notifications?.data?.length
     ? customsDeclaration.notifications.data.map(n => n.id.split('.')[CHED_REF_NUMERIC_IDENTIFIER_INDEX])
     : []
-  const allDocReferences = commodity.documents
-    .filter(d => d.documentReference)
-    .map(d => d.documentReference)
+
   if (!relatedPreNotifications.length) {
-    return { isMatched: false, unmatchedDocRefs: allDocReferences }
+    return { isMatched: false, unmatchedDocRefs: documentReferences }
   }
   // example document reference: GBCHD2024.1234567
   const docRefNumericIdentifierIndex = 1
-  const unmatchedDocRefs = allDocReferences.filter(docRef =>
+  const unmatchedDocRefs = documentReferences.filter(docRef =>
     !relatedPreNotifications.includes(docRef.split('.')[docRefNumericIdentifierIndex]))
   return { isMatched: !unmatchedDocRefs.length, unmatchedDocRefs }
 }
@@ -99,13 +97,17 @@ export const createCustomsDeclarationModel = (sourceCustomsDeclaration) => {
     lastUpdated: format(new Date(sourceCustomsDeclaration.updatedSource), DATE_FORMAT),
     commodities: sourceCustomsDeclaration.items?.length
       ? sourceCustomsDeclaration.items.map(i => {
+        const documentReferences = [
+          ...new Set(i.documents.map(document => document.documentReference))
+        ]
+
         return {
           itemNumber: i.itemNumber,
           commodityCode: i.taricCommodityCode,
           commodityDesc: i.goodsDescription,
           weightOrQuantity: i.itemNetMass && i.itemNetMass !== '0' ? i.itemNetMass : (i.itemSupplementaryUnits ?? ''),
-          matchStatus: getMatchStatus(i, sourceCustomsDeclaration),
-          documents: [...new Set(i.documents.map(d => d.documentReference))],
+          matchStatus: getMatchStatus(documentReferences, sourceCustomsDeclaration),
+          documents: documentReferences,
           decisions: i.checks.map(c => `${getDecisionDescription(c.decisionCode)} (${getAuthorityByCheckCode(c.checkCode)})`)
         }
       })

@@ -107,7 +107,7 @@ describe('#createCustomsDeclarationModel', () => {
         }
       ],
       notifications: {
-        data: [{ id: 'CHEDD.GB.2024.5300753' }]
+        data: []
       }
     }
     const result = createCustomsDeclarationModel(sourceCustomsDeclaration)
@@ -121,8 +121,8 @@ describe('#createCustomsDeclarationModel', () => {
         documents: ['GBCHD2024.5300753'],
         itemNumber: 1,
         matchStatus: {
-          isMatched: true,
-          unmatchedDocRefs: []
+          isMatched: false,
+          unmatchedDocRefs: ['GBCHD2024.5300753']
         },
         weightOrQuantity: '16200'
       }],
