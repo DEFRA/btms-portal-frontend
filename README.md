@@ -106,6 +106,10 @@ To update dependencies use [npm-check-updates](https://github.com/raineorshine/n
 ncu --interactive --format group
 ```
 
+### Environment variable overrides
+
+For local development some environment variables can to be added to a `.env.local` file at the route of the project, (this will be ignored by Git). These will then be picked up by Convict in [src/config/config.js](src/config/config.js) when you start the app using `npm run dev`
+
 ### Formatting
 
 #### Windows prettier issue
