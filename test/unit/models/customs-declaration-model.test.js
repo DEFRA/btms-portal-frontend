@@ -139,4 +139,49 @@ describe('#createCustomsDeclarationModel', () => {
       lastUpdated: '7 April 2025, 08:58'
     })
   })
+
+  test('matches malformed document references', () => {
+    const sourceCustomsDeclaration = {
+      entryReference: '24GBE2IL9OF0YMQAR3',
+      updatedSource: '2025-04-10T17:08:01.725Z',
+      items: [
+        {
+          itemNumber: 1,
+          taricCommodityCode: '0806101090',
+          goodsDescription: 'EDIBLE FRUIT AND NUTS',
+          itemNetMass: '16200',
+          documents: [
+            {
+              documentCode: 'N001',
+              documentReference: 'GB.2024.7654321'
+            }
+          ],
+          checks: []
+        }
+      ],
+      notifications: {
+        data: [{ id: 'GB.CHED.2024.7654321' }]
+      }
+    }
+
+    const result = createCustomsDeclarationModel(sourceCustomsDeclaration)
+
+    expect(result).toEqual({
+      movementReferenceNumber: '24GBE2IL9OF0YMQAR3',
+      commodities: [{
+        commodityCode: '0806101090',
+        commodityDesc: 'EDIBLE FRUIT AND NUTS',
+        decisions: [],
+        documents: ['GB.2024.7654321'],
+        itemNumber: 1,
+        matchStatus: {
+          isMatched: true,
+          unmatchedDocRefs: []
+        },
+        weightOrQuantity: '16200'
+      }],
+      customsDeclarationStatus: 'Released',
+      lastUpdated: '10 April 2025, 17:08'
+    })
+  })
 })
