@@ -2,7 +2,9 @@ import { format } from 'date-fns'
 import {
   decisionCodeDescriptions,
   checkCodeToAuthorityMapping,
-  CHED_REF_NUMERIC_IDENTIFIER_INDEX, DATE_FORMAT
+  finalStateMappings,
+  CHED_REF_NUMERIC_IDENTIFIER_INDEX,
+  DATE_FORMAT
 } from './model-constants.js'
 
 const hasDesiredPrefix = (decisionCode, desiredPrefix) => {
@@ -54,32 +56,39 @@ const getAuthorityByCheckCode = (checkCode) => {
   return (checkCode?.length) ? checkCodeToAuthorityMapping[checkCode.toUpperCase()] : ''
 }
 
-const getCustomsDeclarationStatus = (commodities) => {
-  if (commodities?.length) {
-    if (commodities.some(c => c.checks.some(chk => isErrorDecisionCode(chk.decisionCode)))) {
+const getCustomsDeclarationStatus = (items, finalisation) => {
+  if (finalisation?.manualAction === true) {
+    return 'Manually released'
+  }
+
+  if (finalisation?.manualAction === false) {
+    return finalStateMappings[finalisation.finalState]
+  }
+
+  if (items?.length) {
+    if (items.some(c => c.checks.some(chk => isErrorDecisionCode(chk.decisionCode)))) {
       return 'Data error'
     }
-    if (commodities.some(c => c.checks.some(chk => isRefusalDecisionCode(chk.decisionCode)))) {
+    if (items.some(c => c.checks.some(chk => isRefusalDecisionCode(chk.decisionCode)))) {
       return 'Refusal'
     }
-    if (commodities.some(c => c.checks.some(chk => isNoMatchDecisionCode(chk.decisionCode)))) {
+    if (items.some(c => c.checks.some(chk => isNoMatchDecisionCode(chk.decisionCode)))) {
       return 'No match'
     }
-    if (commodities.some(c => c.checks.some(chk => isHoldDecisionCode(chk.decisionCode)))) {
+    if (items.some(c => c.checks.some(chk => isHoldDecisionCode(chk.decisionCode)))) {
       return 'Hold'
     }
-    if (commodities.every(c => c.checks.every(chk => isReleaseDecisionCode(chk.decisionCode)))) {
+    if (items.every(c => c.checks.every(chk => isReleaseDecisionCode(chk.decisionCode)))) {
       return 'Released'
     }
   }
   return 'Unknown'
 }
 
-const getMatchStatus = (documentReferences, customsDeclaration) => {
+const getMatchStatus = (documentReferences, notifications) => {
   // example pre-notification reference: CHEDD.GB.2024.1234567
-  const relatedPreNotifications = customsDeclaration.notifications?.data?.length
-    ? customsDeclaration.notifications.data.map(n => n.id.split('.')[CHED_REF_NUMERIC_IDENTIFIER_INDEX])
-    : []
+  const relatedPreNotifications = notifications
+    .data.map(n => n.id.split('.')[CHED_REF_NUMERIC_IDENTIFIER_INDEX])
 
   if (!relatedPreNotifications.length) {
     return { isMatched: false, unmatchedDocRefs: documentReferences }
@@ -90,13 +99,19 @@ const getMatchStatus = (documentReferences, customsDeclaration) => {
     !relatedPreNotifications.includes(docRef.split('.')[docRefNumericIdentifierIndex]))
   return { isMatched: !unmatchedDocRefs.length, unmatchedDocRefs }
 }
-export const createCustomsDeclarationModel = (sourceCustomsDeclaration) => {
+export const createCustomsDeclarationModel = ({
+  entryReference,
+  items,
+  updatedSource,
+  notifications,
+  finalisation
+}) => {
   return {
-    movementReferenceNumber: sourceCustomsDeclaration.entryReference,
-    customsDeclarationStatus: getCustomsDeclarationStatus(sourceCustomsDeclaration.items),
-    lastUpdated: format(new Date(sourceCustomsDeclaration.updatedSource), DATE_FORMAT),
-    commodities: sourceCustomsDeclaration.items?.length
-      ? sourceCustomsDeclaration.items.map(i => {
+    movementReferenceNumber: entryReference,
+    customsDeclarationStatus: getCustomsDeclarationStatus(items, finalisation),
+    lastUpdated: format(new Date(updatedSource), DATE_FORMAT),
+    commodities: items?.length
+      ? items.map(i => {
         const documentReferences = [
           ...new Set(i.documents.map(document => document.documentReference))
         ]
@@ -106,7 +121,7 @@ export const createCustomsDeclarationModel = (sourceCustomsDeclaration) => {
           commodityCode: i.taricCommodityCode,
           commodityDesc: i.goodsDescription,
           weightOrQuantity: i.itemNetMass && i.itemNetMass !== '0' ? i.itemNetMass : (i.itemSupplementaryUnits ?? ''),
-          matchStatus: getMatchStatus(documentReferences, sourceCustomsDeclaration),
+          matchStatus: getMatchStatus(documentReferences, notifications),
           documents: documentReferences,
           decisions: i.checks.map(c => `${getDecisionDescription(c.decisionCode)} (${getAuthorityByCheckCode(c.checkCode)})`)
         }
