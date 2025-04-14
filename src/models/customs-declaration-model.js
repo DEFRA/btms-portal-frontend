@@ -3,6 +3,7 @@ import {
   decisionCodeDescriptions,
   checkCodeToAuthorityMapping,
   finalStateMappings,
+  IUUDocumentReferences,
   CHED_REF_NUMERIC_IDENTIFIER_INDEX,
   DATE_FORMAT
 } from './model-constants.js'
@@ -114,7 +115,10 @@ export const createCustomsDeclarationModel = ({
     commodities: items?.length
       ? items.map(i => {
         const documentReferences = [
-          ...new Set(i.documents.map(document => document.documentReference))
+          ...new Set(i.documents
+            .filter(({ documentCode }) => !IUUDocumentReferences.includes(documentCode))
+            .map(({ documentReference }) => documentReference)
+          )
         ]
 
         return {

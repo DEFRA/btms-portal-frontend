@@ -56,6 +56,8 @@ const documentCodeToAuthorityMapping = {
   N002: authorities.HORTICULTURAL_MARKETING_INSPECTORATE
 }
 
+const IUUDocumentReferences = ['C641', 'C673']
+
 const chedStatusDescriptions = {
   Amend: 'Amend',
   Cancelled: 'Cancelled',
@@ -97,6 +99,7 @@ export {
   decisionCodeDescriptions,
   documentCodeToAuthorityMapping,
   finalStateMappings,
+  IUUDocumentReferences,
   CHED_REF_NUMERIC_IDENTIFIER_INDEX,
   DATE_FORMAT
 }
