@@ -93,10 +93,11 @@ const getMatchStatus = (documentReferences, notifications) => {
   if (!relatedPreNotifications.length) {
     return { isMatched: false, unmatchedDocRefs: documentReferences }
   }
-  // example document reference: GBCHD2024.1234567
-  const docRefNumericIdentifierIndex = 1
+  // example document reference: GBCHD2024.1234567 or GB.2024.1234567
+  const refMatchLength = 7
   const unmatchedDocRefs = documentReferences.filter(docRef =>
-    !relatedPreNotifications.includes(docRef.split('.')[docRefNumericIdentifierIndex]))
+    !relatedPreNotifications.includes(docRef.slice(-refMatchLength)))
+
   return { isMatched: !unmatchedDocRefs.length, unmatchedDocRefs }
 }
 export const createCustomsDeclarationModel = ({
