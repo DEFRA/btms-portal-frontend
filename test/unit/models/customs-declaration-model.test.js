@@ -184,4 +184,61 @@ describe('#createCustomsDeclarationModel', () => {
       lastUpdated: '10 April 2025, 17:08'
     })
   })
+
+  test('filters out IUU Document references', () => {
+    const sourceCustomsDeclaration = {
+      entryReference: '25GB14XSTDMHNNIUU1',
+      updatedSource: '2025-04-14T17:24:01.725Z',
+      items: [
+        {
+          itemNumber: 1,
+          taricCommodityCode: '0304719030',
+          goodsDescription: 'FROZEN MSC A COD FILLETS',
+          itemNetMass: '17088.98',
+          documents: [
+            {
+              documentCode: 'N001',
+              documentReference: 'GB.2025.2233441'
+            },
+            {
+              documentCode: 'C641',
+              documentReference: 'GB.2025.2233442'
+            },
+            {
+              documentCode: 'C673',
+              documentReference: 'GB.2025.2233443'
+            }
+          ],
+          checks: []
+        }
+      ],
+      notifications: {
+        data: [
+          { id: 'GB.CHED.2025.2233441' },
+          { id: 'GB.IUURU.2025.2233442' },
+          { id: 'GB.IUURU.2025.2233443' }
+        ]
+      }
+    }
+
+    const result = createCustomsDeclarationModel(sourceCustomsDeclaration)
+
+    expect(result).toEqual({
+      movementReferenceNumber: '25GB14XSTDMHNNIUU1',
+      commodities: [{
+        commodityCode: '0304719030',
+        commodityDesc: 'FROZEN MSC A COD FILLETS',
+        decisions: [],
+        documents: ['GB.2025.2233441'],
+        itemNumber: 1,
+        matchStatus: {
+          isMatched: true,
+          unmatchedDocRefs: []
+        },
+        weightOrQuantity: '17088.98'
+      }],
+      customsDeclarationStatus: 'Released',
+      lastUpdated: '14 April 2025, 17:24'
+    })
+  })
 })
