@@ -57,27 +57,28 @@ const createTestCommodities = (testDecisionCode = 'X00') => {
 
 describe('#createCustomsDeclarationModel', () => {
   test.each([
-    { decisionCode: 'X00', finalisation: null, expectedStatus: 'No match', preNotifications: { data: [] }, expectedDecision: 'No Match (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus },
-    { decisionCode: 'C03', finalisation: null, expectedStatus: 'Released', preNotifications: testPreNotifications, expectedDecision: 'Release - Inspection Complete (PHA - FNAO)', expectedMatchStatus: matchedMatchStatus },
-    { decisionCode: 'N02', finalisation: null, expectedStatus: 'Refusal', preNotifications: testPreNotifications, expectedDecision: 'Refusal - Destroy (PHA - FNAO)', expectedMatchStatus: matchedMatchStatus },
-    { decisionCode: 'H01', finalisation: null, expectedStatus: 'Hold', preNotifications: testPreNotifications, expectedDecision: 'Hold - Awaiting Decision (PHA - FNAO)', expectedMatchStatus: matchedMatchStatus },
-    { decisionCode: 'E02', finalisation: null, expectedStatus: 'Data error', preNotifications: { data: [] }, expectedDecision: 'Data error - Data Error Full Dec vs CFSP loc (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus },
-    { decisionCode: null, finalisation: null, expectedStatus: 'Unknown', preNotifications: { data: [] }, expectedDecision: 'Unknown (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus },
-    { decisionCode: null, finalisation: { finalState: '', manualAction: true }, expectedStatus: 'Manually released', preNotifications: { data: [] }, expectedDecision: 'Unknown (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus },
-    { decisionCode: null, finalisation: { finalState: 'Cleared', manualAction: false }, expectedStatus: 'Released', preNotifications: { data: [] }, expectedDecision: 'Unknown (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus },
-    { decisionCode: null, finalisation: { finalState: 'CancelledAfterArrival', manualAction: false }, expectedStatus: 'Cancelled', preNotifications: { data: [] }, expectedDecision: 'Unknown (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus },
-    { decisionCode: null, finalisation: { finalState: 'CancelledWhilePreLodged', manualAction: false }, expectedStatus: 'Cancelled', preNotifications: { data: [] }, expectedDecision: 'Unknown (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus },
-    { decisionCode: null, finalisation: { finalState: 'Destroyed', manualAction: false }, expectedStatus: 'Destroyed', preNotifications: { data: [] }, expectedDecision: 'Unknown (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus },
-    { decisionCode: null, finalisation: { finalState: 'Seized', manualAction: false }, expectedStatus: 'Seized', preNotifications: { data: [] }, expectedDecision: 'Unknown (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus },
-    { decisionCode: null, finalisation: { finalState: 'ReleasedToKingsWarehouse', manualAction: false }, expectedStatus: 'Released to warehouse', preNotifications: { data: [] }, expectedDecision: 'Unknown (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus },
-    { decisionCode: null, finalisation: { finalState: 'TransferredToMss', manualAction: false }, expectedStatus: 'Transferred to MSS', preNotifications: { data: [] }, expectedDecision: 'Unknown (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus }
-  ])('should return a model with the correct structure for decision code $decisionCode', ({ decisionCode, finalisation, expectedStatus, preNotifications, expectedDecision, expectedMatchStatus }) => {
+    { decisionCode: 'X00', finalisation: null, expectedStatus: 'No match', preNotifications: { data: [] }, expectedDecision: 'No Match (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus, open: true },
+    { decisionCode: 'C03', finalisation: null, expectedStatus: 'Released', preNotifications: testPreNotifications, expectedDecision: 'Release - Inspection Complete (PHA - FNAO)', expectedMatchStatus: matchedMatchStatus, open: true },
+    { decisionCode: 'N02', finalisation: null, expectedStatus: 'Refusal', preNotifications: testPreNotifications, expectedDecision: 'Refusal - Destroy (PHA - FNAO)', expectedMatchStatus: matchedMatchStatus, open: true },
+    { decisionCode: 'H01', finalisation: null, expectedStatus: 'Hold', preNotifications: testPreNotifications, expectedDecision: 'Hold - Awaiting Decision (PHA - FNAO)', expectedMatchStatus: matchedMatchStatus, open: true },
+    { decisionCode: 'E02', finalisation: null, expectedStatus: 'Data error', preNotifications: { data: [] }, expectedDecision: 'Data error - Data Error Full Dec vs CFSP loc (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus, open: true },
+    { decisionCode: null, finalisation: null, expectedStatus: 'Unknown', preNotifications: { data: [] }, expectedDecision: 'Unknown (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus, open: true },
+    { decisionCode: null, finalisation: { finalState: '', manualAction: true }, expectedStatus: 'Manually released', preNotifications: { data: [] }, expectedDecision: 'Unknown (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus, open: true },
+    { decisionCode: null, finalisation: { finalState: 'Cleared', manualAction: false }, expectedStatus: 'Released', preNotifications: { data: [] }, expectedDecision: 'Unknown (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus, open: true },
+    { decisionCode: null, finalisation: { finalState: 'CancelledAfterArrival', manualAction: false }, expectedStatus: 'Cancelled', preNotifications: { data: [] }, expectedDecision: 'Unknown (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus, open: false },
+    { decisionCode: null, finalisation: { finalState: 'CancelledWhilePreLodged', manualAction: false }, expectedStatus: 'Cancelled', preNotifications: { data: [] }, expectedDecision: 'Unknown (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus, open: false },
+    { decisionCode: null, finalisation: { finalState: 'Destroyed', manualAction: false }, expectedStatus: 'Destroyed', preNotifications: { data: [] }, expectedDecision: 'Unknown (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus, open: true },
+    { decisionCode: null, finalisation: { finalState: 'Seized', manualAction: false }, expectedStatus: 'Seized', preNotifications: { data: [] }, expectedDecision: 'Unknown (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus, open: true },
+    { decisionCode: null, finalisation: { finalState: 'ReleasedToKingsWarehouse', manualAction: false }, expectedStatus: 'Released to warehouse', preNotifications: { data: [] }, expectedDecision: 'Unknown (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus, open: true },
+    { decisionCode: null, finalisation: { finalState: 'TransferredToMss', manualAction: false }, expectedStatus: 'Transferred to MSS', preNotifications: { data: [] }, expectedDecision: 'Unknown (PHA - FNAO)', expectedMatchStatus: notMatchedMatchStatus, open: true }
+  ])('should return a model with the correct structure for decision code $decisionCode', ({ decisionCode, finalisation, expectedStatus, preNotifications, expectedDecision, expectedMatchStatus, open }) => {
     const testCustomsDeclaration = createTestCustomsDeclaration(createTestCommodities(decisionCode), preNotifications, finalisation)
     const result = createCustomsDeclarationModel(testCustomsDeclaration)
     expect(result).toEqual({
       movementReferenceNumber: '24GBD46UUIIABCDEF1',
       customsDeclarationStatus: expectedStatus,
       lastUpdated: '21 December 2024, 14:00',
+      open,
       commodities: [
         {
           commodityCode: '1207409000',
@@ -123,6 +124,7 @@ describe('#createCustomsDeclarationModel', () => {
 
     expect(result).toEqual({
       movementReferenceNumber: '24GBE2IL9OF0YMQAR2',
+      open: true,
       commodities: [{
         commodityCode: '0806101090',
         commodityDesc: 'EDIBLE FRUIT AND NUTS',
@@ -168,6 +170,7 @@ describe('#createCustomsDeclarationModel', () => {
 
     expect(result).toEqual({
       movementReferenceNumber: '24GBE2IL9OF0YMQAR3',
+      open: true,
       commodities: [{
         commodityCode: '0806101090',
         commodityDesc: 'EDIBLE FRUIT AND NUTS',
@@ -225,6 +228,7 @@ describe('#createCustomsDeclarationModel', () => {
 
     expect(result).toEqual({
       movementReferenceNumber: '25GB14XSTDMHNNIUU1',
+      open: true,
       commodities: [{
         commodityCode: '0304719030',
         commodityDesc: 'FROZEN MSC A COD FILLETS',

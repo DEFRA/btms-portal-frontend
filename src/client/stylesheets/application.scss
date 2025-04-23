@@ -1,9 +1,7 @@
 @use "govuk-frontend" as *;
 
-@use "variables";
+@use "variables" as *;
 @use "core";
-@use "heading";
-@use "navigation";
 @use "app-search";
 @use "app-search-result";
 

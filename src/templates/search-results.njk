@@ -1,38 +1,5 @@
 {% extends 'layout.njk' %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% from "govuk/components/table/macro.njk" import govukTable %}
-{% from "govuk/components/tag/macro.njk" import govukTag %}
-
-{% macro customsDeclarationCHEDReferences(documents, unmatchedDocRefs) %}
-  {% if documents %}
-    <ul class="govuk-list app-import-commodities__ched-ref--documents-list">
-      {% for document in documents %}
-        {% if document in unmatchedDocRefs %}
-          <li class="app-import-commodities__ched-ref--unmatched">{{ document }}</li>
-        {% else %}
-          <li>{{ document }}</li>
-        {% endif %}
-      {% endfor %}
-    </ul>
-  {% endif %}
-{% endmacro %}
-
-{% macro customsDeclarationMatchStatus(isMatched, unmatchedDocRefs) %}
-  {% if isMatched %}
-    {{ govukTag({ text: "Yes", classes: "govuk-tag--green app-import-commodities__match--yes" }) }}
-  {% else %}
-    {{ govukTag({ text: "No", classes: "govuk-tag--red app-import-commodities__match--no" }) }}
-    <p class="app-import-commodities__match--no-tooltip" role="tooltip">The following CHED reference from the customs declaration cannot be found. Check the CHED reference on the customs declaration:<br/>
-      <br/>{{ unmatchedDocRefs | join("<br/>") | safe }}</p>
-  {% endif %}
-{% endmacro %}
-
-{% macro commodityDescription(commodityDesc, maxLength) %}
-  {{ commodityDesc | truncate(maxLength, true) }}
-  {% if commodityDesc | length > maxLength %}
-    <div class="app-import-commodities__description--tooltip" role="tooltip">{{ commodityDesc }}</div>
-  {% endif %}
-{% endmacro %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
 
 {% set pageTitle = "Search result" %}
 
@@ -45,159 +12,49 @@
         <a class="govuk-link govuk-link--no-visited-state" href="/search">Search again</a>
       </div>
       <h2 class="govuk-heading-m">Customs declaration details</h1>
-
       {% for customsDeclaration in customsDeclarations %}
-
-      {{ govukSummaryList({
-        classes: "app-customs-declaration-summary",
-        rows: [
-          {
-            key: {
-              text: "MRN"
-            },
-            value: {
-              text: customsDeclaration.movementReferenceNumber
+        {% set declarationSummaryHTML %}
+          {% include "./includes/declaration-summary.njk" %}
+        {% endset %}
+        {% set declarationHTML %}
+         {% include "./includes/declaration-html.njk" %}
+        {% endset %}
+        {{
+          govukDetails({
+            summaryHtml: declarationSummaryHTML,
+            html: declarationHTML,
+            open: customsDeclaration.open,
+            classes: 'btms-details',
+            attributes: {
+              'aria-label': customsDeclaration.movementReferenceNumber
             }
-          },
-          {
-            key: {
-              text: "Status"
-            },
-            value: {
-              text: customsDeclaration.customsDeclarationStatus
-            }
-          },
-          {
-            key: {
-              text: "Last updated"
-            },
-            value: {
-              text: customsDeclaration.lastUpdated
-            }
-          }
-        ]
-      }) }}
-
-      {% set tableRows = [] %}
-      {% for commodity in customsDeclaration.commodities %}
-          {% set tableRows = (tableRows.push([
-          { text: commodity.itemNumber },
-          { text: commodity.commodityCode },
-          { text: commodityDescription(commodity.commodityDesc, 24) },
-          { text: commodity.weightOrQuantity },
-          { html: customsDeclarationCHEDReferences(commodity.documents, commodity.matchStatus.unmatchedDocRefs) },
-          { html: customsDeclarationMatchStatus(commodity.matchStatus.isMatched, commodity.matchStatus.unmatchedDocRefs) },
-          { html: commodity.decisions | join("<br/>")}]), tableRows) %}
+          })
+        }}
+      {% else %}
+        <p class="govuk-body">No customs declarations found.</p>
       {% endfor %}
-
-      {{ govukTable({
-          classes: "govuk-table--small-text-until-tablet app-import-commodities",
-          head: [
-            {
-              text: "Item number"
-            },
-            {
-              text: "Commodity code"
-            },
-            {
-              text: "Description"
-            },
-            {
-              text: "Quantity / Weight"
-            },
-            {
-              text: "CHED reference"
-            },
-            {
-              text: "Match"
-            },
-            {
-              text: "Decision (authority)"
+      <h2 class="govuk-heading-m">IPAFFS notification (CHED) details</h2>
+      {% for preNotification in preNotifications %}
+        {% set notificationSummaryHTML %}
+          {% include "./includes/notification-summary.njk" %}
+        {% endset %}
+        {% set notificationHTML %}
+          {% include "./includes/notification-html.njk" %}
+        {% endset %}
+        {{
+          govukDetails({
+            summaryHtml: notificationSummaryHTML,
+            html: notificationHTML,
+            open: preNotification.open,
+            classes: 'btms-details',
+            attributes: {
+              'aria-label': preNotification.chedRef
             }
-          ],
-          rows: tableRows
-      }) }}
-{% else %}
-<p class="govuk-body">No customs declarations found.</p>
-{% endfor %}
-
-<h2 class="govuk-heading-m">IPAFFS notification (CHED) details</h2>
-{% for preNotification in preNotifications %}
-
- {{ govukSummaryList({
-        classes: "app-customs-declaration-summary",
-        rows: [
-          {
-            key: {
-              "text": "CHED Reference"
-            },
-            value: {
-              "text": preNotification.chedRef
-            }
-          },
-          {
-            key: {
-              text: "CHED Status"
-            },
-            value: {
-              text: preNotification.status
-            }
-          },
-          {
-            key: {
-              text: "Last updated"
-            },
-            value: {
-              text: preNotification.lastUpdated
-            }
-          },
-          {
-            key: {
-              text: "Authorities"
-            },
-            value: {
-              text: preNotification.authorities | join(", ")
-            }
-          }
-        ]
-      }) }}
-
-      {% set tableRows = [] %}
-      {% for commodity in preNotification.commodities %}
-          {% set tableRows = (tableRows.push([
-          { text: commodity.itemNumber },
-          { text: commodity.commodityCode },
-          { text: commodityDescription(commodity.commodityDesc, 50) },
-          { text: commodity.weightOrQuantity },
-          { text: preNotification.decision + ' (' + preNotification.authorities | join(", ") + ')'}]), tableRows) %}
+          })
+        }}
+      {% else %}
+        <p class="govuk-body">No pre-notifications found.</p>
       {% endfor %}
-
-      {{ govukTable({
-                classes: "govuk-table--small-text-until-tablet app-import-commodities",
-                head: [
-                  {
-                    text: "Item number"
-                  },
-                  {
-                    text: "Commodity code"
-                  },
-                  {
-                    text: "Description"
-                  },
-                  {
-                    text: "Quantity / Weight"
-                  },
-                  {
-                    text: "Decision (authority)"
-                  }
-                ],
-                rows: tableRows
-            }) }}
-
-{% else %}
-<p class="govuk-body">No pre-notifications found.</p>
-{% endfor %}
     </div>
   </div>
-
 {% endblock %}

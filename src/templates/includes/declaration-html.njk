@@ -1,0 +1,46 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "../macros/commodity-description.njk" import commodityDescription %}
+{% from "../macros/declaration-match-status.njk" import declarationMatchStatus %}
+{% from "../macros/declaration-ched-references.njk" import declarationCHEDReferences %}
+
+{%
+  set tableHead =
+    [
+      { text: "Item number" },
+      { text: "Commodity code" },
+      { text: "Description" },
+      { text: "Quantity / Weight" },
+      { text: "CHED reference" },
+      { text: "Match" },
+      { text: "Decision (authority)" }
+    ]
+%}
+
+{% set tableRows = [] %}
+{% for commodity in customsDeclaration.commodities %}
+  {%
+    set tableRows =
+      (
+        tableRows.push(
+          [
+            { text: commodity.itemNumber },
+            { text: commodity.commodityCode },
+            { text: commodityDescription(commodity.commodityDesc, 24) },
+            { text: commodity.weightOrQuantity },
+            { html: declarationCHEDReferences(commodity.documents, commodity.matchStatus.unmatchedDocRefs) },
+            { html: declarationMatchStatus(commodity.matchStatus.isMatched, commodity.matchStatus.unmatchedDocRefs) },
+            { html: commodity.decisions | join("<br/>")}
+          ]
+        ),
+        tableRows
+      )
+  %}
+{% endfor %}
+
+{{
+  govukTable({
+    classes: "govuk-table--small-text-until-tablet app-import-commodities",
+    head: tableHead,
+    rows: tableRows
+  })
+}}

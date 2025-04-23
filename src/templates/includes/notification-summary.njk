@@ -1,0 +1,25 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{{
+  govukSummaryList({
+    classes: "app-customs-declaration-summary",
+    rows: [
+      {
+        key: { text: "CHED Reference" },
+        value: { text: preNotification.chedRef }
+      },
+      {
+        key: { text: "CHED Status" },
+        value: { text: preNotification.status }
+      },
+      {
+        key: { text: "Last updated" },
+        value: { text: preNotification.lastUpdated }
+      },
+      {
+        key: { text: "Authorities" },
+        value: { text: preNotification.authorities | join(", ") }
+      }
+    ]
+  })
+}}

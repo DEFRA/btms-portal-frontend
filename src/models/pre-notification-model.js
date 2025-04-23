@@ -2,7 +2,9 @@ import { format } from 'date-fns'
 import {
   chedStatusDescriptions,
   chedDecisionDescriptions,
-  documentCodeToAuthorityMapping, DATE_FORMAT
+  documentCodeToAuthorityMapping,
+  displayClosedChedStatuses,
+  DATE_FORMAT
 } from './model-constants.js'
 
 const getAuthorities = (documentCodes) => {
@@ -62,6 +64,7 @@ export const createPreNotificationModel = (sourcePreNotification, relatedDocumen
     }),
     decision: getDecision(sourcePreNotification),
     lastUpdated: format(new Date(sourcePreNotification.updatedSource), DATE_FORMAT),
-    status: getStatus(sourcePreNotification.status)
+    status: getStatus(sourcePreNotification.status),
+    open: !displayClosedChedStatuses.includes(sourcePreNotification.status)
   }
 }

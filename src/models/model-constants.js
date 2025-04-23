@@ -72,6 +72,8 @@ const chedStatusDescriptions = {
   Validated: 'Validated'
 }
 
+const displayClosedChedStatuses = ['Cancelled', 'Deleted', 'Rejected']
+
 const chedDecisionDescriptions = {
   AcceptableForInternalMarket: 'Acceptable for internal market',
   AcceptableForSpecificWarehouse: 'Acceptable for specific warehouse',
@@ -100,6 +102,7 @@ export {
   documentCodeToAuthorityMapping,
   finalStateMappings,
   IUUDocumentReferences,
+  displayClosedChedStatuses,
   CHED_REF_NUMERIC_IDENTIFIER_INDEX,
   DATE_FORMAT
 }

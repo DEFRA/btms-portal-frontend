@@ -1,0 +1,21 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{{
+  govukSummaryList({
+    classes: "app-customs-declaration-summary",
+    rows: [
+      {
+        key: { text: "MRN" },
+        value: { text: customsDeclaration.movementReferenceNumber }
+      },
+      {
+        key: { text: "Status" },
+        value: { text: customsDeclaration.customsDeclarationStatus }
+      },
+      {
+        key: { text: "Last updated" },
+        value: { text: customsDeclaration.lastUpdated }
+      }
+    ]
+  })
+}}
