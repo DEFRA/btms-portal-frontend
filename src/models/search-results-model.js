@@ -21,6 +21,12 @@ export const createSearchResultsModel = (searchResult) => {
     preNotifications: searchResult.preNotifications.map(pn => {
       const relatedDocumentCodes = getRelatedDocumentCodes(searchResult.customsDeclarations, pn.id)
       return createPreNotificationModel(pn, relatedDocumentCodes)
-    })
+    }),
+    breadcrumbs: [{
+      text: 'Search',
+      href: '/search'
+    }, {
+      text: searchResult.searchTerm
+    }]
   }
 }

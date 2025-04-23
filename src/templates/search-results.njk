@@ -39,8 +39,11 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <span class="govuk-caption-l">Search results for</span>
-      <h1 class="govuk-heading-l">{{ searchTerm }}</h1>
+      <span class="govuk-caption-l">Showing results for</span>
+      <div class="btms-heading-container">
+        <h1 class="govuk-heading-l">{{ searchTerm }}</h1>
+        <a class="govuk-link govuk-link--no-visited-state" href="/search">Search again</a>
+      </div>
       <h2 class="govuk-heading-m">Customs declaration details</h1>
 
       {% for customsDeclaration in customsDeclarations %}

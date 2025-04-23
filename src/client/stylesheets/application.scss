@@ -10,3 +10,9 @@
 .app-width-container--wide {
     @include govuk-width-container(1200px);
 }
+
+.btms-heading-container {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
