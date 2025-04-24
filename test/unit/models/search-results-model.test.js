@@ -42,7 +42,13 @@ describe('#createSearchResultsModel', () => {
       searchTerm: testSearchResult.searchTerm,
       searchType: testSearchResult.searchType,
       customsDeclarations: [testCustomsDeclarationModel],
-      preNotifications: [testPreNotificationModel]
+      preNotifications: [testPreNotificationModel],
+      breadcrumbs: [{
+        text: 'Search',
+        href: '/search'
+      }, {
+        text: testSearchResult.searchTerm
+      }]
     })
   })
 })
