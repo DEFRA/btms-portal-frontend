@@ -108,10 +108,14 @@ export const createCustomsDeclarationModel = ({
   notifications,
   finalisation
 }) => {
+  const customsDeclarationStatus = getCustomsDeclarationStatus(items, finalisation)
+  const open = customsDeclarationStatus !== 'Cancelled'
+
   return {
     movementReferenceNumber: entryReference,
-    customsDeclarationStatus: getCustomsDeclarationStatus(items, finalisation),
+    customsDeclarationStatus,
     lastUpdated: format(new Date(updatedSource), DATE_FORMAT),
+    open,
     commodities: items?.length
       ? items.map(i => {
         const documentReferences = [

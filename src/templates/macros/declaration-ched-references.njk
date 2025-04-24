@@ -1,0 +1,13 @@
+{% macro declarationCHEDReferences(documents, unmatchedDocRefs) %}
+  {% if documents %}
+    <ul class="govuk-list app-import-commodities__ched-ref--documents-list">
+      {% for document in documents %}
+        {% if document in unmatchedDocRefs %}
+          <li class="app-import-commodities__ched-ref--unmatched">{{ document }}</li>
+        {% else %}
+          <li>{{ document }}</li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endmacro %}

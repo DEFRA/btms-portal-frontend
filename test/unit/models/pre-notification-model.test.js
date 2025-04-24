@@ -43,7 +43,28 @@ describe('#createPreNotificationModel', () => {
       ],
       decision: 'Decision not given',
       lastUpdated: '21 December 2024, 14:00',
+      open: true,
       status: 'Unknown'
+    })
+  })
+
+  test('sets Cancelled, Deleted or Rejected notifications as closed', () => {
+    const testPreNotification = {
+      status: 'Cancelled',
+      commodities: [],
+      updatedSource: '2025-04-17T16:00:00Z'
+    }
+
+    const preNotificationModel = createPreNotificationModel(testPreNotification, ['N852'])
+
+    expect(preNotificationModel).toEqual({
+      authorities: ['PHA - FNAO'],
+      chedRef: testPreNotification.id,
+      commodities: [],
+      decision: 'Decision not given',
+      lastUpdated: '17 April 2025, 16:00',
+      status: 'Cancelled',
+      open: false
     })
   })
 
@@ -84,7 +105,8 @@ describe('#createPreNotificationModel', () => {
       ],
       decision: 'Acceptable for internal market',
       lastUpdated: '21 December 2024, 14:00',
-      status: testPreNotification.status
+      status: testPreNotification.status,
+      open: true
     })
   })
 })
