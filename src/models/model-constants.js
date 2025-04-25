@@ -72,7 +72,7 @@ const chedStatusDescriptions = {
   Validated: 'Validated'
 }
 
-const displayClosedChedStatuses = ['Cancelled', 'Deleted', 'Rejected']
+const displayClosedChedStatuses = ['Cancelled', 'Deleted', 'Replaced']
 
 const chedDecisionDescriptions = {
   AcceptableForInternalMarket: 'Acceptable for internal market',

@@ -48,7 +48,7 @@ describe('#createPreNotificationModel', () => {
     })
   })
 
-  test('sets Cancelled, Deleted or Rejected notifications as closed', () => {
+  test('sets Cancelled, Deleted or Replaced notifications as closed', () => {
     const testPreNotification = {
       status: 'Cancelled',
       commodities: [],
