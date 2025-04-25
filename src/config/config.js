@@ -260,8 +260,7 @@ const config = convict({
         doc: 'DEFRA ID OIDC Configuration URL',
         format: String,
         env: 'AUTH_DEFRA_ID_OIDC_CONFIGURATION_URL',
-        default:
-          'https://dcidmtest.b2clogin.com/dcidmtest.onmicrosoft.com/b2c_1a_cui_signin_stub/.well-known/openid-configuration'
+        default: 'https://dcidmtest.b2clogin.com/dcidmtest.onmicrosoft.com/b2c_1a_cui_signin_stub/.well-known/openid-configuration'
       },
       serviceId: {
         doc: 'DEFRA ID Service ID',
@@ -287,6 +286,40 @@ const config = convict({
         format: Array,
         sensitive: true,
         env: 'AUTH_DEFRA_ID_SCOPES',
+        default: ['openid', 'offline_access']
+      }
+    },
+    entraId: {
+      oidcConfigurationUrl: {
+        doc: 'ENTRA ID OIDC Configuration URL',
+        format: String,
+        env: 'AUTH_ENTRA_ID_OIDC_CONFIGURATION_URL',
+        default: 'http://localhost:8080/entra-id-stub/.well-known/openid-configuration'
+      },
+      serviceId: {
+        doc: 'ENTRA ID Service ID',
+        format: String,
+        env: 'AUTH_ENTRA_ID_SERVICE_ID',
+        default: '9f6fab72-0972-459d-adf7-d010bd7d1b3b'
+      },
+      clientId: {
+        doc: 'ENTRA ID Client ID',
+        format: String,
+        env: 'AUTH_ENTRA_ID_CLIENT_ID',
+        default: 'b0c83fa1-1458-4a4d-a5bf-97bebb101217'
+      },
+      clientSecret: {
+        doc: 'ENTRA ID Client Secret',
+        format: String,
+        sensitive: true,
+        env: 'AUTH_ENTRA_ID_CLIENT_SECRET',
+        default: ''
+      },
+      scopes: {
+        doc: 'ENTRA ID Scopes',
+        format: Array,
+        sensitive: true,
+        env: 'AUTH_ENTRA_ID_SCOPES',
         default: ['openid', 'offline_access']
       }
     }

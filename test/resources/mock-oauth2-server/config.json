@@ -1,0 +1,27 @@
+{
+  "interactiveLogin": true,
+  "httpServer": "NettyWrapper",
+  "loginPagePath": "/app/login/login.html",
+  "tokenCallbacks": [
+    {
+      "issuerId": "entra-id-stub",
+      "tokenExpiry": 120,
+      "requestMappings": [
+        {
+          "requestParam": "client_id",
+          "match": "b0c83fa1-1458-4a4d-a5bf-97bebb101217",
+          "claims": {
+            "firstName": "Internal",
+            "lastName": "User1",
+            "email": "user1@test.com",
+            "roles": ["BTMS_READ"],
+            "sub": "user1",
+            "aud": [
+              "btms-portal-frontend"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
