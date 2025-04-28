@@ -294,7 +294,7 @@ const config = convict({
       oidcConfigurationUrl: {
         doc: 'Entra ID OIDC Configuration URL',
         format: String,
-        env: 'AUTH_ENTRA_OIDC_CONFIGURATION_URL',
+        env: 'AUTH_ENTRA_ID_OIDC_CONFIGURATION_URL',
         default: 'https://login.microsoftonline.com/c9d74090-b4e6-4b04-981d-e6757a160812/v2.0/.well-known/openid-configuration'
       },
       clientId: {
