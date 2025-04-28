@@ -1,15 +1,13 @@
-import { createLogger } from '../utils/logger.js'
-
 import { config, configKeys } from '../config/config.js'
 import { getUserSession } from './user-session.js'
-import { getDefraIdRefreshToken } from './defra-id-client.js'
+import { getOpenIdRefreshToken } from './open-id-client.js'
 import { paths } from '../routes/route-constants.js'
-
-const authConfig = config.get('auth.defraId')
-const logger = createLogger()
 
 async function refreshAccessToken (request) {
   const authedUser = await getUserSession(request)
+  request.logger.setBindings({ refreshingAccessToken: authedUser.strategy })
+
+  const authConfig = config.get('auth')[authedUser.strategy]
   const refreshToken = authedUser?.refreshToken ?? null
   const clientId = authConfig.clientId
   const clientSecret = authConfig.clientSecret
@@ -25,9 +23,7 @@ async function refreshAccessToken (request) {
     redirect_uri: redirectUri
   }
 
-  logger.info('Access token expired, refreshing...')
-
-  return getDefraIdRefreshToken(authedUser.tokenUrl, params)
+  return getOpenIdRefreshToken(authedUser.tokenUrl, params)
 }
 
 export { refreshAccessToken }

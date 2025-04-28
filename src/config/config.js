@@ -257,36 +257,64 @@ const config = convict({
   auth: {
     defraId: {
       oidcConfigurationUrl: {
-        doc: 'DEFRA ID OIDC Configuration URL',
+        doc: 'Defra ID OIDC Configuration URL',
         format: String,
         env: 'AUTH_DEFRA_ID_OIDC_CONFIGURATION_URL',
         default:
           'https://dcidmtest.b2clogin.com/dcidmtest.onmicrosoft.com/b2c_1a_cui_signin_stub/.well-known/openid-configuration'
       },
       serviceId: {
-        doc: 'DEFRA ID Service ID',
+        doc: 'Defra ID Service ID',
         format: String,
         env: 'AUTH_DEFRA_ID_SERVICE_ID',
         default: 'd7d72b79-9c62-ee11-8df0-000d3adf7047'
       },
       clientId: {
-        doc: 'DEFRA ID Client ID',
+        doc: 'Defra ID Client ID',
         format: String,
         env: 'AUTH_DEFRA_ID_CLIENT_ID',
         default: '2fb0d715-affa-4bf1-836e-44a464e3fbea'
       },
       clientSecret: {
-        doc: 'DEFRA ID Client Secret',
+        doc: 'Defra ID Client Secret',
         format: String,
         sensitive: true,
         env: 'AUTH_DEFRA_ID_CLIENT_SECRET',
         default: ''
       },
       scopes: {
-        doc: 'DEFRA ID Scopes',
+        doc: 'Defra ID Scopes',
         format: Array,
         sensitive: true,
         env: 'AUTH_DEFRA_ID_SCOPES',
+        default: ['openid', 'offline_access']
+      }
+    },
+    entraId: {
+      oidcConfigurationUrl: {
+        doc: 'Entra ID OIDC Configuration URL',
+        format: String,
+        env: 'AUTH_ENTRA_OIDC_CONFIGURATION_URL',
+        default: 'https://login.microsoftonline.com/c9d74090-b4e6-4b04-981d-e6757a160812/v2.0/.well-known/openid-configuration'
+      },
+      clientId: {
+        doc: 'ENTRA ID Client ID',
+        format: String,
+        env: 'AUTH_ENTRA_ID_CLIENT_ID',
+        default: 'af179e5f-b5e3-4218-b791-c930f4e200b3'
+      },
+      clientSecret: {
+        doc: 'ENTRA ID Client Secret',
+        format: String,
+        sensitive: true,
+        env: 'AUTH_ENTRA_ID_CLIENT_SECRET',
+        default: ''
+      },
+      scopes: {
+        doc: 'ENTRA ID Scopes',
+        format: Array,
+        sensitive: true,
+        env: 'AUTH_ENTRA_ID_SCOPES',
         default: ['openid', 'offline_access']
       }
     }

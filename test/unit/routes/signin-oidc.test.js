@@ -25,7 +25,7 @@ describe('#signinOidc', () => {
         method: 'GET',
         url: paths.AUTH_DEFRA_ID_CALLBACK,
         auth: {
-          strategy: 'defra-id',
+          strategy: 'defraId',
           credentials: userSession
         }
       })

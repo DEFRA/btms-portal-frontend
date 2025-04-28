@@ -1,5 +1,5 @@
-import Wreck from '@hapi/wreck'
-import { getDefraIdAuthConfig, getDefraIdRefreshToken } from '../../../src/auth/defra-id-client.js'
+import wreck from '@hapi/wreck'
+import { getOpenIdConfig, getOpenIdRefreshToken } from '../../../src/auth/open-id-client.js'
 
 const mockPost = jest.fn()
 
@@ -18,12 +18,12 @@ jest.mock('../../../src/utils/logger.js', () => ({
 const oidcConfigUrl = 'https://some-oidc-configuration-endpoint'
 const oidcRefreshUrl = 'https://some-token-refresh-endpoint'
 
-describe('#defraIdClient', () => {
-  describe('#getDefraIdAuthConfig', () => {
+describe('#openIdClient', () => {
+  describe('#getOpenIdConfig', () => {
     test('Should call wreck get', async () => {
-      await getDefraIdAuthConfig(oidcConfigUrl)
+      await getOpenIdConfig(oidcConfigUrl)
 
-      expect(Wreck.get).toHaveBeenCalledWith(
+      expect(wreck.get).toHaveBeenCalledWith(
         oidcConfigUrl,
         expect.objectContaining({
           json: 'strict'
@@ -32,7 +32,7 @@ describe('#defraIdClient', () => {
     })
   })
 
-  describe('#getDefraIdRefreshToken', () => {
+  describe('#getOpenIdRefreshToken', () => {
     test('Should return ok response', async () => {
       mockPost.mockReturnValue({
         res: {
@@ -50,7 +50,7 @@ describe('#defraIdClient', () => {
         redirect_uri: 'http://some-uri'
       }
 
-      const result = await getDefraIdRefreshToken(oidcRefreshUrl, params)
+      const result = await getOpenIdRefreshToken(oidcRefreshUrl, params)
 
       expect(mockPost).toHaveBeenCalledWith(
         oidcRefreshUrl,
@@ -84,7 +84,7 @@ describe('#defraIdClient', () => {
         redirect_uri: 'http://some-uri'
       }
 
-      const result = await getDefraIdRefreshToken(oidcRefreshUrl, params)
+      const result = await getOpenIdRefreshToken(oidcRefreshUrl, params)
 
       expect(mockPost).toHaveBeenCalledWith(
         oidcRefreshUrl,
@@ -128,7 +128,7 @@ describe('#defraIdClient', () => {
         redirect_uri: 'http://some-uri'
       }
 
-      const result = await getDefraIdRefreshToken(oidcRefreshUrl, params)
+      const result = await getOpenIdRefreshToken(oidcRefreshUrl, params)
 
       expect(mockPost).toHaveBeenCalledWith(
         oidcRefreshUrl,

@@ -26,7 +26,7 @@ describe('#serveSearchPage', () => {
         method: 'GET',
         url: paths.SEARCH,
         auth: {
-          strategy: 'defra-id',
+          strategy: 'defraId',
           credentials: userSession
         }
       })
@@ -46,7 +46,7 @@ describe('#serveSearchPage', () => {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         payload: `searchTerm=${testChedRef}`,
         auth: {
-          strategy: 'defra-id',
+          strategy: 'defraId',
           credentials: userSession
         }
       })
@@ -69,7 +69,7 @@ describe('#serveSearchPage', () => {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         payload: `searchTerm=${searchTerm}`,
         auth: {
-          strategy: 'defra-id',
+          strategy: 'defraId',
           credentials: userSession
         }
       })

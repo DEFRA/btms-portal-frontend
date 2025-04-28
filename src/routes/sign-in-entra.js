@@ -1,10 +1,10 @@
 import { paths } from './route-constants.js'
 
-export const signIn = {
+export const signInEntra = {
   method: 'GET',
-  path: paths.SIGN_IN,
+  path: paths.SIGN_IN_ENTRA,
   options: {
-    auth: 'defraId'
+    auth: 'entraId'
   },
   handler: async (_request, h) => {
     return h.redirect(paths.SEARCH)

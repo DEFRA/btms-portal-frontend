@@ -41,7 +41,7 @@ describe('#serveSearchResultsPage', () => {
         method: 'GET',
         url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${testSearchTerm}`,
         auth: {
-          strategy: 'defra-id',
+          strategy: 'session',
           credentials: userSession
         }
       })
