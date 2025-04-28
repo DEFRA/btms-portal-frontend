@@ -8,20 +8,6 @@ import {
 } from './btms-api-client.js'
 import { CDS_CHED_REF_PREFIX, searchPatterns, searchTypes } from './search-constants.js'
 
-const isMovementReferenceNumber = (input) => {
-  return input?.length && searchPatterns.MOVEMENT_REF.test(input.toUpperCase())
-}
-const isChedReference = (input) => {
-  return input?.length && searchPatterns.CHED_REF.test(input.toUpperCase())
-}
-const isCdsChedReference = (input) => {
-  return input?.length && searchPatterns.CDS_CHED_REF.test(input.toUpperCase())
-}
-const isPartialChedReference = (input) => {
-  return (input?.length && searchPatterns.PARTIAL_CHED_REF.test(input.toUpperCase())) ||
-    (input?.length && searchPatterns.NUMERIC_ONLY_CHED_REF.test(input.toUpperCase()))
-}
-
 const isValidSearchTerm = (input) => {
   if (input?.length) {
     return Object.keys(searchPatterns).some((searchPatternsKey) => {
@@ -75,10 +61,9 @@ const searchPreNotifications = async (searchTerm, searchType, searchTermToDispla
   let rawPreNotification
   if (searchType === searchTypes.PRE_NOTIFICATION) {
     rawPreNotification = await getPreNotificationByChedRef(searchTerm)
-  } else if (searchType === searchTypes.PRE_NOTIFICATION_PARTIAL_REF) {
+  }
+  if (searchType === searchTypes.PRE_NOTIFICATION_PARTIAL_REF) {
     rawPreNotification = await getPreNotificationByPartialChedRef(searchTerm)
-  } else {
-    throw new Error(`Unexpected searchType encountered: ${searchType}`)
   }
   const relatedCustomsDeclarations = await getRelatedCustomsDeclarations(rawPreNotification)
   return createSearchResult(
@@ -99,20 +84,28 @@ const searchCustomsDeclarations = async (searchTerm) => {
 }
 
 const performSearch = async (searchTerm) => {
-  if (isMovementReferenceNumber(searchTerm)) {
+  if (searchPatterns.MOVEMENT_REF.test(searchTerm.toUpperCase())) {
     return searchCustomsDeclarations(searchTerm)
   }
-  if (isChedReference(searchTerm)) {
+  if (searchPatterns.CHED_REF.test(searchTerm.toUpperCase())) {
     return searchPreNotifications(searchTerm, searchTypes.PRE_NOTIFICATION)
   }
-  if (isCdsChedReference(searchTerm)) {
+  if (searchPatterns.CDS_CHED_REF.test(searchTerm.toUpperCase())) {
     const chedPartialRef = searchTerm.substring(CDS_CHED_REF_PREFIX.length)
     return searchPreNotifications(chedPartialRef, searchTypes.PRE_NOTIFICATION_PARTIAL_REF, searchTerm)
   }
-  if (isPartialChedReference(searchTerm)) {
+  if (
+    searchPatterns.PARTIAL_CHED_REF.test(searchTerm.toUpperCase()) ||
+    searchPatterns.NUMERIC_ONLY_CHED_REF.test(searchTerm.toUpperCase())
+  ) {
     return searchPreNotifications(searchTerm, searchTypes.PRE_NOTIFICATION_PARTIAL_REF)
   }
-  return createSearchResult(searchTerm, null, [], [])
+  if (searchPatterns.DUCR_REF.test(searchTerm.toUpperCase())) {
+    // TODO: this will never return a result, implement against new search endpoint
+    return searchCustomsDeclarations(searchTerm)
+  }
+
+  return createSearchResult(searchTerm, null, ['banan'], [])
 }
 
 export {
