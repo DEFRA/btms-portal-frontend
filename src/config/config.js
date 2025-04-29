@@ -295,13 +295,13 @@ const config = convict({
         doc: 'Entra ID OIDC Configuration URL',
         format: String,
         env: 'AUTH_ENTRA_ID_OIDC_CONFIGURATION_URL',
-        default: 'https://login.microsoftonline.com/c9d74090-b4e6-4b04-981d-e6757a160812/v2.0/.well-known/openid-configuration'
+        default: 'https://dcidmtest.b2clogin.com/dcidmtest.onmicrosoft.com/b2c_1a_cui_signin_stub/.well-known/openid-configuration'
       },
       clientId: {
         doc: 'ENTRA ID Client ID',
         format: String,
         env: 'AUTH_ENTRA_ID_CLIENT_ID',
-        default: 'af179e5f-b5e3-4218-b791-c930f4e200b3'
+        default: '2fb0d715-affa-4bf1-836e-44a464e3fbea'
       },
       clientSecret: {
         doc: 'ENTRA ID Client Secret',

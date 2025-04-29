@@ -5,9 +5,7 @@ export const signinOidc = {
   method: ['GET', 'POST'],
   path: paths.AUTH_DEFRA_ID_CALLBACK,
   options: {
-    auth: {
-      strategies: ['defraId', 'entraId']
-    }
+    auth: 'defraId'
   },
   handler: async (_request, h) => {
     if (_request.auth?.isAuthenticated) {
