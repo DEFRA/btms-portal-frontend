@@ -10,8 +10,8 @@ describe('Search Component', () => {
 
     test('Should render search with no error message', () => {
       expect($renderedTemplate('[id="search-term-error"]')).toHaveLength(0)
-      expect($renderedTemplate.html()).not.toContain('You must enter a valid MRN or CHED')
-      expect($renderedTemplate.html()).not.toContain('This MRN or CHED reference cannot be found')
+      expect($renderedTemplate.html()).not.toContain('You must enter a valid MRN, CHED or DUCR')
+      expect($renderedTemplate.html()).not.toContain('This MRN, CHED or DUCR reference cannot be found')
     })
   })
 
@@ -26,8 +26,8 @@ describe('Search Component', () => {
 
     test('Should render search with correct error message', () => {
       expect($renderedTemplate('[id="search-term-error"]')).toHaveLength(1)
-      expect($renderedTemplate.html()).toContain('You must enter a valid MRN or CHED')
-      expect($renderedTemplate.html()).not.toContain('This MRN or CHED reference cannot be found')
+      expect($renderedTemplate.html()).toContain('You must enter a valid MRN, CHED or DUCR')
+      expect($renderedTemplate.html()).not.toContain('This MRN, CHED or DUCR reference cannot be found')
     })
   })
 
@@ -42,8 +42,8 @@ describe('Search Component', () => {
 
     test('Should render search with correct error message', () => {
       expect($renderedTemplate('[id="search-term-error"]')).toHaveLength(1)
-      expect($renderedTemplate.html()).not.toContain('You must enter a valid MRN or CHED')
-      expect($renderedTemplate.html()).toContain('This MRN or CHED reference cannot be found')
+      expect($renderedTemplate.html()).not.toContain('You must enter a valid MRN, CHED or DUCR')
+      expect($renderedTemplate.html()).toContain('This MRN, CHED or DUCR reference cannot be found')
     })
   })
 })

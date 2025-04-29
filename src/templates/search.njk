@@ -3,39 +3,46 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set errors = {
-  "INVALID_SEARCH_TERM": "You must enter a valid MRN or CHED",
-  "SEARCH_TERM_NOT_FOUND": "This MRN or CHED reference cannot be found"
+  "INVALID_SEARCH_TERM": "You must enter a valid MRN, CHED or DUCR",
+  "SEARCH_TERM_NOT_FOUND": "This MRN, CHED or DUCR reference cannot be found"
 } %}
 
 {% set pageTitle = "Search" %}
-{% set heading = "Search by MRN or CHED" %}
+
+{% set searchHint %}
+  {% include "./includes/search-hint.njk" %}
+{% endset %}
+{% set searchButton %}
+  {% include "./includes/search-button.njk" %}
+{% endset %}
 
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       <form method="post" class="app-search-wrapper">
-        {{ govukInput({
-        errorMessage: { text: errors[errorCode] } if isValid == false,
-        label: {
-          text: heading,
-          classes: "govuk-label--l",
-          isPageHeading: true
-        },
-        id: "search-term",
-        name: "searchTerm",
-        hint: {
-            html: "<ul class=\"govuk-list\"><li>MRN, for example, 24GB6T3HFCIZV1HAR9</li><li>CHED, for example, CHEDP.GB.2024.4450758</li></ul>",
-            classes: "govuk-body-s"
-        },
-        spellcheck: false,
-        suffix: {
-          classes: "app-search-wrapper-submit-button",
-          html: "<button id=\"btn-search\" type=\"submit\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><circle cx=\"10\" cy=\"10\" r=\"8\" stroke=\"#ffffff\" stroke-width=\"2\"></circle><line x1=\"15\" y1=\"15\" x2=\"22\" y2=\"22\" stroke=\"#ffffff\" stroke-width=\"2\"></line></svg></button>"
-        },
-        value: searchTerm
-        }) }}
+        {{
+          govukInput({
+            errorMessage: { text: errors[errorCode] } if isValid == false,
+            label: {
+              text: "Search by MRN, CHED or DUCR",
+              classes: "govuk-label--l",
+              isPageHeading: true
+            },
+            id: "search-term",
+            name: "searchTerm",
+            hint: {
+                html: searchHint,
+                classes: "govuk-body-s"
+            },
+            spellcheck: false,
+            suffix: {
+              classes: "app-search-wrapper-submit-button",
+              html: searchButton
+            },
+            value: searchTerm
+          })
+        }}
       </form>
     </div>
   </div>
-
 {% endblock %}

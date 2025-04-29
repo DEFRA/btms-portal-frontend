@@ -1,8 +1,9 @@
 const searchPatterns = {
+  DUCR_REF: /^\dGB\d{12}-(?:[0-9A-Z()-]{1,19})$/,
   CHED_REF: /^CHED([ADP]|P{2})\.GB\.2\d{3}\.\d{7}$/,
   CDS_CHED_REF: /^GBCHD2\d{3}\.\d{7}$/,
-  PARTIAL_CHED_REF: /2\d{3}\.\d{7}$/,
-  NUMERIC_ONLY_CHED_REF: /\d{7}/,
+  PARTIAL_CHED_REF: /^2\d{3}\.\d{7}$/,
+  NUMERIC_ONLY_CHED_REF: /^\d{7}$/,
   MOVEMENT_REF: /^\d{2}[A-Z]{2}[A-z0-9]{14}$/
 }
 

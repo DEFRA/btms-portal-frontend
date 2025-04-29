@@ -13,6 +13,7 @@ jest.mock('../../../src/services/btms-api-client.js')
 describe('search-service', () => {
   const testMrn = '24GBABCDQR9DEF0AR7'
   const testChedRef = 'CHEDD.GB.2024.1234567'
+  const testDUCR = '4GB335031931000-WB2408-27WWL62745'
   const testCustomsDeclaration = { id: testMrn, notifications: { data: [{ id: testChedRef }] } }
   const testPreNotification = { id: testChedRef, movements: { data: [{ id: testMrn }] } }
   const searchByMovementRefsNumResult = { data: [testCustomsDeclaration] }
@@ -69,6 +70,22 @@ describe('search-service', () => {
       })
       expect(getPreNotificationByChedRef).toHaveBeenCalledWith(testChedRef)
       expect(getCustomsDeclarationsByMovementRefNums).toHaveBeenCalledTimes(0)
+    })
+
+    test('should return customs declaration and related pre-notifications for a valid DUCR', async () => {
+      getCustomsDeclarationByMovementRefNum.mockReturnValue({ data: testCustomsDeclaration })
+      getPreNotificationsByChedRefs.mockReturnValue({ data: [testPreNotification] })
+
+      const result = await performSearch(testDUCR)
+
+      expect(result).toEqual({
+        searchTerm: testDUCR,
+        searchType: searchTypes.CUSTOMS_DECLARATION,
+        customsDeclarations: [testCustomsDeclaration],
+        preNotifications: [testPreNotification]
+      })
+      expect(getCustomsDeclarationByMovementRefNum).toHaveBeenCalledWith(testDUCR)
+      expect(getPreNotificationsByChedRefs).toHaveBeenCalledWith([testChedRef])
     })
 
     test.each([
