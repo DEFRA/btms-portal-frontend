@@ -10,6 +10,7 @@ async function setUserSession (request, sessionId) {
 
   await request.server.app.cache.set(sessionId, {
     ...profile,
+    strategy: request.auth.strategy,
     isAuthenticated: request.auth.isAuthenticated,
     token: request.auth.credentials.token,
     refreshToken: request.auth.credentials.refreshToken,

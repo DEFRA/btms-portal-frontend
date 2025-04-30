@@ -1,21 +1,23 @@
-import { defraIdAuthProvider } from '../../../src/auth/defra-id-auth-provider.js'
+import { openIdProvider } from '../../../src/auth/open-id-provider.js'
 import expect from 'expect'
 import jwt from '@hapi/jwt'
 
-jest.mock('../../../src/auth/defra-id-client.js', () => ({
-  getDefraIdAuthConfig: jest.fn().mockReturnValue({
+jest.mock('../../../src/auth/open-id-client.js', () => ({
+  getOpenIdConfig: jest.fn().mockReturnValue({
     authorization_endpoint: 'http://some-auth-endpoint',
     token_endpoint: 'http://some-token-endpoint',
     end_session_endpoint: 'http://some-end-session-endpoint'
   })
 }))
 
-describe('#defraIdAuthProvider', () => {
+describe('#openIdProvider', () => {
   describe('#profile', () => {
     let provider
 
     beforeAll(async () => {
-      provider = await defraIdAuthProvider()
+      provider = await openIdProvider('defraId', {
+        oidcConfigurationUrl: 'https://test.it'
+      })
     })
 
     test.each([
@@ -24,7 +26,7 @@ describe('#defraIdAuthProvider', () => {
       { credentials: { token: null } }
     ])('When credentials do not exist', async (credentials) => {
       expect(provider.profile(credentials, {}, {})).rejects.toThrow(
-        'Defra ID Auth Access Token not present. Unable to retrieve profile.')
+        'defraId Auth Access Token not present. Unable to retrieve profile.')
     })
 
     test('When credentials exist', async () => {

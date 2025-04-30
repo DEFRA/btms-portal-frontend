@@ -21,7 +21,7 @@ describe('#signIn', () => {
         method: 'GET',
         url: paths.SIGN_IN,
         auth: {
-          strategy: 'defra-id',
+          strategy: 'defraId',
           credentials: userSession
         }
       })

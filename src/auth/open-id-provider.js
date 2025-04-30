@@ -1,14 +1,11 @@
-import { getDefraIdAuthConfig } from './defra-id-client.js'
-import { config } from '../config/config.js'
 import jwt from '@hapi/jwt'
+import { getOpenIdConfig } from './open-id-client.js'
 
-export const defraIdAuthProvider = async () => {
-  const authConfig = config.get('auth.defraId')
-  const oidcConfigurationUrl = authConfig.oidcConfigurationUrl
-  const oidcConf = await getDefraIdAuthConfig(oidcConfigurationUrl)
+export const openIdProvider = async (name, authConfig) => {
+  const oidcConf = await getOpenIdConfig(authConfig.oidcConfigurationUrl)
 
   return {
-    name: 'defra-id',
+    name,
     protocol: 'oauth2',
     useParamsAuth: true,
     auth: oidcConf.authorization_endpoint,
@@ -18,7 +15,8 @@ export const defraIdAuthProvider = async () => {
     profile: async function (credentials, params, _get) {
       if (!credentials?.token) {
         throw new Error(
-          'Defra ID Auth Access Token not present. Unable to retrieve profile.')
+          `${name} Auth Access Token not present. Unable to retrieve profile.`
+        )
       }
 
       const payload = jwt.token.decode(credentials.token).decoded.payload

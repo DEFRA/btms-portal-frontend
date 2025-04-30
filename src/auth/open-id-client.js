@@ -1,28 +1,28 @@
-import Wreck from '@hapi/wreck'
-import Querystring from 'querystring'
-import { constants as httpConstants } from 'http2'
+import querystring from 'node:querystring'
+import wreck from '@hapi/wreck'
+import { constants } from 'http2'
 import { createLogger } from '../utils/logger.js'
 
 const logger = createLogger()
 
-const getDefraIdAuthConfig = async (oidcConfigurationUrl) => {
-  const { payload } = await Wreck.get(oidcConfigurationUrl, {
+const getOpenIdConfig = async (oidcConfigurationUrl) => {
+  const { payload } = await wreck.get(oidcConfigurationUrl, {
     json: 'strict'
   })
 
   return payload
 }
 
-const getDefraIdRefreshToken = async (refreshUrl, params) => {
-  const { res, payload } = await Wreck.post(refreshUrl, {
+const getOpenIdRefreshToken = async (refreshUrl, params) => {
+  const { res, payload } = await wreck.post(refreshUrl, {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Cache-Control': 'no-cache'
     },
-    payload: Querystring.stringify(params)
+    payload: querystring.stringify(params)
   })
 
-  if (res.statusCode === httpConstants.HTTP_STATUS_OK) {
+  if (res.statusCode === constants.HTTP_STATUS_OK) {
     try {
       const jsonResponse = JSON.parse(payload.toString())
 
@@ -36,7 +36,7 @@ const getDefraIdRefreshToken = async (refreshUrl, params) => {
         }
       }
     } catch (e) {
-      logger.error(e, 'Response from Defra ID refresh call contains invalid JSON payload.')
+      logger.error(e, 'Response from Open ID refresh call contains invalid JSON payload.')
     }
   }
 
@@ -44,6 +44,6 @@ const getDefraIdRefreshToken = async (refreshUrl, params) => {
 }
 
 export {
-  getDefraIdAuthConfig,
-  getDefraIdRefreshToken
+  getOpenIdConfig,
+  getOpenIdRefreshToken
 }

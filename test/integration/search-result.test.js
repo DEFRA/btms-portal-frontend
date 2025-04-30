@@ -85,7 +85,7 @@ jest.mock('@hapi/wreck', () => ({
       .mockResolvedValueOnce({ payload: declarations })
       .mockResolvedValueOnce({ payload: notifications })
   }),
-  get: jest.fn().mockResolvedValueOnce({ payload: provider })
+  get: jest.fn().mockResolvedValue({ payload: provider })
 }))
 
 test('shows search results', async () => {
@@ -96,7 +96,7 @@ test('shows search results', async () => {
     method: 'get',
     url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
     auth: {
-      strategy: 'defra-id',
+      strategy: 'defraId',
       credentials
     }
   })

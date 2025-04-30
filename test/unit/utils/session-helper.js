@@ -80,6 +80,7 @@ function createUserProfile (sessionId) {
     expiresIn: expiresInMilliSeconds,
     expiresAt: expiresAt.toISOString(),
     tokenUrl: 'https://foo',
-    logoutUrl: 'https://bar'
+    logoutUrl: 'https://bar',
+    strategy: 'defraId'
   }
 }
