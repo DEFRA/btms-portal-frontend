@@ -19,8 +19,8 @@
       (
         tableRows.push(
           [
-            { text: commodity.itemNumber },
-            { text: commodity.commodityCode },
+            { text: commodity.complementId },
+            { text: commodity.commodityId },
             { text: commodityDescription(commodity.commodityDesc, 50) },
             { text: commodity.weightOrQuantity },
             { text: preNotification.decision + ' (' + preNotification.authorities | join(", ") + ')'}

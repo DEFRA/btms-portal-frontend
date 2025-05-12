@@ -21,7 +21,7 @@ const appSpecificRoutes = [
   signInEntra,
   signinOidcEntra,
   signOut,
-  ...search,
+  search,
   searchResult
 ]
 

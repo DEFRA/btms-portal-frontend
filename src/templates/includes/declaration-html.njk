@@ -24,8 +24,8 @@
         tableRows.push(
           [
             { text: commodity.itemNumber },
-            { text: commodity.commodityCode },
-            { text: commodityDescription(commodity.commodityDesc, 24) },
+            { text: commodity.taricCommodityCode },
+            { text: commodityDescription(commodity.goodsDescription, 24) },
             { text: commodity.weightOrQuantity },
             { html: declarationCHEDReferences(commodity.documents, commodity.matchStatus.unmatchedDocRefs) },
             { html: declarationMatchStatus(commodity.matchStatus.isMatched, commodity.matchStatus.unmatchedDocRefs) },
