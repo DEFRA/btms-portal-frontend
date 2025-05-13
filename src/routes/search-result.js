@@ -62,7 +62,7 @@ export const searchResult = {
         customsDeclarations,
         preNotifications,
         breadcrumbs: [
-          { text: 'Search', href: '/search' },
+          { text: 'Search', href: paths.SEARCH },
           { text: searchTerm }
         ]
       }
