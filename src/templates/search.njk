@@ -19,10 +19,13 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <form method="post" class="app-search-wrapper">
+      <form class="app-search-wrapper" action="/search-result">
         {{
           govukInput({
-            errorMessage: { text: errors[errorCode] } if isValid == false,
+            errorMessage: {
+              text: errors[errorCode],
+              id: 'searchError'
+            } if isValid == false,
             label: {
               text: "Search by MRN, CHED or DUCR",
               classes: "govuk-label--l",
@@ -31,8 +34,8 @@
             id: "search-term",
             name: "searchTerm",
             hint: {
-                html: searchHint,
-                classes: "govuk-body-s"
+              html: searchHint,
+              classes: "govuk-body-s"
             },
             spellcheck: false,
             suffix: {

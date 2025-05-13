@@ -1,4 +1,3 @@
-const CHED_REF_NUMERIC_IDENTIFIER_INDEX = 3
 const DATE_FORMAT = 'd MMMM yyyy, HH:mm'
 
 // PHA: Port Health Authority
@@ -59,50 +58,37 @@ const documentCodeToAuthorityMapping = {
 const IUUDocumentReferences = ['C641', 'C673']
 
 const chedStatusDescriptions = {
-  Amend: 'Amend',
-  Cancelled: 'Cancelled',
-  Deleted: 'Deleted',
-  InProgress: 'In progress',
-  Modify: 'Modify',
-  PartiallyRejected: 'Partially rejected',
-  Rejected: 'Rejected',
-  Replaced: 'Replaced',
-  SplitConsignment: 'Split consignment',
-  Submitted: 'Submitted',
-  Validated: 'Validated'
+  CANCELLED: 'Cancelled',
+  DELETED: 'Deleted',
+  IN_PROGRESS: 'In progress',
+  MODIFY: 'Modify',
+  PARTIALLY_REJECTED: 'Partially rejected',
+  REJECTED: 'Rejected',
+  REPLACED: 'Replaced',
+  SPLIT_CONSIGNMENT: 'Split consignment',
+  SUBMITTED: 'Submitted',
+  VALIDATED: 'Validated'
 }
 
-const displayClosedChedStatuses = ['Cancelled', 'Deleted', 'Replaced']
-
-const chedDecisionDescriptions = {
-  AcceptableForInternalMarket: 'Acceptable for internal market',
-  AcceptableForSpecificWarehouse: 'Acceptable for specific warehouse',
-  AcceptableForTemporaryImport: 'Acceptable for temporary import',
-  AcceptableForTranshipment: 'Acceptable for transhipment',
-  AcceptableForTransit: 'Acceptable for transit',
-  AcceptableIfChanneled: 'Acceptable if channeled',
-  NonAcceptable: 'Non acceptable'
-}
+const displayClosedChedStatuses = ['CANCELLED', 'DELETED', 'REPLACED']
 
 const finalStateMappings = {
-  Cleared: 'Released',
-  CancelledAfterArrival: 'Cancelled',
-  CancelledWhilePreLodged: 'Cancelled',
-  Destroyed: 'Destroyed',
-  Seized: 'Seized',
-  ReleasedToKingsWarehouse: 'Released to warehouse',
-  TransferredToMss: 'Transferred to MSS'
+  0: 'Released',
+  1: 'Cancelled',
+  2: 'Cancelled',
+  3: 'Destroyed',
+  4: 'Seized',
+  5: 'Released to warehouse',
+  6: 'Transferred to MSS'
 }
 
 export {
   checkCodeToAuthorityMapping,
-  chedDecisionDescriptions,
   chedStatusDescriptions,
   decisionCodeDescriptions,
   documentCodeToAuthorityMapping,
   finalStateMappings,
   IUUDocumentReferences,
   displayClosedChedStatuses,
-  CHED_REF_NUMERIC_IDENTIFIER_INDEX,
   DATE_FORMAT
 }

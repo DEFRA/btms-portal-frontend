@@ -1,14 +1,12 @@
 import { renderTemplate } from './template.test.helper.js'
-import { searchTypes } from '../../../src/services/search-constants.js'
 
 function createViewContext (documents, isMatched, unmatchedDocRefs, preNotificationCommodityDesc = 'CHILLI PEPPERS', customsDeclarationCommodityDesc = 'CHILLI PEPPERS') {
   return {
     searchTerm: 'mrn-reference',
-    searchType: searchTypes.CUSTOMS_DECLARATION,
     preNotifications: [{
-      chedRef: 'ched.ref',
+      referenceNumber: 'ched.ref',
       status: 'Validated',
-      lastUpdated: '2025-01-01 09:00:00',
+      updated: '2025-01-01 09:00:00',
       authorities: ['PHA - FNAO'],
       commodities: [
         {
@@ -22,13 +20,13 @@ function createViewContext (documents, isMatched, unmatchedDocRefs, preNotificat
     }],
     customsDeclarations: [{
       movementReferenceNumber: '24GBDX8QQ4WWFZNAR3',
-      customsDeclarationStatus: 'Hold',
-      lastUpdated: '2025-01-01 09:00:00',
+      status: 'Hold',
+      updated: '2025-01-01 09:00:00',
       commodities: [
         {
           itemNumber: 1,
-          commodityCode: '302499000',
-          commodityDesc: customsDeclarationCommodityDesc,
+          taricCommodityCode: '302499000',
+          goodsDescription: customsDeclarationCommodityDesc,
           weightOrQuantity: 3471,
           documents,
           matchStatus: {
@@ -49,7 +47,7 @@ describe('Search Results', () => {
     test('Should render CHED references and Match status without error highlighting', () => {
       const viewContext = createViewContext(['GBCHD2024.5286242'], true, [])
 
-      $renderedTemplate = renderTemplate('search-results.njk', viewContext)
+      $renderedTemplate = renderTemplate('search-result.njk', viewContext)
 
       expect($renderedTemplate.html()).not.toContain('class="error"')
       expect($renderedTemplate.html()).toContain('<li>GBCHD2024.5286242</li>')
@@ -63,7 +61,7 @@ describe('Search Results', () => {
     test('Should render CHED references and Match status with error highlighting', () => {
       const viewContext = createViewContext(['GBCHD2024.5286242', 'GBCHD2024.5313986'], false, ['GBCHD2024.5286242'])
 
-      $renderedTemplate = renderTemplate('search-results.njk', viewContext)
+      $renderedTemplate = renderTemplate('search-result.njk', viewContext)
 
       expect($renderedTemplate.html()).toContain('<li class="app-import-commodities__ched-ref--unmatched">GBCHD2024.5286242</li>')
       expect($renderedTemplate.html()).toContain('<li>GBCHD2024.5313986</li>')
@@ -76,7 +74,7 @@ describe('Search Results', () => {
     test('Should not render description in tooltip', () => {
       const viewContext = createViewContext(['GBCHD2024.5286242'], true, [], 'A short CHED description', 'A short MRN description')
 
-      $renderedTemplate = renderTemplate('search-results.njk', viewContext)
+      $renderedTemplate = renderTemplate('search-result.njk', viewContext)
 
       expect($renderedTemplate.html()).toContain('A short MRN description')
       expect($renderedTemplate.html()).toContain('A short CHED description')
@@ -93,7 +91,7 @@ describe('Search Results', () => {
         'A long CHED description that should be truncated and displayed in full inside a tooltip',
         'A long MRN description that should be truncated and displayed in full inside a tooltip')
 
-      $renderedTemplate = renderTemplate('search-results.njk', viewContext)
+      $renderedTemplate = renderTemplate('search-result.njk', viewContext)
 
       expect($renderedTemplate.html()).toContain('A long MRN description t...')
       expect($renderedTemplate.html()).toContain('A long CHED description that should be truncated a...')
