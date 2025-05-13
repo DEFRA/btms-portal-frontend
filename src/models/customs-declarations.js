@@ -45,11 +45,11 @@ export const getDecisionDescription = (decisionCode) => {
 }
 
 export const getCustomsDeclarationStatus = (items, finalisation) => {
-  if (finalisation?.manualAction === true) {
+  if (finalisation?.isManualRelease === true) {
     return 'Manually released'
   }
 
-  if (finalisation?.manualAction === false) {
+  if (finalisation?.isManualRelease === false) {
     return finalStateMappings[finalisation.finalState]
   }
 

@@ -17,7 +17,7 @@ test('MRN, open, finalised, using netMass, matched', () => {
           }]
         }],
         finalisation: {
-          manualAction: false,
+          isManualRelease: false,
           finalState: 0
         }
       },
@@ -78,7 +78,7 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
           }]
         }],
         finalisation: {
-          manualAction: true
+          isManualRelease: true
         }
       },
       clearanceDecision: null,
