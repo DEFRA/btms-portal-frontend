@@ -26,7 +26,7 @@ const mapCommodity = (commodity, isCHEDA) => {
   }
 }
 
-export const mapPreNotification = (preNotification, documentCodes) => {
+const mapPreNotification = (preNotification, documentCodes) => {
   const authorities = documentCodes
     .map((documentCode) => documentCodeToAuthorityMapping[documentCode])
 
