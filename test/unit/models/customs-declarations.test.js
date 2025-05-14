@@ -44,7 +44,7 @@ test('MRN, open, finalised, using netMass, matched', () => {
   const expected = [{
     commodities: [
       {
-        decisions: ['Release - Inspection Complete (APHA)'],
+        decisions: ['Release - Inspection complete (APHA)'],
         documents: ['GBCHD2025.1234567'],
         itemNumber: 1,
         matchStatus: { isMatched: true, unmatchedDocRefs: [] },
@@ -290,11 +290,11 @@ test('getDecisionDescription()', () => {
     .toBe('Refusal - Not acceptable')
 
   expect(getDecisionDescription('E01'))
-    .toBe('Data error - Data Error SFD vs Non CFSP loc')
+    .toBe('Data error - Data error SFD vs Non CFSP loc')
 
   expect(getDecisionDescription('H01'))
-    .toBe('Hold - Awaiting Decision')
+    .toBe('Hold - Awaiting decision')
 
   expect(getDecisionDescription('X00'))
-    .toBe('No Match')
+    .toBe('No match')
 })
