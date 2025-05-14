@@ -11,12 +11,12 @@ const getDecision = (preNotification) => (
   preNotification.partTwo?.decision?.consignmentDecision
 ) || 'Decision not given'
 
-const mapCommodity = (commodity, isCHEDA) => {
+const mapCommodity = (commodity) => {
   const commodityDesc = commodity.speciesName ||
     commodity.complementName
 
-  const dataKey = isCHEDA ? 'number_animal' : 'netweight'
-  const { data } = commodity.additionalData.find(({ key }) => key === dataKey)
+  const { data } = commodity.additionalData
+    .find(({ key }) => key === 'number_animal' || key === 'netweight')
 
   return {
     complementId: commodity.complementId,
@@ -35,9 +35,8 @@ const mapPreNotification = (preNotification, documentCodes) => {
   const updated = format(new Date(preNotification.updatedSource), DATE_FORMAT)
   const decision = getDecision(preNotification)
 
-  const isCHEDA = preNotification.referenceNumber.startsWith('CHEDA')
   const commodities = preNotification.commodities
-    .map((commodity) => mapCommodity(commodity, isCHEDA))
+    .map((commodity) => mapCommodity(commodity))
 
   return {
     referenceNumber: preNotification.referenceNumber,
