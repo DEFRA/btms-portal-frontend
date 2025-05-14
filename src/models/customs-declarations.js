@@ -128,6 +128,7 @@ const mapCustomsDeclaration = (declaration, notificationReferences) => {
 
   return {
     movementReferenceNumber: declaration.movementReferenceNumber,
+    declarationUcr: clearanceRequest.declarationUcr,
     status,
     updated,
     open,
