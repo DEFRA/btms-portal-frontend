@@ -5,6 +5,7 @@ test('MRN, open, finalised, using netMass, matched', () => {
     customsDeclarations: [{
       movementReferenceNumber: 'GB251234567890ABCD',
       clearanceRequest: {
+        declarationUcr: '5GB123456789000-BDOV123456',
         commodities: [{
           itemNumber: 1,
           netMass: '9999',
@@ -53,6 +54,7 @@ test('MRN, open, finalised, using netMass, matched', () => {
       }
     ],
     movementReferenceNumber: 'GB251234567890ABCD',
+    declarationUcr: '5GB123456789000-BDOV123456',
     open: true,
     status: 'Released',
     updated: '12 May 2025, 11:13'
@@ -66,6 +68,7 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
     customsDeclarations: [{
       movementReferenceNumber: 'GB250123456789DCBA',
       clearanceRequest: {
+        declarationUcr: '5GB123456789000-BDOV123456',
         commodities: [{
           itemNumber: 1,
           supplementaryUnits: '12',
@@ -104,6 +107,7 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
       }
     ],
     movementReferenceNumber: 'GB250123456789DCBA',
+    declarationUcr: '5GB123456789000-BDOV123456',
     open: true,
     status: 'Manually released',
     updated: '12 May 2025, 12:42'
@@ -117,6 +121,7 @@ test('de-dupes document references', () => {
     customsDeclarations: [{
       movementReferenceNumber: 'GB2501010101010101',
       clearanceRequest: {
+        declarationUcr: '5GB123456789000-BDOV123456',
         commodities: [{
           itemNumber: 1,
           netMass: '1000',
@@ -151,6 +156,7 @@ test('de-dupes document references', () => {
       weightOrQuantity: '1000'
     }],
     movementReferenceNumber: 'GB2501010101010101',
+    declarationUcr: '5GB123456789000-BDOV123456',
     open: true,
     status: 'Unknown',
     updated: '12 May 2025, 11:13'
@@ -164,6 +170,7 @@ test('matches malformed references', () => {
     customsDeclarations: [{
       movementReferenceNumber: 'GB2502020202020202',
       clearanceRequest: {
+        declarationUcr: '5GB123456789000-BDOV123456',
         commodities: [{
           itemNumber: 1,
           netMass: '500',
@@ -196,6 +203,7 @@ test('matches malformed references', () => {
       weightOrQuantity: '500'
     }],
     movementReferenceNumber: 'GB2502020202020202',
+    declarationUcr: '5GB123456789000-BDOV123456',
     open: true,
     status: 'Unknown',
     updated: '12 May 2025, 11:13'
