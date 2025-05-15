@@ -5,22 +5,22 @@ export const searchPatterns = [
     description: 'MRN'
   },
   {
-    key: 'ched',
+    key: 'chedId',
     pattern: /^CHED([ADP]|P{2})\.GB\.2\d{3}\.\d{7}$/,
     description: 'CHED'
   },
   {
-    key: 'ched',
+    key: 'chedId',
     pattern: /^GBCHD2\d{3}\.\d{7}$/,
     description: 'CDS CHED'
   },
   {
-    key: 'ched',
+    key: 'chedId',
     pattern: /^2\d{3}\.\d{7}$/,
     description: 'Partial CHED'
   },
   {
-    key: 'ched',
+    key: 'chedId',
     pattern: /^\d{7}$/,
     description: 'last 7 digits of a CHED'
   },
