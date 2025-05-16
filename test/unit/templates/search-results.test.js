@@ -20,6 +20,7 @@ function createViewContext (documents, isMatched, unmatchedDocRefs, preNotificat
     }],
     customsDeclarations: [{
       movementReferenceNumber: '24GBDX8QQ4WWFZNAR3',
+      declarationUcr: '1GB126344356000-ABC35932Y1ABC',
       status: 'Hold',
       updated: '2025-01-01 09:00:00',
       commodities: [

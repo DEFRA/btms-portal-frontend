@@ -1,4 +1,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "../macros/highlight-match.njk" import highlightMatch %}
+
+{% set CHEDClass = highlightMatch(preNotification.referenceNumber, searchTerm) %}
 
 {{
   govukSummaryList({
@@ -6,7 +9,9 @@
     rows: [
       {
         key: { text: "CHED Reference" },
-        value: { text: preNotification.referenceNumber }
+        value: {
+          html: '<span class="' ~ CHEDClass ~ '">'~preNotification.referenceNumber~'</span>'
+        }
       },
       {
         key: { text: "CHED Status" },
