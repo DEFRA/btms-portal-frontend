@@ -22,7 +22,7 @@ test('CHEDP: uses netweight, open state, decision given', () => {
         },
         partTwo: {
           decision: {
-            consignmentDecision: 'Acceptable for internal market'
+            decision: 'Acceptable for internal market'
           }
         }
       }
@@ -83,7 +83,7 @@ test('CHEDA: uses number_animal, closed state, decision ignored', () => {
         },
         partTwo: {
           decision: {
-            consignmentDecision: 'DO NOT USE THIS DECISON'
+            decision: 'DO NOT USE THIS DECISON'
           }
         }
       }
