@@ -1,4 +1,8 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "../macros/highlight-match.njk" import highlightMatch %}
+
+{% set MRNClass = highlightMatch(customsDeclaration.movementReferenceNumber, searchTerm) %}
+{% set DUCRClass = highlightMatch(customsDeclaration.declarationUcr, searchTerm) %}
 
 {{
   govukSummaryList({
@@ -6,11 +10,13 @@
     rows: [
       {
         key: { text: "MRN" },
-        value: { text: customsDeclaration.movementReferenceNumber }
+        value: {
+          html: '<span class="' ~ MRNClass ~ '">'~customsDeclaration.movementReferenceNumber~'</span>'
+        }
       },
       {
         key: { text: "DUCR" },
-        value: { text: customsDeclaration.declarationUcr }
+        value: { html: '<span class="' ~ DUCRClass ~ '">'~customsDeclaration.declarationUcr~'</span>' }
       },
       {
         key: { text: "Status" },
