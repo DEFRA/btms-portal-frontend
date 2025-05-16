@@ -8,7 +8,7 @@ import {
 
 const getDecision = (preNotification) => (
   ['VALIDATED', 'REJECTED'].includes(preNotification.status) &&
-  preNotification.partTwo?.decision?.consignmentDecision
+  preNotification.partTwo?.decision?.decision
 ) || 'Decision not given'
 
 const mapCommodity = (commodity, complementParameterSet) => {
