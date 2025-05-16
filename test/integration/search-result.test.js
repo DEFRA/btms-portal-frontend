@@ -69,24 +69,38 @@ const importPreNotifications = [{
     referenceNumber: 'CHEDA.GB.2025.0000001',
     status: 'CANCELLED',
     updatedSource: '2025-04-22T16:53:17.330Z',
-    commodities: [{
-      complementId: '1',
-      commodityId: '0101',
-      speciesName: 'Equus asinus',
-      additionalData: [{ key: 'number_animal', data: '2' }]
-    }]
+    partOne: {
+      commodities: {
+        commodityComplement: [{
+          complementId: '1',
+          commodityId: '0101',
+          speciesName: 'Equus asinus'
+        }],
+        complementParameterSet: [{
+          complementID: '1',
+          keyDataPair: [{ key: 'number_animal', data: '2' }]
+        }]
+      }
+    }
   }
 }, {
   importPreNotification: {
     referenceNumber: 'CHEDP.GB.2025.0000002',
     status: 'VALIDATED',
     updatedSource: '2025-04-22T16:55:17.330Z',
-    commodities: [{
-      complementId: '2',
-      commodityId: '0202',
-      complementName: 'Dog Chew',
-      additionalData: [{ key: 'netweight', data: '4618.35' }]
-    }]
+    partOne: {
+      commodities: {
+        commodityComplement: [{
+          complementId: '2',
+          commodityId: '0202',
+          complementName: 'Dog Chew'
+        }],
+        complementParameterSet: [{
+          complementID: '2',
+          keyDataPair: [{ key: 'netweight', data: '4618.35' }]
+        }]
+      }
+    }
   }
 }]
 
@@ -124,10 +138,10 @@ test('shows search results', async () => {
   const declaration = getByRole(document.body, 'group', { name: '24GB0Z8WEJ9ZBTL73B' })
   expect(declaration).toHaveAttribute('open')
   getByRole(declaration, 'row', {
-    name: '1 0304719030 FROZEN MSC A COD FILLETS 17088.98 CHEDA.GB.2025.0000001 Yes Release - Inspection Complete (APHA)'
+    name: '1 0304719030 FROZEN MSC A COD FILLETS 17088.98 CHEDA.GB.2025.0000001 Yes Release - Inspection complete (APHA)'
   })
   getByRole(declaration, 'row', {
-    name: '2 0304720000 FROZEN MSC HADDOCK FILLE... FROZEN MSC HADDOCK FILLETS 4618.35 CHEDP.GB.2025.0000002 Yes Hold - Awaiting Decision (PHA - POAO)'
+    name: '2 0304720000 FROZEN MSC HADDOCK FILLE... FROZEN MSC HADDOCK FILLETS 4618.35 CHEDP.GB.2025.0000002 Yes Hold - Awaiting decision (PHA - POAO)'
   })
 
   const notification1 = getByRole(document.body, 'group', { name: 'CHEDA.GB.2025.0000001' })

@@ -7,15 +7,22 @@ test('CHEDP: uses netweight, open state, decision given', () => {
         referenceNumber: 'CHEDP.GB.2025.0000001',
         status: 'VALIDATED',
         updatedSource: '2025-05-12T09:18:17.330Z',
-        commodities: [{
-          complementId: '1',
-          commodityId: '16041319',
-          complementName: 'Sardina pilchardus',
-          additionalData: [{ key: 'netweight', data: '2000' }]
-        }],
+        partOne: {
+          commodities: {
+            commodityComplement: [{
+              complementId: '1',
+              commodityId: '16041319',
+              complementName: 'Sardina pilchardus'
+            }],
+            complementParameterSet: [{
+              complementID: '1',
+              keyDataPair: [{ key: 'netweight', data: '2000' }]
+            }]
+          }
+        },
         partTwo: {
           decision: {
-            consignmentDecision: 'Acceptable for internal market'
+            decision: 'Acceptable for internal market'
           }
         }
       }
@@ -61,15 +68,22 @@ test('CHEDA: uses number_animal, closed state, decision ignored', () => {
         referenceNumber: 'CHEDA.GB.2025.0000001',
         status: 'CANCELLED',
         updatedSource: '2025-04-22T16:53:17.330Z',
-        commodities: [{
-          complementId: '1',
-          commodityId: '0101',
-          speciesName: 'Equus asinus',
-          additionalData: [{ key: 'number_animal', data: '2' }]
-        }],
+        partOne: {
+          commodities: {
+            commodityComplement: [{
+              complementId: '1',
+              commodityId: '0101',
+              speciesName: 'Equus asinus'
+            }],
+            complementParameterSet: [{
+              complementID: '1',
+              keyDataPair: [{ key: 'number_animal', data: '2' }]
+            }]
+          }
+        },
         partTwo: {
           decision: {
-            consignmentDecision: 'DO NOT USE THIS DECISON'
+            decision: 'DO NOT USE THIS DECISON'
           }
         }
       }

@@ -12,25 +12,25 @@ const authorities = {
 
 const decisionCodeDescriptions = {
   C01: 'Customs Freight Simplified Procedures (CFSP)',
-  C02: 'No Inspection Required',
-  C03: 'Inspection Complete',
-  C05: 'Inspection Complete Temporary Admission',
-  C06: 'Inspection Complete T5 Procedure',
+  C02: 'No inspection required',
+  C03: 'Inspection complete',
+  C05: 'Inspection complete temporary admission',
+  C06: 'Inspection complete T5 procedure',
   C07: 'IUU inspection complete',
   C08: 'IUU inspection not applicable',
-  E01: 'Data Error SFD vs Non CFSP loc',
-  E02: 'Data Error Full Dec vs CFSP loc',
-  E03: 'Unexpected data - Transit, Transhipment or Specific Warehouse',
-  H01: 'Awaiting Decision',
-  H02: 'To Be Inspected',
+  E01: 'Data error SFD vs Non CFSP loc',
+  E02: 'Data error full dec vs CFSP loc',
+  E03: 'Unexpected data - transit, transhipment or specific warehouse',
+  H01: 'Awaiting decision',
+  H02: 'To be inspected',
   N01: 'Not acceptable',
   N02: 'Destroy',
   N03: 'Transform',
   N04: 'Re-export or re-dispatch',
   N05: 'Use for other purposes',
-  N06: 'Refusal',
+  N06: 'Refused',
   N07: 'Not acceptable',
-  X00: 'No Match'
+  X00: 'No match'
 }
 const checkCodeToAuthorityMapping = {
   H218: authorities.HORTICULTURAL_MARKETING_INSPECTORATE,
