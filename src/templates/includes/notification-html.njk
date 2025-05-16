@@ -14,6 +14,12 @@
 
 {% set tableRows = [] %}
 {% for commodity in preNotification.commodities %}
+  {% set authoritiesList %}
+    {% if preNotification.authorities.length > 0 %}
+      ({{ preNotification.authorities | join(', ') }})
+    {% endif %}
+  {% endset %}
+
   {%
     set tableRows =
       (
@@ -23,7 +29,7 @@
             { text: commodity.commodityId },
             { text: commodityDescription(commodity.commodityDesc, 50) },
             { text: commodity.weightOrQuantity },
-            { text: preNotification.decision + ' (' + preNotification.authorities | join(", ") + ')'}
+            { text: preNotification.decision + authoritiesList}
           ]
         ),
         tableRows
