@@ -13,6 +13,7 @@ const provider = {
 const customsDeclarations = [{
   movementReferenceNumber: '24GB0Z8WEJ9ZBTL73B',
   clearanceRequest: {
+    declarationUcr: '1GB126344356000-ABC35932Y1BHX',
     commodities: [{
       itemNumber: 1,
       taricCommodityCode: '0304719030',
