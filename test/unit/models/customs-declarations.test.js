@@ -294,14 +294,59 @@ test('getDecisionDescription()', () => {
   expect(getDecisionDescription('C01'))
     .toBe('Release - Customs Freight Simplified Procedures (CFSP)')
 
+  expect(getDecisionDescription('C02'))
+    .toBe('Release - No inspection required')
+
+  expect(getDecisionDescription('C03'))
+    .toBe('Release - Inspection complete')
+
+  expect(getDecisionDescription('C05'))
+    .toBe('Release - Inspection complete temporary admission')
+
+  expect(getDecisionDescription('C06'))
+    .toBe('Release - Inspection complete T5 procedure')
+
+  expect(getDecisionDescription('C07'))
+    .toBe('Release - IUU inspection complete')
+
+  expect(getDecisionDescription('C08'))
+    .toBe('Release - IUU inspection not applicable')
+
   expect(getDecisionDescription('N01'))
+    .toBe('Refusal - Not acceptable')
+
+  expect(getDecisionDescription('N02'))
+    .toBe('Refusal - Destroy')
+
+  expect(getDecisionDescription('N03'))
+    .toBe('Refusal - Transform')
+
+  expect(getDecisionDescription('N04'))
+    .toBe('Refusal - Re-export or re-dispatch')
+
+  expect(getDecisionDescription('N05'))
+    .toBe('Refusal - Use for other purposes')
+
+  expect(getDecisionDescription('N06'))
+    .toBe('Refusal - Refused')
+
+  expect(getDecisionDescription('N07'))
     .toBe('Refusal - Not acceptable')
 
   expect(getDecisionDescription('E01'))
     .toBe('Data error - Data error SFD vs Non CFSP loc')
 
+  expect(getDecisionDescription('E02'))
+    .toBe('Data error - Data error full dec vs CFSP loc')
+
+  expect(getDecisionDescription('E03'))
+    .toBe('Data error - Unexpected data - transit, transhipment or specific warehouse')
+
   expect(getDecisionDescription('H01'))
     .toBe('Hold - Awaiting decision')
+
+  expect(getDecisionDescription('H02'))
+    .toBe('Hold - To be inspected')
 
   expect(getDecisionDescription('X00'))
     .toBe('No match')
