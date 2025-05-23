@@ -29,7 +29,9 @@ const openId = {
 
       const entra = await openIdProvider('entraId', entraId)
       server.auth.strategy('entraId', 'bell', {
-        location: `${baseUrl}${paths.SIGNIN_ENTRA_ID_CALLBACK}`,
+        location: (_req) => {
+          return `${baseUrl}${paths.SIGNIN_ENTRA_ID_CALLBACK}`
+        },
         provider: entra,
         password: cookie.password,
         clientId: entraId.clientId,
