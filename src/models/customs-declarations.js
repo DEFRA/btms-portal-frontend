@@ -1,5 +1,6 @@
 import { format } from 'date-fns'
 import {
+  checkCodeToDocumentCodeMapping,
   decisionCodeDescriptions,
   checkCodeToAuthorityMapping,
   finalStateMappings,
@@ -24,21 +25,20 @@ const isReleaseDecisionCode = (decisionCode) => {
 }
 
 export const getDecisionDescription = (decisionCode) => {
-  const decisionDetail = decisionCodeDescriptions[decisionCode]
   let decisionHighLevelDesc
   if (isReleaseDecisionCode(decisionCode)) {
-    decisionHighLevelDesc = 'Release - '
+    decisionHighLevelDesc = 'Release'
   } else if (isRefusalDecisionCode(decisionCode)) {
-    decisionHighLevelDesc = 'Refusal - '
+    decisionHighLevelDesc = 'Refuse'
   } else if (isErrorDecisionCode(decisionCode)) {
-    decisionHighLevelDesc = 'Data error - '
+    decisionHighLevelDesc = 'Data error'
   } else if (isHoldDecisionCode(decisionCode)) {
-    decisionHighLevelDesc = 'Hold - '
+    decisionHighLevelDesc = 'Hold'
   } else {
     decisionHighLevelDesc = ''
   }
 
-  return `${decisionHighLevelDesc}${decisionDetail}` || 'Unknown'
+  return decisionHighLevelDesc
 }
 
 export const getCustomsDeclarationStatus = (finalisation) => {
@@ -53,31 +53,18 @@ export const getCustomsDeclarationStatus = (finalisation) => {
   return `Finalised - ${finalStateMappings[finalisation.finalState]}`
 }
 
-const getMatchStatus = (documentReferences, notificationReferences) => {
-  if (!notificationReferences.length) {
-    return { isMatched: false, unmatchedDocRefs: documentReferences }
-  }
-  // example document reference: GBCHD2024.1234567 or GB.2024.1234567
-  const refMatchLength = 7
-  const unmatchedDocRefs = documentReferences.filter(docRef =>
-    !notificationReferences.includes(docRef.slice(-refMatchLength)))
-
-  return { isMatched: !unmatchedDocRefs.length, unmatchedDocRefs }
-}
-
 const mapCommodity = (commodity, notificationReferences, clearanceDecision) => {
-  const documents = [
-    ...new Set(commodity.documents
-      .filter(({ documentCode }) => !IUUDocumentReferences.includes(documentCode))
-      .map(({ documentReference }) => documentReference)
-    )
-  ]
+  const documents = commodity.documents
+    .filter(({ documentCode }) => !IUUDocumentReferences.includes(documentCode))
+    .reduce((docs, doc) => {
+      const references = docs[doc.documentReference] || []
+      docs[doc.documentReference] = [...new Set(references.concat(doc.documentCode))]
+      return docs
+    }, {})
 
   const weightOrQuantity = Number(commodity.netMass)
     ? commodity.netMass
     : commodity.supplementaryUnits
-
-  const matchStatus = getMatchStatus(documents, notificationReferences)
 
   const decisonChecks = clearanceDecision
     ? clearanceDecision.items
@@ -85,14 +72,40 @@ const mapCommodity = (commodity, notificationReferences, clearanceDecision) => {
       .flatMap(({ checks }) => checks)
     : []
 
-  const decisions = decisonChecks
-    .map((check) => `${getDecisionDescription(check.decisionCode)} (${checkCodeToAuthorityMapping[check.checkCode]})`)
+  const checksWithDecisionCodes = commodity.checks.map((check) => {
+    const decision = decisonChecks
+      .find(({ checkCode }) => checkCode === check.checkCode)
+
+    return {
+      ...check,
+      decisionCode: decision?.decisionCode
+    }
+  })
+
+  const decisions = Object.entries(documents).map(([documentReference, documentCodes]) => {
+    const lastSeven = 7
+
+    return {
+      documentReference,
+      outcomes: documentCodes.flatMap((documentCode) => {
+        const checks = checksWithDecisionCodes.filter(({ checkCode }) =>
+          checkCodeToDocumentCodeMapping[checkCode].includes(documentCode)
+        )
+
+        return checks.map(({ checkCode, decisionCode }) => ({
+          decision: getDecisionDescription(decisionCode),
+          decisionDetail: decisionCodeDescriptions[decisionCode],
+          departmentCode: checkCodeToAuthorityMapping[checkCode]
+        }))
+      }),
+      match: notificationReferences.includes(documentReference.slice(-lastSeven))
+    }
+  })
 
   return {
     ...commodity,
     documents,
     weightOrQuantity,
-    matchStatus,
     decisions
   }
 }

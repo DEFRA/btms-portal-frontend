@@ -1,0 +1,10 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{{
+  govukButton({
+    text: "Clear filters",
+    type: "reset",
+    attributes: "hidden",
+    classes: "govuk-link"
+  })
+}}

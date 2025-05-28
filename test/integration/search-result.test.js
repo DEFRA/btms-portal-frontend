@@ -22,11 +22,10 @@ const customsDeclarations = [{
       supplementaryUnits: 0,
       documents: [{
         documentReference: 'CHEDA.GB.2025.0000001',
-        documentCode: 'C640'
+        documentCode: 'N002'
       }],
       checks: [
-        { checkCode: 'H218', departmentCode: 'HMI' },
-        { checkCode: 'H223', departmentCode: 'PHA' }
+        { checkCode: 'H218', departmentCode: 'HMI' }
       ]
     }, {
       itemNumber: 2,
@@ -47,7 +46,7 @@ const customsDeclarations = [{
     items: [{
       itemNumber: 1,
       checks: [{
-        checkCode: 'H221',
+        checkCode: 'H218',
         decisionCode: 'C03'
       }]
     }, {
@@ -139,22 +138,22 @@ test('shows search results', async () => {
   const declaration = getByRole(document.body, 'group', { name: '24GB0Z8WEJ9ZBTL73B' })
   expect(declaration).toHaveAttribute('open')
   getByRole(declaration, 'row', {
-    name: '1 0304719030 FROZEN MSC A COD FILLETS 17088.98 CHEDA.GB.2025.0000001 Yes Release - Inspection complete (APHA)'
+    name: '1 0304719030 FROZEN MSC A COD FILLETS 17088.98 CHEDA.GB.2025.0000001 Yes Release - Inspection complete (HMI)'
   })
   getByRole(declaration, 'row', {
-    name: '2 0304720000 FROZEN MSC HADDOCK FILLE... FROZEN MSC HADDOCK FILLETS 4618.35 CHEDP.GB.2025.0000002 Yes Hold - Awaiting decision (PHA - POAO)'
+    name: '2 0304720000 FROZEN MSC HADDOCK FILLE... FROZEN MSC HADDOCK FILLETS 4618.35 CHEDP.GB.2025.0000002 Yes Hold - Awaiting decision (POAO)'
   })
 
   const notification1 = getByRole(document.body, 'group', { name: 'CHEDA.GB.2025.0000001' })
   expect(notification1.hasAttribute('open')).toBe(false)
   expect(getByRole(notification1, 'row', {
-    name: '1 0101 Equus asinus 2 Decision not given (APHA)'
+    name: '1 0101 Equus asinus 2 Decision not given (HMI)'
   })).not.toBeVisible()
 
   const notification2 = getByRole(document.body, 'group', { name: 'CHEDP.GB.2025.0000002' })
   expect(notification2.hasAttribute('open')).toBe(true)
   expect(getByRole(notification2, 'row', {
-    name: '2 0202 Dog Chew 4618.35 Decision not given (PHA - POAO)'
+    name: '2 0202 Dog Chew 4618.35 Decision not given (POAO)'
   })).toBeVisible()
 })
 

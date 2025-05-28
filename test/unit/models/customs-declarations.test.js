@@ -15,6 +15,9 @@ test('MRN, open, finalised, using netMass, matched', () => {
           }, {
             documentCode: 'C641',
             documentReference: 'IGNORED IUUD DOCUMENT'
+          }],
+          checks: [{
+            checkCode: 'H223'
           }]
         }]
       },
@@ -23,7 +26,7 @@ test('MRN, open, finalised, using netMass, matched', () => {
           itemNumber: 1,
           checks: [{
             decisionCode: 'C03',
-            checkCode: 'H221'
+            checkCode: 'H223'
           }]
         }]
       },
@@ -45,10 +48,20 @@ test('MRN, open, finalised, using netMass, matched', () => {
   const expected = [{
     commodities: [
       {
-        decisions: ['Release - Inspection complete (APHA)'],
-        documents: ['GBCHD2025.1234567'],
+        decisions: [{
+          documentReference: 'GBCHD2025.1234567',
+          match: true,
+          outcomes: [{
+            decision: 'Release',
+            decisionDetail: 'Inspection complete',
+            departmentCode: 'FNAO'
+          }]
+        }],
+        documents: {
+          'GBCHD2025.1234567': ['C678']
+        },
+        checks: [{ checkCode: 'H223' }],
         itemNumber: 1,
-        matchStatus: { isMatched: true, unmatchedDocRefs: [] },
         netMass: '9999',
         weightOrQuantity: '9999'
       }
@@ -73,13 +86,17 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
           itemNumber: 1,
           supplementaryUnits: '12',
           documents: [{
-            documentCode: 'C678',
+            documentCode: 'N851',
             documentReference: 'GBCHD2025.1234567'
           }, {
             documentCode: 'C641',
             documentReference: 'IGNORED IUUD DOCUMENT'
-          }]
-        }]
+          }],
+          checks: [{ checkCode: 'H219' }]
+        }],
+        finalisation: {
+          isManualRelease: true
+        }
       },
       clearanceDecision: null,
       finalisation: {
@@ -95,13 +112,21 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
   const expected = [{
     commodities: [
       {
-        decisions: [],
-        documents: ['GBCHD2025.1234567'],
-        itemNumber: 1,
-        matchStatus: {
-          isMatched: false,
-          unmatchedDocRefs: ['GBCHD2025.1234567']
+        decisions: [{
+          documentReference: 'GBCHD2025.1234567',
+          match: false,
+          outcomes: [
+            {
+              decision: '',
+              decisionDetail: undefined,
+              departmentCode: 'PHSI'
+            }]
+        }],
+        documents: {
+          'GBCHD2025.1234567': ['N851']
         },
+        checks: [{ checkCode: 'H219' }],
+        itemNumber: 1,
         supplementaryUnits: '12',
         weightOrQuantity: '12'
       }
@@ -126,13 +151,14 @@ test('de-dupes document references', () => {
           itemNumber: 1,
           netMass: '1000',
           documents: [{
-            documentCode: 'N851',
+            documentCode: 'N853',
             documentReference: 'GBCHD2025.0000001'
           }, {
-            documentCode: 'N851',
+            documentCode: 'N853',
             documentReference: 'GBCHD2025.0000001'
-          }]
-        }]
+          }],
+          checks: [{ checkCode: 'H222' }]
+        }],
       },
       clearanceDecision: null,
       finalisation: null,
@@ -145,13 +171,20 @@ test('de-dupes document references', () => {
 
   const expected = [{
     commodities: [{
-      decisions: [],
-      documents: ['GBCHD2025.0000001'],
-      itemNumber: 1,
-      matchStatus: {
-        isMatched: false,
-        unmatchedDocRefs: ['GBCHD2025.0000001']
+      decisions: [{
+        documentReference: 'GBCHD2025.0000001',
+        match: false,
+        outcomes: [{
+          decision: '',
+          decisionDetail: undefined,
+          departmentCode: 'POAO'
+        }]
+      }],
+      documents: {
+        'GBCHD2025.0000001': ['N853']
       },
+      checks: [{ checkCode: 'H222' }],
+      itemNumber: 1,
       netMass: '1000',
       weightOrQuantity: '1000'
     }],
@@ -175,9 +208,10 @@ test('matches malformed references', () => {
           itemNumber: 1,
           netMass: '500',
           documents: [{
-            documentCode: 'C633',
+            documentCode: 'C678',
             documentReference: 'GB.CHD.2025.0000002'
-          }]
+          }],
+          checks: [{ checkCode: 'H223' }]
         }]
       },
       clearanceDecision: null,
@@ -195,10 +229,20 @@ test('matches malformed references', () => {
 
   const expected = [{
     commodities: [{
-      decisions: [],
-      documents: ['GB.CHD.2025.0000002'],
+      decisions: [{
+        documentReference: 'GB.CHD.2025.0000002',
+        match: true,
+        outcomes: [{
+          decision: '',
+          decisionDetail: undefined,
+          departmentCode: 'FNAO'
+        }]
+      }],
+      checks: [{ checkCode: 'H223' }],
+      documents: {
+        'GB.CHD.2025.0000002': ['C678']
+      },
       itemNumber: 1,
-      matchStatus: { isMatched: true, unmatchedDocRefs: [] },
       netMass: '500',
       weightOrQuantity: '500'
     }],
@@ -214,17 +258,17 @@ test('matches malformed references', () => {
 
 test('getDecisionDescription()', () => {
   expect(getDecisionDescription('C01'))
-    .toBe('Release - Customs Freight Simplified Procedures (CFSP)')
+    .toBe('Release')
 
   expect(getDecisionDescription('N01'))
-    .toBe('Refusal - Not acceptable')
+    .toBe('Refuse')
 
   expect(getDecisionDescription('E01'))
-    .toBe('Data error - Data error SFD vs Non CFSP loc')
+    .toBe('Data error')
 
   expect(getDecisionDescription('H01'))
-    .toBe('Hold - Awaiting decision')
+    .toBe('Hold')
 
   expect(getDecisionDescription('X00'))
-    .toBe('No match')
+    .toBe('')
 })

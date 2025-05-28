@@ -1,0 +1,28 @@
+@use "govuk-frontend" as *;
+
+.btms-filters {
+  display: flex;
+  gap: 1.2rem;
+
+  .govuk-label, select {
+    font-size: 1rem;
+  }
+
+  .btms-clear-filters {
+    &:not([hidden]) {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+  }
+
+  .govuk-button {
+    border: none;
+    background-color: inherit;
+    color: $govuk-link-colour;
+    box-shadow: none;
+    margin: 0 0 6px;
+    padding: 12px 0;
+    font-size: 1rem;
+  }
+}

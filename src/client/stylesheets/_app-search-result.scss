@@ -7,6 +7,7 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive columns */
   padding: govuk-spacing(3) 0;
   margin: 0;
+  @include govuk-font-size($size: 14);
 
   .govuk-summary-list__row {
     border-bottom: none;
@@ -19,19 +20,17 @@
       width: inherit;
       margin: 0;
       padding: 0;
-      @include govuk-font-size($size: 16);
     }
 
     .govuk-summary-list__value {
       padding-bottom: 0;
       padding-top: govuk-spacing(1);
-      @include govuk-font-size($size: 16);
     }
   }
 }
 
 .app-import-commodities {
-  @include govuk-font-size($size: 16);
+  @include govuk-font-size($size: 14);
 
   &__ched-ref--documents-list {
     margin-bottom: 0;
@@ -51,12 +50,10 @@
     text-decoration: underline dotted;
     text-underline-position: under;
     cursor: help;
-    font-size: 1rem;
     line-height: 1.25;
   }
 
   &__match--yes {
-    font-size: 1rem;
     line-height: 1.25;
   }
 
@@ -145,6 +142,11 @@
       box-shadow: none;
     }
   }
+
+  .govuk-tag,
+  .govuk-list {
+     font-size: 0.875rem;
+  }
 }
 
 .btms-details[open] {
@@ -167,5 +169,30 @@
     .govuk-table__cell {
       border-bottom: none;
     }
+  }
+
+  .btms-declaration tbody > tr:not([hidden]) + tr:not(:first-of-type) > td:nth-child(-n+4) {
+    visibility: hidden;
+  }
+
+  .btms-declaration tbody tr:not(:last-of-type) > td:nth-last-child(-n+3) {
+    border-bottom: 1px dashed $btms-light-to-mid-grey;
+  }
+
+  .btms-declaration tbody:last-of-type tr:last-of-type > td {
+    border-bottom: none;
+  }
+
+  .btms-declaration tbody > tr:not(:last-of-type) > td {
+    border: none;
+  }
+
+  .govuk-inset-text {
+    margin:0;
+    @include govuk-font-size($size: 16);
+  }
+
+  .govuk-list {
+    margin-bottom: 0;
   }
 }

@@ -44,33 +44,6 @@ function createViewContext (documents, isMatched, unmatchedDocRefs, preNotificat
 describe('Search Results', () => {
   let $renderedTemplate
 
-  describe('With MRNs matched to CHEDs', () => {
-    test('Should render CHED references and Match status without error highlighting', () => {
-      const viewContext = createViewContext(['GBCHD2024.5286242'], true, [])
-
-      $renderedTemplate = renderTemplate('search-result.njk', viewContext)
-
-      expect($renderedTemplate.html()).not.toContain('class="error"')
-      expect($renderedTemplate.html()).toContain('<li>GBCHD2024.5286242</li>')
-      expect($renderedTemplate.html()).toContain('<strong class="govuk-tag govuk-tag--green app-import-commodities__match--yes">')
-      expect($renderedTemplate.html()).not.toContain('class="govuk-tag govuk-tag--red')
-      expect($renderedTemplate.html()).not.toContain('<span class="tooltip" role="tooltip">')
-    })
-  })
-
-  describe('With MRNs not matched to CHEDs', () => {
-    test('Should render CHED references and Match status with error highlighting', () => {
-      const viewContext = createViewContext(['GBCHD2024.5286242', 'GBCHD2024.5313986'], false, ['GBCHD2024.5286242'])
-
-      $renderedTemplate = renderTemplate('search-result.njk', viewContext)
-
-      expect($renderedTemplate.html()).toContain('<li class="app-import-commodities__ched-ref--unmatched">GBCHD2024.5286242</li>')
-      expect($renderedTemplate.html()).toContain('<li>GBCHD2024.5313986</li>')
-      expect($renderedTemplate.html()).toContain('<strong class="govuk-tag govuk-tag--red app-import-commodities__match--no">')
-      expect($renderedTemplate.html()).toContain('<p class="app-import-commodities__match--no-tooltip" role="tooltip">')
-    })
-  })
-
   describe('With MRN that has a short description', () => {
     test('Should not render description in tooltip', () => {
       const viewContext = createViewContext(['GBCHD2024.5286242'], true, [], 'A short CHED description', 'A short MRN description')

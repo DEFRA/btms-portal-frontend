@@ -1,46 +1,39 @@
-{% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "../macros/commodity-description.njk" import commodityDescription %}
-{% from "../macros/declaration-match-status.njk" import declarationMatchStatus %}
-{% from "../macros/declaration-ched-references.njk" import declarationCHEDReferences %}
+{% from "../macros/decision-match.njk" import decisionMatch %}
 
-{%
-  set tableHead =
-    [
-      { text: "Item number" },
-      { text: "Commodity code" },
-      { text: "Description" },
-      { text: "Quantity / Weight" },
-      { text: "CHED reference" },
-      { text: "Match" },
-      { text: "Decision (authority)" }
-    ]
-%}
-
-{% set tableRows = [] %}
-{% for commodity in customsDeclaration.commodities %}
-  {%
-    set tableRows =
-      (
-        tableRows.push(
-          [
-            { text: commodity.itemNumber },
-            { text: commodity.taricCommodityCode },
-            { text: commodityDescription(commodity.goodsDescription, 24) },
-            { text: commodity.weightOrQuantity },
-            { html: declarationCHEDReferences(commodity.documents, commodity.matchStatus.unmatchedDocRefs) },
-            { html: declarationMatchStatus(commodity.matchStatus.isMatched, commodity.matchStatus.unmatchedDocRefs) },
-            { html: commodity.decisions | join("<br/>")}
-          ]
-        ),
-        tableRows
-      )
-  %}
-{% endfor %}
-
-{{
-  govukTable({
-    classes: "govuk-table--small-text-until-tablet app-import-commodities",
-    head: tableHead,
-    rows: tableRows
-  })
-}}
+<table class="govuk-table govuk-table--small-text-until-tablet app-import-commodities btms-declaration">
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header">Item number</th>
+      <th scope="col" class="govuk-table__header">Commodity code</th>
+      <th scope="col" class="govuk-table__header">Description</th>
+      <th scope="col" class="govuk-table__header">Quantity / Weight</th>
+      <th scope="col" class="govuk-table__header">CHED reference</th>
+      <th scope="col" class="govuk-table__header">Match</th>
+      <th scope="col" class="govuk-table__header">Decision (authority)</th>
+    </tr>
+  </thead>
+  {% for commodity in customsDeclaration.commodities %}
+    <tbody class="govuk-table__body">
+    {% for decision in commodity.decisions %}
+        <tr data-match="{{ decision.match }}">
+          <td class="govuk-table__cell">{{ commodity.itemNumber }}</td>
+          <td class="govuk-table__cell">{{ commodity.taricCommodityCode }}</td>
+          <td class="govuk-table__cell">{{ commodityDescription(commodity.goodsDescription, 24) }}</td>
+          <td class="govuk-table__cell">{{ commodity.weightOrQuantity }}</td>
+          <td class="govuk-table__cell">{{ decision.documentReference }}</td>
+          <td class="govuk-table__cell">{{ decisionMatch(decision.match) }}</td>
+          <td class="govuk-table__cell btms-decision-outcomes">
+            {% for outcome in decision.outcomes %}
+              {% if loop.first %} <ul class="govuk-list"> {% endif %}
+              <li
+                data-decision="{{ outcome.decision }}"
+                data-authority="{{ outcome.departmentCode }}"
+              >{{ outcome.decision }} - {{ outcome.decisionDetail }} ({{ outcome.departmentCode }})</li>
+              {% if loop.last %} </ul> {% endif %}
+            {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  {% endfor %}
+</table>
