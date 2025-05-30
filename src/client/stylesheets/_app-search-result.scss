@@ -150,7 +150,7 @@
 
   .govuk-tag,
   .govuk-list {
-    font-size: 0.875rem;
+    @include govuk-font-size($size: 14);
   }
 }
 

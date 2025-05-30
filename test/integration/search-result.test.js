@@ -1,9 +1,11 @@
 import globalJsdom from 'global-jsdom'
 import wreck from '@hapi/wreck'
-import { getByRole } from '@testing-library/dom'
+import { getAllByRole, getByRole } from '@testing-library/dom'
+import userEvent from '@testing-library/user-event'
 import { paths, queryStringParams } from '../../src/routes/route-constants.js'
 import { initialiseServer } from '../utils/initialise-server.js'
 import { setupAuthedUserSession } from '../unit/utils/session-helper.js'
+import { initFilters } from '../../src/client/javascripts/filters.js'
 
 const provider = {
   authorization_endpoint: 'https://auth.endpoint',
@@ -40,6 +42,16 @@ const customsDeclarations = [{
         departmentCode: 'HMI',
         checkCode: 'H222'
       }]
+    }, {
+      itemNumber: 3,
+      taricCommodityCode: '1602321990',
+      goodsDescription: 'JBB VIENNESE ROAST 2 KG',
+      netMass: '87.07',
+      documents: [{
+        documentReference: 'CHEDP.BB.2025.NOMATCH',
+        documentCode: 'N002'
+      }],
+      checks: [{ checkCode: 'H218', departmentCode: 'HMI' }]
     }]
   },
   clearanceDecision: {
@@ -66,25 +78,6 @@ const customsDeclarations = [{
 
 const importPreNotifications = [{
   importPreNotification: {
-    referenceNumber: 'CHEDA.GB.2025.0000001',
-    status: 'CANCELLED',
-    updatedSource: '2025-04-22T16:53:17.330Z',
-    partOne: {
-      commodities: {
-        commodityComplements: [{
-          complementId: '1',
-          commodityId: '0101',
-          speciesName: 'Equus asinus'
-        }],
-        complementParameterSets: [{
-          complementId: '1',
-          keyDataPair: [{ key: 'number_animal', data: '2' }]
-        }]
-      }
-    }
-  }
-}, {
-  importPreNotification: {
     referenceNumber: 'CHEDP.GB.2025.0000002',
     status: 'VALIDATED',
     updatedSource: '2025-04-22T16:55:17.330Z',
@@ -102,6 +95,25 @@ const importPreNotifications = [{
       }
     }
   }
+}, {
+  importPreNotification: {
+    referenceNumber: 'CHEDA.GB.2025.0000001',
+    status: 'CANCELLED',
+    updatedSource: '2025-04-22T16:53:17.330Z',
+    partOne: {
+      commodities: {
+        commodityComplements: [{
+          complementId: '1',
+          commodityId: '0101',
+          speciesName: 'Equus asinus'
+        }],
+        complementParameterSets: [{
+          complementId: '1',
+          keyDataPair: [{ key: 'number_animal', data: '2' }]
+        }]
+      }
+    }
+  }
 }]
 
 const relatedImportDeclarations = {
@@ -114,6 +126,8 @@ jest.mock('@hapi/wreck', () => ({
 }))
 
 test('shows search results', async () => {
+  const user = userEvent.setup()
+
   wreck.get
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
@@ -134,27 +148,59 @@ test('shows search results', async () => {
   expect(headers['cache-control']).toBe('no-store')
 
   globalJsdom(payload)
+  initFilters()
 
   const declaration = getByRole(document.body, 'group', { name: '24GB0Z8WEJ9ZBTL73B' })
   expect(declaration).toHaveAttribute('open')
-  getByRole(declaration, 'row', {
-    name: '1 0304719030 FROZEN MSC A COD FILLETS 17088.98 CHEDA.GB.2025.0000001 Yes Release - Inspection complete (HMI)'
+
+  const declarationRow3 = getByRole(declaration, 'row', {
+    name: '3 1602321990 JBB VIENNESE ROAST 2 KG 87.07 CHEDP.BB.2025.NOMATCH No - (HMI)'
   })
-  getByRole(declaration, 'row', {
+  const declarationMatchFilter = getByRole(document.body, 'combobox', { name: 'Match' })
+  await user.selectOptions(declarationMatchFilter, 'true')
+  expect(declarationRow3.hasAttribute('hidden')).toBe(true)
+
+  await user.selectOptions(declarationMatchFilter, '')
+
+  const declarationRow2 = getByRole(declaration, 'row', {
     name: '2 0304720000 FROZEN MSC HADDOCK FILLE... FROZEN MSC HADDOCK FILLETS 4618.35 CHEDP.GB.2025.0000002 Yes Hold - Awaiting decision (POAO)'
   })
+  const declarationDecisionFilter = getByRole(document.body, 'combobox', { name: 'Decision' })
+  await user.selectOptions(declarationDecisionFilter, 'Release')
+  expect(declarationRow2.hasAttribute('hidden')).toBe(true)
 
-  const notification1 = getByRole(document.body, 'group', { name: 'CHEDA.GB.2025.0000001' })
-  expect(notification1.hasAttribute('open')).toBe(false)
-  expect(getByRole(notification1, 'row', {
+  const declarationRow1 = getByRole(declaration, 'row', {
+    name: '1 0304719030 FROZEN MSC A COD FILLETS 17088.98 CHEDA.GB.2025.0000001 Yes Release - Inspection complete (HMI)'
+  })
+  const [declarationAuthorityFilter] = getAllByRole(document.body, 'combobox', { name: 'Authority' })
+  await user.selectOptions(declarationAuthorityFilter, 'APHA')
+  expect(declarationRow1.hasAttribute('hidden')).toBe(true)
+
+  const [resetDeclaration] = await getAllByRole(document.body, 'button')
+  await user.click(resetDeclaration)
+  expect(declarationRow1.hasAttribute('hidden')).toBe(false)
+  expect(declarationRow2.hasAttribute('hidden')).toBe(false)
+  expect(declarationRow3.hasAttribute('hidden')).toBe(false)
+
+  const notification1 = getByRole(document.body, 'group', { name: 'CHEDP.GB.2025.0000002' })
+  expect(notification1.hasAttribute('open')).toBe(true)
+  const notificationRow1 = getByRole(notification1, 'row', {
+    name: '2 0202 Dog Chew 4618.35 Decision not given (POAO)'
+  })
+
+  const notificationAuthorityFilter = getAllByRole(document.body, 'combobox', { name: 'Authority' })[1]
+  await user.selectOptions(notificationAuthorityFilter, 'HMI')
+  expect(notificationRow1.hasAttribute('hidden')).toBe(true)
+
+  const resetNotification = getByRole(document.body, 'button')
+  await user.click(resetNotification)
+  expect(notificationRow1.hasAttribute('hidden')).toBe(false)
+
+  const closedNotification = getByRole(document.body, 'group', { name: 'CHEDA.GB.2025.0000001' })
+  expect(closedNotification.hasAttribute('open')).toBe(false)
+  expect(getByRole(closedNotification, 'row', {
     name: '1 0101 Equus asinus 2 Decision not given (HMI)'
   })).not.toBeVisible()
-
-  const notification2 = getByRole(document.body, 'group', { name: 'CHEDP.GB.2025.0000002' })
-  expect(notification2.hasAttribute('open')).toBe(true)
-  expect(getByRole(notification2, 'row', {
-    name: '2 0202 Dog Chew 4618.35 Decision not given (POAO)'
-  })).toBeVisible()
 })
 
 test('redirects to search page if no results', async () => {

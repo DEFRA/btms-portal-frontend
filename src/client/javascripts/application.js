@@ -7,7 +7,7 @@ import {
   Radios,
   SkipLink
 } from 'govuk-frontend'
-import { filters } from './filters.js'
+import { initFilters } from './filters.js'
 
 createAll(Button)
 createAll(Checkboxes)
@@ -17,4 +17,4 @@ createAll(Radios)
 createAll(SkipLink)
 
 window.BTMS = window.BTMS || {}
-window.BTMS.filters = filters
+window.BTMS.initFilters = initFilters
