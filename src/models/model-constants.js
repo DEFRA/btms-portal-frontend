@@ -4,9 +4,9 @@ const DATE_FORMAT = 'd MMMM yyyy, HH:mm'
 const authorities = {
   ANIMAL_PLANT_HEALTH_AGENCY: 'APHA',
   HORTICULTURAL_MARKETING_INSPECTORATE: 'HMI',
-  PHA_FOODS_NOT_ANIMAL_ORIGIN: 'PHA - FNAO',
-  PHA_ILLEGAL_UNREPORTED_UNREGULATED: 'PHA - IUU',
-  PHA_PRODUCTS_OF_ANIMAL_ORIGIN: 'PHA - POAO',
+  PHA_FOODS_NOT_ANIMAL_ORIGIN: 'FNAO',
+  PHA_ILLEGAL_UNREPORTED_UNREGULATED: 'IUU',
+  PHA_PRODUCTS_OF_ANIMAL_ORIGIN: 'POAO',
   PLANT_HEALTH_SEEDS_INSPECTORATE: 'PHSI'
 }
 
@@ -32,6 +32,7 @@ const decisionCodeDescriptions = {
   N07: 'Not acceptable',
   X00: 'No match'
 }
+
 const checkCodeToAuthorityMapping = {
   H218: authorities.HORTICULTURAL_MARKETING_INSPECTORATE,
   H219: authorities.PLANT_HEALTH_SEEDS_INSPECTORATE,
@@ -53,6 +54,16 @@ const documentCodeToAuthorityMapping = {
   C633: authorities.PLANT_HEALTH_SEEDS_INSPECTORATE,
   9115: authorities.PLANT_HEALTH_SEEDS_INSPECTORATE,
   N002: authorities.HORTICULTURAL_MARKETING_INSPECTORATE
+}
+
+const checkCodeToDocumentCodeMapping = {
+  H218: ['N002'],
+  H219: ['N851', '9115'],
+  H220: ['N002'],
+  H221: ['C640'],
+  H222: ['N853'],
+  H223: ['C678'],
+  H224: ['C673', 'C641']
 }
 
 const IUUDocumentReferences = ['C641', 'C673']
@@ -84,6 +95,7 @@ const finalStateMappings = {
 
 export {
   checkCodeToAuthorityMapping,
+  checkCodeToDocumentCodeMapping,
   chedStatusDescriptions,
   decisionCodeDescriptions,
   documentCodeToAuthorityMapping,
