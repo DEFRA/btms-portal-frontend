@@ -31,22 +31,22 @@ const setState = (event) => {
   window.history.replaceState({}, '', newUrl)
 }
 
-const getState = (filterTypes) => {
+const getState = (filterKeys) => {
   const url = new URL(window.location.href)
   const params = new URLSearchParams(url.search)
 
-  const entries = filterTypes
+  const entries = filterKeys
     .map((key) => [key, params.get(key)])
     .filter(([_, value]) => value)
 
   return Object.fromEntries(entries)
 }
 
-const resetState = (filterTypes) => {
+const resetState = (filterKeys) => {
   const url = new URL(window.location.href)
   const params = new URLSearchParams(url.search)
 
-  filterTypes.forEach((name) => params.delete(name))
+  filterKeys.forEach((name) => params.delete(name))
 
   const newUrl = `${url.pathname}?${params.toString()}`
   window.history.replaceState({}, '', newUrl)
@@ -85,32 +85,33 @@ const fixOutcomeWidths = () => {
     .forEach((cell) => { cell.style.width = `${cell.offsetWidth}px` })
 }
 
+const setRow = (state, target, row) => {
+  const decisionsList = row.querySelector('ul')
+  const listItems = [...decisionsList.querySelectorAll('li')]
+
+  listItems.forEach((li) => {
+    li.hidden = filterTypes[target].list.some((key) =>
+      state[key] && li.dataset[key] !== state[key]
+    )
+  })
+
+  const rowHidden = filterTypes[target].row.some((key) =>
+    state[key] && row.dataset[key] !== state[key]
+  )
+
+  row.hidden = Boolean(
+    decisionsList.querySelectorAll('li:not([hidden])').length === 0 ||
+    rowHidden
+  )
+}
+
 const setRows = (state, target) => {
   const tables = [...document.querySelectorAll(`table.btms-${target}`)]
 
   tables.forEach((table) => {
     const rows = [...table.querySelectorAll('tbody tr')]
 
-    rows.forEach((row) => {
-      const decisionsList = row.querySelector('ul')
-      const listItems = [...decisionsList.querySelectorAll('li')]
-
-      listItems.forEach((li) => {
-        li.hidden = filterTypes[target].list.some((key) =>
-          state[key] && li.dataset[key] !== state[key]
-        )
-      })
-
-      const rowHidden = filterTypes[target].row.some((key) =>
-        state[key] && row.dataset[key] !== state[key]
-      )
-
-      row.hidden = Boolean(
-        decisionsList.querySelectorAll('li:not([hidden])').length === 0 ||
-        rowHidden
-      )
-    })
-
+    rows.forEach((row) => setRow(state, target, row))
     setEmptyState(table)
   })
 }
@@ -130,13 +131,13 @@ const setUpFilters = (type) => {
     setRows(state, type)
   })
 
-  const state = getState(filterTypes[type].all)
-  clearButton(state, `${type}-reset`)
-  selects(state)
-  setRows(state, type)
+  const initialState = getState(filterTypes[type].all)
+  clearButton(initialState, `${type}-reset`)
+  selects(initialState)
+  setRows(initialState, type)
 }
 
-export const filters = () => {
+export const initFilters = () => {
   setUpFilters('declaration')
   setUpFilters('notification')
   fixOutcomeWidths()
