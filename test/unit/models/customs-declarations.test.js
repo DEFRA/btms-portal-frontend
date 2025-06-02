@@ -48,7 +48,9 @@ test('MRN, open, finalised, using netMass, matched', () => {
   const expected = [{
     commodities: [
       {
+        id: expect.any(String),
         decisions: [{
+          id: expect.any(String),
           documentReference: 'GBCHD2025.1234567',
           match: true,
           outcomes: [{
@@ -112,7 +114,9 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
   const expected = [{
     commodities: [
       {
+        id: expect.any(String),
         decisions: [{
+          id: expect.any(String),
           documentReference: 'GBCHD2025.1234567',
           match: false,
           outcomes: [
@@ -171,7 +175,9 @@ test('de-dupes document references', () => {
 
   const expected = [{
     commodities: [{
+      id: expect.any(String),
       decisions: [{
+        id: expect.any(String),
         documentReference: 'GBCHD2025.0000001',
         match: false,
         outcomes: [{
@@ -229,7 +235,9 @@ test('matches malformed references', () => {
 
   const expected = [{
     commodities: [{
+      id: expect.any(String),
       decisions: [{
+        id: expect.any(String),
         documentReference: 'GB.CHD.2025.0000002',
         match: true,
         outcomes: [{

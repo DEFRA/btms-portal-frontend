@@ -10,6 +10,7 @@ function createViewContext (documents, isMatched, unmatchedDocRefs, preNotificat
       authorities: ['PHA - FNAO'],
       commodities: [
         {
+          id: '1',
           itemNumber: 12074014,
           commodityCode: '0909',
           commodityDesc: preNotificationCommodityDesc,
@@ -25,6 +26,7 @@ function createViewContext (documents, isMatched, unmatchedDocRefs, preNotificat
       updated: '2025-01-01 09:00:00',
       commodities: [
         {
+          id: '2',
           itemNumber: 1,
           taricCommodityCode: '302499000',
           goodsDescription: customsDeclarationCommodityDesc,
@@ -69,8 +71,8 @@ describe('Search Results', () => {
 
       expect($renderedTemplate.html()).toContain('A long MRN description t...')
       expect($renderedTemplate.html()).toContain('A long CHED description that should be truncated a...')
-      expect($renderedTemplate.html()).toContain('<div class="app-import-commodities__description--tooltip" role="tooltip">A long MRN description that should be truncated and displayed in full inside a tooltip</div>')
-      expect($renderedTemplate.html()).toContain('<div class="app-import-commodities__description--tooltip" role="tooltip">A long CHED description that should be truncated and displayed in full inside a tooltip</div>')
+      expect($renderedTemplate.html()).toContain('<div role="tooltip" id="tooltip-2">A long MRN description that should be truncated and displayed in full inside a tooltip</div>')
+      expect($renderedTemplate.html()).toContain('<div role="tooltip" id="tooltip-1">A long CHED description that should be truncated and displayed in full inside a tooltip</div>')
     })
   })
 })

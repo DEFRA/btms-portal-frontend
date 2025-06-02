@@ -1,7 +1,7 @@
 @use "govuk-frontend" as *;
 @use 'variables' as *;
 
-.app-customs-declaration-summary {
+.btms-customs-declaration-summary {
   background-color: govuk-colour('light-grey');
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive columns */
@@ -26,73 +26,6 @@
       padding-bottom: 0;
       padding-top: govuk-spacing(1);
     }
-  }
-}
-
-.app-import-commodities {
-  @include govuk-font-size($size: 14);
-
-  &__ched-ref--documents-list {
-    margin-bottom: 0;
-
-    li {
-      margin-bottom: 0;
-      font-size: 1rem;
-      line-height: 1.25;
-    }
-  }
-
-  &__ched-ref--unmatched {
-    color: $govuk-error-colour;
-  }
-
-  &__match--no {
-    text-decoration: underline dotted;
-    text-underline-position: under;
-    cursor: help;
-    line-height: 1.25;
-  }
-
-  &__match--yes {
-    line-height: 1.25;
-  }
-
-  &__match--no-tooltip,
-  &__description--tooltip {
-    visibility: hidden;
-    position: absolute;
-    padding: govuk-spacing(2);
-    width: 15em;
-    z-index: 9999;
-    background-color: govuk-colour("light-grey");
-    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
-    font-size: 1rem;
-    line-height: 1.25;
-  }
-
-  &__description--tooltip {
-    width: 20em;
-  }
-
-  .govuk-table__cell:has(&__match--no-tooltip),
-  .govuk-table__cell:has(&__description--tooltip) {
-    cursor: help;
-  }
-
-  .govuk-table__cell:hover &__match--no-tooltip,
-  .govuk-table__cell:focus &__match--no-tooltip,
-  .tooltip-container:hover &__match--no-tooltip,
-  .tooltip-container:focus &__match--no-tooltip,
-  .govuk-table__cell:hover &__description--tooltip,
-  .govuk-table__cell:focus &__description--tooltip,
-  .tooltip-container:hover &__description--tooltip,
-  .tooltip-container:focus &__description--tooltip {
-    visibility: visible;
-  }
-
-  .govuk-table__cell, .tooltip-container {
-    position: relative;
-    overflow: visible;
   }
 }
 
@@ -148,6 +81,7 @@
     padding: 2px;
   }
 
+  .govuk-table,
   .govuk-tag,
   .govuk-list {
     @include govuk-font-size($size: 14);
@@ -167,13 +101,44 @@
     border-width: 0 1px 1px;
     border-style: solid;
     border-color: $btms-light-to-mid-grey;
-    padding: 15px;
+    padding: govuk-spacing(3);
   }
 
   .govuk-table__row:last-child {
     .govuk-table__cell {
       border-bottom: none;
     }
+  }
+
+  [aria-describedby] {
+    cursor: help;
+    position: relative;
+
+    [role="tooltip"] {
+      display: none;
+    }
+
+    &:hover,
+    &:focus {
+      [role="tooltip"] {
+        display: block;
+        position: absolute;
+        left: 0;
+        width: 300px;
+        padding: govuk-spacing(2);
+        color: $govuk-text-colour;
+        background-color: govuk-colour("light-grey");
+        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+        text-decoration: none;
+        z-index: 10000;
+      }
+    }
+  }
+
+  .btms-no-match {
+    color: $govuk-error-colour;
+    text-decoration: underline dashed $govuk-error-colour;
+    text-underline-offset: 4px;
   }
 
   .btms-declaration tbody > tr:not([hidden]) + tr:not(:first-of-type) > td:nth-child(-n+4) {

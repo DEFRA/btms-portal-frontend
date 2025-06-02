@@ -85,17 +85,17 @@ const fixOutcomeWidths = () => {
     .forEach((cell) => { cell.style.width = `${cell.offsetWidth}px` })
 }
 
-const setRow = (state, target, row) => {
+const setRow = (state, type, row) => {
   const decisionsList = row.querySelector('ul')
   const listItems = [...decisionsList.querySelectorAll('li')]
 
   listItems.forEach((li) => {
-    li.hidden = filterTypes[target].list.some((key) =>
+    li.hidden = filterTypes[type].list.some((key) =>
       state[key] && li.dataset[key] !== state[key]
     )
   })
 
-  const rowHidden = filterTypes[target].row.some((key) =>
+  const rowHidden = filterTypes[type].row.some((key) =>
     state[key] && row.dataset[key] !== state[key]
   )
 
@@ -105,13 +105,13 @@ const setRow = (state, target, row) => {
   )
 }
 
-const setRows = (state, target) => {
-  const tables = [...document.querySelectorAll(`table.btms-${target}`)]
+const setRows = (state, type) => {
+  const tables = [...document.querySelectorAll(`table.btms-${type}`)]
 
   tables.forEach((table) => {
     const rows = [...table.querySelectorAll('tbody tr')]
 
-    rows.forEach((row) => setRow(state, target, row))
+    rows.forEach((row) => setRow(state, type, row))
     setEmptyState(table)
   })
 }

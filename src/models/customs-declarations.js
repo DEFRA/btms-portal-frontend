@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { format } from 'date-fns'
 import {
   checkCodeToDocumentCodeMapping,
@@ -86,6 +87,7 @@ const mapCommodity = (commodity, notificationReferences, clearanceDecision) => {
     const lastSeven = 7
 
     return {
+      id: randomUUID(),
       documentReference,
       outcomes: documentCodes.flatMap((documentCode) => {
         const checks = checksWithDecisionCodes.filter(({ checkCode }) =>
@@ -103,6 +105,7 @@ const mapCommodity = (commodity, notificationReferences, clearanceDecision) => {
   })
 
   return {
+    id: randomUUID(),
     ...commodity,
     documents,
     weightOrQuantity,
