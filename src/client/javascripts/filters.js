@@ -11,10 +11,15 @@ const filterTypes = {
   }
 }
 
-const noResultsInset = () => {
+const resultTypes = {
+  declaration: 'items',
+  notification: 'commodities'
+}
+
+const noResultsInset = (type) => {
   const div = document.createElement('div')
   div.classList.add('govuk-inset-text')
-  div.innerText = 'There are no items that match the filters selected.'
+  div.innerText = `There are no ${resultTypes[type]} that match the filters selected.`
 
   return div
 }
@@ -64,14 +69,14 @@ const selects = (state) => {
   })
 }
 
-const setEmptyState = (table) => {
+const setEmptyState = (table, type) => {
   const hasVisibleRows = table
     .querySelectorAll('tbody > tr:not([hidden])').length > 0
   const header = table.querySelector('thead')
 
   if (!hasVisibleRows && header.hidden === false) {
     header.hidden = true
-    const inset = noResultsInset()
+    const inset = noResultsInset(type)
     table.before(inset)
   }
   if (hasVisibleRows && header.hidden === true) {
@@ -112,7 +117,7 @@ const setRows = (state, type) => {
     const rows = [...table.querySelectorAll('tbody tr')]
 
     rows.forEach((row) => setRow(state, type, row))
-    setEmptyState(table)
+    setEmptyState(table, type)
   })
 }
 
