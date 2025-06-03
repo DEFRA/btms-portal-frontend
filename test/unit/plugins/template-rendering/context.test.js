@@ -63,7 +63,8 @@ describe('#context', () => {
           }
         ],
         serviceName: expectedServiceName,
-        serviceUrl: '/'
+        serviceUrl: '/',
+        signOutUrl: '/sign-out'
       })
     })
 

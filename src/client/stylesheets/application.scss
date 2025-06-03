@@ -4,9 +4,10 @@
 @use "core";
 @use "app-search";
 @use "app-search-result";
+@use "themes";
 
-.app-width-container--wide {
-    @include govuk-width-container(1200px);
+.btms-width-container--wide {
+  @include govuk-width-container(1200px);
 }
 
 .btms-heading-container {

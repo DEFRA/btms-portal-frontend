@@ -58,6 +58,7 @@ export const searchResult = {
       const preNotifications = mapPreNotifications(data)
 
       const viewModel = {
+        resultsPage: true,
         searchTerm,
         customsDeclarations,
         preNotifications,

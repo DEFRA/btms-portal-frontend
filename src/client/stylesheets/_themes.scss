@@ -1,0 +1,26 @@
+@use "govuk-frontend" as *;
+
+.btms-landing-page-header {
+  border-bottom: 10px govuk-colour("blue");
+}
+
+.btms-header-nav {
+  float: right;
+  font-weight: 700;
+}
+
+.btms-masthead {
+  background-color: govuk-colour("blue");
+  padding-top: govuk-spacing(8);
+
+  .govuk-body,
+  .govuk-heading-xl {
+    color: govuk-colour("white");
+    margin-bottom: govuk-spacing(6);
+  }
+
+  .btms-start-link {
+    margin-bottom: 0;
+    padding-bottom: govuk-spacing(3)
+  }
+}
