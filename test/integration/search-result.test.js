@@ -72,13 +72,13 @@ const importPreNotifications = [{
     updatedSource: '2025-04-22T16:53:17.330Z',
     partOne: {
       commodities: {
-        commodityComplement: [{
+        commodityComplements: [{
           complementId: '1',
           commodityId: '0101',
           speciesName: 'Equus asinus'
         }],
-        complementParameterSet: [{
-          complementID: '1',
+        complementParameterSets: [{
+          complementId: '1',
           keyDataPair: [{ key: 'number_animal', data: '2' }]
         }]
       }
@@ -91,13 +91,13 @@ const importPreNotifications = [{
     updatedSource: '2025-04-22T16:55:17.330Z',
     partOne: {
       commodities: {
-        commodityComplement: [{
+        commodityComplements: [{
           complementId: '2',
           commodityId: '0202',
           complementName: 'Dog Chew'
         }],
-        complementParameterSet: [{
-          complementID: '2',
+        complementParameterSets: [{
+          complementId: '2',
           keyDataPair: [{ key: 'netweight', data: '4618.35' }]
         }]
       }
