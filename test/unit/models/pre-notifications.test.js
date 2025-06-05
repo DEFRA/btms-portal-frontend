@@ -9,13 +9,13 @@ test('CHEDP: uses netweight, open state, decision given', () => {
         updatedSource: '2025-05-12T09:18:17.330Z',
         partOne: {
           commodities: {
-            commodityComplement: [{
+            commodityComplements: [{
               complementId: '1',
               commodityId: '16041319',
               complementName: 'Sardina pilchardus'
             }],
-            complementParameterSet: [{
-              complementID: '1',
+            complementParameterSets: [{
+              complementId: '1',
               keyDataPair: [{ key: 'netweight', data: '2000' }]
             }]
           }
@@ -70,13 +70,13 @@ test('CHEDA: uses number_animal, closed state, decision ignored', () => {
         updatedSource: '2025-04-22T16:53:17.330Z',
         partOne: {
           commodities: {
-            commodityComplement: [{
+            commodityComplements: [{
               complementId: '1',
               commodityId: '0101',
               speciesName: 'Equus asinus'
             }],
-            complementParameterSet: [{
-              complementID: '1',
+            complementParameterSets: [{
+              complementId: '1',
               keyDataPair: [{ key: 'number_animal', data: '2' }]
             }]
           }

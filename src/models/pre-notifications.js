@@ -11,12 +11,12 @@ const getDecision = (preNotification) => (
   preNotification.partTwo?.decision?.decision
 ) || 'Decision not given'
 
-const mapCommodity = (commodity, complementParameterSet) => {
+const mapCommodity = (commodity, complementParameterSets) => {
   const commodityDesc = commodity.speciesName ||
     commodity.complementName
 
-  const { keyDataPair } = complementParameterSet
-    .find(({ complementID }) => complementID === commodity.complementId)
+  const { keyDataPair } = complementParameterSets
+    .find(({ complementId }) => complementId === commodity.complementId)
 
   const { data } = keyDataPair
     .find(({ key }) => key === 'number_animal' || key === 'netweight')
@@ -38,9 +38,9 @@ const mapPreNotification = (preNotification, documentCodes) => {
   const updated = format(new Date(preNotification.updatedSource), DATE_FORMAT)
   const decision = getDecision(preNotification)
 
-  const { commodityComplement, complementParameterSet } = preNotification.partOne.commodities
-  const commodities = commodityComplement
-    .map((commodity) => mapCommodity(commodity, complementParameterSet))
+  const { commodityComplements, complementParameterSets } = preNotification.partOne.commodities
+  const commodities = commodityComplements
+    .map((commodity) => mapCommodity(commodity, complementParameterSets))
 
   return {
     referenceNumber: preNotification.referenceNumber,
