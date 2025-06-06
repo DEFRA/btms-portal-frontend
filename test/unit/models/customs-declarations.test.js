@@ -162,7 +162,7 @@ test('de-dupes document references', () => {
             documentReference: 'GBCHD2025.0000001'
           }],
           checks: [{ checkCode: 'H222' }]
-        }],
+        }]
       },
       clearanceDecision: null,
       finalisation: null,

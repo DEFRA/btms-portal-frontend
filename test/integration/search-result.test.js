@@ -154,7 +154,7 @@ test('shows search results', async () => {
   expect(declaration).toHaveAttribute('open')
 
   const declarationRow3 = getByRole(declaration, 'row', {
-    name: '3 1602321990 JBB VIENNESE ROAST 2 KG 87.07 CHEDP.BB.2025.NOMATCH This CHED reference cannot be found on the customs declaration. Please check that the reference is correct. No unknown (HMI)'
+    name: '3 1602321990 JBB VIENNESE ROAST 2 KG 87.07 CHEDP.BB.2025.NOMATCH This CHED reference cannot be found on the customs declaration. Please check that the reference is correct. No No match (HMI)'
   })
   const declarationMatchFilter = getByRole(document.body, 'combobox', { name: 'Match' })
   await user.selectOptions(declarationMatchFilter, 'true')

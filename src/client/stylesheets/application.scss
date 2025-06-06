@@ -5,6 +5,7 @@
 @use "app-search";
 @use "app-search-result";
 @use "landing-page";
+@use "filters";
 
 .btms-width-container--wide {
   @include govuk-width-container(1200px);

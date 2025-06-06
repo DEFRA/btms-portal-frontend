@@ -2,6 +2,8 @@
 {% from "../macros/document-reference.njk" import documentReference %}
 {% from "../macros/decision-match.njk" import decisionMatch %}
 
+{% set maxLength = 24 %}
+
 <table class="govuk-table govuk-table--small-text-until-tablet btms-declaration">
   <thead class="govuk-table__head">
     <tr class="govuk-table__row">
@@ -20,7 +22,7 @@
         <tr data-match="{{ decision.match }}">
           <td class="govuk-table__cell">{{ commodity.itemNumber }}</td>
           <td class="govuk-table__cell">{{ commodity.taricCommodityCode }}</td>
-          <td class="govuk-table__cell">{{ commodityDescription(commodity.goodsDescription, commodity.id, 24) }}</td>
+          <td class="govuk-table__cell">{{ commodityDescription(commodity.goodsDescription, commodity.id, maxLength) }}</td>
           <td class="govuk-table__cell">{{ commodity.weightOrQuantity }}</td>
           {{ documentReference(decision) }}
           <td class="govuk-table__cell">{{ decisionMatch(decision.match) }}</td>
@@ -34,7 +36,7 @@
                 {% if outcome.decision and outcome.decisionDetail %}
                   {{ outcome.decision }} - {{ outcome.decisionDetail }} ({{ outcome.departmentCode }})
                 {% else %}
-                  unknown ({{ outcome.departmentCode }})
+                  No match ({{ outcome.departmentCode }})
                 {% endif %}
               </li>
               {% if loop.last %} </ul> {% endif %}
