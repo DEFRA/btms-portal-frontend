@@ -1,7 +1,7 @@
 @use "govuk-frontend" as *;
 
 .btms-landing-page-header {
-  border-bottom: 10px govuk-colour("blue");
+  border-bottom: govuk-spacing(2) govuk-colour("blue");
 }
 
 .btms-header-nav {
