@@ -35,10 +35,10 @@
 {% endif %}
 
 {% set additionalHeaderOptions = {} %}
-{% set themeClass = 'govuk-main-wrapper' %}
+{% set wrapperClass = 'govuk-main-wrapper' %}
 
 {% if landingPage %}
-  {% set themeClass = 'btms-masthead' %}
+  {% set wrapperClass = 'btms-landing-page-wrapper' %}
   {% set additionalHeaderOptions = {
     classes: 'btms-landing-page-header'
   } %}
@@ -68,7 +68,7 @@
     {% endif %}
   </div>
   <main role="main">
-    <div class="{{ themeClass }}">
+    <div class="{{ wrapperClass }}">
       <div class="govuk-width-container {{ containerClasses }}">
         {% block content %}{% endblock %}
       </div>

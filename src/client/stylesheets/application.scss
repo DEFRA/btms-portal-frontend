@@ -4,10 +4,15 @@
 @use "core";
 @use "app-search";
 @use "app-search-result";
-@use "themes";
+@use "landing-page";
 
 .btms-width-container--wide {
   @include govuk-width-container(1200px);
+}
+
+.btms-header-nav {
+  float: right;
+  font-weight: 700;
 }
 
 .btms-heading-container {
