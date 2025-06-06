@@ -42,7 +42,7 @@ test('CHEDP: uses netweight, open state, decision given', () => {
   const result = mapPreNotifications(data)
 
   const expected = [{
-    authorities: ['PHA - POAO'],
+    authorities: ['POAO'],
     commodities: [
       {
         commodityDesc: 'Sardina pilchardus',
@@ -103,7 +103,7 @@ test('CHEDA: uses number_animal, closed state, decision ignored', () => {
   const result = mapPreNotifications(data)
 
   const expected = [{
-    authorities: ['PHA - POAO'],
+    authorities: ['POAO'],
     commodities: [
       {
         commodityDesc: 'Equus asinus',

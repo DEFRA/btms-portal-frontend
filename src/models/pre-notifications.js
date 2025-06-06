@@ -13,6 +13,7 @@ const getDecision = (preNotification) => (
 
 const mapCommodity = (commodity, complementParameterSets) => {
   const commodityDesc = commodity.speciesName ||
+    commodity.commodityDescription ||
     commodity.complementName
 
   const { keyDataPair } = complementParameterSets
