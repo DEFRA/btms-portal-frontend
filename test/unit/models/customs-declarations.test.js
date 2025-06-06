@@ -56,7 +56,7 @@ test('MRN, open, finalised, using netMass, matched', () => {
     movementReferenceNumber: 'GB251234567890ABCD',
     declarationUcr: '5GB123456789000-BDOV123456',
     open: true,
-    status: 'Finalised - Cleared',
+    status: 'Finalised - Released',
     updated: '12 May 2025, 11:13'
   }]
 
@@ -109,7 +109,7 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
     movementReferenceNumber: 'GB250123456789DCBA',
     declarationUcr: '5GB123456789000-BDOV123456',
     open: true,
-    status: 'Finalised - Manually cleared',
+    status: 'Finalised - Manually released',
     updated: '12 May 2025, 12:42'
   }]
 

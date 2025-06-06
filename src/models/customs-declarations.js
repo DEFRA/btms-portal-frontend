@@ -47,7 +47,7 @@ export const getCustomsDeclarationStatus = (finalisation) => {
   }
 
   if (finalisation.isManualRelease === true) {
-    return 'Finalised - Manually cleared'
+    return 'Finalised - Manually released'
   }
 
   return `Finalised - ${finalStateMappings[finalisation.finalState]}`

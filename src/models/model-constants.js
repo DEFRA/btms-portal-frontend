@@ -73,7 +73,7 @@ const chedStatusDescriptions = {
 const displayClosedChedStatuses = ['CANCELLED', 'DELETED', 'REPLACED']
 
 const finalStateMappings = {
-  0: 'Cleared',
+  0: 'Released',
   1: 'Cancelled after arrival',
   2: 'Cancelled while pre-lodged',
   3: 'Destroyed',
