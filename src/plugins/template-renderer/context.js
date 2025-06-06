@@ -1,10 +1,10 @@
 import path from 'node:path'
 import { readFileSync } from 'node:fs'
-
 import { config } from '../../config/config.js'
 import { createLogger } from '../../utils/logger.js'
 import { getNavigationItems } from '../../config/navigation-items.js'
 import { getUserSession } from '../../auth/user-session.js'
+import { paths } from '../../routes/route-constants.js'
 
 const logger = createLogger()
 const assetPath = config.get('assetPath')
@@ -37,6 +37,7 @@ export async function context (request) {
     serviceUrl: '/',
     breadcrumbs: [],
     navigation: getNavigationItems(request),
+    signOutUrl: paths.SIGN_OUT,
 
     /**
      * @param {string} asset
