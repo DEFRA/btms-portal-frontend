@@ -10,9 +10,6 @@ import {
 const hasDesiredPrefix = (decisionCode, desiredPrefix) => {
   return decisionCode?.length && decisionCode.toLowerCase().startsWith(desiredPrefix)
 }
-const isNoMatchDecisionCode = (decisionCode) => {
-  return decisionCode?.length && decisionCode.toLowerCase() === 'x00'
-}
 const isErrorDecisionCode = (decisionCode) => {
   return hasDesiredPrefix(decisionCode, 'e0')
 }
@@ -44,33 +41,16 @@ export const getDecisionDescription = (decisionCode) => {
   return `${decisionHighLevelDesc}${decisionDetail}` || 'Unknown'
 }
 
-export const getCustomsDeclarationStatus = (items, finalisation) => {
-  if (finalisation?.isManualRelease === true) {
-    return 'Manually released'
+export const getCustomsDeclarationStatus = (finalisation) => {
+  if (finalisation === null) {
+    return 'Current'
   }
 
-  if (finalisation?.isManualRelease === false) {
-    return finalStateMappings[finalisation.finalState]
+  if (finalisation.isManualRelease === true) {
+    return 'Finalised - Manually cleared'
   }
 
-  if (items?.length) {
-    if (items.some(c => c.checks.some(chk => isErrorDecisionCode(chk.decisionCode)))) {
-      return 'Data error'
-    }
-    if (items.some(c => c.checks.some(chk => isRefusalDecisionCode(chk.decisionCode)))) {
-      return 'Refusal'
-    }
-    if (items.some(c => c.checks.some(chk => isNoMatchDecisionCode(chk.decisionCode)))) {
-      return 'No match'
-    }
-    if (items.some(c => c.checks.some(chk => isHoldDecisionCode(chk.decisionCode)))) {
-      return 'Hold'
-    }
-    if (items.every(c => c.checks.every(chk => isReleaseDecisionCode(chk.decisionCode)))) {
-      return 'Released'
-    }
-  }
-  return 'Unknown'
+  return `Finalised - ${finalStateMappings[finalisation.finalState]}`
 }
 
 const getMatchStatus = (documentReferences, notificationReferences) => {
@@ -118,12 +98,12 @@ const mapCommodity = (commodity, notificationReferences, clearanceDecision) => {
 }
 
 const mapCustomsDeclaration = (declaration, notificationReferences) => {
-  const { clearanceRequest, clearanceDecision } = declaration
+  const { clearanceRequest, clearanceDecision, finalisation } = declaration
   const updated = format(declaration.updated, DATE_FORMAT)
   const commodities = clearanceRequest.commodities
     .map((commodity) => mapCommodity(commodity, notificationReferences, clearanceDecision))
 
-  const status = getCustomsDeclarationStatus(clearanceDecision?.items, clearanceRequest.finalisation)
+  const status = getCustomsDeclarationStatus(finalisation)
   const open = status !== 'Cancelled'
 
   return {

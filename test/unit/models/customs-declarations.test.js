@@ -1,4 +1,4 @@
-import { mapCustomsDeclarations, getCustomsDeclarationStatus, getDecisionDescription } from '../../../src/models/customs-declarations.js'
+import { mapCustomsDeclarations, getDecisionDescription } from '../../../src/models/customs-declarations.js'
 
 test('MRN, open, finalised, using netMass, matched', () => {
   const data = {
@@ -16,11 +16,7 @@ test('MRN, open, finalised, using netMass, matched', () => {
             documentCode: 'C641',
             documentReference: 'IGNORED IUUD DOCUMENT'
           }]
-        }],
-        finalisation: {
-          isManualRelease: false,
-          finalState: 0
-        }
+        }]
       },
       clearanceDecision: {
         items: [{
@@ -30,6 +26,10 @@ test('MRN, open, finalised, using netMass, matched', () => {
             checkCode: 'H221'
           }]
         }]
+      },
+      finalisation: {
+        isManualRelease: false,
+        finalState: 0
       },
       updated: '2025-05-12T11:13:17.330Z'
     }],
@@ -56,7 +56,7 @@ test('MRN, open, finalised, using netMass, matched', () => {
     movementReferenceNumber: 'GB251234567890ABCD',
     declarationUcr: '5GB123456789000-BDOV123456',
     open: true,
-    status: 'Released',
+    status: 'Finalised - Cleared',
     updated: '12 May 2025, 11:13'
   }]
 
@@ -79,12 +79,12 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
             documentCode: 'C641',
             documentReference: 'IGNORED IUUD DOCUMENT'
           }]
-        }],
-        finalisation: {
-          isManualRelease: true
-        }
+        }]
       },
       clearanceDecision: null,
+      finalisation: {
+        isManualRelease: true
+      },
       updated: '2025-05-12T12:42:17.330Z'
     }],
     importPreNotifications: []
@@ -109,7 +109,7 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
     movementReferenceNumber: 'GB250123456789DCBA',
     declarationUcr: '5GB123456789000-BDOV123456',
     open: true,
-    status: 'Manually released',
+    status: 'Finalised - Manually cleared',
     updated: '12 May 2025, 12:42'
   }]
 
@@ -132,10 +132,10 @@ test('de-dupes document references', () => {
             documentCode: 'N851',
             documentReference: 'GBCHD2025.0000001'
           }]
-        }],
-        finalisation: null
+        }]
       },
       clearanceDecision: null,
+      finalisation: null,
       updated: '2025-05-12T11:13:17.330Z'
     }],
     importPreNotifications: []
@@ -158,7 +158,7 @@ test('de-dupes document references', () => {
     movementReferenceNumber: 'GB2501010101010101',
     declarationUcr: '5GB123456789000-BDOV123456',
     open: true,
-    status: 'Unknown',
+    status: 'Current',
     updated: '12 May 2025, 11:13'
   }]
 
@@ -178,10 +178,10 @@ test('matches malformed references', () => {
             documentCode: 'C633',
             documentReference: 'GB.CHD.2025.0000002'
           }]
-        }],
-        finalisation: null
+        }]
       },
       clearanceDecision: null,
+      finalisation: null,
       updated: '2025-05-12T11:13:17.330Z'
     }],
     importPreNotifications: [{
@@ -205,89 +205,11 @@ test('matches malformed references', () => {
     movementReferenceNumber: 'GB2502020202020202',
     declarationUcr: '5GB123456789000-BDOV123456',
     open: true,
-    status: 'Unknown',
+    status: 'Current',
     updated: '12 May 2025, 11:13'
   }]
 
   expect(result).toEqual(expected)
-})
-
-test('getCustomsDeclarationStatus() no finalisation, prefers error codes', () => {
-  const items = [{
-    checks: [
-      { decisionCode: 'C0_RELEASED_CODE' },
-      { decisionCode: 'H0_HOLD_CODE' },
-      { decisionCode: 'X00' },
-      { decisionCode: 'N0_REFUSAL_CODE' },
-      { decisionCode: 'E0_ERROR_CODE' }
-    ]
-  }]
-  const finalisation = null
-
-  expect(getCustomsDeclarationStatus(items, finalisation))
-    .toBe('Data error')
-})
-
-test('getCustomsDeclarationStatus() no finalisation, prefers refusal codes', () => {
-  const items = [{
-    checks: [
-      { decisionCode: 'C0_RELEASED_CODE' },
-      { decisionCode: 'H0_HOLD_CODE' },
-      { decisionCode: 'X00' },
-      { decisionCode: 'N0_REFUSAL_CODE' }
-    ]
-  }]
-  const finalisation = null
-
-  expect(getCustomsDeclarationStatus(items, finalisation))
-    .toBe('Refusal')
-})
-
-test('getCustomsDeclarationStatus() no finalisation, prefers no match codes', () => {
-  const items = [{
-    checks: [
-      { decisionCode: 'C0_RELEASED_CODE' },
-      { decisionCode: 'H0_HOLD_CODE' },
-      { decisionCode: 'X00' }
-    ]
-  }]
-  const finalisation = null
-
-  expect(getCustomsDeclarationStatus(items, finalisation))
-    .toBe('No match')
-})
-
-test('getCustomsDeclarationStatus() no finalisation, prefers hold codes', () => {
-  const items = [{
-    checks: [
-      { decisionCode: 'C0_RELEASED_CODE' },
-      { decisionCode: 'H0_HOLD_CODE' }
-    ]
-  }]
-  const finalisation = null
-
-  expect(getCustomsDeclarationStatus(items, finalisation))
-    .toBe('Hold')
-})
-
-test('getCustomsDeclarationStatus() no finalisation, release codes are last', () => {
-  const items = [{
-    checks: [
-      { decisionCode: 'C0_RELEASED_CODE' }
-    ]
-  }]
-  const finalisation = null
-
-  expect(getCustomsDeclarationStatus(items, finalisation))
-    .toBe('Released')
-})
-
-test('getCustomsDeclarationStatus() no finalisation, no clearanceDecision items', () => {
-  const items = []
-  const finalisation = null
-
-  expect(getCustomsDeclarationStatus(items, finalisation))
-    .toBe('Unknown')
 })
 
 test('getDecisionDescription()', () => {
