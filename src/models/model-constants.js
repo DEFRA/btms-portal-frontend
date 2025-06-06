@@ -74,11 +74,11 @@ const displayClosedChedStatuses = ['CANCELLED', 'DELETED', 'REPLACED']
 
 const finalStateMappings = {
   0: 'Released',
-  1: 'Cancelled',
-  2: 'Cancelled',
+  1: 'Cancelled after arrival',
+  2: 'Cancelled while pre-lodged',
   3: 'Destroyed',
   4: 'Seized',
-  5: 'Released to warehouse',
+  5: 'Released to King’s warehouse',
   6: 'Transferred to MSS'
 }
 
