@@ -19,7 +19,7 @@ export const searchResult = {
 
           return match ? { [match.key]: value } : h.error('any.invalid')
         })
-      }),
+      }).unknown(),
       failAction: async (request, h, err) => {
         request.logger.setBindings({ err })
         request.yar.flash(

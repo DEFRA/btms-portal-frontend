@@ -12,6 +12,7 @@
         <a class="govuk-link govuk-link--no-visited-state" href="/search">Search again</a>
       </div>
       <h2 class="govuk-heading-m">Customs declaration details</h1>
+      {% include "./includes/declaration-filters.njk" %}
       {% for customsDeclaration in customsDeclarations %}
         {% set declarationSummaryHTML %}
           {% include "./includes/declaration-summary.njk" %}
@@ -34,6 +35,7 @@
         <p class="govuk-body">No customs declarations found.</p>
       {% endfor %}
       <h2 class="govuk-heading-m">IPAFFS notification (CHED) details</h2>
+      {% include "./includes/notification-filters.njk" %}
       {% for preNotification in preNotifications %}
         {% set notificationSummaryHTML %}
           {% include "./includes/notification-summary.njk" %}
@@ -57,4 +59,8 @@
       {% endfor %}
     </div>
   </div>
+{% endblock %}
+{% block bodyEnd %}
+  {{ super() }}
+  <script>BTMS.initFilters()</script>
 {% endblock %}

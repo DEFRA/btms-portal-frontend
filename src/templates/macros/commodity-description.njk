@@ -1,6 +1,11 @@
-{% macro commodityDescription(commodityDesc, maxLength) %}
-  {{ commodityDesc | truncate(maxLength, true) }}
-  {% if commodityDesc | length > maxLength %}
-    <div class="app-import-commodities__description--tooltip" role="tooltip">{{ commodityDesc }}</div>
+{% macro commodityDescription(description, id, maxLength) %}
+  {% if description | length > maxLength %}
+    {% set id = 'tooltip-' + id %}
+    <div aria-describedby="{{ id }}">
+      {{ description | truncate(maxLength, true) }}
+      <div role="tooltip" id="{{ id }}">{{ description }}</div>
+    </div>
+  {% else %}
+    {{ description }}
   {% endif %}
 {% endmacro %}
