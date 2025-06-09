@@ -78,7 +78,7 @@ const chedStatusDescriptions = {
   REPLACED: 'Replaced',
   SPLIT_CONSIGNMENT: 'Split consignment',
   SUBMITTED: 'Submitted',
-  VALIDATED: 'Validated'
+  VALIDATED: 'Valid'
 }
 
 const displayClosedChedStatuses = ['CANCELLED', 'DELETED', 'REPLACED']

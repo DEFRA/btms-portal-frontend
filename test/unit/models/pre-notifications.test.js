@@ -54,7 +54,7 @@ test('CHEDP: uses netweight, open state, decision given', () => {
     decision: 'Acceptable for internal market',
     open: true,
     referenceNumber: 'CHEDP.GB.2025.0000001',
-    status: 'Validated',
+    status: 'Valid',
     updated: '12 May 2025, 09:18'
   }]
 
