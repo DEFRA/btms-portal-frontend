@@ -5,6 +5,7 @@ import {
   displayClosedChedStatuses,
   DATE_FORMAT
 } from './model-constants.js'
+import { config } from '../config/config.js'
 
 const getDecision = (preNotification) => (
   ['VALIDATED', 'REJECTED'].includes(preNotification.status) &&
@@ -43,6 +44,9 @@ const mapPreNotification = (preNotification, documentCodes) => {
   const commodities = commodityComplements
     .map((commodity) => mapCommodity(commodity, complementParameterSets))
 
+  const ipaffsUrlTemplate = config.get('ipaffs.urlTemplate')
+  const ipaffsUrl = ipaffsUrlTemplate.replace('CHED_REFERENCE', preNotification.referenceNumber)
+
   return {
     referenceNumber: preNotification.referenceNumber,
     status,
@@ -50,7 +54,8 @@ const mapPreNotification = (preNotification, documentCodes) => {
     updated,
     decision,
     authorities,
-    commodities
+    commodities,
+    ipaffsUrl
   }
 }
 

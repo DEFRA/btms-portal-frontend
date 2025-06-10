@@ -1,4 +1,7 @@
 import { mapPreNotifications } from '../../../src/models/pre-notifications.js'
+import { config } from '../../../src/config/config.js'
+
+config.set('ipaffs.urlTemplate', 'http://ipaffs/CHED_REFERENCE/ched')
 
 test('CHEDP: uses netweight, open state, decision given', () => {
   const data = {
@@ -52,6 +55,7 @@ test('CHEDP: uses netweight, open state, decision given', () => {
       }
     ],
     decision: 'Acceptable for internal market',
+    ipaffsUrl: 'http://ipaffs/CHEDP.GB.2025.0000001/ched',
     open: true,
     referenceNumber: 'CHEDP.GB.2025.0000001',
     status: 'Valid',
@@ -113,6 +117,7 @@ test('CHEDA: uses number_animal, closed state, decision ignored', () => {
       }
     ],
     decision: 'Decision not given',
+    ipaffsUrl: 'http://ipaffs/CHEDA.GB.2025.0000001/ched',
     open: false,
     referenceNumber: 'CHEDA.GB.2025.0000001',
     status: 'Cancelled',
