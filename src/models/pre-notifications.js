@@ -7,6 +7,8 @@ import {
 } from './model-constants.js'
 import { config } from '../config/config.js'
 
+const ipaffsUrlTemplate = config.get('ipaffs.urlTemplate')
+
 const getDecision = (preNotification) => (
   ['VALIDATED', 'REJECTED'].includes(preNotification.status) &&
   preNotification.partTwo?.decision?.decision
@@ -44,7 +46,6 @@ const mapPreNotification = (preNotification, documentCodes) => {
   const commodities = commodityComplements
     .map((commodity) => mapCommodity(commodity, complementParameterSets))
 
-  const ipaffsUrlTemplate = config.get('ipaffs.urlTemplate')
   const ipaffsUrl = ipaffsUrlTemplate.replace('CHED_REFERENCE', preNotification.referenceNumber)
 
   return {

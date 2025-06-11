@@ -321,10 +321,10 @@ const config = convict({
   },
   ipaffs: {
     urlTemplate: {
-      doc: 'IPAFFS Notifications base URL',
+      doc: 'IPAFFS Notifications URL template',
       format: String,
       default: '',
-      env: 'IPAFFS_BASE_URL'
+      env: 'IPAFFS_URL'
     }
   }
 })
