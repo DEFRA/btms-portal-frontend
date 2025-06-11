@@ -67,7 +67,7 @@
       {{ govukBreadcrumbs({ items: breadcrumbs }) }}
     {% endif %}
   </div>
-  <main role="main">
+  <main role="main" id="main-content">
     <div class="{{ wrapperClass }}">
       <div class="govuk-width-container {{ containerClasses }}">
         {% block content %}{% endblock %}

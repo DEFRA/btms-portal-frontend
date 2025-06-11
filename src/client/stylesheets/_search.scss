@@ -1,0 +1,83 @@
+@use "govuk-frontend" as *;
+
+.btms-search-wrapper {
+  padding: govuk-spacing(7);
+  background-color: govuk-colour("light-grey");
+
+  .govuk-input__suffix {
+    position: relative;
+    padding: govuk-spacing(0);
+  }
+
+  .govuk-hint .govuk-body-s {
+    color: inherit;
+    margin-bottom: 3px;
+  }
+}
+
+.btms-search-buttons {
+  width: 50px;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 0;
+  padding: 0;
+
+  li {
+    margin-bottom: 0;
+
+    &:first-child {
+      display: flex;
+    }
+  }
+
+  button {
+    position: absolute;
+    border: 0;
+    cursor: pointer;
+    display: block;
+  }
+
+  .btms-reset-search {
+    left: -40px;
+    width: 30px;
+    top: 3px;
+    bottom: 3px;
+    z-index: 10000;
+    background-color: transparent;
+
+    &::after {
+      content: '×';
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      left: 0;
+      width: 30px;
+      border: 0;
+      top: 0;
+      bottom: 0;
+      color: govuk-colour("blue");
+      font-size: 30px;
+      line-height: 30px;
+    }
+  }
+
+  .btms-submit-search {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    position: relative;
+    left: -2px;
+    background-color: govuk-colour("blue");
+    border: 1px solid govuk-colour("black");
+  }
+
+  .btms-search-icon {
+    fill: none;
+    stroke: govuk-colour('white');
+    stroke-width: 2;
+  }
+}
+
