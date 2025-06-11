@@ -25,3 +25,15 @@
 .btms-hidden {
   visibility: hidden;
 }
+
+.btms-external-link {
+  position: relative;
+
+  svg {
+    position: absolute;
+    display: block;
+    height: 12px;
+    top: 2px;
+    right: -18px;
+  }
+}

@@ -2,6 +2,7 @@
 {% from "../macros/highlight-match.njk" import highlightMatch %}
 
 {% set CHEDClass = highlightMatch(preNotification.referenceNumber, searchTerm) %}
+{% set linkIcon %} {% include "./svg-external.njk" %} {% endset %}
 
 {{
   govukSummaryList({
@@ -10,7 +11,12 @@
       {
         key: { text: "CHED Reference" },
         value: {
-          html: '<span class="' ~ CHEDClass ~ '">'~preNotification.referenceNumber~'</span>'
+          html: '
+            <span class="' ~ CHEDClass ~ '">
+              <a class="btms-external-link" href="' ~ preNotification.ipaffsUrl ~ '" target="' ~ preNotification.ipaffsUrl ~ '" rel="noopener noreferrer">'
+                ~ preNotification.referenceNumber ~ linkIcon ~
+              '</a>
+            </span>'
         }
       },
       {
