@@ -77,7 +77,7 @@ const chedStatusDescriptions = {
   REJECTED: 'Rejected',
   REPLACED: 'Replaced',
   SPLIT_CONSIGNMENT: 'Split consignment',
-  SUBMITTED: 'Submitted',
+  SUBMITTED: 'New',
   VALIDATED: 'Valid'
 }
 
