@@ -318,6 +318,14 @@ const config = convict({
         default: ['openid', 'offline_access']
       }
     }
+  },
+  ipaffs: {
+    urlTemplate: {
+      doc: 'IPAFFS Notifications URL template',
+      format: String,
+      default: '',
+      env: 'IPAFFS_URL'
+    }
   }
 })
 

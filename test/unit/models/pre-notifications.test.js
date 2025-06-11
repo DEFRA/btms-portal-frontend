@@ -52,6 +52,7 @@ test('CHEDP: uses netweight, open state, decision given', () => {
       }
     ],
     decision: 'Acceptable for internal market',
+    ipaffsUrl: 'https://ipaffs/CHEDP.GB.2025.0000001/ched',
     open: true,
     referenceNumber: 'CHEDP.GB.2025.0000001',
     status: 'Valid',
@@ -113,6 +114,7 @@ test('CHEDA: uses number_animal, closed state, decision ignored', () => {
       }
     ],
     decision: 'Decision not given',
+    ipaffsUrl: 'https://ipaffs/CHEDA.GB.2025.0000001/ched',
     open: false,
     referenceNumber: 'CHEDA.GB.2025.0000001',
     status: 'Cancelled',
