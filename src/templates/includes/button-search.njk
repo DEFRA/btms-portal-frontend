@@ -1,6 +1,16 @@
-<button id="btn-search" type="submit">
-  <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <circle cx="10" cy="10" r="8" stroke="#ffffff" stroke-width="2"></circle>
-    <line x1="15" y1="15" x2="22" y2="22" stroke="#ffffff" stroke-width="2"></line>
-  </svg>
-</button>
+<ul class="govuk-list btms-search-buttons">
+  <li>
+    <button type="submit" class="btms-submit-search">
+      <span class="govuk-visually-hidden">Submit</span>
+      <svg class="btms-search-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <circle cx="10" cy="10" r="8" stroke="#ffffff" stroke-width="2"></circle>
+        <line x1="15" y1="15" x2="22" y2="22" stroke="#ffffff" stroke-width="2"></line>
+      </svg>
+    </button>
+  </li>
+  <li id="reset-search" hidden>
+    <button type="reset" class="btms-reset-search">
+      <span class="govuk-visually-hidden">Clear</span>
+    </button>
+  </li>
+</ul>

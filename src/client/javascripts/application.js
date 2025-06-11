@@ -8,6 +8,7 @@ import {
   SkipLink
 } from 'govuk-frontend'
 import { initFilters } from './filters.js'
+import { initSearch } from './search.js'
 
 createAll(Button)
 createAll(Checkboxes)
@@ -16,5 +17,7 @@ createAll(Header)
 createAll(Radios)
 createAll(SkipLink)
 
-window.BTMS = window.BTMS || {}
-window.BTMS.initFilters = initFilters
+window.BTMS = {
+  initFilters,
+  initSearch
+}

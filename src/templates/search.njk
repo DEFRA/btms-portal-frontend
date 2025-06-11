@@ -19,7 +19,7 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <form class="app-search-wrapper" action="/search-result">
+      <form id="search" class="btms-search-wrapper" action="/search-result">
         {{
           govukInput({
             errorMessage: {
@@ -38,9 +38,10 @@
               classes: "govuk-body-s"
             },
             spellcheck: false,
-            suffix: {
-              classes: "app-search-wrapper-submit-button",
-              html: searchButton
+            formGroup: {
+              afterInput: {
+                html: searchButton
+              }
             },
             value: searchTerm
           })
@@ -48,4 +49,8 @@
       </form>
     </div>
   </div>
+{% endblock %}
+{% block bodyEnd %}
+  {{ super() }}
+  <script>BTMS.initSearch()</script>
 {% endblock %}
