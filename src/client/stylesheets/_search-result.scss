@@ -86,6 +86,10 @@
   .govuk-list {
     @include govuk-font-size($size: 14);
   }
+
+  .govuk-table td:last-child {
+    width: 25%;
+  }
 }
 
 .btms-details[open] {

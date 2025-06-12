@@ -85,11 +85,6 @@ const setEmptyState = (table, type) => {
   }
 }
 
-const fixOutcomeWidths = () => {
-  [...document.querySelectorAll('.btms-decision-outcomes')]
-    .forEach((cell) => { cell.style.width = `${cell.offsetWidth}px` })
-}
-
 const setRow = (state, type, row) => {
   const decisionsList = row.querySelector('ul')
   const listItems = [...decisionsList.querySelectorAll('li')]
@@ -145,5 +140,4 @@ const setUpFilters = (type) => {
 export const initFilters = () => {
   setUpFilters('declaration')
   setUpFilters('notification')
-  fixOutcomeWidths()
 }
