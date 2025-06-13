@@ -257,61 +257,68 @@ const config = convict({
   auth: {
     defraId: {
       oidcConfigurationUrl: {
-        doc: 'Defra ID OIDC Configuration URL',
+        doc: 'Defra ID OIDC configuration URL',
         format: String,
         env: 'AUTH_DEFRA_ID_OIDC_CONFIGURATION_URL',
         default:
           'https://dcidmtest.b2clogin.com/dcidmtest.onmicrosoft.com/b2c_1a_cui_signin_stub/.well-known/openid-configuration'
       },
       serviceId: {
-        doc: 'Defra ID Service ID',
+        doc: 'Defra ID service ID',
         format: String,
         env: 'AUTH_DEFRA_ID_SERVICE_ID',
         default: 'd7d72b79-9c62-ee11-8df0-000d3adf7047'
       },
       clientId: {
-        doc: 'Defra ID Client ID',
+        doc: 'Defra ID client ID',
         format: String,
         env: 'AUTH_DEFRA_ID_CLIENT_ID',
         default: '2fb0d715-affa-4bf1-836e-44a464e3fbea'
       },
       clientSecret: {
-        doc: 'Defra ID Client Secret',
+        doc: 'Defra ID client secret',
         format: String,
         sensitive: true,
         env: 'AUTH_DEFRA_ID_CLIENT_SECRET',
         default: ''
       },
       scopes: {
-        doc: 'Defra ID Scopes',
+        doc: 'Defra ID scopes',
         format: Array,
         sensitive: true,
         env: 'AUTH_DEFRA_ID_SCOPES',
         default: ['openid', 'offline_access']
+      },
+      organisations: {
+        doc: 'Defra ID allowed organisations',
+        format: Array,
+        sensitive: true,
+        env: 'AUTH_DEFRA_ID_ORGANISATIONS',
+        default: ['7f2f65e0-4858-11f0-afd0-f3af378128f9']
       }
     },
     entraId: {
       oidcConfigurationUrl: {
-        doc: 'Entra ID OIDC Configuration URL',
+        doc: 'Entra ID OIDC configuration URL',
         format: String,
         env: 'AUTH_ENTRA_ID_OIDC_CONFIGURATION_URL',
         default: 'https://dcidmtest.b2clogin.com/dcidmtest.onmicrosoft.com/b2c_1a_cui_signin_stub/.well-known/openid-configuration'
       },
       clientId: {
-        doc: 'ENTRA ID Client ID',
+        doc: 'ENTRA ID client ID',
         format: String,
         env: 'AUTH_ENTRA_ID_CLIENT_ID',
         default: '2fb0d715-affa-4bf1-836e-44a464e3fbea'
       },
       clientSecret: {
-        doc: 'ENTRA ID Client Secret',
+        doc: 'ENTRA ID client Secret',
         format: String,
         sensitive: true,
         env: 'AUTH_ENTRA_ID_CLIENT_SECRET',
         default: ''
       },
       scopes: {
-        doc: 'ENTRA ID Scopes',
+        doc: 'ENTRA ID scopes',
         format: Array,
         sensitive: true,
         env: 'AUTH_ENTRA_ID_SCOPES',
@@ -321,7 +328,7 @@ const config = convict({
   },
   ipaffs: {
     urlTemplate: {
-      doc: 'IPAFFS Notifications URL template',
+      doc: 'IPAFFS notifications URL template',
       format: String,
       default: '',
       env: 'IPAFFS_URL'
