@@ -24,7 +24,7 @@ export const openIdProvider = async (name, authConfig, server) => {
         nothing: payload.relationships,
         typeof: typeof payload.relationships,
         current: payload.currentRelationshipId
-      }, 'JWT token')
+      }, 'nothing to see here')
 
       const displayName = [payload.firstName, payload.lastName]
         .filter((part) => part)
