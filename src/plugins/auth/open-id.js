@@ -10,7 +10,7 @@ const openId = {
   plugin: {
     name: 'open-id',
     register: async (server) => {
-      const defra = await openIdProvider('defraId', defraId, server)
+      const defra = await openIdProvider('defraId', defraId)
       server.auth.strategy('defraId', 'bell', {
         location: (request) => {
           request.yar.flash('referrer', paths.SEARCH)
