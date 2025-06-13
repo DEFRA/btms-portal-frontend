@@ -20,11 +20,7 @@ export const openIdProvider = async (name, authConfig, server) => {
       }
 
       const payload = jwt.token.decode(credentials.token).decoded.payload
-      server?.logger.info({
-        nothing: payload.relationships,
-        typeof: typeof payload.relationships,
-        current: payload.currentRelationshipId
-      }, 'nothing to see here')
+      server?.logger.info(`relationships:${payload.relationships} typeof:${typeof payload.relationships} current:${payload.currentRelationshipId}`)
 
       const displayName = [payload.firstName, payload.lastName]
         .filter((part) => part)
