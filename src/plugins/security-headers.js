@@ -1,7 +1,11 @@
+const govScriptTag = 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='
+const searchScriptTag = 'sha256-uHGkJwHxU+M7xHQgrwOcFeeWse8WK+FzkrkQQF5rk5Y='
+const searchResultsScriptTag = 'sha256-fwdedhdbz9FmWG14XxCNLJTnz76qk8IWqi1Q2jNSuxc='
+
 const headersToAdd = {
   'content-security-policy':
     "default-src 'self'; " +
-    "script-src 'self'; " +
+    `script-src 'self' '${govScriptTag}' '${searchScriptTag}' '${searchResultsScriptTag}'; ` +
     "style-src 'self'; " +
     "img-src 'self' data:; " +
     "connect-src 'self'; " +
