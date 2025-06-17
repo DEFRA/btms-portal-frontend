@@ -33,15 +33,13 @@ const serveFriendlyErrorPage = (request, h) => {
     .code(statusCode)
 }
 export const errorPage = {
-  plugin: {
-    name: 'error-page',
-    register: (server) => {
-      server.ext('onPreResponse', (request, h) => {
-        if (!request.response.isBoom) {
-          return h.continue
-        }
-        return serveFriendlyErrorPage(request, h)
-      })
-    }
+  name: 'error-page',
+  async register (server) {
+    server.ext('onPreResponse', (request, h) => {
+      if (!request.response.isBoom) {
+        return h.continue
+      }
+      return serveFriendlyErrorPage(request, h)
+    })
   }
 }
