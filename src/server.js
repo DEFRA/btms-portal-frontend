@@ -19,16 +19,6 @@ export async function createServer () {
       },
       files: {
         relativeTo: path.resolve(config.get('root'), '.public')
-      },
-      security: {
-        hsts: {
-          maxAge: 31536000,
-          includeSubDomains: true,
-          preload: false
-        },
-        xss: 'enabled',
-        noSniff: true,
-        xframe: true
       }
     },
     router: {

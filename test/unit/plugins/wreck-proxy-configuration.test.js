@@ -20,7 +20,7 @@ describe('#wreckProxyConfiguration', () => {
       config.set('httpProxy', httpProxyUrl)
       config.set('httpsProxy', httpsProxyUrl)
 
-      wreckProxyConfiguration.plugin.register()
+      wreckProxyConfiguration.register()
 
       expect(Wreck.agents).toEqual(
         expect.objectContaining({
@@ -35,7 +35,7 @@ describe('#wreckProxyConfiguration', () => {
     test('Should use default agents', async () => {
       const Wreck = await import('@hapi/wreck')
 
-      wreckProxyConfiguration.plugin.register()
+      wreckProxyConfiguration.register()
 
       expect(Wreck.agents).toEqual(
         expect.objectContaining({
