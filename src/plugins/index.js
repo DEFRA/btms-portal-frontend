@@ -9,6 +9,7 @@ import { router } from './router.js'
 import { pulse } from './pulse.js'
 import { errorPage } from './error-page.js'
 import { wreckProxyConfiguration } from './wreck-proxy-configuration.js'
+import { securityHeaders } from './security-headers.js'
 
 export default [
   requestLogger,
@@ -21,5 +22,6 @@ export default [
   sessionCookie,
   vision,
   router,
-  errorPage
+  errorPage,
+  securityHeaders
 ]

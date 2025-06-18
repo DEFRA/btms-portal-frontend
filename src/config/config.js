@@ -311,7 +311,7 @@ const config = convict({
         default: '2fb0d715-affa-4bf1-836e-44a464e3fbea'
       },
       clientSecret: {
-        doc: 'ENTRA ID client Secret',
+        doc: 'ENTRA ID client secret',
         format: String,
         sensitive: true,
         env: 'AUTH_ENTRA_ID_CLIENT_SECRET',
