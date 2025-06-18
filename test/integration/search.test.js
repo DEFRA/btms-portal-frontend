@@ -40,6 +40,9 @@ test('renders search page', async () => {
     .toHaveValue('')
   expect(queryByRole(document.body, 'button', { name: 'Clear' }))
     .toBe(null)
+
+  expect(document.querySelectorAll('script[nonce]').length)
+    .toBe(2)
 })
 
 test('renders search page with error', async () => {
