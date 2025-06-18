@@ -1,6 +1,13 @@
 @use "govuk-frontend" as *;
 @use 'variables' as *;
 
+.btms-search-results {
+  .govuk-inset-text {
+    margin-top: 0;
+    @include govuk-font-size($size: 16);
+  }
+}
+
 .btms-customs-declaration-summary {
   background-color: govuk-colour('light-grey');
   display: grid;
@@ -167,7 +174,6 @@
 
   .govuk-inset-text {
     margin:0;
-    @include govuk-font-size($size: 16);
   }
 
   .govuk-list {
