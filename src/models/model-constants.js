@@ -81,7 +81,7 @@ const chedStatusDescriptions = {
   VALIDATED: 'Valid'
 }
 
-const displayClosedChedStatuses = ['CANCELLED', 'DELETED', 'REPLACED']
+const closedChedStatuses = ['CANCELLED', 'REPLACED']
 
 const finalStateMappings = {
   0: 'Released',
@@ -101,6 +101,6 @@ export {
   documentCodeToAuthorityMapping,
   finalStateMappings,
   IUUDocumentReferences,
-  displayClosedChedStatuses,
+  closedChedStatuses,
   DATE_FORMAT
 }

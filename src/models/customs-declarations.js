@@ -3,6 +3,7 @@ import { format } from 'date-fns'
 import {
   checkCodeToDocumentCodeMapping,
   decisionCodeDescriptions,
+  closedChedStatuses,
   checkCodeToAuthorityMapping,
   finalStateMappings,
   IUUDocumentReferences,
@@ -25,7 +26,7 @@ const isReleaseDecisionCode = (decisionCode) => {
   return hasDesiredPrefix(decisionCode, 'c0')
 }
 
-export const getDecisionDescription = (decisionCode) => {
+export const getDecision = (decisionCode) => {
   let decisionHighLevelDesc
   if (isReleaseDecisionCode(decisionCode)) {
     decisionHighLevelDesc = 'Release'
@@ -42,6 +43,14 @@ export const getDecisionDescription = (decisionCode) => {
   return decisionHighLevelDesc
 }
 
+export const getDecisionDescription = (decisionCode, notificationStatus) => {
+  if (closedChedStatuses.includes(notificationStatus)) {
+    return `CHED ${notificationStatus.toLowerCase()}`
+  }
+
+  return decisionCodeDescriptions[decisionCode]
+}
+
 export const getCustomsDeclarationStatus = (finalisation) => {
   if (finalisation === null) {
     return 'Current'
@@ -54,7 +63,7 @@ export const getCustomsDeclarationStatus = (finalisation) => {
   return `Finalised - ${finalStateMappings[finalisation.finalState]}`
 }
 
-const mapCommodity = (commodity, notificationReferences, clearanceDecision) => {
+const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
   const documents = commodity.documents
     .filter(({ documentCode }) => !IUUDocumentReferences.includes(documentCode))
     .reduce((docs, doc) => {
@@ -67,14 +76,14 @@ const mapCommodity = (commodity, notificationReferences, clearanceDecision) => {
     ? commodity.netMass
     : commodity.supplementaryUnits
 
-  const decisonChecks = clearanceDecision
+  const decisionChecks = clearanceDecision
     ? clearanceDecision.items
       .filter(({ itemNumber }) => itemNumber === commodity.itemNumber)
       .flatMap(({ checks }) => checks)
     : []
 
   const checksWithDecisionCodes = commodity.checks.map((check) => {
-    const decision = decisonChecks
+    const decision = decisionChecks
       .find(({ checkCode }) => checkCode === check.checkCode)
 
     return {
@@ -85,6 +94,7 @@ const mapCommodity = (commodity, notificationReferences, clearanceDecision) => {
 
   const decisions = Object.entries(documents).map(([documentReference, documentCodes]) => {
     const lastSeven = 7
+    const notificationStatus = notificationStatuses[documentReference.slice(-lastSeven)]
 
     return {
       id: randomUUID(),
@@ -95,12 +105,12 @@ const mapCommodity = (commodity, notificationReferences, clearanceDecision) => {
         )
 
         return checks.map(({ checkCode, decisionCode }) => ({
-          decision: getDecisionDescription(decisionCode),
-          decisionDetail: decisionCodeDescriptions[decisionCode],
+          decision: getDecision(decisionCode),
+          decisionDetail: getDecisionDescription(decisionCode, notificationStatus),
           departmentCode: checkCodeToAuthorityMapping[checkCode]
         }))
       }),
-      match: notificationReferences.includes(documentReference.slice(-lastSeven))
+      match: Boolean(notificationStatus)
     }
   })
 
@@ -113,11 +123,11 @@ const mapCommodity = (commodity, notificationReferences, clearanceDecision) => {
   }
 }
 
-const mapCustomsDeclaration = (declaration, notificationReferences) => {
+const mapCustomsDeclaration = (declaration, notificationStatuses) => {
   const { clearanceRequest, clearanceDecision, finalisation } = declaration
   const updated = format(declaration.updated, DATE_FORMAT)
   const commodities = clearanceRequest.commodities
-    .map((commodity) => mapCommodity(commodity, notificationReferences, clearanceDecision))
+    .map((commodity) => mapCommodity(commodity, notificationStatuses, clearanceDecision))
 
   const status = getCustomsDeclarationStatus(finalisation)
   const open = status !== 'Cancelled'
@@ -132,10 +142,14 @@ const mapCustomsDeclaration = (declaration, notificationReferences) => {
   }
 }
 
-export const mapCustomsDeclarations = (data) => {
-  const notificationReferences = data.importPreNotifications
-    .map(({ importPreNotification }) => importPreNotification.referenceNumber.split('.').pop())
+export const mapCustomsDeclarations = ({ customsDeclarations, importPreNotifications }) => {
+  const notificationStatuses = importPreNotifications
+    .reduce((statuses, { importPreNotification }) => {
+      const ref = importPreNotification.referenceNumber.split('.').pop()
+      statuses[ref] = importPreNotification.status
+      return statuses
+    }, {})
 
-  return data.customsDeclarations
-    .map((declaration) => mapCustomsDeclaration(declaration, notificationReferences))
+  return customsDeclarations
+    .map((declaration) => mapCustomsDeclaration(declaration, notificationStatuses))
 }

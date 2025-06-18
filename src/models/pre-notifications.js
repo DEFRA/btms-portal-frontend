@@ -2,7 +2,7 @@ import { format } from 'date-fns'
 import {
   chedStatusDescriptions,
   documentCodeToAuthorityMapping,
-  displayClosedChedStatuses,
+  closedChedStatuses,
   DATE_FORMAT
 } from './model-constants.js'
 import { config } from '../config/config.js'
@@ -38,7 +38,7 @@ const mapPreNotification = (preNotification, documentCodes) => {
     .map((documentCode) => documentCodeToAuthorityMapping[documentCode])
 
   const status = chedStatusDescriptions[preNotification.status]
-  const open = !displayClosedChedStatuses.includes(preNotification.status)
+  const open = !closedChedStatuses.includes(preNotification.status)
   const updated = format(new Date(preNotification.updatedSource), DATE_FORMAT)
   const decision = getDecision(preNotification)
 
