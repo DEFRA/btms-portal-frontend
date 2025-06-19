@@ -15,7 +15,6 @@ test('common responses', async () => {
 
   expect(headers)
     .toEqual({
-      'accept-ranges': 'bytes',
       'content-security-policy': "default-src 'self'; script-src 'self' 'nonce-random'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';",
       'cross-origin-opener-policy': 'same-origin',
       'cross-origin-resource-policy': 'same-origin',
