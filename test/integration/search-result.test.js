@@ -201,6 +201,9 @@ test('shows search results', async () => {
   expect(getByRole(closedNotification, 'row', {
     name: '1 0101 Equus asinus 2 Decision not given (HMI)'
   })).not.toBeVisible()
+
+  expect(document.querySelectorAll('script[nonce]').length)
+    .toBe(2)
 })
 
 test('redirects to search page if no results', async () => {
