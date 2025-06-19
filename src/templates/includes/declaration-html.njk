@@ -33,11 +33,9 @@
                 data-decision="{{ outcome.decision }}"
                 data-authority="{{ outcome.departmentCode }}"
               >
-                {% if outcome.decision and outcome.decisionDetail %}
-                  {{ outcome.decision }} - {{ outcome.decisionDetail }} ({{ outcome.departmentCode }})
-                {% else %}
-                  No match ({{ outcome.departmentCode }})
-                {% endif %}
+                {% if outcome.decision %}
+                  {{ outcome.decision }} -
+                {% endif %} {{ outcome.decisionDetail }} ({{ outcome.departmentCode }})
               </li>
               {% if loop.last %} </ul> {% endif %}
             {% endfor %}

@@ -1,4 +1,4 @@
-import { mapCustomsDeclarations, getDecisionDescription } from '../../../src/models/customs-declarations.js'
+import { mapCustomsDeclarations, getDecision } from '../../../src/models/customs-declarations.js'
 
 test('MRN, open, finalised, using netMass, matched', () => {
   const data = {
@@ -38,7 +38,8 @@ test('MRN, open, finalised, using netMass, matched', () => {
     }],
     importPreNotifications: [{
       importPreNotification: {
-        referenceNumber: 'CHEDP.GB.2025.1234567'
+        referenceNumber: 'CHEDP.GB.2025.1234567',
+        status: 'VALIDATED'
       }
     }]
   }
@@ -226,7 +227,8 @@ test('matches malformed references', () => {
     }],
     importPreNotifications: [{
       importPreNotification: {
-        referenceNumber: 'CHEDP.GB.2025.0000002'
+        referenceNumber: 'CHEDP.GB.2025.0000002',
+        status: 'SUBMITTED'
       }
     }]
   }
@@ -264,19 +266,19 @@ test('matches malformed references', () => {
   expect(result).toEqual(expected)
 })
 
-test('getDecisionDescription()', () => {
-  expect(getDecisionDescription('C01'))
+test('getDecision()', () => {
+  expect(getDecision('C01'))
     .toBe('Release')
 
-  expect(getDecisionDescription('N01'))
+  expect(getDecision('N01'))
     .toBe('Refuse')
 
-  expect(getDecisionDescription('E01'))
+  expect(getDecision('E01'))
     .toBe('Data error')
 
-  expect(getDecisionDescription('H01'))
+  expect(getDecision('H01'))
     .toBe('Hold')
 
-  expect(getDecisionDescription('X00'))
+  expect(getDecision('X00'))
     .toBe('')
 })
