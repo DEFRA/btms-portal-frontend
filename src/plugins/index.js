@@ -10,6 +10,8 @@ import { pulse } from './pulse.js'
 import { errorPage } from './error-page.js'
 import { wreckProxyConfiguration } from './wreck-proxy-configuration.js'
 import { securityHeaders } from './security-headers.js'
+import { commonViewContext } from './common-view-context.js'
+import { cspNonce } from './csp-nonce.js'
 
 export default [
   requestLogger,
@@ -22,6 +24,8 @@ export default [
   sessionCookie,
   vision,
   router,
+  cspNonce,
   errorPage,
-  securityHeaders
+  securityHeaders,
+  commonViewContext
 ]

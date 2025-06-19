@@ -51,7 +51,7 @@ const customsDeclarations = [{
         documentReference: 'CHEDP.BB.2025.NOMATCH',
         documentCode: 'N002'
       }],
-      checks: [{ checkCode: 'H218', departmentCode: 'HMI' }]
+      checks: [{ checkCode: 'H220', departmentCode: 'HMI' }]
     }]
   },
   clearanceDecision: {
@@ -66,6 +66,12 @@ const customsDeclarations = [{
       checks: [{
         checkCode: 'H222',
         decisionCode: 'H01'
+      }]
+    }, {
+      itemNumber: 3,
+      checks: [{
+        checkCode: 'H220',
+        decisionCode: 'X00'
       }]
     }]
   },
@@ -170,7 +176,7 @@ test('shows search results', async () => {
   expect(declarationRow2.hasAttribute('hidden')).toBe(true)
 
   const declarationRow1 = getByRole(declaration, 'row', {
-    name: '1 0304719030 FROZEN MSC A COD FILLETS 17088.98 CHEDA.GB.2025.0000001 Yes Release - Inspection complete (HMI)'
+    name: '1 0304719030 FROZEN MSC A COD FILLETS 17088.98 CHEDA.GB.2025.0000001 Yes Release - CHED cancelled (HMI)'
   })
   const [declarationAuthorityFilter] = getAllByRole(document.body, 'combobox', { name: 'Authority' })
   await user.selectOptions(declarationAuthorityFilter, 'APHA')
@@ -201,6 +207,9 @@ test('shows search results', async () => {
   expect(getByRole(closedNotification, 'row', {
     name: '1 0101 Equus asinus 2 Decision not given (HMI)'
   })).not.toBeVisible()
+
+  expect(document.querySelectorAll('script[nonce]').length)
+    .toBe(2)
 })
 
 test('redirects to search page if no results', async () => {

@@ -62,5 +62,5 @@
 {% endblock %}
 {% block bodyEnd %}
   {{ super() }}
-  <script>BTMS.initFilters()</script>
+  <script nonce={{ cspNonce }}>BTMS.initFilters()</script>
 {% endblock %}
