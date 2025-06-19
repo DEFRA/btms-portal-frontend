@@ -394,7 +394,7 @@ describe('#userSession', () => {
           }
         }
 
-        await expect(dropUserSession(request)).resolves.not.toThrowError()
+        await expect(dropUserSession(request)).resolves.not.toThrow()
       })
     })
   })
