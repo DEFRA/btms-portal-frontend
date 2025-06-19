@@ -4,7 +4,7 @@
 {% set pageTitle = "Search result" %}
 
 {% block content %}
-  <div class="govuk-grid-row">
+  <div class="govuk-grid-row btms-search-results">
     <div class="govuk-grid-column-full">
       <span class="govuk-caption-l">Showing results for</span>
       <div class="btms-heading-container">
@@ -32,7 +32,7 @@
           })
         }}
       {% else %}
-        <p class="govuk-body">No customs declarations found.</p>
+        <p class="govuk-inset-text">There are no matching Customs declaration details</p>
       {% endfor %}
       <h2 class="govuk-heading-m">IPAFFS notification (CHED) details</h2>
       {% include "./includes/notification-filters.njk" %}
@@ -55,7 +55,7 @@
           })
         }}
       {% else %}
-        <p class="govuk-body">No pre-notifications found.</p>
+        <p class="govuk-inset-text">There are no matching IPAFFS pre-notification (CHED) details</p>
       {% endfor %}
     </div>
   </div>
