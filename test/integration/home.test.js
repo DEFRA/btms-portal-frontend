@@ -16,6 +16,9 @@ test('not authenticated', async () => {
 
   expect(getByRole(document.body, 'link', { name: 'Sign in' }))
     .toHaveAttribute('href', '/sign-in')
+
+  expect(document.querySelectorAll('script[nonce]').length)
+    .toBe(1)
 })
 
 test('authenticated', async () => {
