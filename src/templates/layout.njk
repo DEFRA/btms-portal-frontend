@@ -1,5 +1,4 @@
 {% extends "govuk/template.njk" %}
-{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 
 {% set containerClasses = "" %}
@@ -10,9 +9,8 @@
 
 {%
   set defaultHeaderOptions = {
-    homepageUrl: "/",
+    homepageUrl: "https://www.gov.uk",
     serviceName: serviceName,
-    serviceUrl: serviceUrl,
     useTudorCrown: true
   }
 %}
@@ -62,11 +60,6 @@
 {% endblock %}
 
 {% block main %}
-  <div class="govuk-width-container {{ containerClasses }}">
-    {% if breadcrumbs.length > 1 %}
-      {{ govukBreadcrumbs({ items: breadcrumbs }) }}
-    {% endif %}
-  </div>
   <main role="main" id="main-content">
     <div class="{{ wrapperClass }}">
       <div class="govuk-width-container {{ containerClasses }}">

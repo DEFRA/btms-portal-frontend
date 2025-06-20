@@ -61,11 +61,7 @@ export const searchResult = {
         resultsPage: true,
         searchTerm,
         customsDeclarations,
-        preNotifications,
-        breadcrumbs: [
-          { text: 'Search', href: paths.SEARCH },
-          { text: searchTerm }
-        ]
+        preNotifications
       }
 
       return h.view('search-result', viewModel)
