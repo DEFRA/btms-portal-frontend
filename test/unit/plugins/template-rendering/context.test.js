@@ -3,7 +3,6 @@ import { getUserSession } from '../../../../src/auth/user-session.js'
 
 const mockReadFileSync = jest.fn()
 const mockLoggerError = jest.fn()
-const expectedServiceName = 'Border Trade Matching Service'
 
 jest.mock('node:fs', () => ({
   ...jest.requireActual('node:fs'),
@@ -53,17 +52,8 @@ describe('#context', () => {
       expect(contextResult).toEqual({
         authedUser,
         assetPath: '/public/assets',
-        breadcrumbs: [],
         getAssetPath: expect.any(Function),
-        navigation: [
-          {
-            isActive: true,
-            text: 'Home',
-            url: '/'
-          }
-        ],
-        serviceName: expectedServiceName,
-        serviceUrl: '/',
+        serviceName: 'Border Trade Matching Service',
         signOutUrl: '/sign-out'
       })
     })
