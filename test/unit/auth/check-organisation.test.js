@@ -15,8 +15,8 @@ test('matches the current relationship', () => {
     `${currentRelationshipId}:${organisationId}`
   ]
 
-  expect(checkOrganisation(currentRelationshipId, relationships))
-    .toBe(true)
+  expect(() => checkOrganisation(currentRelationshipId, relationships))
+    .not.toThrow()
 })
 
 test('no relationship match', () => {
@@ -27,8 +27,8 @@ test('no relationship match', () => {
 
   const relationships = ['rel-100:org-666']
 
-  expect(checkOrganisation('rel-555', relationships))
-    .toBe(false)
+  expect(() => checkOrganisation('rel-555', relationships))
+    .toThrow('organisation not allowed')
 })
 
 test('relationships as string from defra stub (local & dev)', () => {
@@ -43,6 +43,6 @@ test('relationships as string from defra stub (local & dev)', () => {
   const relationships =
     `not-this-one:org-666,${currentRelationshipId}:${organisationId}`
 
-  expect(checkOrganisation(currentRelationshipId, relationships))
-    .toBe(true)
+  expect(() => checkOrganisation(currentRelationshipId, relationships))
+    .not.toThrow()
 })

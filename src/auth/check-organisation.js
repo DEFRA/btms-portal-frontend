@@ -1,4 +1,5 @@
 import { config } from '../config/config.js'
+import boom from '@hapi/boom'
 
 const handleStubRelationshipsStrings = (relationships) => Array
   .isArray(relationships)
@@ -16,5 +17,7 @@ export const checkOrganisation = (currentRelationshipId, relationships) => {
       : matchedOrgId
   }, null)
 
-  return organisations.includes(organisationId)
+  if (!organisations.includes(organisationId)) {
+    throw boom.forbidden('organisation not allowed')
+  }
 }
