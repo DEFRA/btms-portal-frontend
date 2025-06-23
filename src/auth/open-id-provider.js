@@ -1,5 +1,4 @@
 import jwt from '@hapi/jwt'
-import boom from '@hapi/boom'
 import { getOpenIdConfig } from './open-id-client.js'
 import { checkOrganisation } from './check-organisation.js'
 
@@ -24,10 +23,9 @@ export const openIdProvider = async (name, authConfig) => {
       const payload = jwt.token.decode(credentials.token).decoded.payload
 
       const { currentRelationshipId, relationships } = payload
-      const orgIsAllowed = checkOrganisation(currentRelationshipId, relationships)
 
-      if (orgIsAllowed === false) {
-        throw boom.forbidden('organisation not allowed')
+      if (credentials.provider === 'defraId') {
+        checkOrganisation(currentRelationshipId, relationships)
       }
 
       const displayName = [payload.firstName, payload.lastName]

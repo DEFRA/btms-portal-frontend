@@ -92,7 +92,7 @@ test('credentials exist', async () => {
   })
 })
 
-test('organisation not allowed', () => {
+test('DefraId organisation not allowed', () => {
   config.set('auth.defraId.organisations', ['allowed-org'])
 
   const token = jwt.token.generate({
@@ -103,6 +103,11 @@ test('organisation not allowed', () => {
     algorithm: 'HS256'
   })
 
-  expect(async () => provider.profile({ token }, {}, {}))
+  const credentials = {
+    provider: 'defraId',
+    token
+  }
+
+  expect(async () => provider.profile(credentials, {}, {}))
     .rejects.toThrow('organisation not allowed')
 })
