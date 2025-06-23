@@ -63,6 +63,12 @@ export const getCustomsDeclarationStatus = (finalisation) => {
   return `Finalised - ${finalStateMappings[finalisation.finalState]}`
 }
 
+export const getCustomsDeclarationOpenState = (finalisation) => !(
+  finalisation !== null &&
+  finalisation.isManualRelease === false &&
+  (finalisation.finalState === '1' || finalisation.finalState === '2')
+)
+
 const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
   const documents = commodity.documents
     .filter(({ documentCode }) => !IUUDocumentReferences.includes(documentCode))
@@ -130,7 +136,7 @@ const mapCustomsDeclaration = (declaration, notificationStatuses) => {
     .map((commodity) => mapCommodity(commodity, notificationStatuses, clearanceDecision))
 
   const status = getCustomsDeclarationStatus(finalisation)
-  const open = status !== 'Cancelled'
+  const open = getCustomsDeclarationOpenState(finalisation)
 
   return {
     movementReferenceNumber: declaration.movementReferenceNumber,
