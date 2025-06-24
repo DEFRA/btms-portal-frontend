@@ -1,4 +1,8 @@
-import { mapCustomsDeclarations, getDecision } from '../../../src/models/customs-declarations.js'
+import {
+  mapCustomsDeclarations,
+  getDecision,
+  getCustomsDeclarationOpenState
+} from '../../../src/models/customs-declarations.js'
 
 test('MRN, open, finalised, using netMass, matched', () => {
   const data = {
@@ -281,4 +285,32 @@ test('getDecision()', () => {
 
   expect(getDecision('X00'))
     .toBe('')
+})
+
+test('getCustomsDeclarationOpenState()', () => {
+  expect(getCustomsDeclarationOpenState(null))
+    .toBe(true)
+
+  expect(getCustomsDeclarationOpenState({
+    isManualRelease: true
+  }))
+    .toBe(true)
+
+  expect(getCustomsDeclarationOpenState({
+    isManualRelease: false,
+    finalState: '0'
+  }))
+    .toBe(true)
+
+  expect(getCustomsDeclarationOpenState({
+    isManualRelease: false,
+    finalState: '1'
+  }))
+    .toBe(false)
+
+  expect(getCustomsDeclarationOpenState({
+    isManualRelease: false,
+    finalState: '2'
+  }))
+    .toBe(false)
 })
