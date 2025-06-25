@@ -1,10 +1,11 @@
-import { mapPreNotifications } from '../../../src/models/pre-notifications.js'
+import { getAuthorities, mapPreNotifications } from '../../../src/models/pre-notifications.js'
 
 test('CHEDP: uses netweight, open state, decision given', () => {
   const data = {
     importPreNotifications: [{
       importPreNotification: {
         referenceNumber: 'CHEDP.GB.2025.0000001',
+        importNotificationType: 'CVEDP',
         status: 'VALIDATED',
         updatedSource: '2025-05-12T09:18:17.330Z',
         partOne: {
@@ -15,6 +16,7 @@ test('CHEDP: uses netweight, open state, decision given', () => {
               complementName: 'Sardina pilchardus'
             }],
             complementParameterSets: [{
+              uniqueComplementId: '5fccbd6d-c943-4d2c-8a6f-1144fcb77cf3',
               complementId: '1',
               keyDataPair: [{ key: 'netweight', data: '2000' }]
             }]
@@ -26,29 +28,20 @@ test('CHEDP: uses netweight, open state, decision given', () => {
           }
         }
       }
-    }],
-    customsDeclarations: [{
-      clearanceRequest: {
-        commodities: [{
-          documents: [{
-            documentReference: 'CHED2025.0000001',
-            documentCode: 'N853'
-          }]
-        }]
-      }
     }]
   }
 
   const result = mapPreNotifications(data)
 
   const expected = [{
-    authorities: ['POAO'],
     commodities: [
       {
+        id: '5fccbd6d-c943-4d2c-8a6f-1144fcb77cf3',
         commodityDesc: 'Sardina pilchardus',
         commodityId: '16041319',
         complementId: '1',
-        weightOrQuantity: '2000'
+        weightOrQuantity: '2000',
+        authorities: ['POAO']
       }
     ],
     decision: 'Acceptable for internal market',
@@ -67,6 +60,7 @@ test('CHEDA: uses number_animal, closed state, decision ignored', () => {
     importPreNotifications: [{
       importPreNotification: {
         referenceNumber: 'CHEDA.GB.2025.0000001',
+        importNotificationType: 'CVEDA',
         status: 'CANCELLED',
         updatedSource: '2025-04-22T16:53:17.330Z',
         partOne: {
@@ -77,6 +71,7 @@ test('CHEDA: uses number_animal, closed state, decision ignored', () => {
               speciesName: 'Equus asinus'
             }],
             complementParameterSets: [{
+              uniqueComplementId: 'a7959b8b-55cd-4b6e-af55-020406ac2ffa',
               complementId: '1',
               keyDataPair: [{ key: 'number_animal', data: '2' }]
             }]
@@ -88,25 +83,16 @@ test('CHEDA: uses number_animal, closed state, decision ignored', () => {
           }
         }
       }
-    }],
-    customsDeclarations: [{
-      clearanceRequest: {
-        commodities: [{
-          documents: [{
-            documentReference: 'CHED2025.0000001',
-            documentCode: 'N853'
-          }]
-        }]
-      }
     }]
   }
 
   const result = mapPreNotifications(data)
 
   const expected = [{
-    authorities: ['POAO'],
     commodities: [
       {
+        authorities: ['APHA'],
+        id: 'a7959b8b-55cd-4b6e-af55-020406ac2ffa',
         commodityDesc: 'Equus asinus',
         commodityId: '0101',
         complementId: '1',
@@ -122,4 +108,61 @@ test('CHEDA: uses number_animal, closed state, decision ignored', () => {
   }]
 
   expect(result).toEqual(expected)
+})
+
+test('getAuthorities(): CHEDA', () => {
+  const importNotificationType = 'CVEDA'
+
+  expect(getAuthorities(importNotificationType, {}))
+    .toEqual(['APHA'])
+})
+
+test('getAuthorities(): CHEDD', () => {
+  const importNotificationType = 'CED'
+
+  expect(getAuthorities(importNotificationType, {}))
+    .toEqual(['FNAO'])
+})
+
+test('getAuthorities(): CHEDP', () => {
+  const importNotificationType = 'CVEDP'
+
+  expect(getAuthorities(importNotificationType, {}))
+    .toEqual(['POAO'])
+})
+
+test('getAuthorities(): CHEDPP JOINT', () => {
+  const importNotificationType = 'CHEDPP'
+  const complementParameterSet = {
+    keyDataPair: [{
+      key: 'regulatory_authority',
+      data: 'JOINT'
+    }]
+  }
+  expect(getAuthorities(importNotificationType, complementParameterSet))
+    .toEqual(['PHSI', 'HMI'])
+})
+
+test('getAuthorities(): CHEDPP PHSI', () => {
+  const importNotificationType = 'CHEDPP'
+  const complementParameterSet = {
+    keyDataPair: [{
+      key: 'regulatory_authority',
+      data: 'PHSI'
+    }]
+  }
+  expect(getAuthorities(importNotificationType, complementParameterSet))
+    .toEqual(['PHSI'])
+})
+
+test('getAuthorities(): CHEDPP HMI', () => {
+  const importNotificationType = 'CHEDPP'
+  const complementParameterSet = {
+    keyDataPair: [{
+      key: 'regulatory_authority',
+      data: 'HMI'
+    }]
+  }
+  expect(getAuthorities(importNotificationType, complementParameterSet))
+    .toEqual(['HMI'])
 })

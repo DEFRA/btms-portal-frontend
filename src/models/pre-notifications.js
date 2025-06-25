@@ -1,7 +1,12 @@
 import { format } from 'date-fns'
 import {
+  ANIMAL_PLANT_HEALTH_AGENCY,
+  FOODS_NOT_ANIMAL_ORIGIN,
+  PRODUCTS_OF_ANIMAL_ORIGIN,
+  PLANT_HEALTH_SEEDS_INSPECTORATE,
+  HORTICULTURAL_MARKETING_INSPECTORATE,
   chedStatusDescriptions,
-  documentCodeToAuthorityMapping,
+  chedTypes,
   closedChedStatuses,
   DATE_FORMAT
 } from './model-constants.js'
@@ -14,37 +19,73 @@ const getDecision = (preNotification) => (
   preNotification.partTwo?.decision?.decision
 ) || 'Decision not given'
 
-const mapCommodity = (commodity, complementParameterSets) => {
-  const commodityDesc = commodity.speciesName ||
-    commodity.commodityDescription ||
-    commodity.complementName
+export const getAuthorities = (importNotificationType, complementParameterSet) => {
+  if (importNotificationType === chedTypes.CHEDA) {
+    return [ANIMAL_PLANT_HEALTH_AGENCY]
+  }
+  if (importNotificationType === chedTypes.CHEDD) {
+    return [FOODS_NOT_ANIMAL_ORIGIN]
+  }
+  if (importNotificationType === chedTypes.CHEDP) {
+    return [PRODUCTS_OF_ANIMAL_ORIGIN]
+  }
 
-  const { keyDataPair } = complementParameterSets
-    .find(({ complementId }) => complementId === commodity.complementId)
+  const { data } = complementParameterSet.keyDataPair
+    .find(({ key }) => key === 'regulatory_authority')
 
-  const { data } = keyDataPair
+  const chedppAuthorities = data === 'JOINT'
+    ? [
+        PLANT_HEALTH_SEEDS_INSPECTORATE,
+        HORTICULTURAL_MARKETING_INSPECTORATE
+      ]
+    : [data]
+
+  return chedppAuthorities
+}
+
+const mapCommodity = (
+  commodityComplement,
+  complementParameterSets,
+  importNotificationType
+) => {
+  const complementParameterSet = complementParameterSets
+    .find(({ complementId }) => complementId === commodityComplement.complementId)
+
+  const commodityDesc = commodityComplement.speciesName ||
+    commodityComplement.commodityDescription ||
+    commodityComplement.complementName
+
+  const { data } = complementParameterSet.keyDataPair
     .find(({ key }) => key === 'number_animal' || key === 'netweight')
 
+  const authorities = getAuthorities(importNotificationType, complementParameterSet)
+
   return {
-    complementId: commodity.complementId,
-    commodityId: commodity.commodityId,
+    id: complementParameterSet.uniqueComplementId,
+    complementId: commodityComplement.complementId,
+    commodityId: commodityComplement.commodityId,
     commodityDesc,
-    weightOrQuantity: data
+    weightOrQuantity: data,
+    authorities
   }
 }
 
-const mapPreNotification = (preNotification, documentCodes) => {
-  const authorities = documentCodes
-    .map((documentCode) => documentCodeToAuthorityMapping[documentCode])
-
+const mapPreNotification = (preNotification) => {
   const status = chedStatusDescriptions[preNotification.status]
   const open = !closedChedStatuses.includes(preNotification.status)
   const updated = format(new Date(preNotification.updatedSource), DATE_FORMAT)
   const decision = getDecision(preNotification)
 
   const { commodityComplements, complementParameterSets } = preNotification.partOne.commodities
-  const commodities = commodityComplements
-    .map((commodity) => mapCommodity(commodity, complementParameterSets))
+  const { importNotificationType } = preNotification
+
+  const commodities = commodityComplements.map((commodityComplement) =>
+    mapCommodity(
+      commodityComplement,
+      complementParameterSets,
+      importNotificationType
+    )
+  )
 
   const ipaffsUrl = ipaffsUrlTemplate.replace('CHED_REFERENCE', preNotification.referenceNumber)
 
@@ -54,28 +95,10 @@ const mapPreNotification = (preNotification, documentCodes) => {
     open,
     updated,
     decision,
-    authorities,
     commodities,
     ipaffsUrl
   }
 }
 
-export const mapPreNotifications = (data) => {
-  const declarationDocuments = [...new Set(data.customsDeclarations
-    .flatMap((declaration) => declaration.clearanceRequest.commodities
-      .flatMap((commodity) => commodity.documents)
-    ))
-  ]
-
-  return data.importPreNotifications
-    .map(({ importPreNotification }) => {
-      const documentCodes = [...new Set(declarationDocuments
-        .filter(({ documentReference }) =>
-          documentReference.split('.').pop() === importPreNotification.referenceNumber.split('.').pop()
-        )
-        .map(({ documentCode }) => documentCode))
-      ]
-
-      return mapPreNotification(importPreNotification, documentCodes)
-    })
-}
+export const mapPreNotifications = ({ importPreNotifications }) => importPreNotifications
+  .map(({ importPreNotification }) => mapPreNotification(importPreNotification))
