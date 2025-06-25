@@ -85,6 +85,7 @@ const customsDeclarations = [{
 const importPreNotifications = [{
   importPreNotification: {
     referenceNumber: 'CHEDP.GB.2025.0000002',
+    importNotificationType: 'CVEDP',
     status: 'VALIDATED',
     updatedSource: '2025-04-22T16:55:17.330Z',
     partOne: {
@@ -95,6 +96,7 @@ const importPreNotifications = [{
           complementName: 'Dog Chew'
         }],
         complementParameterSets: [{
+          uniqueComplementId: 'bbdb5c23-0f7c-4c8f-ac1d-8d81aacdc0d9',
           complementId: '2',
           keyDataPair: [{ key: 'netweight', data: '4618.35' }]
         }]
@@ -104,6 +106,7 @@ const importPreNotifications = [{
 }, {
   importPreNotification: {
     referenceNumber: 'CHEDA.GB.2025.0000001',
+    importNotificationType: 'CVEDA',
     status: 'CANCELLED',
     updatedSource: '2025-04-22T16:53:17.330Z',
     partOne: {
@@ -114,6 +117,7 @@ const importPreNotifications = [{
           speciesName: 'Equus asinus'
         }],
         complementParameterSets: [{
+          uniqueComplementId: '9604ce16-8352-4ead-ae8b-4828b3e022cb',
           complementId: '1',
           keyDataPair: [{ key: 'number_animal', data: '2' }]
         }]
@@ -205,7 +209,7 @@ test('shows search results', async () => {
   const closedNotification = getByRole(document.body, 'group', { name: 'CHEDA.GB.2025.0000001' })
   expect(closedNotification.hasAttribute('open')).toBe(false)
   expect(getByRole(closedNotification, 'row', {
-    name: '1 0101 Equus asinus 2 Decision not given (HMI)'
+    name: '1 0101 Equus asinus 2 Decision not given (APHA)'
   })).not.toBeVisible()
 
   expect(document.querySelectorAll('script[nonce]').length)

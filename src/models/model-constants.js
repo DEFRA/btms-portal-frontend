@@ -1,16 +1,20 @@
-const DATE_FORMAT = 'd MMMM yyyy, HH:mm'
+export const DATE_FORMAT = 'd MMMM yyyy, HH:mm'
 
-// PHA: Port Health Authority
-const authorities = {
-  ANIMAL_PLANT_HEALTH_AGENCY: 'APHA',
-  HORTICULTURAL_MARKETING_INSPECTORATE: 'HMI',
-  PHA_FOODS_NOT_ANIMAL_ORIGIN: 'FNAO',
-  PHA_ILLEGAL_UNREPORTED_UNREGULATED: 'IUU',
-  PHA_PRODUCTS_OF_ANIMAL_ORIGIN: 'POAO',
-  PLANT_HEALTH_SEEDS_INSPECTORATE: 'PHSI'
+export const ANIMAL_PLANT_HEALTH_AGENCY = 'APHA'
+export const HORTICULTURAL_MARKETING_INSPECTORATE = 'HMI'
+export const FOODS_NOT_ANIMAL_ORIGIN = 'FNAO'
+export const ILLEGAL_UNREPORTED_UNREGULATED = 'IUU'
+export const PRODUCTS_OF_ANIMAL_ORIGIN = 'POAO'
+export const PLANT_HEALTH_SEEDS_INSPECTORATE = 'PHSI'
+
+export const chedTypes = {
+  CHEDA: 'CVEDA',
+  CHEDD: 'CED',
+  CHEDP: 'CVEDP',
+  CHEDPP: 'CHEDPP'
 }
 
-const decisionCodeDescriptions = {
+export const decisionCodeDescriptions = {
   C01: 'Customs Freight Simplified Procedures (CFSP)',
   C02: 'No inspection required',
   C03: 'Inspection complete',
@@ -33,30 +37,17 @@ const decisionCodeDescriptions = {
   X00: 'No match'
 }
 
-const checkCodeToAuthorityMapping = {
-  H218: authorities.HORTICULTURAL_MARKETING_INSPECTORATE,
-  H219: authorities.PLANT_HEALTH_SEEDS_INSPECTORATE,
-  H220: authorities.HORTICULTURAL_MARKETING_INSPECTORATE,
-  H221: authorities.ANIMAL_PLANT_HEALTH_AGENCY,
-  H222: authorities.PHA_PRODUCTS_OF_ANIMAL_ORIGIN,
-  H223: authorities.PHA_FOODS_NOT_ANIMAL_ORIGIN,
-  H224: authorities.PHA_ILLEGAL_UNREPORTED_UNREGULATED
+export const checkCodeToAuthorityMapping = {
+  H218: HORTICULTURAL_MARKETING_INSPECTORATE,
+  H219: PLANT_HEALTH_SEEDS_INSPECTORATE,
+  H220: HORTICULTURAL_MARKETING_INSPECTORATE,
+  H221: ANIMAL_PLANT_HEALTH_AGENCY,
+  H222: PRODUCTS_OF_ANIMAL_ORIGIN,
+  H223: FOODS_NOT_ANIMAL_ORIGIN,
+  H224: ILLEGAL_UNREPORTED_UNREGULATED
 }
 
-const documentCodeToAuthorityMapping = {
-  C640: authorities.ANIMAL_PLANT_HEALTH_AGENCY,
-  N852: authorities.PHA_FOODS_NOT_ANIMAL_ORIGIN,
-  C678: authorities.PHA_FOODS_NOT_ANIMAL_ORIGIN,
-  N853: authorities.PHA_PRODUCTS_OF_ANIMAL_ORIGIN,
-  C673: authorities.PHA_ILLEGAL_UNREPORTED_UNREGULATED,
-  C641: authorities.PHA_ILLEGAL_UNREPORTED_UNREGULATED,
-  N851: authorities.PLANT_HEALTH_SEEDS_INSPECTORATE,
-  C633: authorities.PLANT_HEALTH_SEEDS_INSPECTORATE,
-  9115: authorities.PLANT_HEALTH_SEEDS_INSPECTORATE,
-  N002: authorities.HORTICULTURAL_MARKETING_INSPECTORATE
-}
-
-const checkCodeToDocumentCodeMapping = {
+export const checkCodeToDocumentCodeMapping = {
   H218: ['N002'],
   H219: ['N851', '9115'],
   H220: ['N002'],
@@ -66,9 +57,9 @@ const checkCodeToDocumentCodeMapping = {
   H224: ['C673', 'C641']
 }
 
-const IUUDocumentReferences = ['C641', 'C673']
+export const IUUDocumentReferences = ['C641', 'C673']
 
-const chedStatusDescriptions = {
+export const chedStatusDescriptions = {
   CANCELLED: 'Cancelled',
   DELETED: 'Deleted',
   IN_PROGRESS: 'In progress',
@@ -81,9 +72,9 @@ const chedStatusDescriptions = {
   VALIDATED: 'Valid'
 }
 
-const closedChedStatuses = ['CANCELLED', 'REPLACED']
+export const closedChedStatuses = ['CANCELLED', 'REPLACED']
 
-const finalStateMappings = {
+export const finalStateMappings = {
   0: 'Released',
   1: 'Cancelled after arrival',
   2: 'Cancelled while pre-lodged',
@@ -91,16 +82,4 @@ const finalStateMappings = {
   4: 'Seized',
   5: 'Released to King’s warehouse',
   6: 'Transferred to MSS'
-}
-
-export {
-  checkCodeToAuthorityMapping,
-  checkCodeToDocumentCodeMapping,
-  chedStatusDescriptions,
-  decisionCodeDescriptions,
-  documentCodeToAuthorityMapping,
-  finalStateMappings,
-  IUUDocumentReferences,
-  closedChedStatuses,
-  DATE_FORMAT
 }
