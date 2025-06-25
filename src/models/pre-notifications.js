@@ -29,17 +29,18 @@ export const getAuthorities = (importNotificationType, complementParameterSet) =
   if (importNotificationType === chedTypes.CHEDP) {
     return [PRODUCTS_OF_ANIMAL_ORIGIN]
   }
-  if (importNotificationType === chedTypes.CHEDPP) {
-    const { data } = complementParameterSet.keyDataPair
-      .find(({ key }) => key === 'regulatory_authority')
 
-    return data === 'JOINT'
-      ? [
-          PLANT_HEALTH_SEEDS_INSPECTORATE,
-          HORTICULTURAL_MARKETING_INSPECTORATE
-        ]
-      : [data]
-  }
+  const { data } = complementParameterSet.keyDataPair
+    .find(({ key }) => key === 'regulatory_authority')
+
+  const chedppAuthorities = data === 'JOINT'
+    ? [
+        PLANT_HEALTH_SEEDS_INSPECTORATE,
+        HORTICULTURAL_MARKETING_INSPECTORATE
+      ]
+    : [data]
+
+  return chedppAuthorities
 }
 
 const mapCommodity = (
