@@ -4,20 +4,21 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_btms-portal-frontend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=DEFRA_btms-portal-frontend)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_btms-portal-frontend&metric=coverage)](https://sonarcloud.io/summary/new_code?id=DEFRA_btms-portal-frontend)
 
-Core delivery platform Node.js Frontend Template.
+The BTMS Portal Frontend provides search for DEFRA Import Notifications (IPAFFS) and HMRC Customs Declarations (CDS) showing the relationships between them.
 
-- [Requirements](#requirements)
-  - [Node.js](#nodejs)
-- [Server-side Caching](#server-side-caching)
-- [Redis](#redis)
-- [Local Development](#local-development)
+- [Prerequisites](#prerequisites)
+- [Local development](#local-development)
   - [Setup](#setup)
   - [Development](#development)
   - [Production](#production)
   - [Npm scripts](#npm-scripts)
+  - [Authentication](#authentication)
   - [Update dependencies](#update-dependencies)
+  - [Environment variables](#environment-variables)
   - [Formatting](#formatting)
-    - [Windows prettier issue](#windows-prettier-issue)
+    - [Windows Prettier issue](#windows-prettier-issue)
+- [Server-side caching](#server-side-caching)
+- [Redis](#redis)
 - [Docker](#docker)
   - [Development image](#development-image)
   - [Production image](#production-image)
@@ -27,40 +28,15 @@ Core delivery platform Node.js Frontend Template.
 - [Licence](#licence)
   - [About the licence](#about-the-licence)
 
-## Requirements
+## Prerequisites
 
-### Node.js
+* [Node.js](http://nodejs.org/) `>= v22`
+* [npm](https://nodejs.org/) `>= v10.5.1` (installed with Node.js)
+* [Docker](https://www.docker.com/)
 
-Please install [Node.js](http://nodejs.org/) `>= v18` and [npm](https://nodejs.org/) `>= v9`. You will find it
-easier to use the Node Version Manager [nvm](https://github.com/creationix/nvm)
+You may find it easier to manage Node.js versions using a version manager such as [nvm](https://github.com/creationix/nvm) or [n](https://www.npmjs.com/package/n). From within the project folder you can then either run `nvm use` or `n auto` to install the required version.
 
-To use the correct version of Node.js for this application, via nvm:
-
-```bash
-cd btms-portal-frontend
-nvm use
-```
-
-## Server-side Caching
-
-We use Catbox for server-side caching. By default the service will use CatboxRedis when deployed and CatboxMemory for
-local development.
-You can override the default behaviour by setting the `SESSION_CACHE_ENGINE` environment variable to either `redis` or
-`memory`.
-
-Please note: CatboxMemory (`memory`) is _not_ suitable for production use! The cache will not be shared between each
-instance of the service and it will not persist between restarts.
-
-## Redis
-
-Redis is an in-memory key-value store. Every instance of a service has access to the same Redis key-value store similar
-to how services might have a database (or MongoDB). All frontend services are given access to a namespaced prefixed that
-matches the service name. e.g. `my-service` will have access to everything in Redis that is prefixed with `my-service`.
-
-If your service does not require a session cache to be shared between instances or if you don't require Redis, you can
-disable setting `SESSION_CACHE_ENGINE=false` or changing the default value in `~/src/config/index.js`.
-
-## Local Development
+## Local development
 
 ### Setup
 
@@ -94,6 +70,9 @@ To view them in your command line run:
 ```bash
 npm run
 ```
+### Authentication
+
+For local authentication, we use the [cdp-defra-id-stub](https://github.com/DEFRA/cdp-defra-id-stub). If you run this as within Docker you will also get an instance of Redis, which can be used for session caching. You should also delete the [reference to localstack](https://github.com/DEFRA/cdp-defra-id-stub/blob/main/compose.yml#L20-L21) within the stubs `compose.yml` file.
 
 ### Update dependencies
 
@@ -106,19 +85,51 @@ To update dependencies use [npm-check-updates](https://github.com/raineorshine/n
 ncu --interactive --format group
 ```
 
-### Environment variable overrides
+### Environment variables
 
-For local development some environment variables can to be added to a `.env.local` file at the route of the project, (this will be ignored by Git). These will then be picked up by Convict in [src/config/config.js](src/config/config.js) when you start the app using `npm run dev`
+For local development some environment variables can to be added to a `.env.local` file at the root of the project, (this will be ignored by Git). These will then be picked up by Convict in [src/config/config.js](src/config/config.js) when you start the app using `npm run dev`
+
+#### Variables needed for local development
+
+Ask a member of the team to provide you with values.
+
+| name                                 | purpose                                                  |
+| ------------------------------------ | -------------------------------------------------------- |
+| BTMS_API_BASE_URL                    | Search queries use this API for results                  |
+| BTMS_API_USERNAME                    | Username for calls to search API                         |
+| BTMS_API_PASSWORD                    | Password for calls to search API                         |
+| AUTH_DEFRA_ID_OIDC_CONFIGURATION_URL | Configuration URL for DefraId                            |
+| AUTH_DEFRA_ID_CLIENT_SECRET          | Secret for DefraId                                       |
+| AUTH_DEFRA_ID_ORGANISATIONS          | List of DefraId organisations with access to the service |
+| AUTH_ENTRA_ID_OIDC_CONFIGURATION_URL | Configuration URL for EntraId                            |
+| AUTH_ENTRA_ID_CLIENT_ID              | Client ID for EntraId                                    |
+| AUTH_ENTRA_ID_CLIENT_SECRET          | Secret for EntraId                                       |
+| SESSION_CACHE_ENGINE                 | Location of session storage ('redis' or 'memory')        |
+| IPAFFS_URL                           | URL for links out to IPAFFS from notifications           |
 
 ### Formatting
 
-#### Windows prettier issue
+#### Windows Prettier issue
 
 If you are having issues with formatting of line breaks on Windows update your global git config by running:
 
 ```bash
 git config --global core.autocrlf false
 ```
+
+## Server-side caching
+
+We use Catbox for server-side caching. By default the service will use CatboxRedis when deployed and CatboxMemory for
+local development. You can override the default behaviour by setting the `SESSION_CACHE_ENGINE` environment variable to either `redis` or `memory`.
+
+Please note: CatboxMemory (`memory`) is _not_ suitable for production use! The cache will not be shared between each instance of the service and it will not persist between restarts.
+
+## Redis
+
+Redis is an in-memory key-value store. Every instance of a service has access to the same Redis key-value store similar to how services might have a database (or MongoDB). All frontend services access Redis keys that are namespaced using the service name (e.g. `my-service:*`).
+
+If your service does not require a session cache to be shared between instances or if you don't require Redis, you can
+disable Redis be setting `SESSION_CACHE_ENGINE=memory`.
 
 ## Docker
 
@@ -157,8 +168,8 @@ A local environment with:
 - Localstack for AWS services (S3, SQS)
 - Redis
 - MongoDB
-- This service.
-- A commented out backend example.
+- This service
+- A commented out backend example
 
 ```bash
 docker compose up --build -d
