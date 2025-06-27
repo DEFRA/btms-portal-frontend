@@ -1,4 +1,5 @@
 import globalJsdom from 'global-jsdom'
+import { getByRole } from '@testing-library/dom'
 import { initialiseServer } from '../utils/initialise-server.js'
 import { setupAuthedUserSession } from '../unit/utils/session-helper.js'
 import { paths } from '../../src/routes/route-constants.js'
@@ -12,6 +13,10 @@ test('not authenticated', async () => {
   })
 
   globalJsdom(payload)
+
+  expect(getByRole(document.body, 'link', { name: 'Sign in' }))
+    .toHaveAttribute('href', '/sign-in')
+
   expect(document.querySelectorAll('script[nonce]').length)
     .toBe(1)
 })
