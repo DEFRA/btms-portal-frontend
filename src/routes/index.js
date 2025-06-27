@@ -1,3 +1,4 @@
+import { accessibility } from './accessibility.js'
 import { health } from './health.js'
 import { staticAssetRoutes } from './static-assets.js'
 import { home } from './home.js'
@@ -11,6 +12,7 @@ import { search } from './search.js'
 import { searchResult } from './search-result.js'
 
 const defaultRoutes = [
+  accessibility,
   health,
   home,
   ...staticAssetRoutes

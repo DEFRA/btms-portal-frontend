@@ -1,6 +1,7 @@
 const paths = {
   HEALTH: '/health',
   LANDING: '/',
+  ACCESSIBILITY: '/accessibility-statement',
   AUTH_DEFRA_ID_CALLBACK: '/signin-oidc',
   SIGN_IN: '/sign-in',
   SIGN_IN_ENTRA: '/sign-in-entra',
