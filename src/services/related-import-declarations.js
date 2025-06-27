@@ -17,8 +17,8 @@ export const getRelatedImportDeclarations = async (request) => {
     )
 
     return payload
-  } catch (err) {
-    request.logger.setBindings({ err })
-    throw err
+  } catch (error) {
+    request.logger.setBindings({ error })
+    throw error
   }
 }

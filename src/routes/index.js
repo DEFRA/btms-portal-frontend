@@ -9,10 +9,12 @@ import { signOut } from './sign-out.js'
 import { signedOut } from './signed-out.js'
 import { search } from './search.js'
 import { searchResult } from './search-result.js'
+import { chromeDevtools } from './chrome-devtools.js'
 
 const defaultRoutes = [
   health,
   home,
+  chromeDevtools,
   ...staticAssetRoutes
 ]
 

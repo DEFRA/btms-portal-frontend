@@ -8,7 +8,8 @@ export const staticAssetRoutes = [
       cache: {
         expiresIn: config.get('staticCacheTimeout'),
         privacy: 'private'
-      }
+      },
+      tags: ['assets']
     },
     method: 'GET',
     path: '/favicon.ico',
@@ -16,7 +17,6 @@ export const staticAssetRoutes = [
       return h
         .response()
         .code(httpConstants.HTTP_STATUS_NO_CONTENT)
-        .type('image/x-icon')
     }
   },
   {
@@ -25,7 +25,8 @@ export const staticAssetRoutes = [
       cache: {
         expiresIn: config.get('staticCacheTimeout'),
         privacy: 'private'
-      }
+      },
+      tags: ['assets']
     },
     method: 'GET',
     path: `${config.get('assetPath')}/{param*}`,
