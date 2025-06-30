@@ -152,6 +152,9 @@ test('shows search results', async () => {
     auth: {
       strategy: 'session',
       credentials
+    },
+    headers: {
+      Cookie: 'cookie_policy={"analytics":true}'
     }
   })
 

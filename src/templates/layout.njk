@@ -52,6 +52,9 @@
 {% set headerOptions = defaultHeaderOptions | merge(additionalHeaderOptions) %}
 
 {% block header %}
+  {% if not cookiePolicy %}
+    {% include "./includes/cookie-banner.njk" %}
+  {% endif %}
   {{ govukHeader(headerOptions) }}
 {% endblock %}
 
