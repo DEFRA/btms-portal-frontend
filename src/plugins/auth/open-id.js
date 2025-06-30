@@ -12,11 +12,7 @@ const openId = {
     register: async (server) => {
       const defra = await openIdProvider('defraId', defraId)
       server.auth.strategy('defraId', 'bell', {
-        location: (request) => {
-          request.yar.flash('referrer', paths.SEARCH)
-
-          return `${baseUrl}${paths.AUTH_DEFRA_ID_CALLBACK}`
-        },
+        location: () => `${baseUrl}${paths.AUTH_DEFRA_ID_CALLBACK}`,
         provider: defra,
         password: cookie.password,
         clientId: defraId.clientId,
@@ -29,9 +25,7 @@ const openId = {
 
       const entra = await openIdProvider('entraId', entraId)
       server.auth.strategy('entraId', 'bell', {
-        location: (_req) => {
-          return `${baseUrl}${paths.SIGNIN_ENTRA_ID_CALLBACK}`
-        },
+        location: () => `${baseUrl}${paths.SIGNIN_ENTRA_ID_CALLBACK}`,
         provider: entra,
         password: cookie.password,
         clientId: entraId.clientId,

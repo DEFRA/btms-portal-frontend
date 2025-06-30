@@ -51,7 +51,7 @@ test('renders search page with error', async () => {
     message: {
       searchTerm: 'test search',
       isValid: false,
-      errorCode: 'INVALID_SEARCH_TERM'
+      errorCode: 'SEARCH_TERM_INVALID'
     }
   }
 

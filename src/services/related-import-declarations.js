@@ -5,7 +5,7 @@ const { baseUrl, password, username } = config.get('btmsApi')
 const token = Buffer.from(`${username}:${password}`).toString('base64')
 
 export const getRelatedImportDeclarations = async (request) => {
-  const query = new URLSearchParams(request.query.searchTerm)
+  const query = new URLSearchParams(request.pre.searchQuery)
 
   try {
     const { payload } = await wreck.get(
