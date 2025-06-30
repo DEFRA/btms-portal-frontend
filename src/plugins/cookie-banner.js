@@ -4,7 +4,7 @@ export const cookieBanner = {
   name: 'cookie-banner',
   async register (server) {
     server.state('cookie_policy', {
-      isSecure: config.get('env') !== 'development'
+      isSecure: config.get('isProduction')
     })
 
     server.ext('onPreHandler', (request, h) => {
