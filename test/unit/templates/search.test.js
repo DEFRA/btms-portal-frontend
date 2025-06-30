@@ -20,7 +20,7 @@ describe('Search Component', () => {
       $renderedTemplate = renderTemplate('search.njk', {
         searchTerm: 'FOO',
         isValid: false,
-        errorCode: 'INVALID_SEARCH_TERM'
+        errorCode: 'SEARCH_TERM_INVALID'
       })
     })
 

@@ -1,5 +1,6 @@
 import { paths } from './route-constants.js'
 import { setUserSession } from '../auth/user-session.js'
+import { metricsCounter } from '../utils/metrics.js'
 
 export const signinOidc = {
   method: ['GET', 'POST'],
@@ -8,16 +9,11 @@ export const signinOidc = {
     auth: 'defraId'
   },
   handler: async (request, h) => {
-    if (request.auth?.isAuthenticated) {
-      const sessionId = crypto.randomUUID()
+    const sessionId = crypto.randomUUID()
+    await setUserSession(request, sessionId)
+    request.cookieAuth.set({ sessionId })
 
-      await setUserSession(request, sessionId)
-
-      request.cookieAuth.set({ sessionId })
-    }
-
-    const redirect = request.yar.flash('referrer')?.at(0) ?? paths.SEARCH
-
-    return h.redirect(redirect)
+    metricsCounter('signIn.defraId')
+    return h.redirect(paths.SEARCH)
   }
 }

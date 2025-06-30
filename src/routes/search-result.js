@@ -4,6 +4,7 @@ import { searchPatterns } from '../services/search-patterns.js'
 import { getRelatedImportDeclarations } from '../services/related-import-declarations.js'
 import { mapCustomsDeclarations } from '../models/customs-declarations.js'
 import { mapPreNotifications } from '../models/pre-notifications.js'
+import { metricsCounter } from '../utils/metrics.js'
 
 export const searchResult = {
   method: 'get',
@@ -13,29 +14,46 @@ export const searchResult = {
     cache: CACHE_CONTROL_NO_STORE,
     validate: {
       query: joi.object({
-        searchTerm: joi.string().custom((origValue, h) => {
-          const value = origValue.trim().toUpperCase()
-          const match = searchPatterns.find(({ pattern }) => pattern.test(value))
-
-          return match ? { [match.key]: value } : h.error('any.invalid')
-        })
+        searchTerm: joi.string().required()
       }).unknown(),
       failAction: async (request, h, error) => {
         request.logger.setBindings({ error })
         request.yar.flash(
           'searchError',
           {
-            searchTerm: request.orig.query.searchTerm,
+            searchTerm: '',
             isValid: false,
-            errorCode: 'INVALID_SEARCH_TERM'
+            errorCode: 'SEARCH_TERM_REQUIRED'
           }
         )
-
         return h.redirect(paths.SEARCH).takeover()
       }
     },
+    pre: [{
+      method: (request, h) => {
+        const value = request.query.searchTerm.trim().toUpperCase()
+        const match = searchPatterns.find(({ pattern }) => pattern.test(value))
+
+        if (!match) {
+          request.yar.flash(
+            'searchError',
+            {
+              searchTerm: request.orig.query.searchTerm,
+              isValid: false,
+              errorCode: 'SEARCH_TERM_INVALID'
+            }
+          )
+
+          return h.redirect(paths.SEARCH).takeover()
+        }
+
+        metricsCounter(`search.${match.key}`)
+        return { [match.key]: value }
+      },
+      assign: 'searchQuery'
+    }],
     handler: async (request, h) => {
-      const searchTerm = request.orig.query.searchTerm.trim()
+      const searchTerm = request.query.searchTerm.trim()
       const data = await getRelatedImportDeclarations(request)
 
       if (
