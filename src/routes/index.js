@@ -1,3 +1,4 @@
+import { accessibility } from './accessibility.js'
 import { health } from './health.js'
 import { staticAssetRoutes } from './static-assets.js'
 import { home } from './home.js'
@@ -12,6 +13,7 @@ import { searchResult } from './search-result.js'
 import { chromeDevtools } from './chrome-devtools.js'
 
 const defaultRoutes = [
+  accessibility,
   health,
   home,
   chromeDevtools,
