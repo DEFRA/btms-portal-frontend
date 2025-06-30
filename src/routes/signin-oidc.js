@@ -7,18 +7,16 @@ export const signinOidc = {
   options: {
     auth: 'defraId'
   },
-  handler: async (_request, h) => {
-    if (_request.auth?.isAuthenticated) {
+  handler: async (request, h) => {
+    if (request.auth?.isAuthenticated) {
       const sessionId = crypto.randomUUID()
 
-      await setUserSession(_request, sessionId)
+      await setUserSession(request, sessionId)
 
-      _request.cookieAuth.set({ sessionId })
-
-      _request.logger.info('User has been successfully authenticated')
+      request.cookieAuth.set({ sessionId })
     }
 
-    const redirect = _request.yar.flash('referrer')?.at(0) ?? paths.SEARCH
+    const redirect = request.yar.flash('referrer')?.at(0) ?? paths.SEARCH
 
     return h.redirect(redirect)
   }

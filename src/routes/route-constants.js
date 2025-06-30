@@ -9,7 +9,8 @@ const paths = {
   SIGNED_OUT: '/signed-out',
   SIGNIN_ENTRA_ID_CALLBACK: '/signin-entra-id',
   SEARCH: '/search',
-  SEARCH_RESULT: '/search-result'
+  SEARCH_RESULT: '/search-result',
+  CHROME_DEVTOOLS: '/.well-known/appspecific/com.chrome.devtools.json'
 }
 
 const queryStringParams = {

@@ -33,6 +33,7 @@ const formatters = {
 export const loggerOptions = {
   enabled: logConfig.enabled,
   ignorePaths: ['/health'],
+  ignoreTags: ['assets'],
   redact: {
     paths: logConfig.redact,
     remove: true
