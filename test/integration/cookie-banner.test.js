@@ -1,6 +1,5 @@
 import { initialiseServer } from '../utils/initialise-server.js'
 import { paths } from '../../src/routes/route-constants.js'
-import globalJsdom from 'global-jsdom'
 
 test('when cookie policy has not been accepted, the cookie banner is visible', async () => {
   const server = await initialiseServer()
@@ -9,8 +8,6 @@ test('when cookie policy has not been accepted, the cookie banner is visible', a
     method: 'get',
     url: paths.LANDING
   })
-
-  globalJsdom(payload)
 
   expect(payload).toContain('Cookies on Border Trade Matching Service')
 })
@@ -26,8 +23,6 @@ test('when cookie_policy cookie is garbled, the cookie banner is visible', async
     url: paths.LANDING
   })
 
-  globalJsdom(payload)
-
   expect(payload).toContain('Cookies on Border Trade Matching Service')
 })
 
@@ -42,23 +37,20 @@ test('when cookie policy has been accepted, the cookie banner is not visible', a
     url: paths.LANDING
   })
 
-  globalJsdom(payload)
-
   expect(payload).not.toContain('Cookies on Border Trade Matching Service')
 })
 
 test('when user accepts additional cookies, the cookie is set with analytics as true', async () => {
   const server = await initialiseServer()
 
-  const { request, payload } = await server.inject({
+  const { request } = await server.inject({
     method: 'post',
     payload: {
-      'cookies[additional]': 'yes'
+      'cookies[additional]': 'yes',
+      previousUrl: '/'
     },
     url: `${paths.COOKIES}`
   })
-
-  globalJsdom(payload)
 
   expect(JSON.parse(request._states.cookie_policy.value)).toEqual({ analytics: true })
 })
@@ -66,15 +58,14 @@ test('when user accepts additional cookies, the cookie is set with analytics as 
 test('when user rejects additional cookies, the cookie is set with analytics as false', async () => {
   const server = await initialiseServer()
 
-  const { request, payload } = await server.inject({
+  const { request } = await server.inject({
     method: 'post',
     payload: {
-      'cookies[additional]': 'no'
+      'cookies[additional]': 'no',
+      previousUrl: '/'
     },
     url: `${paths.COOKIES}`
   })
-
-  globalJsdom(payload)
 
   expect(JSON.parse(request._states.cookie_policy.value)).toEqual({ analytics: false })
 })
@@ -82,7 +73,7 @@ test('when user rejects additional cookies, the cookie is set with analytics as 
 test('when user clicks accept or reject in the cookie banner, they are redirected back to their original location', async () => {
   const server = await initialiseServer()
 
-  const { payload, headers } = await server.inject({
+  const { headers } = await server.inject({
     method: 'post',
     payload: {
       'cookies[additional]': 'no',
@@ -90,8 +81,6 @@ test('when user clicks accept or reject in the cookie banner, they are redirecte
     },
     url: `${paths.COOKIES}`
   })
-
-  globalJsdom(payload)
 
   expect(headers.location).toBe('/search?cookieBannerConfirmation=true')
 })
@@ -107,8 +96,6 @@ test('when the user has accepted cookies, after redirecting they are shown a con
     url: `${paths.LANDING}?cookieBannerConfirmation=true`
   })
 
-  globalJsdom(payload)
-
   expect(payload).toContain('You’ve accepted additional cookies.')
 })
 
@@ -122,8 +109,6 @@ test('when the user has rejected cookies, after redirecting they are shown a con
     method: 'get',
     url: `${paths.LANDING}?cookieBannerConfirmation=true`
   })
-
-  globalJsdom(payload)
 
   expect(payload).toContain('You’ve rejected additional cookies.')
 })

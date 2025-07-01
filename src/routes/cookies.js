@@ -1,4 +1,5 @@
 import { paths } from './route-constants.js'
+import Joi from 'joi'
 
 export const cookiesGet = {
   method: 'GET',
@@ -11,20 +12,27 @@ export const cookiesGet = {
 export const cookiesPost = {
   method: 'POST',
   path: paths.COOKIES,
+  options: {
+    validate: {
+      payload: Joi.object({
+        'cookies[additional]': Joi.string().valid('yes', 'no').required(),
+        previousUrl: Joi.string().required()
+      }),
+      options: {
+        allowUnknown: true
+      }
+    }
+  },
   handler: (request, h) => {
     const { 'cookies[additional]': acceptAdditionalCookies, previousUrl } = request.payload
-    if (acceptAdditionalCookies === undefined) {
-      return h.view('cookies')
-    }
-
     const acceptedCookies = acceptAdditionalCookies === 'yes'
 
     h.state('cookie_policy', JSON.stringify({ analytics: acceptedCookies }))
 
-    if (previousUrl !== undefined) {
-      return h.redirect(`${previousUrl}?cookieBannerConfirmation=true`)
+    if (previousUrl === '/cookies') {
+      return h.view('cookies', { acceptedCookies, cookiePageConfirmation: true })
     }
 
-    return h.view('cookies', { acceptedCookies, cookiePageConfirmation: true })
+    return h.redirect(`${previousUrl}?cookieBannerConfirmation=true`)
   }
 }
