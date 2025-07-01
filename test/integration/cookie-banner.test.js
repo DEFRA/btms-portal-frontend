@@ -51,8 +51,11 @@ test('when user accepts additional cookies, the cookie is set with analytics as 
   const server = await initialiseServer()
 
   const { request, payload } = await server.inject({
-    method: 'get',
-    url: `${paths.LANDING}?cookies[additional]=yes`
+    method: 'post',
+    payload: {
+      'cookies[additional]': 'yes'
+    },
+    url: `${paths.COOKIES}`
   })
 
   globalJsdom(payload)
@@ -64,11 +67,63 @@ test('when user rejects additional cookies, the cookie is set with analytics as 
   const server = await initialiseServer()
 
   const { request, payload } = await server.inject({
-    method: 'get',
-    url: `${paths.LANDING}?cookies[additional]=no`
+    method: 'post',
+    payload: {
+      'cookies[additional]': 'no'
+    },
+    url: `${paths.COOKIES}`
   })
 
   globalJsdom(payload)
 
   expect(JSON.parse(request._states.cookie_policy.value)).toEqual({ analytics: false })
+})
+
+test('when user clicks accept or reject in the cookie banner, they are redirected back to their original location', async () => {
+  const server = await initialiseServer()
+
+  const { payload, headers } = await server.inject({
+    method: 'post',
+    payload: {
+      'cookies[additional]': 'no',
+      previousUrl: '/search'
+    },
+    url: `${paths.COOKIES}`
+  })
+
+  globalJsdom(payload)
+
+  expect(headers.location).toBe('/search?cookieBannerConfirmation=true')
+})
+
+test('when the user has accepted cookies, after redirecting they are shown a confirmation notification', async () => {
+  const server = await initialiseServer()
+
+  const { payload } = await server.inject({
+    headers: {
+      Cookie: 'cookie_policy={"analytics":true}'
+    },
+    method: 'get',
+    url: `${paths.LANDING}?cookieBannerConfirmation=true`
+  })
+
+  globalJsdom(payload)
+
+  expect(payload).toContain('You’ve accepted additional cookies.')
+})
+
+test('when the user has rejected cookies, after redirecting they are shown a confirmation notification', async () => {
+  const server = await initialiseServer()
+
+  const { payload } = await server.inject({
+    headers: {
+      Cookie: 'cookie_policy={"analytics":true}'
+    },
+    method: 'get',
+    url: `${paths.LANDING}?cookieBannerConfirmation=true`
+  })
+
+  globalJsdom(payload)
+
+  expect(payload).toContain('You’ve rejected additional cookies.')
 })

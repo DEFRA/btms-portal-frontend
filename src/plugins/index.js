@@ -12,7 +12,7 @@ import { wreckProxyConfiguration } from './wreck-proxy-configuration.js'
 import { securityHeaders } from './security-headers.js'
 import { commonViewContext } from './common-view-context.js'
 import { cspNonce } from './csp-nonce.js'
-import { cookieBanner } from './cookie-banner.js'
+import { cookiePolicy } from './cookie-policy.js'
 
 export default [
   requestLogger,
@@ -29,5 +29,5 @@ export default [
   errorPage,
   securityHeaders,
   commonViewContext,
-  cookieBanner
+  cookiePolicy
 ]

@@ -1,4 +1,5 @@
 const paths = {
+  COOKIES: '/cookies',
   HEALTH: '/health',
   LANDING: '/',
   ACCESSIBILITY: '/accessibility-statement',
