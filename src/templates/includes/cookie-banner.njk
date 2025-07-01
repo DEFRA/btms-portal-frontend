@@ -5,32 +5,71 @@
   <p class="govuk-body">We’d also like to use analytics cookies so we can understand how you use the service and make improvements.</p>
 {% endset %}
 
-<form>
+{% set acceptHtml %}
+  <p class="govuk-body">You’ve accepted additional cookies. You can <a class="govuk-link" href="/cookies">change your cookie settings</a> at any time.</p>
+{% endset %}
+
+{% set rejectedHtml %}
+  <p class="govuk-body">You’ve rejected additional cookies. You can <a class="govuk-link" href="/cookies">change your cookie settings</a> at any time.</p>
+{% endset %}
+
+{% if cookieBannerConfirmation == "true" and cookiePolicy != null %}
   {{ govukCookieBanner({
     ariaLabel: "Cookies on Border Trade Matching Service",
     messages: [
       {
-        headingText: "Cookies on Border Trade Matching Service",
-        html: html,
+        html: acceptHtml,
+        hidden: cookiePolicy.analytics == false,
         actions: [
           {
-            text: "Accept additional cookies",
-            type: "submit",
-            name: "cookies[additional]",
-            value: "yes"
-          },
-          {
-            text: "Reject additional cookies",
-            type: "submit",
-            name: "cookies[additional]",
-            value: "no"
-          },
-          {
-            text: "View cookies",
-            href: "#"
+            text: "Hide cookie message",
+            type: "button",
+            href: currentUrl
           }
         ]
+      },
+      {
+        html: rejectedHtml,
+        hidden: cookiePolicy.analytics == true,
+        actions: [
+        {
+          text: "Hide cookie message",
+          type: "button",
+          href: currentUrl
+        }
+      ]
       }
     ]
   }) }}
-</form>
+{% else %}
+  <form method="post" action="/cookies">
+    <input type="hidden" id="previousUrl" name="previousUrl" value="{{ currentUrl }}" />
+    {{ govukCookieBanner({
+      ariaLabel: "Cookies on Border Trade Matching Service",
+      messages: [
+        {
+          headingText: "Cookies on Border Trade Matching Service",
+          html: html,
+          actions: [
+            {
+              text: "Accept additional cookies",
+              type: "submit",
+              name: "cookies[additional]",
+              value: "yes"
+            },
+            {
+              text: "Reject additional cookies",
+              type: "submit",
+              name: "cookies[additional]",
+              value: "no"
+            },
+            {
+              text: "View cookies",
+              href: "/cookies"
+            }
+          ]
+        }
+      ]
+    }) }}
+  </form>
+{% endif %}

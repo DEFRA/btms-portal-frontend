@@ -11,9 +11,12 @@ import { signedOut } from './signed-out.js'
 import { search } from './search.js'
 import { searchResult } from './search-result.js'
 import { chromeDevtools } from './chrome-devtools.js'
+import { cookiesGet, cookiesPost } from './cookies.js'
 
 const defaultRoutes = [
   accessibility,
+  cookiesGet,
+  cookiesPost,
   health,
   home,
   chromeDevtools,
