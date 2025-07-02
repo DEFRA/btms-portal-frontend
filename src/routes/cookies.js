@@ -15,7 +15,7 @@ export const cookiesPost = {
   options: {
     validate: {
       payload: Joi.object({
-        'cookies[additional]': Joi.string().valid('yes', 'no').required(),
+        'cookies[analytics]': Joi.string().valid('yes', 'no').required(),
         previousUrl: Joi.string().required()
       }),
       options: {
@@ -24,8 +24,8 @@ export const cookiesPost = {
     }
   },
   handler: (request, h) => {
-    const { 'cookies[additional]': acceptAdditionalCookies, previousUrl } = request.payload
-    const acceptedCookies = acceptAdditionalCookies === 'yes'
+    const { 'cookies[analytics]': acceptAnalyticsCookies, previousUrl } = request.payload
+    const acceptedCookies = acceptAnalyticsCookies === 'yes'
 
     h.state('cookie_policy', { analytics: acceptedCookies })
 

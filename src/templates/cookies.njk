@@ -84,14 +84,14 @@
         </legend>
         <div class="govuk-radios" data-module="govuk-radios" data-govuk-radios-init="">
           <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="accept-additional-cookies" name="cookies[additional]" type="radio" value="yes" {% if acceptedCookies == true or (acceptCookies == undefined and cookiePolicy.analytics == true) %} checked {% endif %}>
-            <label class="govuk-label govuk-radios__label" for="accept-additional-cookies">
+            <input class="govuk-radios__input" id="accept-analytics-cookies" name="cookies[analytics]" type="radio" value="yes" {% if acceptedCookies == true or (acceptCookies == undefined and cookiePolicy.analytics == true) %} checked {% endif %}>
+            <label class="govuk-label govuk-radios__label" for="accept-analytics-cookies">
               Yes
             </label>
           </div>
           <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="reject-additional-cookies" name="cookies[additional]" type="radio" value="no" {% if acceptedCookies == false or (acceptedCookies == undefined and cookiePolicy.analytics == false) %} checked {% endif %}>
-            <label class="govuk-label govuk-radios__label" for="reject-additional-cookies">
+            <input class="govuk-radios__input" id="reject-analytics-cookies" name="cookies[analytics]" type="radio" value="no" {% if acceptedCookies == false or (acceptedCookies == undefined and cookiePolicy.analytics == false) %} checked {% endif %}>
+            <label class="govuk-label govuk-radios__label" for="reject-analytics-cookies">
               No
             </label>
           </div>
