@@ -52,7 +52,7 @@
 {% set headerOptions = defaultHeaderOptions | merge(additionalHeaderOptions) %}
 
 {% block header %}
-  {% if currentUrl != "/cookies" and (cookiePolicy == null or cookieBannerConfirmation != null) %}
+  {% if currentUrl != "/cookies" and (cookiePolicy == null or cookieBannerConfirmation != null) and hideCookieBanner != true %}
     {% include "./includes/cookie-banner.njk" %}
   {% endif %}
   {{ govukHeader(headerOptions) }}

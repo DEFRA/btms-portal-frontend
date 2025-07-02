@@ -12,10 +12,10 @@ test('when cookie policy has not been accepted, the cookie banner is visible', a
   expect(payload).toContain('Cookies on Border Trade Matching Service')
 })
 
-test('when cookie_policy cookie is garbled, the cookie banner is visible', async () => {
+test('when cookie_policy cookie is garbled, the cookie is deleted', async () => {
   const server = await initialiseServer()
 
-  const { payload } = await server.inject({
+  const { request } = await server.inject({
     headers: {
       Cookie: 'cookie_policy=anfojaenojas'
     },
@@ -23,7 +23,9 @@ test('when cookie_policy cookie is garbled, the cookie banner is visible', async
     url: paths.LANDING
   })
 
-  expect(payload).toContain('Cookies on Border Trade Matching Service')
+  const cookiePolicyRemoval = request.response.headers['set-cookie'].reduce(c => c.startsWith('cookie_policy'))
+
+  expect(cookiePolicyRemoval).toContain('Max-Age=0')
 })
 
 test('when cookie policy has been accepted, the cookie banner is not visible', async () => {
@@ -111,4 +113,15 @@ test('when the user has rejected cookies, after redirecting they are shown a con
   })
 
   expect(payload).toContain('You’ve rejected additional cookies.')
+})
+
+test('the cookie banner is not displayed on an error page', async () => {
+  const server = await initialiseServer()
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: '/404'
+  })
+
+  expect(payload).not.toContain('Cookies on Border Trade Matching Service')
 })
