@@ -31,7 +31,7 @@ test('when cookie policy has been accepted, the cookie banner is not visible', a
 
   const { payload } = await server.inject({
     headers: {
-      Cookie: 'cookie_policy={"analytics":true}'
+      Cookie: 'cookie_policy=' + Buffer.from('{"analytics":true}').toString('base64')
     },
     method: 'get',
     url: paths.LANDING
@@ -52,7 +52,7 @@ test('when user accepts additional cookies, the cookie is set with analytics as 
     url: `${paths.COOKIES}`
   })
 
-  expect(JSON.parse(request._states.cookie_policy.value)).toEqual({ analytics: true })
+  expect(request._states.cookie_policy.value).toEqual({ analytics: true })
 })
 
 test('when user rejects additional cookies, the cookie is set with analytics as false', async () => {
@@ -67,7 +67,7 @@ test('when user rejects additional cookies, the cookie is set with analytics as 
     url: `${paths.COOKIES}`
   })
 
-  expect(JSON.parse(request._states.cookie_policy.value)).toEqual({ analytics: false })
+  expect(request._states.cookie_policy.value).toEqual({ analytics: false })
 })
 
 test('when user clicks accept or reject in the cookie banner, they are redirected back to their original location', async () => {
@@ -90,7 +90,7 @@ test('when the user has accepted cookies, after redirecting they are shown a con
 
   const { payload } = await server.inject({
     headers: {
-      Cookie: 'cookie_policy={"analytics":true}'
+      Cookie: 'cookie_policy=' + Buffer.from('{"analytics":true}').toString('base64')
     },
     method: 'get',
     url: `${paths.LANDING}?cookieBannerConfirmation=true`
@@ -104,7 +104,7 @@ test('when the user has rejected cookies, after redirecting they are shown a con
 
   const { payload } = await server.inject({
     headers: {
-      Cookie: 'cookie_policy={"analytics":true}'
+      Cookie: 'cookie_policy=' + Buffer.from('{"analytics":true}').toString('base64')
     },
     method: 'get',
     url: `${paths.LANDING}?cookieBannerConfirmation=true`
