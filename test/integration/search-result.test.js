@@ -325,6 +325,6 @@ test('handles upstream errors', async () => {
 
   expect(statusCode).toBe(500)
 
-  expect(getByRole(document.body, 'heading', { name: '500' }))
+  expect(getByRole(document.body, 'heading', { name: 'Sorry, there is a problem with this service' }))
     .toBeInTheDocument()
 })
