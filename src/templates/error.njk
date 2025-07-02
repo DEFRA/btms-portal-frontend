@@ -1,10 +1,12 @@
 {% extends 'layout.njk' %}
 
 {% block content %}
-  <h1 class="govuk-heading-xl">{{ heading }}</h1>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <p>{{ message }}</p>
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+      {% for message in messages %}
+        <p>{{ message }}<p>
+      {% endfor %}
     </div>
   </div>
 {% endblock %}
