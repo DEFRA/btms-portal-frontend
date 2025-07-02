@@ -25,14 +25,14 @@ test('the cookie banner does not display on the cookies page', async () => {
   expect(payload).not.toContain('Cookies on Border Trade Matching Service')
 })
 
-test('agreeing to accept additional cookies sets the cookie_policy cookie correctly', async () => {
+test('agreeing to accept analytics cookies sets the cookie_policy cookie correctly', async () => {
   const server = await initialiseServer()
 
   const { payload, request, statusCode } = await server.inject({
     method: 'post',
     url: paths.COOKIES,
     payload: {
-      'cookies[additional]': 'yes',
+      'cookies[analytics]': 'yes',
       previousUrl: '/cookies'
     }
   })
@@ -42,14 +42,14 @@ test('agreeing to accept additional cookies sets the cookie_policy cookie correc
   expect(JSON.parse(request._states.cookie_policy.value)).toEqual({ analytics: true })
 })
 
-test('rejecting additional cookies sets the cookie_policy cookie correctly', async () => {
+test('rejecting analytics cookies sets the cookie_policy cookie correctly', async () => {
   const server = await initialiseServer()
 
   const { payload, request, statusCode } = await server.inject({
     method: 'post',
     url: paths.COOKIES,
     payload: {
-      'cookies[additional]': 'no',
+      'cookies[analytics]': 'no',
       previousUrl: '/cookies'
     }
   })
@@ -66,7 +66,7 @@ test('POSTing to the /cookies endpoint with an invalid payload returns a 404', a
     method: 'post',
     url: paths.COOKIES,
     payload: {
-      'cookies[additional]': 'abcd'
+      'cookies[analytics]': 'abcd'
     }
   })
 
@@ -80,7 +80,7 @@ test('POSTing to the /cookies endpoint without a previousUrl returns a 404', asy
     method: 'post',
     url: paths.COOKIES,
     payload: {
-      'cookies[additional]': 'yes'
+      'cookies[analytics]': 'yes'
     }
   })
 

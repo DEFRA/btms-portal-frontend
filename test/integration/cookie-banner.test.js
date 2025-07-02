@@ -40,13 +40,13 @@ test('when cookie policy has been accepted, the cookie banner is not visible', a
   expect(payload).not.toContain('Cookies on Border Trade Matching Service')
 })
 
-test('when user accepts additional cookies, the cookie is set with analytics as true', async () => {
+test('when user accepts analytics cookies, the cookie is set with analytics as true', async () => {
   const server = await initialiseServer()
 
   const { request } = await server.inject({
     method: 'post',
     payload: {
-      'cookies[additional]': 'yes',
+      'cookies[analytics]': 'yes',
       previousUrl: '/'
     },
     url: `${paths.COOKIES}`
@@ -55,13 +55,13 @@ test('when user accepts additional cookies, the cookie is set with analytics as 
   expect(JSON.parse(request._states.cookie_policy.value)).toEqual({ analytics: true })
 })
 
-test('when user rejects additional cookies, the cookie is set with analytics as false', async () => {
+test('when user rejects analytics cookies, the cookie is set with analytics as false', async () => {
   const server = await initialiseServer()
 
   const { request } = await server.inject({
     method: 'post',
     payload: {
-      'cookies[additional]': 'no',
+      'cookies[analytics]': 'no',
       previousUrl: '/'
     },
     url: `${paths.COOKIES}`
@@ -76,7 +76,7 @@ test('when user clicks accept or reject in the cookie banner, they are redirecte
   const { headers } = await server.inject({
     method: 'post',
     payload: {
-      'cookies[additional]': 'no',
+      'cookies[analytics]': 'no',
       previousUrl: '/search'
     },
     url: `${paths.COOKIES}`
