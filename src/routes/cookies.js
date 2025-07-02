@@ -27,7 +27,7 @@ export const cookiesPost = {
     const { 'cookies[analytics]': acceptAnalyticsCookies, previousUrl } = request.payload
     const acceptedCookies = acceptAnalyticsCookies === 'yes'
 
-    h.state('cookie_policy', JSON.stringify({ analytics: acceptedCookies }))
+    h.state('cookie_policy', { analytics: acceptedCookies })
 
     if (previousUrl === '/cookies') {
       return h.view('cookies', { acceptedCookies, cookiePageConfirmation: true })

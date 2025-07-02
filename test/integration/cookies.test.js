@@ -39,7 +39,7 @@ test('agreeing to accept analytics cookies sets the cookie_policy cookie correct
 
   expect(statusCode).toBe(httpConstants.HTTP_STATUS_OK)
   expect(payload).toContain('You’ve set your cookie preferences.')
-  expect(JSON.parse(request._states.cookie_policy.value)).toEqual({ analytics: true })
+  expect(request._states.cookie_policy.value).toEqual({ analytics: true })
 })
 
 test('rejecting analytics cookies sets the cookie_policy cookie correctly', async () => {
@@ -56,7 +56,7 @@ test('rejecting analytics cookies sets the cookie_policy cookie correctly', asyn
 
   expect(statusCode).toBe(httpConstants.HTTP_STATUS_OK)
   expect(payload).toContain('You’ve set your cookie preferences.')
-  expect(JSON.parse(request._states.cookie_policy.value)).toEqual({ analytics: false })
+  expect(request._states.cookie_policy.value).toEqual({ analytics: false })
 })
 
 test('POSTing to the /cookies endpoint with an invalid payload returns a 404', async () => {
