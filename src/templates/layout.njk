@@ -7,46 +7,21 @@
   <link href="{{ getAssetPath('stylesheets/application.scss') }}" rel="stylesheet">
 {% endblock %}
 
-{%
-  set defaultHeaderOptions = {
-    homepageUrl: "https://www.gov.uk",
-    serviceName: serviceName,
-    useTudorCrown: true
-  }
-%}
+{% set additionalHeaderOptions = {
+  navigationClasses: 'btms-header-nav',
+  useTudorCrown: true
+} %}
 
-{%
-  set navigationOptions = {
-    navigationClasses: 'btms-header-nav',
-    navigation: [{
-      text: 'Manage account',
-      href: 'https://your-account.cpdev.cui.defra.gov.uk/management'
-    }, {
-      text: 'Sign out',
-      href: signOutUrl
-    }]
-  }
-%}
-
-{% if authedUser.isAuthenticated %}
-  {% set defaultHeaderOptions = defaultHeaderOptions | merge(navigationOptions) %}
-{% endif %}
-
-{% set additionalHeaderOptions = {} %}
 {% set wrapperClass = 'govuk-main-wrapper' %}
 
 {% if landingPage %}
   {% set wrapperClass = 'btms-landing-page-wrapper' %}
-  {% set additionalHeaderOptions = {
-    classes: 'btms-landing-page-header'
-  } %}
+  {% set additionalHeaderOptions = additionalHeaderOptions | merge({ classes: 'btms-landing-page-header' }) %}
 {% endif %}
 
 {% if resultsPage %}
   {% set containerClasses = 'btms-width-container--wide' %}
-  {% set additionalHeaderOptions = {
-    containerClasses: containerClasses
-  } %}
+  {% set additionalHeaderOptions = additionalHeaderOptions | merge({ containerClasses: containerClasses }) %}
 {% endif %}
 
 {% set headerOptions = defaultHeaderOptions | merge(additionalHeaderOptions) %}

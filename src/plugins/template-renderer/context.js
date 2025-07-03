@@ -1,46 +1,61 @@
 import path from 'node:path'
 import { readFileSync } from 'node:fs'
 import { config } from '../../config/config.js'
-import { createLogger } from '../../utils/logger.js'
 import { getUserSession } from '../../auth/user-session.js'
 import { paths } from '../../routes/route-constants.js'
 
-const logger = createLogger()
-const assetPath = config.get('assetPath')
-const manifestPath = path.join(
-  config.get('root'),
-  '.public/assets-manifest.json'
-)
-
-/** @type {Record<string, string> | undefined} */
 let webpackManifest
+// once we move to Eslint 9.19+ we can use import with { type: json }
+const getManifest = () => {
+  if (!webpackManifest) {
+    const manifestPath = path.resolve(config.get('root'), '.public/assets-manifest.json')
+    webpackManifest = JSON.parse(readFileSync(manifestPath, 'utf-8'))
+  }
+  return webpackManifest
+}
 
 /**
- * @param {Request | null} request
+ * @param {Request} request
  */
 export async function context (request) {
-  if (!webpackManifest) {
-    try {
-      webpackManifest = JSON.parse(readFileSync(manifestPath, 'utf-8'))
-    } catch (error) {
-      logger.error(`Webpack ${path.basename(manifestPath)} not found`)
-    }
-  }
+  const manifest = getManifest()
+  const assetPath = config.get('assetPath')
+  const serviceName = config.get('serviceName')
 
   const authedUser = await getUserSession(request)
 
+  const navigation = []
+
+  if (authedUser?.strategy === 'defraId') {
+    navigation.push({
+      text: 'Manage account',
+      href: 'https://your-account.cpdev.cui.defra.gov.uk/management'
+    })
+  }
+  if (authedUser?.isAuthenticated) {
+    navigation.push({
+      text: 'Sign out',
+      href: `${paths.SIGN_OUT}?provider=${authedUser.strategy}`
+    })
+  }
+
   return {
-    authedUser,
     assetPath: `${assetPath}/assets`,
-    serviceName: config.get('serviceName'),
-    signOutUrl: paths.SIGN_OUT,
+    defaultHeaderOptions: {
+      homepageUrl: 'https://www.gov.uk',
+      serviceName,
+      navigation
+    },
 
     /**
      * @param {string} asset
      */
     getAssetPath (asset) {
-      const webpackAssetPath = webpackManifest?.[asset]
-      return `${assetPath}/${webpackAssetPath ?? asset}`
+      const hashed = manifest[asset]
+      if (!hashed) {
+        request.logger.error(`Asset ${asset} not found in manifest`)
+      }
+      return `${assetPath}/${hashed}`
     }
   }
 }
