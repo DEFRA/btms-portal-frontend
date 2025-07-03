@@ -7,6 +7,7 @@ export const cookiePolicy = {
   name: 'cookie-policy',
   async register (server) {
     server.state('cookie_policy', {
+      clearInvalid: true,
       encoding: 'base64json',
       isSecure: config.get('isProduction'),
       ttl: oneYearInMilliseconds
