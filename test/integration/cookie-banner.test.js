@@ -23,7 +23,7 @@ test('when cookie_policy cookie is garbled, the cookie is deleted', async () => 
     url: paths.LANDING
   })
 
-  const cookiePolicyRemoval = request.response.headers['set-cookie'].reduce(c => c.startsWith('cookie_policy'))
+  const cookiePolicyRemoval = request.response.headers['set-cookie'].find(c => c.startsWith('cookie_policy'))
 
   expect(cookiePolicyRemoval).toContain('Max-Age=0')
 })
