@@ -20,9 +20,9 @@
         <td class="govuk-table__cell">{{ commodityDescription(commodity.commodityDesc, commodity.id, maxLength) }}</td>
         <td class="govuk-table__cell">{{ commodity.weightOrQuantity }}</td>
         <td class="govuk-table__cell btms-decision-outcomes">
-          {% for authority in commodity.authorities %}
+          {% for check in commodity.checks %}
             {% if loop.first %} <ul class="govuk-list"> {% endif %}
-            <li data-ched-authority="{{ authority }}">{{ preNotification.decision }} ({{ authority }})</li>
+            <li data-ched-authority="{{ check.authority }}">{{ check.decision }} ({{ check.authority }})</li>
             {% if loop.last %} </ul> {% endif %}
           {% endfor %}
         </td>
