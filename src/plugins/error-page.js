@@ -39,7 +39,7 @@ export const errorPage = {
       }
 
       const heading = titles[statusCode] || 'Sorry, there is a problem with this service'
-      const messages = paragraphs[statusCode] || ['Try again later']
+      const messages = paragraphs[statusCode] || ['Try again later.']
 
       return h.view('error', { heading, hideCookieBanner: true, messages })
         .code(statusCode)
