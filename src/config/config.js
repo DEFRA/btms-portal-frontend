@@ -296,6 +296,12 @@ const config = convict({
         sensitive: true,
         env: 'AUTH_DEFRA_ID_ORGANISATIONS',
         default: ['7f2f65e0-4858-11f0-afd0-f3af378128f9']
+      },
+      accountManagementUrl: {
+        doc: 'Defra ID account management portal URL',
+        format: String,
+        env: 'AUTH_DEFRA_ID_ACCOUNT_MANAGEMENT_URL',
+        default: '#'
       }
     },
     entraId: {

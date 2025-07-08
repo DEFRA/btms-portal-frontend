@@ -27,9 +27,10 @@ export async function context (request) {
   const navigation = []
 
   if (authedUser?.strategy === 'defraId') {
+    const accountManagementUrl = config.get('auth.defraId.accountManagementUrl')
     navigation.push({
       text: 'Manage account',
-      href: 'https://your-account.cpdev.cui.defra.gov.uk/management'
+      href: accountManagementUrl
     })
   }
   if (authedUser?.isAuthenticated) {
