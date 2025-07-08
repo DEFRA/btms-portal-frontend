@@ -36,6 +36,9 @@ export const errorPage = {
 
       if (statusCode >= HTTP_STATUS_INTERNAL_SERVER_ERROR) {
         request.logger.error(response.stack)
+        if (response.data) {
+          request.logger.error(JSON.stringify(response.data))
+        }
       }
 
       const heading = titles[statusCode] || 'Sorry, there is a problem with this service'
