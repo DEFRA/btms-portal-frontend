@@ -8,46 +8,83 @@ import {
   chedStatusDescriptions,
   chedTypes,
   closedChedStatuses,
-  DATE_FORMAT
+  DATE_FORMAT,
+  checkStatusToOutcome
 } from './model-constants.js'
 import { config } from '../config/config.js'
 
 const ipaffsUrlTemplate = config.get('ipaffs.urlTemplate')
 
-const getDecision = (preNotification) => (
-  ['VALIDATED', 'REJECTED'].includes(preNotification.status) &&
-  preNotification.partTwo?.decision?.decision
-) || 'Decision not given'
-
-export const getAuthorities = (importNotificationType, complementParameterSet) => {
-  if (importNotificationType === chedTypes.CHEDA) {
-    return [ANIMAL_PLANT_HEALTH_AGENCY]
-  }
-  if (importNotificationType === chedTypes.CHEDD) {
-    return [FOODS_NOT_ANIMAL_ORIGIN]
-  }
-  if (importNotificationType === chedTypes.CHEDP) {
-    return [PRODUCTS_OF_ANIMAL_ORIGIN]
+const getChecks = (preNotification) => {
+  const authorities = {
+    [chedTypes.CHEDA]: ANIMAL_PLANT_HEALTH_AGENCY,
+    [chedTypes.CHEDD]: FOODS_NOT_ANIMAL_ORIGIN,
+    [chedTypes.CHEDP]: PRODUCTS_OF_ANIMAL_ORIGIN
   }
 
+  const decision =
+    (['VALIDATED', 'REJECTED'].includes(preNotification.status) &&
+      preNotification.partTwo?.decision?.decision) ||
+    'Decision not given'
+
+  const authority = authorities[preNotification.importNotificationType]
+
+  return [{ decision, authority }]
+}
+
+const getChedPPChecks = (preNotification, complementParameterSet) => {
   const { data } = complementParameterSet.keyDataPair
     .find(({ key }) => key === 'regulatory_authority')
 
-  const chedppAuthorities = data === 'JOINT'
+  const authorities = data === 'JOINT'
     ? [
         PLANT_HEALTH_SEEDS_INSPECTORATE,
         HORTICULTURAL_MARKETING_INSPECTORATE
       ]
     : [data]
 
-  return chedppAuthorities
+  const { commodityChecks, phsiAutoCleared, hmiAutoCleared } = preNotification.partTwo
+
+  const { checks } = commodityChecks.find(({ uniqueComplementId }) => {
+    return uniqueComplementId === complementParameterSet.uniqueComplementId
+  })
+
+  return authorities.map((authority) => {
+    if (!['VALIDATED', 'REJECTED', 'PARTIALLY_REJECTED'].includes(preNotification.status)) {
+      return { authority, decision: 'Decision not given' }
+    }
+
+    if (
+      (authority === PLANT_HEALTH_SEEDS_INSPECTORATE && phsiAutoCleared) ||
+      (authority === HORTICULTURAL_MARKETING_INSPECTORATE && hmiAutoCleared)
+    ) {
+      return { authority, decision: 'Auto cleared' }
+    }
+
+    const outcomePrecedence = {
+      'Non compliant': 1,
+      Hold: 2,
+      Compliant: 3
+    }
+
+    const decision = checks.reduce((finalOutcome, check) => {
+      if (check.type.startsWith(authority)) {
+        const outcome = checkStatusToOutcome[check.status]
+        return outcomePrecedence[outcome] < outcomePrecedence[finalOutcome]
+          ? outcome
+          : finalOutcome
+      }
+
+      return finalOutcome
+    }, 'Compliant')
+
+    return { authority, decision }
+  })
 }
 
-const mapCommodity = (
-  commodityComplement,
-  complementParameterSets,
-  importNotificationType
-) => {
+const mapCommodity = (commodityComplement, preNotification) => {
+  const { complementParameterSets } = preNotification.partOne.commodities
+  const { importNotificationType } = preNotification
   const complementParameterSet = complementParameterSets
     .find(({ complementId }) => complementId === commodityComplement.complementId)
 
@@ -58,7 +95,9 @@ const mapCommodity = (
   const { data } = complementParameterSet.keyDataPair
     .find(({ key }) => key === 'number_animal' || key === 'netweight')
 
-  const authorities = getAuthorities(importNotificationType, complementParameterSet)
+  const checks = importNotificationType === chedTypes.CHEDPP
+    ? getChedPPChecks(preNotification, complementParameterSet)
+    : getChecks(preNotification)
 
   return {
     id: complementParameterSet.uniqueComplementId,
@@ -66,7 +105,7 @@ const mapCommodity = (
     commodityId: commodityComplement.commodityId,
     commodityDesc,
     weightOrQuantity: data,
-    authorities
+    checks
   }
 }
 
@@ -74,17 +113,10 @@ const mapPreNotification = (preNotification) => {
   const status = chedStatusDescriptions[preNotification.status]
   const open = !closedChedStatuses.includes(preNotification.status)
   const updated = format(new Date(preNotification.updatedSource), DATE_FORMAT)
-  const decision = getDecision(preNotification)
 
-  const { commodityComplements, complementParameterSets } = preNotification.partOne.commodities
-  const { importNotificationType } = preNotification
-
+  const { commodityComplements } = preNotification.partOne.commodities
   const commodities = commodityComplements.map((commodityComplement) =>
-    mapCommodity(
-      commodityComplement,
-      complementParameterSets,
-      importNotificationType
-    )
+    mapCommodity(commodityComplement, preNotification)
   )
 
   const ipaffsUrl = ipaffsUrlTemplate.replace('CHED_REFERENCE', preNotification.referenceNumber)
@@ -94,7 +126,6 @@ const mapPreNotification = (preNotification) => {
     status,
     open,
     updated,
-    decision,
     commodities,
     ipaffsUrl
   }

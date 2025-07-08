@@ -14,6 +14,16 @@ export const chedTypes = {
   CHEDPP: 'CHEDPP'
 }
 
+export const checkStatusToOutcome = {
+  Hold: 'Hold',
+  'To do': 'Hold',
+  'To be inspected': 'Hold',
+  Compliant: 'Compliant',
+  'Auto cleared': 'Compliant',
+  'Not inspected': 'Compliant',
+  'Non compliant': 'Non compliant'
+}
+
 export const decisionCodeDescriptions = {
   C01: 'Customs Freight Simplified Procedures (CFSP)',
   C02: 'No inspection required',
