@@ -94,6 +94,14 @@
     @include govuk-font-size($size: 14);
   }
 
+  .btms-declaration td:nth-child(3) {
+    width: 25%;
+  }
+
+  .btms-notification td:nth-child(3) {
+    width: 30%;
+  }
+
   .govuk-table td:last-child {
     width: 25%;
   }
