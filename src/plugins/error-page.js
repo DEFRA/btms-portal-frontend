@@ -22,6 +22,25 @@ const paragraphs = {
   ]
 }
 
+const getCircularReplacer = () => {
+  const ancestors = []
+  return function (key, value) {
+    if (typeof value !== 'object' || value === null) {
+      return value
+    }
+    // `this` is the object that value is contained in,
+    // i.e., its direct parent.
+    while (ancestors.length > 0 && ancestors.at(-1) !== this) {
+      ancestors.pop()
+    }
+    if (ancestors.includes(value)) {
+      return '[Circular]'
+    }
+    ancestors.push(value)
+    return value
+  }
+}
+
 export const errorPage = {
   name: 'error-page',
   async register (server) {
@@ -36,6 +55,9 @@ export const errorPage = {
 
       if (statusCode >= HTTP_STATUS_INTERNAL_SERVER_ERROR) {
         request.logger.error(response.stack)
+        if (response.data) {
+          request.logger.error(JSON.stringify(response.data, getCircularReplacer()))
+        }
       }
 
       const heading = titles[statusCode] || 'Sorry, there is a problem with this service'
