@@ -27,7 +27,7 @@ test('logged in: defraId', async () => {
       navigation: [
         {
           text: 'Manage account',
-          href: 'https://your-account.cpdev.cui.defra.gov.uk/management'
+          href: '#'
         },
         { text: 'Sign out', href: '/sign-out?provider=defraId' }
       ]
