@@ -43,6 +43,8 @@ test('renders search page', async () => {
 
   expect(document.querySelectorAll('script[nonce]').length)
     .toBe(2)
+  expect(document.title)
+    .toBe('Search by MRN, CHED or DUCR - Border Trade Matching Service')
 })
 
 test('renders search page with error', async () => {

@@ -15,6 +15,9 @@ test('signed out from defraId', async () => {
 
   expect(getByRole(document.body, 'link', { name: 'Sign in' }))
     .toHaveAttribute('href', '/sign-in')
+
+  expect(document.title)
+    .toBe('You are signed out - Border Trade Matching Service')
 })
 
 test('signed out from entraId', async () => {

@@ -217,6 +217,8 @@ test('shows search results', async () => {
 
   expect(document.querySelectorAll('script[nonce]').length)
     .toBe(2)
+  expect(document.title)
+    .toBe('Showing result for 24GB0Z8WEJ9ZBTL73B - Border Trade Matching Service')
 })
 
 test('redirects to search page if no results', async () => {

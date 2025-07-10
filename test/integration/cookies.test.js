@@ -1,17 +1,24 @@
 import { paths } from '../../src/routes/route-constants.js'
+import { getByRole, queryByRole } from '@testing-library/dom'
+import globalJsdom from 'global-jsdom'
 import { constants as httpConstants } from 'http2'
 import { initialiseServer } from '../utils/initialise-server.js'
 
 test('cookies page renders', async () => {
   const server = await initialiseServer()
 
-  const { payload, statusCode } = await server.inject({
+  const { payload } = await server.inject({
     method: 'get',
     url: paths.COOKIES
   })
 
-  expect(statusCode).toBe(httpConstants.HTTP_STATUS_OK)
-  expect(payload).toContain('Essential cookies')
+  globalJsdom(payload)
+
+  getByRole(document.body, 'heading', {
+    name: 'Cookies',
+    level: 1
+  })
+  expect(document.title).toBe('Cookies - Border Trade Matching Service')
 })
 
 test('the cookie banner does not display on the cookies page', async () => {
@@ -22,7 +29,12 @@ test('the cookie banner does not display on the cookies page', async () => {
     url: paths.COOKIES
   })
 
-  expect(payload).not.toContain('Cookies on Border Trade Matching Service')
+  globalJsdom(payload)
+
+  const cookieBanner = queryByRole(document.body, 'region', {
+    name: 'Cookies on Border Trade Matching Service'
+  })
+  expect(cookieBanner).not.toBeInTheDocument()
 })
 
 test('agreeing to accept analytics cookies sets the cookie_policy cookie correctly', async () => {

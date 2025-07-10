@@ -18,8 +18,17 @@
 
 .btms-heading-container {
   display: flex;
-  align-items: baseline;
+  align-items: end;
   gap: 1rem;
+  margin-bottom: govuk-spacing(6);
+
+  .govuk-heading-l {
+    margin-bottom: 0;
+  }
+
+  .govuk-link {
+    margin-bottom: 7px;
+  }
 }
 
 .btms-hidden {
