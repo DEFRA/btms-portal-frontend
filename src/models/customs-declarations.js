@@ -7,8 +7,12 @@ import {
   checkCodeToAuthorityMapping,
   finalStateMappings,
   IUUDocumentReferences,
-  DATE_FORMAT
+  DATE_FORMAT,
+  ILLEGAL_UNREPORTED_UNREGULATED
 } from './model-constants.js'
+
+const isIUU = ({ departmentCode }) =>
+  departmentCode === ILLEGAL_UNREPORTED_UNREGULATED
 
 const hasDesiredPrefix = (decisionCode, desiredPrefix) => {
   return decisionCode?.length && decisionCode.toLowerCase().startsWith(desiredPrefix)
@@ -71,7 +75,6 @@ export const getCustomsDeclarationOpenState = (finalisation) => !(
 
 const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
   const documents = commodity.documents
-    .filter(({ documentCode }) => !IUUDocumentReferences.includes(documentCode))
     .reduce((docs, doc) => {
       const references = docs[doc.documentReference] || []
       docs[doc.documentReference] = [...new Set(references.concat(doc.documentCode))]
@@ -102,10 +105,12 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
     const lastSeven = 7
     const notificationStatus = notificationStatuses[documentReference.slice(-lastSeven)]
 
-    return {
-      id: randomUUID(),
-      documentReference,
-      outcomes: documentCodes.flatMap((documentCode) => {
+    const outcomes = documentCodes
+      .sort((a, b) =>
+        Number(IUUDocumentReferences.includes(a)) -
+        Number(IUUDocumentReferences.includes(b))
+      )
+      .flatMap((documentCode) => {
         const checks = checksWithDecisionCodes.filter(({ checkCode }) =>
           checkCodeToDocumentCodeMapping[checkCode].includes(documentCode)
         )
@@ -115,10 +120,19 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
           decisionDetail: getDecisionDescription(decisionCode, notificationStatus),
           departmentCode: checkCodeToAuthorityMapping[checkCode]
         }))
-      }),
-      match: Boolean(notificationStatus)
+      })
+
+    const hasOnlyIuuOutcome = outcomes.length === 1 &&
+      isIUU(outcomes[0])
+    return {
+      id: randomUUID(),
+      documentReference: hasOnlyIuuOutcome ? null : documentReference,
+      outcomes,
+      match: hasOnlyIuuOutcome ? null : Boolean(notificationStatus)
     }
-  })
+  }).sort(
+    (a, b) => Number(a.outcomes.some(isIUU)) - Number(b.outcomes.some(isIUU))
+  )
 
   return {
     id: randomUUID(),
