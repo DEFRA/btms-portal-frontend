@@ -8,7 +8,7 @@
   "SEARCH_TERM_NOT_FOUND": "This MRN, CHED or DUCR reference cannot be found"
 } %}
 
-{% set pageTitle = "Search" %}
+{% set pageTitle = "Search by MRN, CHED or DUCR" %}
 
 {% set searchHint %}
   {% include "./includes/search-hint.njk" %}
@@ -28,7 +28,7 @@
               id: 'searchError'
             } if isValid == false,
             label: {
-              text: "Search by MRN, CHED or DUCR",
+              text: pageTitle,
               classes: "govuk-label--l",
               isPageHeading: true
             },

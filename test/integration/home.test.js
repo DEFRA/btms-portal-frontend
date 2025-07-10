@@ -19,6 +19,9 @@ test('not authenticated', async () => {
 
   expect(document.querySelectorAll('script[nonce]').length)
     .toBe(1)
+
+  expect(document.title)
+    .toBe('Border Trade Matching Service - Border Trade Matching Service')
 })
 
 test('authenticated', async () => {

@@ -22,6 +22,8 @@ test('400: bad request', async () => {
   getByRole(document.body, 'heading', {
     name: 'Sorry, there is a problem with this service'
   })
+  expect(document.title)
+    .toBe('Sorry, there is a problem with this service - Border Trade Matching Service')
 })
 
 test('401: unauthorized', async () => {
@@ -43,6 +45,8 @@ test('401: unauthorized', async () => {
   getByRole(document.body, 'heading', {
     name: 'Sign in'
   })
+  expect(document.title)
+    .toBe('Sign in - Border Trade Matching Service')
 })
 
 test('403: forbidden', async () => {
@@ -64,6 +68,8 @@ test('403: forbidden', async () => {
   getByRole(document.body, 'heading', {
     name: 'You do not have the correct permissions to access this service'
   })
+  expect(document.title)
+    .toBe('You do not have the correct permissions to access this service - Border Trade Matching Service')
 })
 
 test('404: not found', async () => {
@@ -79,6 +85,8 @@ test('404: not found', async () => {
   getByRole(document.body, 'heading', {
     name: 'Page not found'
   })
+  expect(document.title)
+    .toBe('Page not found - Border Trade Matching Service')
 })
 
 test('500: internal server error', async () => {
@@ -100,6 +108,8 @@ test('500: internal server error', async () => {
   getByRole(document.body, 'heading', {
     name: 'Sorry, there is a problem with this service'
   })
+  expect(document.title)
+    .toBe('Sorry, there is a problem with this service - Border Trade Matching Service')
 })
 
 test('502: bad gateway', async () => {
@@ -121,4 +131,6 @@ test('502: bad gateway', async () => {
   getByRole(document.body, 'heading', {
     name: 'Sorry, there is a problem with this service'
   })
+  expect(document.title)
+    .toBe('Sorry, there is a problem with this service - Border Trade Matching Service')
 })

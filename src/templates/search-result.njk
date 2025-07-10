@@ -1,14 +1,15 @@
 {% extends 'layout.njk' %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 
-{% set pageTitle = "Search result" %}
+{% set pageTitle = "Showing result for " ~ searchTerm %}
 
 {% block content %}
   <div class="govuk-grid-row btms-search-results">
     <div class="govuk-grid-column-full">
-      <span class="govuk-caption-l">Showing results for</span>
       <div class="btms-heading-container">
-        <h1 class="govuk-heading-l">{{ searchTerm }}</h1>
+        <h1 class="govuk-heading-l">
+          <span class="govuk-caption-l">Showing result for</span>{{ searchTerm }}
+        </h1>
         <a class="govuk-link govuk-link--no-visited-state" href="/search">Search again</a>
       </div>
       <h2 class="govuk-heading-m">Customs declaration details</h1>
