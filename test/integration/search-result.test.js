@@ -290,7 +290,7 @@ test('redirects to search page for incorrect search', async () => {
   expect(headers.location).toBe(paths.SEARCH)
 })
 
-test('rejects non authorised requests', async () => {
+test('redirect non authorised requests', async () => {
   wreck.get
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
@@ -302,7 +302,7 @@ test('rejects non authorised requests', async () => {
     url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73Y`
   })
 
-  expect(statusCode).toBe(401)
+  expect(statusCode).toBe(302)
 })
 
 test('handles upstream errors', async () => {

@@ -26,7 +26,7 @@ test('400: bad request', async () => {
     .toBe('Sorry, there is a problem with this service - Border Trade Matching Service')
 })
 
-test('401: unauthorized', async () => {
+test('401: unauthorized should redirect to /signed-out', async () => {
   const server = await initialiseServer()
   server.route({
     method: 'get',
@@ -34,19 +34,13 @@ test('401: unauthorized', async () => {
     handler: (_request, h) => boom.unauthorized()
   })
 
-  const { payload, statusCode } = await server.inject({
+  const { headers, statusCode } = await server.inject({
     method: 'get',
     url: '/simulate-unauthorized-error'
   })
 
-  globalJsdom(payload)
-
-  expect(statusCode).toBe(401)
-  getByRole(document.body, 'heading', {
-    name: 'Sign in'
-  })
-  expect(document.title)
-    .toBe('Sign in - Border Trade Matching Service')
+  expect(statusCode).toBe(302)
+  expect(headers.location).toContain('/signed-out')
 })
 
 test('403: forbidden', async () => {
