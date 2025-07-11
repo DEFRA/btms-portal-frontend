@@ -1,23 +1,25 @@
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 
-<form id="notification-filters" class="btms-filters" hidden>
-  {{
-    govukSelect({
-      id: "chedAuthority",
-      name: "chedAuthority",
-      label: { text: "Authority" },
-      items: [
-        { text: 'Show all', value: '', selected: true },
-        { text: "APHA", value: "APHA" },
-        { text: "FNAO", value: "FNAO" },
-        { text: "HMI", value: "HMI" },
-        { text: "IUU", value: "IUU" },
-        { text: "PHSI", value: "PHSI" },
-        { text: "POAO", value: "POAO" }
-      ]
-    })
-  }}
-  <div id="notification-reset" class="btms-clear-filters" hidden>
-    {% include "./button-reset.njk" %}
-  </div>
-</form>
+<div id="notification-filters-wrapper" hidden>
+  <form id="notification-filters" class="btms-filters">
+    {{
+      govukSelect({
+        id: "chedAuthority",
+        name: "chedAuthority",
+        label: { text: "Authority" },
+        items: [
+          { text: 'Show all', value: '', selected: true },
+          { text: "APHA", value: "APHA" },
+          { text: "FNAO", value: "FNAO" },
+          { text: "HMI", value: "HMI" },
+          { text: "IUU", value: "IUU" },
+          { text: "PHSI", value: "PHSI" },
+          { text: "POAO", value: "POAO" }
+        ]
+      })
+    }}
+    <div id="notification-reset" class="btms-clear-filters" hidden>
+      {% include "./button-reset.njk" %}
+    </div>
+  </form>
+</div>
