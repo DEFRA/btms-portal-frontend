@@ -14,13 +14,15 @@ test('MRN, open, finalised, using netMass, matched', () => {
           itemNumber: 1,
           netMass: '9999',
           documents: [{
-            documentCode: 'C678',
-            documentReference: 'GBCHD2025.1234567'
-          }, {
             documentCode: 'C641',
             documentReference: 'IGNORED IUUD DOCUMENT'
+          }, {
+            documentCode: 'C678',
+            documentReference: 'GBCHD2025.1234567'
           }],
           checks: [{
+            checkCode: 'H224'
+          }, {
             checkCode: 'H223'
           }]
         }]
@@ -29,6 +31,9 @@ test('MRN, open, finalised, using netMass, matched', () => {
         items: [{
           itemNumber: 1,
           checks: [{
+            decisionCode: 'C07',
+            checkCode: 'H224'
+          }, {
             decisionCode: 'C03',
             checkCode: 'H223'
           }]
@@ -63,11 +68,24 @@ test('MRN, open, finalised, using netMass, matched', () => {
             decisionDetail: 'Inspection complete',
             departmentCode: 'FNAO'
           }]
+        }, {
+          id: expect.any(String),
+          documentReference: null,
+          match: null,
+          outcomes: [{
+            decision: 'Release',
+            decisionDetail: 'IUU inspection complete',
+            departmentCode: 'IUU'
+          }]
         }],
         documents: {
-          'GBCHD2025.1234567': ['C678']
+          'GBCHD2025.1234567': ['C678'],
+          'IGNORED IUUD DOCUMENT': ['C641']
         },
-        checks: [{ checkCode: 'H223' }],
+        checks: [
+          { checkCode: 'H224' },
+          { checkCode: 'H223' }
+        ],
         itemNumber: 1,
         netMass: '9999',
         weightOrQuantity: '9999'
@@ -96,10 +114,16 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
             documentCode: 'N851',
             documentReference: 'GBCHD2025.1234567'
           }, {
+            documentCode: '9115',
+            documentReference: 'GBCHD2025.1234567'
+          }, {
             documentCode: 'C641',
             documentReference: 'IGNORED IUUD DOCUMENT'
           }],
-          checks: [{ checkCode: 'H219' }]
+          checks: [
+            { checkCode: 'H224' },
+            { checkCode: 'H219' }
+          ]
         }],
         finalisation: {
           isManualRelease: true
@@ -124,17 +148,34 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
           id: expect.any(String),
           documentReference: 'GBCHD2025.1234567',
           match: false,
+          outcomes: [{
+            decision: '',
+            decisionDetail: undefined,
+            departmentCode: 'PHSI'
+          }, {
+            decision: '',
+            decisionDetail: undefined,
+            departmentCode: 'PHSI'
+          }]
+        }, {
+          id: expect.any(String),
+          documentReference: null,
+          match: null,
           outcomes: [
             {
               decision: '',
               decisionDetail: undefined,
-              departmentCode: 'PHSI'
+              departmentCode: 'IUU'
             }]
         }],
         documents: {
-          'GBCHD2025.1234567': ['N851']
+          'GBCHD2025.1234567': ['N851', '9115'],
+          'IGNORED IUUD DOCUMENT': ['C641']
         },
-        checks: [{ checkCode: 'H219' }],
+        checks: [
+          { checkCode: 'H224' },
+          { checkCode: 'H219' }
+        ],
         itemNumber: 1,
         supplementaryUnits: '12',
         weightOrQuantity: '12'

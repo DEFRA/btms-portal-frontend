@@ -1,9 +1,10 @@
 {% from "govuk/components/tag/macro.njk" import govukTag %}
 
 {% macro decisionMatch(match) %}
-  {% if match %}
+  {% if match === true %}
     {{ govukTag({ text: "Yes", classes: "govuk-tag--green" }) }}
-  {% else %}
+  {% endif %}
+  {% if match === false %}
     {{ govukTag({ text: "No", classes: "govuk-tag--red" }) }}
   {% endif %}
 {% endmacro %}
