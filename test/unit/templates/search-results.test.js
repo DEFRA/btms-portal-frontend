@@ -69,8 +69,8 @@ describe('Search Results', () => {
 
       $renderedTemplate = renderTemplate('search-result.njk', viewContext)
 
-      expect($renderedTemplate.html()).toContain('A long MRN description t...')
-      expect($renderedTemplate.html()).toContain('A long CHED description that should be truncated a...')
+      expect($renderedTemplate.html()).toContain('A long MRN description t…')
+      expect($renderedTemplate.html()).toContain('A long CHED description that should be truncated a…')
       expect($renderedTemplate.html()).toContain('<div role="tooltip" id="tooltip-2">A long MRN description that should be truncated and displayed in full inside a tooltip</div>')
       expect($renderedTemplate.html()).toContain('<div role="tooltip" id="tooltip-1">A long CHED description that should be truncated and displayed in full inside a tooltip</div>')
     })
