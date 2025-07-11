@@ -2,7 +2,7 @@
   {% if description | length > maxLength %}
     {% set id = 'tooltip-' + id %}
     <div aria-describedby="{{ id }}">
-      {{ description | truncate(maxLength, true) }}
+      {{ description | truncate(maxLength, true, '…') }}
       <div role="tooltip" id="{{ id }}">{{ description }}</div>
     </div>
   {% else %}

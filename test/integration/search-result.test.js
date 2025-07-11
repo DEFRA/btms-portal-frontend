@@ -176,7 +176,7 @@ test('shows search results', async () => {
   await user.selectOptions(declarationMatchFilter, '')
 
   const declarationRow2 = getByRole(declaration, 'row', {
-    name: '2 0304720000 FROZEN MSC HADDOCK FILLE... FROZEN MSC HADDOCK FILLETS 4618.35 CHEDP.GB.2025.0000002 Yes Hold - Awaiting decision (POAO)'
+    name: '2 0304720000 FROZEN MSC HADDOCK FILLE… FROZEN MSC HADDOCK FILLETS 4618.35 CHEDP.GB.2025.0000002 Yes Hold - Awaiting decision (POAO)'
   })
   const declarationDecisionFilter = getByRole(document.body, 'combobox', { name: 'Decision' })
   await user.selectOptions(declarationDecisionFilter, 'Release')
