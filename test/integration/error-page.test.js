@@ -2,7 +2,6 @@ import boom from '@hapi/boom'
 import globalJsdom from 'global-jsdom'
 import { getByRole } from '@testing-library/dom'
 import { initialiseServer } from '../utils/initialise-server.js'
-import { paths as PATHS } from '../../src/routes/route-constants.js'
 
 test('400: bad request', async () => {
   const server = await initialiseServer()
@@ -35,15 +34,13 @@ test('401: unauthorized should redirect to /signed-out', async () => {
     handler: (_request, h) => boom.unauthorized()
   })
 
-  const { headers, payload, statusCode } = await server.inject({
+  const { headers, statusCode } = await server.inject({
     method: 'get',
     url: '/simulate-unauthorized-error'
   })
 
-  globalJsdom(payload)
-
   expect(statusCode).toBe(302)
-  expect(headers.location).toContain(PATHS.SIGNED_OUT)
+  expect(headers.location).toContain('/signed-out')
 })
 
 test('403: forbidden', async () => {
