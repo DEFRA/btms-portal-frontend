@@ -8,13 +8,11 @@ const {
 } = constants
 
 const titles = {
-  [HTTP_STATUS_UNAUTHORIZED]: 'Sign in',
   [HTTP_STATUS_FORBIDDEN]: 'You do not have the correct permissions to access this service',
   [HTTP_STATUS_NOT_FOUND]: 'Page not found'
 }
 
 const paragraphs = {
-  [HTTP_STATUS_UNAUTHORIZED]: ['You need to sign in to this service.'],
   [HTTP_STATUS_FORBIDDEN]: ['Contact your organisation’s administrator if you need access.'],
   [HTTP_STATUS_NOT_FOUND]: [
     'If you typed the web address, check it is correct.',
@@ -52,6 +50,10 @@ export const errorPage = {
       }
 
       const { statusCode } = response.output
+
+      if (statusCode === HTTP_STATUS_UNAUTHORIZED) {
+        return h.redirect('/signed-out')
+      }
 
       if (statusCode >= HTTP_STATUS_INTERNAL_SERVER_ERROR) {
         request.logger.error(response.stack)

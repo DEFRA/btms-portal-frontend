@@ -89,7 +89,7 @@ test('renders search page with error', async () => {
     .toBe(null)
 })
 
-test('rejects non authorised requests', async () => {
+test('redirect non authorised requests', async () => {
   const server = await initialiseServer()
 
   const { statusCode } = await server.inject({
@@ -97,5 +97,5 @@ test('rejects non authorised requests', async () => {
     url: paths.SEARCH
   })
 
-  expect(statusCode).toBe(401)
+  expect(statusCode).toBe(302)
 })
