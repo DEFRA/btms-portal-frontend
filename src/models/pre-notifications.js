@@ -105,8 +105,11 @@ const getChedPPChecks = (preNotification, complementParameterSet) => {
 const mapCommodity = (commodityComplement, preNotification) => {
   const { complementParameterSets } = preNotification.partOne.commodities
   const { importNotificationType } = preNotification
-  const complementParameterSet = complementParameterSets
-    .find(({ complementId }) => complementId === commodityComplement.complementId)
+  const complementParameterSet = complementParameterSets.find(
+    ({ complementId, speciesId }) =>
+      complementId === commodityComplement.complementId &&
+      speciesId === commodityComplement.speciesId
+  )
 
   const commodityDesc = commodityComplement.speciesName ||
     commodityComplement.commodityDescription ||
