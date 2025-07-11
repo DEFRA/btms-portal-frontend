@@ -1,6 +1,11 @@
 import globalJsdom from 'global-jsdom'
 import userEvent from '@testing-library/user-event'
-import { getByRole, getByText, fireEvent, queryByRole } from '@testing-library/dom'
+import {
+  getByRole,
+  getByText,
+  fireEvent,
+  queryByRole
+} from '@testing-library/dom'
 import { initialiseServer } from '../utils/initialise-server.js'
 import { setupAuthedUserSession } from '../unit/utils/session-helper.js'
 import { paths } from '../../src/routes/route-constants.js'
@@ -23,28 +28,25 @@ test('renders search page', async () => {
   globalJsdom(payload)
   initSearch()
 
-  const searchBox = getByRole(document.body, 'textbox', { name: 'Search by MRN, CHED or DUCR' })
-  expect(searchBox)
-    .not.toHaveClass('govuk-input--error')
+  const searchBox = getByRole(document.body, 'textbox', {
+    name: 'Search by MRN, CHED or DUCR'
+  })
+  expect(searchBox).not.toHaveClass('govuk-input--error')
 
-  expect(queryByRole(document.body, 'button', { name: 'Clear' }))
-    .toBe(null)
+  expect(queryByRole(document.body, 'button', { name: 'Clear' })).toBe(null)
 
   fireEvent.keyUp(searchBox, { target: { value: 'test search' } })
-  expect(searchBox)
-    .toHaveValue('test search')
+  expect(searchBox).toHaveValue('test search')
 
   const resetButton = getByRole(document.body, 'button', { name: 'Clear' })
   await user.click(resetButton)
-  expect(searchBox)
-    .toHaveValue('')
-  expect(queryByRole(document.body, 'button', { name: 'Clear' }))
-    .toBe(null)
+  expect(searchBox).toHaveValue('')
+  expect(queryByRole(document.body, 'button', { name: 'Clear' })).toBe(null)
 
-  expect(document.querySelectorAll('script[nonce]').length)
-    .toBe(2)
-  expect(document.title)
-    .toBe('Search by MRN, CHED or DUCR - Border Trade Matching Service')
+  expect(document.querySelectorAll('script[nonce]').length).toBe(2)
+  expect(document.title).toBe(
+    'Search by MRN, CHED or DUCR - Border Trade Matching Service'
+  )
 })
 
 test('renders search page with error', async () => {
@@ -73,20 +75,21 @@ test('renders search page with error', async () => {
   globalJsdom(payload)
   initSearch()
 
-  const searchBox = getByRole(document.body, 'textbox', { name: 'Search by MRN, CHED or DUCR' })
-  expect(searchBox)
-    .toHaveClass('govuk-input--error')
-  expect(searchBox)
-    .toHaveValue('test search')
-  expect(getByText(document.body, 'You must enter a valid MRN, CHED or DUC', { exact: false }))
-    .toBeInTheDocument()
+  const searchBox = getByRole(document.body, 'textbox', {
+    name: 'Search by MRN, CHED or DUCR'
+  })
+  expect(searchBox).toHaveClass('govuk-input--error')
+  expect(searchBox).toHaveValue('test search')
+  expect(
+    getByText(document.body, 'You must enter a valid MRN, CHED or DUC', {
+      exact: false
+    })
+  ).toBeInTheDocument()
 
   const resetButton = getByRole(document.body, 'button', { name: 'Clear' })
   await user.click(resetButton)
-  expect(searchBox)
-    .toHaveValue('')
-  expect(queryByRole(document.body, 'button', { name: 'Clear' }))
-    .toBe(null)
+  expect(searchBox).toHaveValue('')
+  expect(queryByRole(document.body, 'button', { name: 'Clear' })).toBe(null)
 })
 
 test('redirect non authorised requests', async () => {

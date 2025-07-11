@@ -24,7 +24,7 @@ Object.entries(filters).forEach(([name, filter]) => {
  * @param {object} params
  * @param {string} [callBlock]
  */
-export function renderMacro (componentName, params, callBlock) {
+export function renderMacro(componentName, params, callBlock) {
   const macroPath = `common/${componentName}/macro.njk`
   const macroName = `app${
     componentName.charAt(0).toUpperCase() + componentName.slice(1)

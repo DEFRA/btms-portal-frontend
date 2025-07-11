@@ -23,8 +23,4 @@ const CACHE_CONTROL_NO_STORE = {
   otherwise: 'no-store'
 }
 
-export {
-  paths,
-  queryStringParams,
-  CACHE_CONTROL_NO_STORE
-}
+export { paths, queryStringParams, CACHE_CONTROL_NO_STORE }

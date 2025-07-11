@@ -14,14 +14,16 @@ test('not authenticated', async () => {
 
   globalJsdom(payload)
 
-  expect(getByRole(document.body, 'link', { name: 'Sign in' }))
-    .toHaveAttribute('href', '/sign-in')
+  expect(getByRole(document.body, 'link', { name: 'Sign in' })).toHaveAttribute(
+    'href',
+    '/sign-in'
+  )
 
-  expect(document.querySelectorAll('script[nonce]').length)
-    .toBe(1)
+  expect(document.querySelectorAll('script[nonce]').length).toBe(1)
 
-  expect(document.title)
-    .toBe('Border Trade Matching Service - Border Trade Matching Service')
+  expect(document.title).toBe(
+    'Border Trade Matching Service - Border Trade Matching Service'
+  )
 })
 
 test('authenticated', async () => {
@@ -37,6 +39,5 @@ test('authenticated', async () => {
     }
   })
 
-  expect(headers.location)
-    .toBe('/search')
+  expect(headers.location).toBe('/search')
 })

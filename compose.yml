@@ -1,5 +1,4 @@
 services:
-
   localstack:
     image: localstack/localstack:3.0.2
     ports:
@@ -41,7 +40,7 @@ services:
       - mongodb-data:/data
     restart: always
 
-################################################################################
+  ################################################################################
 
   btms-portal-frontend:
     build:

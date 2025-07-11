@@ -39,7 +39,7 @@ export const vision = {
          * @param {{ environment: typeof nunjucksEnvironment }} options
          * @returns {(options: ReturnType<Awaited<typeof context>>) => string}
          */
-        compile (src, options) {
+        compile(src, options) {
           const template = nunjucks.compile(src, options.environment)
           return (ctx) => template.render(ctx)
         }

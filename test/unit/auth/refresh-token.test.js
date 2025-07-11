@@ -26,7 +26,8 @@ describe('#refreshToken', () => {
       const authedUser = createAuthedUser()
       const clientId = authConfig.defraId.clientId
       const clientSecret = authConfig.defraId.clientSecret
-      const redirectUri = config.get(configKeys.APP_BASE_URL) + paths.AUTH_DEFRA_ID_CALLBACK
+      const redirectUri =
+        config.get(configKeys.APP_BASE_URL) + paths.AUTH_DEFRA_ID_CALLBACK
 
       getUserSession.mockReturnValue(authedUser)
 
@@ -39,14 +40,17 @@ describe('#refreshToken', () => {
       await refreshAccessToken(request)
 
       expect(mockGetOpenIdRefreshToken).toHaveBeenCalledTimes(1)
-      expect(mockGetOpenIdRefreshToken).toHaveBeenCalledWith(authedUser.tokenUrl, expect.objectContaining({
-        client_id: clientId,
-        client_secret: clientSecret,
-        grant_type: 'refresh_token',
-        refresh_token: authedUser.refreshToken,
-        scope: 'openid offline_access',
-        redirect_uri: redirectUri
-      }))
+      expect(mockGetOpenIdRefreshToken).toHaveBeenCalledWith(
+        authedUser.tokenUrl,
+        expect.objectContaining({
+          client_id: clientId,
+          client_secret: clientSecret,
+          grant_type: 'refresh_token',
+          refresh_token: authedUser.refreshToken,
+          scope: 'openid offline_access',
+          redirect_uri: redirectUri
+        })
+      )
     })
   })
 })

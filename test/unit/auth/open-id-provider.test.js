@@ -24,7 +24,8 @@ test.each([
   { credentials: { token: null } }
 ])('credentials do not exist', async (credentials) => {
   expect(provider.profile(credentials, {}, {})).rejects.toThrow(
-    'defraId Auth Access Token not present. Unable to retrieve profile.')
+    'defraId Auth Access Token not present. Unable to retrieve profile.'
+  )
 })
 
 test('credentials exist', async () => {
@@ -95,19 +96,23 @@ test('credentials exist', async () => {
 test('DefraId organisation not allowed', () => {
   config.set('auth.defraId.organisations', ['allowed-org'])
 
-  const token = jwt.token.generate({
-    currentRelationshipId: 'rel-1',
-    relationships: ['rel1:forbidden-org']
-  }, {
-    key: 'test',
-    algorithm: 'HS256'
-  })
+  const token = jwt.token.generate(
+    {
+      currentRelationshipId: 'rel-1',
+      relationships: ['rel1:forbidden-org']
+    },
+    {
+      key: 'test',
+      algorithm: 'HS256'
+    }
+  )
 
   const credentials = {
     provider: 'defraId',
     token
   }
 
-  expect(async () => provider.profile(credentials, {}, {}))
-    .rejects.toThrow('organisation not allowed')
+  expect(async () => provider.profile(credentials, {}, {})).rejects.toThrow(
+    'organisation not allowed'
+  )
 })

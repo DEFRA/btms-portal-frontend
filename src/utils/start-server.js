@@ -3,7 +3,7 @@ import { config } from '../config/config.js'
 import { createServer } from '../server.js'
 import { createLogger } from './logger.js'
 
-export async function startServer () {
+export async function startServer() {
   let server
 
   try {

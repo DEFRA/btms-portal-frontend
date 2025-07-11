@@ -1,6 +1,6 @@
 import { createServer } from '../../src/server'
 
-export async function initialiseServer (state) {
+export async function initialiseServer(state) {
   const server = await createServer()
 
   if (state) {

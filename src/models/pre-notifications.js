@@ -18,11 +18,10 @@ const ipaffsUrlTemplate = config.get('ipaffs.urlTemplate')
 
 const isCatchCertificateRequired = (keyDataPair) =>
   Boolean(
-    keyDataPair
-      .find(({ key, data }) =>
-        key === 'is_catch_certificate_required' &&
-        data === 'true'
-      )
+    keyDataPair.find(
+      ({ key, data }) =>
+        key === 'is_catch_certificate_required' && data === 'true'
+    )
   )
 
 const getChecks = (preNotification, complementParameterSet) => {
@@ -37,10 +36,9 @@ const getChecks = (preNotification, complementParameterSet) => {
       preNotification.partTwo?.decision?.decision) ||
     'Decision not given'
 
-  const needsCatchCertificate = (
+  const needsCatchCertificate =
     preNotification.importNotificationType === chedTypes.CHEDP &&
     isCatchCertificateRequired(complementParameterSet.keyDataPair)
-  )
 
   const authority = authorities[preNotification.importNotificationType]
 
@@ -53,24 +51,28 @@ const getChecks = (preNotification, complementParameterSet) => {
 }
 
 const getChedPPChecks = (preNotification, complementParameterSet) => {
-  const { data } = complementParameterSet.keyDataPair
-    .find(({ key }) => key === 'regulatory_authority')
+  const { data } = complementParameterSet.keyDataPair.find(
+    ({ key }) => key === 'regulatory_authority'
+  )
 
-  const authorities = data === 'JOINT'
-    ? [
-        PLANT_HEALTH_SEEDS_INSPECTORATE,
-        HORTICULTURAL_MARKETING_INSPECTORATE
-      ]
-    : [data]
+  const authorities =
+    data === 'JOINT'
+      ? [PLANT_HEALTH_SEEDS_INSPECTORATE, HORTICULTURAL_MARKETING_INSPECTORATE]
+      : [data]
 
-  const { commodityChecks, phsiAutoCleared, hmiAutoCleared } = preNotification.partTwo
+  const { commodityChecks, phsiAutoCleared, hmiAutoCleared } =
+    preNotification.partTwo
 
   const commodityCheck = commodityChecks?.find(({ uniqueComplementId }) => {
     return uniqueComplementId === complementParameterSet.uniqueComplementId
   })
 
   return authorities.map((authority) => {
-    if (!['VALIDATED', 'REJECTED', 'PARTIALLY_REJECTED'].includes(preNotification.status)) {
+    if (
+      !['VALIDATED', 'REJECTED', 'PARTIALLY_REJECTED'].includes(
+        preNotification.status
+      )
+    ) {
       return { authority, decision: 'Decision not given' }
     }
 
@@ -111,16 +113,19 @@ const mapCommodity = (commodityComplement, preNotification) => {
       speciesId === commodityComplement.speciesId
   )
 
-  const commodityDesc = commodityComplement.speciesName ||
+  const commodityDesc =
+    commodityComplement.speciesName ||
     commodityComplement.commodityDescription ||
     commodityComplement.complementName
 
-  const { data } = complementParameterSet.keyDataPair
-    .find(({ key }) => key === 'number_animal' || key === 'netweight')
+  const { data } = complementParameterSet.keyDataPair.find(
+    ({ key }) => key === 'number_animal' || key === 'netweight'
+  )
 
-  const checks = importNotificationType === chedTypes.CHEDPP
-    ? getChedPPChecks(preNotification, complementParameterSet)
-    : getChecks(preNotification, complementParameterSet)
+  const checks =
+    importNotificationType === chedTypes.CHEDPP
+      ? getChedPPChecks(preNotification, complementParameterSet)
+      : getChecks(preNotification, complementParameterSet)
 
   return {
     id: complementParameterSet.uniqueComplementId,
@@ -142,7 +147,10 @@ const mapPreNotification = (preNotification) => {
     mapCommodity(commodityComplement, preNotification)
   )
 
-  const ipaffsUrl = ipaffsUrlTemplate.replace('CHED_REFERENCE', preNotification.referenceNumber)
+  const ipaffsUrl = ipaffsUrlTemplate.replace(
+    'CHED_REFERENCE',
+    preNotification.referenceNumber
+  )
 
   return {
     referenceNumber: preNotification.referenceNumber,
@@ -154,5 +162,7 @@ const mapPreNotification = (preNotification) => {
   }
 }
 
-export const mapPreNotifications = ({ importPreNotifications }) => importPreNotifications
-  .map(({ importPreNotification }) => mapPreNotification(importPreNotification))
+export const mapPreNotifications = ({ importPreNotifications }) =>
+  importPreNotifications.map(({ importPreNotification }) =>
+    mapPreNotification(importPreNotification)
+  )

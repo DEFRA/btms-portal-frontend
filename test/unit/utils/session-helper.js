@@ -34,7 +34,7 @@ export const createRefreshedToken = (sessionId) => {
   return createDummyToken(authedUserProfile, sessionConfig.cache.ttl / 1000)
 }
 
-function createDummyToken (authedUserProfile, ttl) {
+function createDummyToken(authedUserProfile, ttl) {
   return jwt.token.generate(
     {
       ...authedUserProfile,
@@ -53,7 +53,7 @@ function createDummyToken (authedUserProfile, ttl) {
   )
 }
 
-function createUserProfile (sessionId) {
+function createUserProfile(sessionId) {
   const expiresInSeconds = sessionConfig.cache.ttl / 1000
   const expiresInMilliSeconds = sessionConfig.cache.ttl
   const expiresAt = addSeconds(new Date(), expiresInSeconds)

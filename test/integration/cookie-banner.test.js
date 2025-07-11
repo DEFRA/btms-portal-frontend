@@ -23,7 +23,9 @@ test('when cookie_policy cookie is garbled, the cookie is deleted', async () => 
     url: paths.LANDING
   })
 
-  const cookiePolicyRemoval = request.response.headers['set-cookie'].find(c => c.startsWith('cookie_policy'))
+  const cookiePolicyRemoval = request.response.headers['set-cookie'].find((c) =>
+    c.startsWith('cookie_policy')
+  )
 
   expect(cookiePolicyRemoval).toContain('Max-Age=0')
 })
@@ -33,7 +35,8 @@ test('when cookie policy has been accepted, the cookie banner is not visible', a
 
   const { payload } = await server.inject({
     headers: {
-      Cookie: 'cookie_policy=' + Buffer.from('{"analytics":true}').toString('base64')
+      Cookie:
+        'cookie_policy=' + Buffer.from('{"analytics":true}').toString('base64')
     },
     method: 'get',
     url: paths.LANDING
@@ -92,7 +95,8 @@ test('when the user has accepted cookies, after redirecting they are shown a con
 
   const { payload } = await server.inject({
     headers: {
-      Cookie: 'cookie_policy=' + Buffer.from('{"analytics":true}').toString('base64')
+      Cookie:
+        'cookie_policy=' + Buffer.from('{"analytics":true}').toString('base64')
     },
     method: 'get',
     url: `${paths.LANDING}?cookieBannerConfirmation=true`
@@ -106,7 +110,8 @@ test('when the user has rejected cookies, after redirecting they are shown a con
 
   const { payload } = await server.inject({
     headers: {
-      Cookie: 'cookie_policy=' + Buffer.from('{"analytics":true}').toString('base64')
+      Cookie:
+        'cookie_policy=' + Buffer.from('{"analytics":true}').toString('base64')
     },
     method: 'get',
     url: `${paths.LANDING}?cookieBannerConfirmation=true`

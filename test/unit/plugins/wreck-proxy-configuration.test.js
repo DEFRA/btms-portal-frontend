@@ -24,10 +24,17 @@ describe('#wreckProxyConfiguration', () => {
 
       expect(Wreck.agents).toEqual(
         expect.objectContaining({
-          https: expect.objectContaining({ connectOpts: expect.objectContaining({ host: 'some-proxy' }) }),
-          http: expect.objectContaining({ connectOpts: expect.objectContaining({ host: 'some-proxy' }) }),
-          httpsAllowUnauthorized: expect.objectContaining({ connectOpts: expect.objectContaining({ host: 'some-proxy' }) })
-        }))
+          https: expect.objectContaining({
+            connectOpts: expect.objectContaining({ host: 'some-proxy' })
+          }),
+          http: expect.objectContaining({
+            connectOpts: expect.objectContaining({ host: 'some-proxy' })
+          }),
+          httpsAllowUnauthorized: expect.objectContaining({
+            connectOpts: expect.objectContaining({ host: 'some-proxy' })
+          })
+        })
+      )
     })
   })
 
@@ -39,10 +46,15 @@ describe('#wreckProxyConfiguration', () => {
 
       expect(Wreck.agents).toEqual(
         expect.objectContaining({
-          https: expect.not.objectContaining({ connectOpts: expect.anything() }),
+          https: expect.not.objectContaining({
+            connectOpts: expect.anything()
+          }),
           http: expect.not.objectContaining({ connectOpts: expect.anything() }),
-          httpsAllowUnauthorized: expect.not.objectContaining({ connectOpts: expect.anything() })
-        }))
+          httpsAllowUnauthorized: expect.not.objectContaining({
+            connectOpts: expect.anything()
+          })
+        })
+      )
     })
   })
 })

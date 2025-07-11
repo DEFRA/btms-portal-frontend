@@ -4,7 +4,7 @@ import { HttpsProxyAgent } from 'https-proxy-agent'
 
 const wreckProxyConfiguration = {
   name: 'wreck-proxy-configuration',
-  async register () {
+  async register() {
     const proxyUrl = config.get('httpsProxy') ?? config.get('httpProxy')
 
     if (proxyUrl) {

@@ -70,8 +70,8 @@ const selects = (state) => {
 }
 
 const setEmptyState = (table, type) => {
-  const hasVisibleRows = table
-    .querySelectorAll('tbody > tr:not([hidden])').length > 0
+  const hasVisibleRows =
+    table.querySelectorAll('tbody > tr:not([hidden])').length > 0
   const header = table.querySelector('thead')
 
   if (!hasVisibleRows && header.hidden === false) {
@@ -90,18 +90,17 @@ const setRow = (state, type, row) => {
   const listItems = [...decisionsList.querySelectorAll('li')]
 
   listItems.forEach((li) => {
-    li.hidden = filterTypes[type].list.some((key) =>
-      state[key] && li.dataset[key] !== state[key]
+    li.hidden = filterTypes[type].list.some(
+      (key) => state[key] && li.dataset[key] !== state[key]
     )
   })
 
-  const rowHidden = filterTypes[type].row.some((key) =>
-    state[key] && row.dataset[key] !== state[key]
+  const rowHidden = filterTypes[type].row.some(
+    (key) => state[key] && row.dataset[key] !== state[key]
   )
 
   row.hidden = Boolean(
-    decisionsList.querySelectorAll('li:not([hidden])').length === 0 ||
-    rowHidden
+    decisionsList.querySelectorAll('li:not([hidden])').length === 0 || rowHidden
   )
 }
 
