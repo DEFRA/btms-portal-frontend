@@ -18,7 +18,10 @@ test('CHEDP: uses netweight, open state, decision given', () => {
             complementParameterSets: [{
               uniqueComplementId: '5fccbd6d-c943-4d2c-8a6f-1144fcb77cf3',
               complementId: '1',
-              keyDataPair: [{ key: 'netweight', data: '2000' }]
+              keyDataPair: [
+                { key: 'netweight', data: '2000' },
+                { key: 'is_catch_certificate_required', data: 'true' }
+              ]
             }]
           }
         },
@@ -43,6 +46,9 @@ test('CHEDP: uses netweight, open state, decision given', () => {
         weightOrQuantity: '2000',
         checks: [{
           authority: 'POAO',
+          decision: 'Acceptable for internal market'
+        }, {
+          authority: 'IUU',
           decision: 'Acceptable for internal market'
         }]
       }

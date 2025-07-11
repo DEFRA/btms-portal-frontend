@@ -2,6 +2,7 @@ import { format } from 'date-fns'
 import {
   ANIMAL_PLANT_HEALTH_AGENCY,
   FOODS_NOT_ANIMAL_ORIGIN,
+  ILLEGAL_UNREPORTED_UNREGULATED,
   PRODUCTS_OF_ANIMAL_ORIGIN,
   PLANT_HEALTH_SEEDS_INSPECTORATE,
   HORTICULTURAL_MARKETING_INSPECTORATE,
@@ -15,7 +16,16 @@ import { config } from '../config/config.js'
 
 const ipaffsUrlTemplate = config.get('ipaffs.urlTemplate')
 
-const getChecks = (preNotification) => {
+const isCatchCertificateRequired = (keyDataPair) =>
+  Boolean(
+    keyDataPair
+      .find(({ key, data }) =>
+        key === 'is_catch_certificate_required' &&
+        data === 'true'
+      )
+  )
+
+const getChecks = (preNotification, complementParameterSet) => {
   const authorities = {
     [chedTypes.CHEDA]: ANIMAL_PLANT_HEALTH_AGENCY,
     [chedTypes.CHEDD]: FOODS_NOT_ANIMAL_ORIGIN,
@@ -27,9 +37,19 @@ const getChecks = (preNotification) => {
       preNotification.partTwo?.decision?.decision) ||
     'Decision not given'
 
+  const needsCatchCertificate = (
+    preNotification.importNotificationType === chedTypes.CHEDP &&
+    isCatchCertificateRequired(complementParameterSet.keyDataPair)
+  )
+
   const authority = authorities[preNotification.importNotificationType]
 
-  return [{ decision, authority }]
+  return needsCatchCertificate
+    ? [
+        { decision, authority },
+        { decision, authority: ILLEGAL_UNREPORTED_UNREGULATED }
+      ]
+    : [{ decision, authority }]
 }
 
 const getChedPPChecks = (preNotification, complementParameterSet) => {
@@ -97,7 +117,7 @@ const mapCommodity = (commodityComplement, preNotification) => {
 
   const checks = importNotificationType === chedTypes.CHEDPP
     ? getChedPPChecks(preNotification, complementParameterSet)
-    : getChecks(preNotification)
+    : getChecks(preNotification, complementParameterSet)
 
   return {
     id: complementParameterSet.uniqueComplementId,
