@@ -9,6 +9,5 @@ test('not authenticated', async () => {
     url: paths.CHROME_DEVTOOLS
   })
 
-  expect(statusCode)
-    .toBe(204)
+  expect(statusCode).toBe(204)
 })

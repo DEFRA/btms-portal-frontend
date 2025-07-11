@@ -3,7 +3,7 @@ import { getUserSession } from './user-session.js'
 import { getOpenIdRefreshToken } from './open-id-client.js'
 import { paths } from '../routes/route-constants.js'
 
-async function refreshAccessToken (request) {
+async function refreshAccessToken(request) {
   const authedUser = await getUserSession(request)
   request.logger.setBindings({ refreshingAccessToken: authedUser.strategy })
 
@@ -12,7 +12,8 @@ async function refreshAccessToken (request) {
   const clientId = authConfig.clientId
   const clientSecret = authConfig.clientSecret
   const scopes = authConfig.scopes.join(' ')
-  const redirectUri = config.get(configKeys.APP_BASE_URL) + paths.AUTH_DEFRA_ID_CALLBACK
+  const redirectUri =
+    config.get(configKeys.APP_BASE_URL) + paths.AUTH_DEFRA_ID_CALLBACK
 
   const params = {
     client_id: clientId,

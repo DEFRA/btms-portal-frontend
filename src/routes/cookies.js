@@ -24,13 +24,17 @@ export const cookiesPost = {
     }
   },
   handler: (request, h) => {
-    const { 'cookies[analytics]': acceptAnalyticsCookies, previousUrl } = request.payload
+    const { 'cookies[analytics]': acceptAnalyticsCookies, previousUrl } =
+      request.payload
     const acceptedCookies = acceptAnalyticsCookies === 'yes'
 
     h.state('cookie_policy', { analytics: acceptedCookies })
 
     if (previousUrl === '/cookies') {
-      return h.view('cookies', { acceptedCookies, cookiePageConfirmation: true })
+      return h.view('cookies', {
+        acceptedCookies,
+        cookiePageConfirmation: true
+      })
     }
 
     return h.redirect(`${previousUrl}?cookieBannerConfirmation=true`)

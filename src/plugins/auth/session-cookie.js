@@ -30,6 +30,4 @@ const sessionCookie = {
   }
 }
 
-export {
-  sessionCookie
-}
+export { sessionCookie }

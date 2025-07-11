@@ -1,6 +1,6 @@
 export const securityHeaders = {
   name: 'security-headers',
-  async register (server) {
+  async register(server) {
     server.ext('onPreResponse', (request, h) => {
       const headersToAdd = {
         'content-security-policy':
@@ -22,10 +22,9 @@ export const securityHeaders = {
         'x-download-options': 'noopen'
       }
 
-      Object.entries(headersToAdd)
-        .forEach(([key, value]) => {
-          request.response.headers[key] = value
-        })
+      Object.entries(headersToAdd).forEach(([key, value]) => {
+        request.response.headers[key] = value
+      })
 
       return h.continue
     })

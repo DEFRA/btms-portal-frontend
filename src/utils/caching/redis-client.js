@@ -20,7 +20,7 @@ import { createLogger } from '../logger.js'
  * @param {RedisConfig} redisConfig - Redis config
  * @returns {Cluster | Redis}
  */
-export function buildRedisClient (redisConfig) {
+export function buildRedisClient(redisConfig) {
   const port = 6379
   const db = 0
   const keyPrefix = redisConfig.keyPrefix

@@ -1,4 +1,4 @@
-@use "govuk-frontend" as *;
+@use 'govuk-frontend' as *;
 @use 'variables' as *;
 
 .btms-search-results {
@@ -11,7 +11,10 @@
 .btms-customs-declaration-summary {
   background-color: govuk-colour('light-grey');
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive columns */
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(200px, 1fr)
+  ); /* Responsive columns */
   padding: govuk-spacing(3) 0;
   margin: 0;
   @include govuk-font-size($size: 14);
@@ -36,7 +39,8 @@
   }
 }
 
-.btms-details, .btms-details[open] {
+.btms-details,
+.btms-details[open] {
   .govuk-details__summary-text {
     text-decoration: none;
   }
@@ -58,7 +62,7 @@
     &::after {
       content: '';
       box-sizing: border-box;
-      background-color: govuk-colour("light-grey");
+      background-color: govuk-colour('light-grey');
       background-image: $chevron-down;
       background-repeat: no-repeat;
       background-position: center;
@@ -74,11 +78,11 @@
       width: 70px;
       align-items: center;
       justify-content: center;
-      border-left: 1px solid $btms-light-to-mid-grey
+      border-left: 1px solid $btms-light-to-mid-grey;
     }
 
     &:focus {
-      outline: 3px solid govuk-colour("yellow");
+      outline: 3px solid govuk-colour('yellow');
       box-shadow: none;
     }
   }
@@ -133,20 +137,20 @@
     cursor: help;
     position: relative;
 
-    [role="tooltip"] {
+    [role='tooltip'] {
       display: none;
     }
 
     &:hover,
     &:focus {
-      [role="tooltip"] {
+      [role='tooltip'] {
         display: block;
         position: absolute;
         left: 0;
         width: 300px;
         padding: govuk-spacing(2);
         color: $govuk-text-colour;
-        background-color: govuk-colour("light-grey");
+        background-color: govuk-colour('light-grey');
         box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
         text-decoration: none;
         z-index: 10000;
@@ -160,11 +164,15 @@
     text-underline-offset: 4px;
   }
 
-  .btms-declaration tbody > tr:not([hidden]) + tr:not(:first-of-type) > td:nth-child(-n+4) {
+  .btms-declaration
+    tbody
+    > tr:not([hidden])
+    + tr:not(:first-of-type)
+    > td:nth-child(-n + 4) {
     visibility: hidden;
   }
 
-  .btms-declaration tbody tr:not(:last-of-type) > td:nth-last-child(-n+3) {
+  .btms-declaration tbody tr:not(:last-of-type) > td:nth-last-child(-n + 3) {
     border-bottom: 1px dashed $btms-light-to-mid-grey;
   }
 
@@ -181,7 +189,7 @@
   }
 
   .govuk-inset-text {
-    margin:0;
+    margin: 0;
   }
 
   .govuk-list {

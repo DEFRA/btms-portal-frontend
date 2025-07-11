@@ -13,11 +13,14 @@ test('signed out from defraId', async () => {
 
   globalJsdom(payload)
 
-  expect(getByRole(document.body, 'link', { name: 'Sign in' }))
-    .toHaveAttribute('href', '/sign-in')
+  expect(getByRole(document.body, 'link', { name: 'Sign in' })).toHaveAttribute(
+    'href',
+    '/sign-in'
+  )
 
-  expect(document.title)
-    .toBe('You are signed out - Border Trade Matching Service')
+  expect(document.title).toBe(
+    'You are signed out - Border Trade Matching Service'
+  )
 })
 
 test('signed out from entraId', async () => {
@@ -30,6 +33,8 @@ test('signed out from entraId', async () => {
 
   globalJsdom(payload)
 
-  expect(getByRole(document.body, 'link', { name: 'Sign in' }))
-    .toHaveAttribute('href', '/sign-in-entra')
+  expect(getByRole(document.body, 'link', { name: 'Sign in' })).toHaveAttribute(
+    'href',
+    '/sign-in-entra'
+  )
 })

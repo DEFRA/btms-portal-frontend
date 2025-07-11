@@ -1,8 +1,8 @@
-@use "govuk-frontend" as *;
+@use 'govuk-frontend' as *;
 
 .btms-search-wrapper {
   padding: govuk-spacing(7);
-  background-color: govuk-colour("light-grey");
+  background-color: govuk-colour('light-grey');
 
   .govuk-input__suffix {
     position: relative;
@@ -57,22 +57,22 @@
       border: 0;
       top: 0;
       bottom: 0;
-      color: govuk-colour("blue");
+      color: govuk-colour('blue');
       font-size: 30px;
       line-height: 30px;
     }
   }
 
   .btms-submit-search {
-    color: govuk-colour("white");
+    color: govuk-colour('white');
     display: flex;
     justify-content: center;
     align-items: center;
     width: 50px;
     position: relative;
     left: -2px;
-    background-color: govuk-colour("blue");
-    border: 1px solid govuk-colour("black");
+    background-color: govuk-colour('blue');
+    border: 1px solid govuk-colour('black');
   }
 
   .btms-search-icon {
@@ -81,4 +81,3 @@
     stroke-width: 2;
   }
 }
-

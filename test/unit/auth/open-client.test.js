@@ -1,5 +1,8 @@
 import wreck from '@hapi/wreck'
-import { getOpenIdConfig, getOpenIdRefreshToken } from '../../../src/auth/open-id-client.js'
+import {
+  getOpenIdConfig,
+  getOpenIdRefreshToken
+} from '../../../src/auth/open-id-client.js'
 
 const mockPost = jest.fn()
 
@@ -38,7 +41,8 @@ describe('#openIdClient', () => {
         res: {
           statusCode: 200
         },
-        payload: '{ "access_token": "FOO", "expires_in": 1000, "id_token": "FOO", "refresh_token": "FOO" }'
+        payload:
+          '{ "access_token": "FOO", "expires_in": 1000, "id_token": "FOO", "refresh_token": "FOO" }'
       })
 
       const params = {
@@ -59,13 +63,16 @@ describe('#openIdClient', () => {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Cache-Control': 'no-cache'
           },
-          payload: 'client_id=some-client-id&client_secret=some-client-secret&grant_type=refresh_token&refresh_token=some-refresh-token&scope=some-client-id%20openid&redirect_uri=http%3A%2F%2Fsome-uri'
+          payload:
+            'client_id=some-client-id&client_secret=some-client-secret&grant_type=refresh_token&refresh_token=some-refresh-token&scope=some-client-id%20openid&redirect_uri=http%3A%2F%2Fsome-uri'
         })
       )
       expect(result.ok).toBeTruthy()
-      expect(result.json).toEqual(expect.objectContaining({
-        access_token: 'FOO'
-      }))
+      expect(result.json).toEqual(
+        expect.objectContaining({
+          access_token: 'FOO'
+        })
+      )
     })
 
     test('Should return not ok response', async () => {
@@ -93,13 +100,16 @@ describe('#openIdClient', () => {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Cache-Control': 'no-cache'
           },
-          payload: 'client_id=some-client-id&client_secret=some-client-secret&grant_type=refresh_token&refresh_token=some-refresh-token&scope=some-client-id%20openid&redirect_uri=http%3A%2F%2Fsome-uri'
+          payload:
+            'client_id=some-client-id&client_secret=some-client-secret&grant_type=refresh_token&refresh_token=some-refresh-token&scope=some-client-id%20openid&redirect_uri=http%3A%2F%2Fsome-uri'
         })
       )
       expect(result.ok).toBeFalsy()
-      expect(result).toEqual(expect.not.objectContaining({
-        json: expect.anything()
-      }))
+      expect(result).toEqual(
+        expect.not.objectContaining({
+          json: expect.anything()
+        })
+      )
     })
   })
 
@@ -110,7 +120,10 @@ describe('#openIdClient', () => {
       { refreshPayload: '{}' },
       { refreshPayload: '{ "access_token": "some-token" }' },
       { refreshPayload: '{ "access_token": "FOO", "expires_in": 1000 }' },
-      { refreshPayload: '{ "access_token": "FOO", "expires_in": 1000, "id_token": "FOO" }' }
+      {
+        refreshPayload:
+          '{ "access_token": "FOO", "expires_in": 1000, "id_token": "FOO" }'
+      }
     ])('Should return not ok response', async ({ refreshPayload }) => {
       mockPost.mockReturnValue({
         res: {
@@ -137,13 +150,16 @@ describe('#openIdClient', () => {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Cache-Control': 'no-cache'
           },
-          payload: 'client_id=some-client-id&client_secret=some-client-secret&grant_type=refresh_token&refresh_token=some-refresh-token&scope=some-client-id%20openid&redirect_uri=http%3A%2F%2Fsome-uri'
+          payload:
+            'client_id=some-client-id&client_secret=some-client-secret&grant_type=refresh_token&refresh_token=some-refresh-token&scope=some-client-id%20openid&redirect_uri=http%3A%2F%2Fsome-uri'
         })
       )
       expect(result.ok).toBeFalsy()
-      expect(result).toEqual(expect.not.objectContaining({
-        json: expect.anything()
-      }))
+      expect(result).toEqual(
+        expect.not.objectContaining({
+          json: expect.anything()
+        })
+      )
     })
   })
 })

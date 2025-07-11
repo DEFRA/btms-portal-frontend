@@ -8,9 +8,11 @@ jest.mock('../../../../src/auth/user-session.js', () => ({
 }))
 
 jest.mock('node:fs', () => ({
-  readFileSync: jest.fn().mockReturnValue(JSON.stringify({
-    'application.js': 'javascripts/application.HASH.js'
-  }))
+  readFileSync: jest.fn().mockReturnValue(
+    JSON.stringify({
+      'application.js': 'javascripts/application.HASH.js'
+    })
+  )
 }))
 
 test('logged in: defraId', async () => {
@@ -51,9 +53,7 @@ test('logged in: entraId', async () => {
     defaultHeaderOptions: {
       homepageUrl: 'https://www.gov.uk',
       serviceName: 'Border Trade Matching Service',
-      navigation: [
-        { text: 'Sign out', href: '/sign-out?provider=entraId' }
-      ]
+      navigation: [{ text: 'Sign out', href: '/sign-out?provider=entraId' }]
     },
     getAssetPath: expect.any(Function)
   }
@@ -91,8 +91,9 @@ test('getAssetPath(): returns hashed path', async () => {
 
   const { getAssetPath } = await context({})
 
-  expect(getAssetPath('application.js'))
-    .toBe('/test/javascripts/application.HASH.js')
+  expect(getAssetPath('application.js')).toBe(
+    '/test/javascripts/application.HASH.js'
+  )
 })
 
 test('getAssetPath(): logs error for unmapped files', async () => {
@@ -105,8 +106,7 @@ test('getAssetPath(): logs error for unmapped files', async () => {
 
   const { getAssetPath } = await context(request)
 
-  expect(getAssetPath('not-built-with-webpack.js'))
-    .toBe('/test/undefined')
+  expect(getAssetPath('not-built-with-webpack.js')).toBe('/test/undefined')
   expect(request.logger.error.mock.calls).toEqual([
     ['Asset not-built-with-webpack.js not found in manifest']
   ])
