@@ -117,8 +117,10 @@ const setRows = (state, type) => {
 }
 
 const setUpFilters = (type) => {
+  const filtersWrapper = document.getElementById(`${type}-filters-wrapper`)
+  filtersWrapper.removeAttribute('hidden')
+
   const filters = document.getElementById(`${type}-filters`)
-  filters.removeAttribute('hidden')
   filters.addEventListener('change', (event) => {
     setState(event)
     const state = getState(filterTypes[type].all)
