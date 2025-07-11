@@ -45,7 +45,7 @@ const getChedPPChecks = (preNotification, complementParameterSet) => {
 
   const { commodityChecks, phsiAutoCleared, hmiAutoCleared } = preNotification.partTwo
 
-  const { checks } = commodityChecks.find(({ uniqueComplementId }) => {
+  const commodityCheck = commodityChecks?.find(({ uniqueComplementId }) => {
     return uniqueComplementId === complementParameterSet.uniqueComplementId
   })
 
@@ -67,7 +67,7 @@ const getChedPPChecks = (preNotification, complementParameterSet) => {
       Compliant: 3
     }
 
-    const decision = checks.reduce((finalOutcome, check) => {
+    const decision = commodityCheck?.checks.reduce((finalOutcome, check) => {
       if (check.type.startsWith(authority)) {
         const outcome = checkStatusToOutcome[check.status]
         return outcomePrecedence[outcome] < outcomePrecedence[finalOutcome]
