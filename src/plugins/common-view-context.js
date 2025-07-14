@@ -1,3 +1,5 @@
+import { config } from '../config/config.js'
+
 export const commonViewContext = {
   name: 'common-view-context',
   async register (server) {
@@ -8,7 +10,8 @@ export const commonViewContext = {
         response.source.context = {
           ...response.source.context,
           cspNonce: request.app.cspNonce,
-          currentUrl: request.path
+          currentUrl: request.path,
+          gtmId: config.get('gtmId')
         }
       }
 

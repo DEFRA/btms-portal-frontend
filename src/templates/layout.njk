@@ -30,6 +30,9 @@
   {% if currentUrl != "/cookies" and (cookiePolicy == null or cookieBannerConfirmation != null) and hideCookieBanner != true %}
     {% include "./includes/cookie-banner.njk" %}
   {% endif %}
+  {% if cookiePolicy.analytics == true %}
+    {% include "./includes/google-analytics.njk" %}
+  {% endif %}
   {{ govukHeader(headerOptions) }}
 {% endblock %}
 

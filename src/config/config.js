@@ -340,6 +340,12 @@ const config = convict({
       default: '',
       env: 'IPAFFS_URL'
     }
+  },
+  gtmId: {
+    doc: 'Google Tag Manager ID',
+    format: String,
+    default: 'GTM-PSCS57N9',
+    env: 'GTM_ID'
   }
 })
 
