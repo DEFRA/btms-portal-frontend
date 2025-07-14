@@ -1,48 +1,50 @@
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 
-<form id="declaration-filters" class="btms-filters" hidden>
-  {{
-    govukSelect({
-      id: "match",
-      name: "match",
-      label: { text: "Match" },
-      items: [
-        { text: 'Show all', value: '', selected: true },
-        { text: "Yes", value: true },
-        { text: "No", value: false }
-      ]
-    })
-  }}
-  {{
-    govukSelect({
-      id: "decision",
-      name: "decision",
-      label: { text: "Decision" },
-      items: [
-        { text: 'Show all', value: '', selected: true },
-        { text: "Hold", value: "Hold" },
-        { text: "Refuse", value: "Refuse" },
-        { text: "Release", value: "Release" }
-      ]
-    })
-  }}
-  {{
-    govukSelect({
-      id: "authority",
-      name: "authority",
-      label: { text: "Authority" },
-      items: [
-        { text: 'Show all', value: '', selected: true },
-        { text: "APHA", value: "APHA" },
-        { text: "FNAO", value: "FNAO" },
-        { text: "HMI", value: "HMI" },
-        { text: "IUU", value: "IUU" },
-        { text: "PHSI", value: "PHSI" },
-        { text: "POAO", value: "POAO" }
-      ]
-    })
-  }}
-  <div id="declaration-reset" class="btms-clear-filters" hidden>
-    {% include "./button-reset.njk" %}
-  </div>
-</form>
+<div id="declaration-filters-wrapper" hidden>
+  <form id="declaration-filters" class="btms-filters">
+    {{
+      govukSelect({
+        id: "match",
+        name: "match",
+        label: { text: "Match" },
+        items: [
+          { text: 'Show all', value: '', selected: true },
+          { text: "Yes", value: true },
+          { text: "No", value: false }
+        ]
+      })
+    }}
+    {{
+      govukSelect({
+        id: "decision",
+        name: "decision",
+        label: { text: "Decision" },
+        items: [
+          { text: 'Show all', value: '', selected: true },
+          { text: "Hold", value: "Hold" },
+          { text: "Refuse", value: "Refuse" },
+          { text: "Release", value: "Release" }
+        ]
+      })
+    }}
+    {{
+      govukSelect({
+        id: "authority",
+        name: "authority",
+        label: { text: "Authority" },
+        items: [
+          { text: 'Show all', value: '', selected: true },
+          { text: "APHA", value: "APHA" },
+          { text: "FNAO", value: "FNAO" },
+          { text: "HMI", value: "HMI" },
+          { text: "IUU", value: "IUU" },
+          { text: "PHSI", value: "PHSI" },
+          { text: "POAO", value: "POAO" }
+        ]
+      })
+    }}
+    <div id="declaration-reset" class="btms-clear-filters" hidden>
+      {% include "./button-reset.njk" %}
+    </div>
+  </form>
+</div>
