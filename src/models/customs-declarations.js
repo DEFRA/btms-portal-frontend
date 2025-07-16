@@ -7,12 +7,8 @@ import {
   checkCodeToAuthorityMapping,
   finalStateMappings,
   IUUDocumentReferences,
-  DATE_FORMAT,
-  ILLEGAL_UNREPORTED_UNREGULATED
+  DATE_FORMAT
 } from './model-constants.js'
-
-const isIUU = ({ departmentCode }) =>
-  departmentCode === ILLEGAL_UNREPORTED_UNREGULATED
 
 const hasDesiredPrefix = (decisionCode, desiredPrefix) => {
   return decisionCode?.length && decisionCode.toLowerCase().startsWith(desiredPrefix)
@@ -74,7 +70,7 @@ export const getCustomsDeclarationOpenState = (finalisation) => !(
 )
 
 const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
-  const documents = commodity.documents
+  const documents = (commodity.documents || [])
     .reduce((docs, doc) => {
       const references = docs[doc.documentReference] || []
       docs[doc.documentReference] = [...new Set(references.concat(doc.documentCode))]
@@ -97,42 +93,36 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
 
     return {
       ...check,
-      decisionCode: decision?.decisionCode
+      decisionCode: decision?.decisionCode,
+      decisionReasons: decision?.decisionReasons,
+      decisionInternalFurtherDetail: decision?.decisionInternalFurtherDetail
     }
   })
 
-  const decisions = Object.entries(documents).map(([documentReference, documentCodes]) => {
+  const decisions = checksWithDecisionCodes.map(check => {
     const lastSeven = 7
-    const notificationStatus = notificationStatuses[documentReference.slice(-lastSeven)]
+    const relevantDocuments = checkCodeToDocumentCodeMapping[check.checkCode]
+    const checkDocuments = (commodity.documents || []).filter(doc => relevantDocuments.includes(doc.documentCode))
+    const documentReference = (checkDocuments.length > 0) ? checkDocuments[0].documentReference : null
+    const notificationStatus = documentReference ? notificationStatuses[documentReference.slice(-lastSeven)] : null
 
-    const outcomes = documentCodes
-      .sort((a, b) =>
-        Number(IUUDocumentReferences.includes(a)) -
-        Number(IUUDocumentReferences.includes(b))
-      )
-      .flatMap((documentCode) => {
-        const checks = checksWithDecisionCodes.filter(({ checkCode }) =>
-          checkCodeToDocumentCodeMapping[checkCode].includes(documentCode)
-        )
+    const outcome = {
+      decision: getDecision(check.decisionCode),
+      decisionDetail: getDecisionDescription(check.decisionCode, notificationStatus),
+      decisionReason: check.decisionReasons?.length > 0 ? check.decisionReasons[0] : null,
+      departmentCode: checkCodeToAuthorityMapping[check.checkCode],
+      isIuuOutcome: relevantDocuments.some(doc => IUUDocumentReferences.includes(doc))
+    }
 
-        return checks.map(({ checkCode, decisionCode }) => ({
-          decision: getDecision(decisionCode),
-          decisionDetail: getDecisionDescription(decisionCode, notificationStatus),
-          departmentCode: checkCodeToAuthorityMapping[checkCode]
-        }))
-      })
+    const isIuuOutcome = relevantDocuments.some(doc => IUUDocumentReferences.includes(doc))
 
-    const hasOnlyIuuOutcome = outcomes.length === 1 &&
-      isIUU(outcomes[0])
     return {
       id: randomUUID(),
-      documentReference: hasOnlyIuuOutcome ? null : documentReference,
-      outcomes,
-      match: hasOnlyIuuOutcome ? null : Boolean(notificationStatus)
+      documentReference: isIuuOutcome ? null : documentReference,
+      outcome,
+      match: isIuuOutcome ? null : Boolean(notificationStatus)
     }
-  }).sort(
-    (a, b) => Number(a.outcomes.some(isIUU)) - Number(b.outcomes.some(isIUU))
-  )
+  }).sort((a, b) => a.outcome.isIuuOutcome - b.outcome.isIuuOutcome)
 
   return {
     id: randomUUID(),
