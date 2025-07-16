@@ -6,6 +6,7 @@ import {
   PRODUCTS_OF_ANIMAL_ORIGIN,
   PLANT_HEALTH_SEEDS_INSPECTORATE,
   HORTICULTURAL_MARKETING_INSPECTORATE,
+  DECISION_NOT_GIVEN,
   chedStatusDescriptions,
   chedTypes,
   closedChedStatuses,
@@ -36,14 +37,14 @@ const getChecks = (preNotification, complementParameterSet) => {
   const decision =
     (['VALIDATED', 'REJECTED'].includes(preNotification.status) &&
       preNotification.partTwo?.decision?.decision) ||
-    'Decision not given'
+    DECISION_NOT_GIVEN
 
   const needsCatchCertificate = (
     preNotification.importNotificationType === chedTypes.CHEDP &&
     isCatchCertificateRequired(complementParameterSet.keyDataPair)
   )
 
-  const iuuDecision = (needsCatchCertificate && iuuDecisionDisplay[preNotification.partTwo?.controlAuthority?.iuuOption]) || 'Decision not given'
+  const iuuDecision = (needsCatchCertificate && iuuDecisionDisplay[preNotification.partTwo?.controlAuthority?.iuuOption]) || DECISION_NOT_GIVEN
 
   const authority = authorities[preNotification.importNotificationType]
 
@@ -74,7 +75,7 @@ const getChedPPChecks = (preNotification, complementParameterSet) => {
 
   return authorities.map((authority) => {
     if (!['VALIDATED', 'REJECTED', 'PARTIALLY_REJECTED'].includes(preNotification.status)) {
-      return { authority, decision: 'Decision not given' }
+      return { authority, decision: DECISION_NOT_GIVEN }
     }
 
     if (
