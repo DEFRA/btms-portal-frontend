@@ -10,7 +10,8 @@ import {
   chedTypes,
   closedChedStatuses,
   DATE_FORMAT,
-  checkStatusToOutcome
+  checkStatusToOutcome,
+  iuuDecisionDisplay
 } from './model-constants.js'
 import { config } from '../config/config.js'
 
@@ -42,12 +43,14 @@ const getChecks = (preNotification, complementParameterSet) => {
     isCatchCertificateRequired(complementParameterSet.keyDataPair)
   )
 
+  const iuuDecision = (needsCatchCertificate && iuuDecisionDisplay[preNotification.partTwo?.controlAuthority?.iuuOption]) || decision
+
   const authority = authorities[preNotification.importNotificationType]
 
   return needsCatchCertificate
     ? [
         { decision, authority },
-        { decision, authority: ILLEGAL_UNREPORTED_UNREGULATED }
+        { decision: iuuDecision, authority: ILLEGAL_UNREPORTED_UNREGULATED }
       ]
     : [{ decision, authority }]
 }

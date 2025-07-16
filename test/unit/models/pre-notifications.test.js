@@ -28,6 +28,9 @@ test('CHEDP: uses netweight, open state, decision given', () => {
         partTwo: {
           decision: {
             decision: 'Acceptable for internal market'
+          },
+          controlAuthority: {
+            iuuOption: 'IUUOK'
           }
         }
       }
@@ -49,7 +52,7 @@ test('CHEDP: uses netweight, open state, decision given', () => {
           decision: 'Acceptable for internal market'
         }, {
           authority: 'IUU',
-          decision: 'Acceptable for internal market'
+          decision: 'IUU inspection complete'
         }]
       }
     ],

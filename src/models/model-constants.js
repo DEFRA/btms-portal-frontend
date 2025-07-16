@@ -93,3 +93,9 @@ export const finalStateMappings = {
   5: 'Released to King’s warehouse',
   6: 'Transferred to MSS'
 }
+
+export const iuuDecisionDisplay = {
+  IUUOK: 'IUU inspection complete',
+  IUUNotCompliant: 'IUU not compliant',
+  IUUNA: 'IUU inspection not applicable'
+}
