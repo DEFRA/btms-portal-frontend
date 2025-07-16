@@ -43,7 +43,7 @@ const getChecks = (preNotification, complementParameterSet) => {
     isCatchCertificateRequired(complementParameterSet.keyDataPair)
   )
 
-  const iuuDecision = (needsCatchCertificate && iuuDecisionDisplay[preNotification.partTwo?.controlAuthority?.iuuOption]) || decision
+  const iuuDecision = (needsCatchCertificate && iuuDecisionDisplay[preNotification.partTwo?.controlAuthority?.iuuOption]) || 'Decision not given'
 
   const authority = authorities[preNotification.importNotificationType]
 

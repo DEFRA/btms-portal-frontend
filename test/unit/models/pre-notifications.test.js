@@ -1,6 +1,12 @@
 import { mapPreNotifications } from '../../../src/models/pre-notifications.js'
 
-test('CHEDP: uses netweight, open state, decision given', () => {
+test.each([
+  { controlAuthority: null, iuuDecisionDisplay: 'Decision not given' },
+  { controlAuthority: { iuuOption: null }, iuuDecisionDisplay: 'Decision not given' },
+  { controlAuthority: { iuuOption: 'IUUOK' }, iuuDecisionDisplay: 'IUU inspection complete' },
+  { controlAuthority: { iuuOption: 'IUUNotCompliant' }, iuuDecisionDisplay: 'IUU not compliant' },
+  { controlAuthority: { iuuOption: 'IUUNA' }, iuuDecisionDisplay: 'IUU inspection not applicable' }
+])('CHEDP: uses netweight, open state, decision given', (iuuOptions) => {
   const data = {
     importPreNotifications: [{
       importPreNotification: {
@@ -29,9 +35,7 @@ test('CHEDP: uses netweight, open state, decision given', () => {
           decision: {
             decision: 'Acceptable for internal market'
           },
-          controlAuthority: {
-            iuuOption: 'IUUOK'
-          }
+          controlAuthority: iuuOptions.controlAuthority
         }
       }
     }]
@@ -52,7 +56,7 @@ test('CHEDP: uses netweight, open state, decision given', () => {
           decision: 'Acceptable for internal market'
         }, {
           authority: 'IUU',
-          decision: 'IUU inspection complete'
+          decision: iuuOptions.iuuDecisionDisplay
         }]
       }
     ],
