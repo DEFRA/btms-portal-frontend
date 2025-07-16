@@ -105,6 +105,72 @@ test('MRN, open, finalised, using netMass, matched', () => {
   expect(result).toEqual(expected)
 })
 
+test('an MRN, with no CHED, with no documents returns expected response', () => {
+  const data = {
+    customsDeclarations: [{
+      movementReferenceNumber: 'GB251234567890ABCD',
+      clearanceRequest: {
+        declarationUcr: '5GB123456789000-BDOV123456',
+        commodities: [{
+          itemNumber: 1,
+          netMass: '9999',
+          checks: [{
+            checkCode: 'H220'
+          }]
+        }]
+      },
+      clearanceDecision: {
+        items: [{
+          itemNumber: 1,
+          checks: [{
+            decisionCode: 'X00',
+            checkCode: 'H220'
+          }]
+        }]
+      },
+      finalisation: null,
+      updated: '2025-05-12T11:13:17.330Z'
+    }],
+    importPreNotifications: []
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  const expected = [{
+    commodities: [
+      {
+        id: expect.any(String),
+        decisions: [{
+          id: expect.any(String),
+          documentReference: null,
+          match: false,
+          outcome: {
+            decision: '',
+            decisionDetail: 'No match',
+            decisionReason: null,
+            departmentCode: 'HMI',
+            isIuuOutcome: false
+          }
+        }],
+        documents: {},
+        checks: [
+          { checkCode: 'H220' }
+        ],
+        itemNumber: 1,
+        netMass: '9999',
+        weightOrQuantity: '9999'
+      }
+    ],
+    movementReferenceNumber: 'GB251234567890ABCD',
+    declarationUcr: '5GB123456789000-BDOV123456',
+    open: true,
+    status: 'Current',
+    updated: '12 May 2025, 11:13'
+  }]
+
+  expect(result).toEqual(expected)
+})
+
 test('MRN, open, manual release, using supplementaryUnits, no decisions', () => {
   const data = {
     customsDeclarations: [{
