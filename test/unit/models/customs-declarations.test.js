@@ -63,20 +63,24 @@ test('MRN, open, finalised, using netMass, matched', () => {
           id: expect.any(String),
           documentReference: 'GBCHD2025.1234567',
           match: true,
-          outcomes: [{
+          outcome: {
             decision: 'Release',
             decisionDetail: 'Inspection complete',
-            departmentCode: 'FNAO'
-          }]
+            decisionReason: null,
+            departmentCode: 'FNAO',
+            isIuuOutcome: false
+          }
         }, {
           id: expect.any(String),
           documentReference: null,
           match: null,
-          outcomes: [{
+          outcome: {
             decision: 'Release',
             decisionDetail: 'IUU inspection complete',
-            departmentCode: 'IUU'
-          }]
+            decisionReason: null,
+            departmentCode: 'IUU',
+            isIuuOutcome: true
+          }
         }],
         documents: {
           'GBCHD2025.1234567': ['C678'],
@@ -95,6 +99,72 @@ test('MRN, open, finalised, using netMass, matched', () => {
     declarationUcr: '5GB123456789000-BDOV123456',
     open: true,
     status: 'Finalised - Released',
+    updated: '12 May 2025, 11:13'
+  }]
+
+  expect(result).toEqual(expected)
+})
+
+test('an MRN, with no CHED, with no documents returns expected response', () => {
+  const data = {
+    customsDeclarations: [{
+      movementReferenceNumber: 'GB251234567890ABCD',
+      clearanceRequest: {
+        declarationUcr: '5GB123456789000-BDOV123456',
+        commodities: [{
+          itemNumber: 1,
+          netMass: '9999',
+          checks: [{
+            checkCode: 'H220'
+          }]
+        }]
+      },
+      clearanceDecision: {
+        items: [{
+          itemNumber: 1,
+          checks: [{
+            decisionCode: 'X00',
+            checkCode: 'H220'
+          }]
+        }]
+      },
+      finalisation: null,
+      updated: '2025-05-12T11:13:17.330Z'
+    }],
+    importPreNotifications: []
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  const expected = [{
+    commodities: [
+      {
+        id: expect.any(String),
+        decisions: [{
+          id: expect.any(String),
+          documentReference: null,
+          match: false,
+          outcome: {
+            decision: '',
+            decisionDetail: 'No match',
+            decisionReason: null,
+            departmentCode: 'HMI',
+            isIuuOutcome: false
+          }
+        }],
+        documents: {},
+        checks: [
+          { checkCode: 'H220' }
+        ],
+        itemNumber: 1,
+        netMass: '9999',
+        weightOrQuantity: '9999'
+      }
+    ],
+    movementReferenceNumber: 'GB251234567890ABCD',
+    declarationUcr: '5GB123456789000-BDOV123456',
+    open: true,
+    status: 'Current',
     updated: '12 May 2025, 11:13'
   }]
 
@@ -148,25 +218,25 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
           id: expect.any(String),
           documentReference: 'GBCHD2025.1234567',
           match: false,
-          outcomes: [{
+          outcome: {
             decision: '',
+            decisionReason: null,
             decisionDetail: undefined,
-            departmentCode: 'PHSI'
-          }, {
-            decision: '',
-            decisionDetail: undefined,
-            departmentCode: 'PHSI'
-          }]
+            departmentCode: 'PHSI',
+            isIuuOutcome: false
+          }
         }, {
           id: expect.any(String),
           documentReference: null,
           match: null,
-          outcomes: [
+          outcome:
             {
               decision: '',
               decisionDetail: undefined,
-              departmentCode: 'IUU'
-            }]
+              decisionReason: null,
+              departmentCode: 'IUU',
+              isIuuOutcome: true
+            }
         }],
         documents: {
           'GBCHD2025.1234567': ['N851', '9115'],
@@ -226,11 +296,13 @@ test('de-dupes document references', () => {
         id: expect.any(String),
         documentReference: 'GBCHD2025.0000001',
         match: false,
-        outcomes: [{
+        outcome: {
           decision: '',
           decisionDetail: undefined,
-          departmentCode: 'POAO'
-        }]
+          decisionReason: null,
+          departmentCode: 'POAO',
+          isIuuOutcome: false
+        }
       }],
       documents: {
         'GBCHD2025.0000001': ['N853']
@@ -287,11 +359,13 @@ test('matches malformed references', () => {
         id: expect.any(String),
         documentReference: 'GB.CHD.2025.0000002',
         match: true,
-        outcomes: [{
+        outcome: {
           decision: '',
           decisionDetail: undefined,
-          departmentCode: 'FNAO'
-        }]
+          decisionReason: null,
+          departmentCode: 'FNAO',
+          isIuuOutcome: false
+        }
       }],
       checks: [{ checkCode: 'H223' }],
       documents: {
