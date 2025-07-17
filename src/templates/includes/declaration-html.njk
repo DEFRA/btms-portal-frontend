@@ -27,18 +27,16 @@
           {{ documentReference(decision) }}
           <td class="govuk-table__cell">{{ decisionMatch(decision.match) }}</td>
           <td class="govuk-table__cell btms-decision-outcomes">
-            {% for outcome in decision.outcomes %}
-              {% if loop.first %} <ul class="govuk-list"> {% endif %}
+            <ul class="govuk-list">
               <li
-                data-decision="{{ outcome.decision }}"
-                data-authority="{{ outcome.departmentCode }}"
+                data-decision="{{ decision.outcome.decision }}"
+                data-authority="{{ decision.outcome.departmentCode }}"
               >
-                {% if outcome.decision %}
-                  {{ outcome.decision }} -
-                {% endif %} {{ outcome.decisionDetail }} ({{ outcome.departmentCode }})
+                {% if decision.outcome.decision %}
+                  {{ decision.outcome.decision }} -
+                {% endif %} {{ decision.outcome.decisionDetail }} ({{ decision.outcome.departmentCode }})
               </li>
-              {% if loop.last %} </ul> {% endif %}
-            {% endfor %}
+            </ul>
         </tr>
       {% endfor %}
     </tbody>
