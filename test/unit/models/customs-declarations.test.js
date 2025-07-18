@@ -429,3 +429,116 @@ test('getCustomsDeclarationOpenState()', () => {
   }))
     .toBe(false)
 })
+
+test.each([
+  { chedDecisionCode: 'H01', iuuDecisionCode: 'C07', chedDecision: 'Hold', chedDecisionDetail: 'Awaiting decision', iuuDecision: 'Release', iuuDecisionDetail: 'IUU inspection complete' },
+  { chedDecisionCode: 'H01', iuuDecisionCode: 'C08', chedDecision: 'Hold', chedDecisionDetail: 'Awaiting decision', iuuDecision: 'Release', iuuDecisionDetail: 'IUU inspection not applicable' },
+  { chedDecisionCode: 'H01', iuuDecisionCode: 'X00', chedDecision: 'Hold', chedDecisionDetail: 'Awaiting decision', iuuDecision: '', iuuDecisionDetail: 'Hold - Decision not given' },
+  { chedDecisionCode: 'H02', iuuDecisionCode: 'C07', chedDecision: 'Hold', chedDecisionDetail: 'To be inspected', iuuDecision: 'Release', iuuDecisionDetail: 'IUU inspection complete' },
+  { chedDecisionCode: 'H02', iuuDecisionCode: 'C08', chedDecision: 'Hold', chedDecisionDetail: 'To be inspected', iuuDecision: 'Release', iuuDecisionDetail: 'IUU inspection not applicable' },
+  { chedDecisionCode: 'H02', iuuDecisionCode: 'X00', chedDecision: 'Hold', chedDecisionDetail: 'To be inspected', iuuDecision: '', iuuDecisionDetail: 'Hold - To be inspected' },
+  { chedDecisionCode: 'X00', iuuDecisionCode: 'C07', chedDecision: '', chedDecisionDetail: 'No match', iuuDecision: 'Release', iuuDecisionDetail: 'IUU inspection complete' },
+  { chedDecisionCode: 'X00', iuuDecisionCode: 'C08', chedDecision: '', chedDecisionDetail: 'No match', iuuDecision: 'Release', iuuDecisionDetail: 'IUU inspection not applicable' },
+  { chedDecisionCode: 'X00', iuuDecisionCode: 'X00', chedDecision: '', chedDecisionDetail: 'No match', iuuDecision: '', iuuDecisionDetail: 'No match' },
+  { chedDecisionCode: 'C01', iuuDecisionCode: 'X00', chedDecision: 'Release', chedDecisionDetail: 'Customs Freight Simplified Procedures (CFSP)', iuuDecision: '', iuuDecisionDetail: 'Refuse - IUU not compliant' },
+  { chedDecisionCode: 'N01', iuuDecisionCode: 'X00', chedDecision: 'Refuse', chedDecisionDetail: 'Not acceptable', iuuDecision: '', iuuDecisionDetail: 'Refuse - IUU not compliant' }
+])('IUU MRN Decision CHED Check Decision Code: $chedDecisionCode, IUU Check Decision Code: $iuuDecisionCode', (options) => {
+  const data = {
+    customsDeclarations: [{
+      movementReferenceNumber: 'GB251234567890ABCD',
+      clearanceRequest: {
+        declarationUcr: '5GB123456789000-BDOV123456',
+        commodities: [{
+          itemNumber: 1,
+          netMass: '9999',
+          documents: [{
+            documentCode: 'N853',
+            documentReference: 'GBCHD2025.1234567'
+          }, {
+            documentCode: 'C673',
+            documentReference: 'GBIUU-VARIOUS'
+          }],
+          checks: [{
+            checkCode: 'H222'
+          }, {
+            checkCode: 'H224'
+          }]
+        }]
+      },
+      clearanceDecision: {
+        items: [{
+          itemNumber: 1,
+          checks: [{
+            decisionCode: options.chedDecisionCode,
+            checkCode: 'H222'
+          }, {
+            decisionCode: options.iuuDecisionCode,
+            checkCode: 'H224'
+          }]
+        }]
+      },
+      finalisation: {
+        isManualRelease: false,
+        finalState: 0
+      },
+      updated: '2025-05-12T11:13:17.330Z'
+    }],
+    importPreNotifications: [{
+      importPreNotification: {
+        referenceNumber: 'CHEDP.GB.2025.1234567',
+        status: 'VALIDATED'
+      }
+    }]
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  const expected = [{
+    commodities: [
+      {
+        id: expect.any(String),
+        decisions: [{
+          id: expect.any(String),
+          documentReference: 'GBCHD2025.1234567',
+          match: true,
+          outcome: {
+            decision: options.chedDecision,
+            decisionDetail: options.chedDecisionDetail,
+            decisionReason: null,
+            departmentCode: 'POAO',
+            isIuuOutcome: false
+          }
+        }, {
+          id: expect.any(String),
+          documentReference: null,
+          match: null,
+          outcome: {
+            decision: options.iuuDecision,
+            decisionDetail: options.iuuDecisionDetail,
+            decisionReason: null,
+            departmentCode: 'IUU',
+            isIuuOutcome: true
+          }
+        }],
+        documents: {
+          'GBCHD2025.1234567': ['N853'],
+          'GBIUU-VARIOUS': ['C673']
+        },
+        checks: [
+          { checkCode: 'H222' },
+          { checkCode: 'H224' }
+        ],
+        itemNumber: 1,
+        netMass: '9999',
+        weightOrQuantity: '9999'
+      }
+    ],
+    movementReferenceNumber: 'GB251234567890ABCD',
+    declarationUcr: '5GB123456789000-BDOV123456',
+    open: true,
+    status: 'Finalised - Released',
+    updated: '12 May 2025, 11:13'
+  }]
+
+  expect(result).toEqual(expected)
+})

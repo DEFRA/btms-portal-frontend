@@ -43,9 +43,28 @@ export const getDecision = (decisionCode) => {
   return decisionHighLevelDesc
 }
 
-export const getDecisionDescription = (decisionCode, notificationStatus) => {
+export const getDecisionDescription = (decisionCode, notificationStatus, isIuuOutcome, allDecisionCodesAreNoMatch, iuuRelatedChedpCheck) => {
   if (closedChedStatuses.includes(notificationStatus)) {
     return `CHED ${notificationStatus.toLowerCase()}`
+  }
+
+  if (isIuuOutcome && decisionCode === 'X00') {
+    if (allDecisionCodesAreNoMatch) {
+      return 'No match'
+    }
+
+    if (iuuRelatedChedpCheck?.decisionCode === 'H01') {
+      return 'Hold - Decision not given'
+    }
+
+    if (iuuRelatedChedpCheck?.decisionCode === 'H02') {
+      return 'Hold - To be inspected'
+    }
+
+    if (isReleaseDecisionCode(iuuRelatedChedpCheck?.decisionCode) ||
+      isRefusalDecisionCode(iuuRelatedChedpCheck?.decisionCode)) {
+      return 'Refuse - IUU not compliant'
+    }
   }
 
   return decisionCodeDescriptions[decisionCode]
@@ -99,6 +118,12 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
     }
   })
 
+  const allDecisionCodesAreNoMatch = checksWithDecisionCodes.every((check) => {
+    return check.decisionCode === 'X00'
+  })
+
+  const iuuRelatedChedpCheck = checksWithDecisionCodes.find((check) => check.checkCode === 'H222')
+
   const decisions = checksWithDecisionCodes.map(check => {
     const lastSeven = 7
     const relevantDocuments = checkCodeToDocumentCodeMapping[check.checkCode]
@@ -106,15 +131,15 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
     const documentReference = (checkDocuments.length > 0) ? checkDocuments[0].documentReference : null
     const notificationStatus = documentReference ? notificationStatuses[documentReference.slice(-lastSeven)] : null
 
+    const isIuuOutcome = relevantDocuments.some(doc => IUUDocumentReferences.includes(doc))
+
     const outcome = {
       decision: getDecision(check.decisionCode),
-      decisionDetail: getDecisionDescription(check.decisionCode, notificationStatus),
+      decisionDetail: getDecisionDescription(check.decisionCode, notificationStatus, isIuuOutcome, allDecisionCodesAreNoMatch, iuuRelatedChedpCheck),
       decisionReason: check.decisionReasons?.length > 0 ? check.decisionReasons[0] : null,
       departmentCode: checkCodeToAuthorityMapping[check.checkCode],
       isIuuOutcome: relevantDocuments.some(doc => IUUDocumentReferences.includes(doc))
     }
-
-    const isIuuOutcome = relevantDocuments.some(doc => IUUDocumentReferences.includes(doc))
 
     return {
       id: randomUUID(),
