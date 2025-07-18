@@ -52,6 +52,12 @@ const customsDeclarations = [{
         documentCode: 'N002'
       }],
       checks: [{ checkCode: 'H220', departmentCode: 'HMI' }]
+    }, {
+      itemNumber: 4,
+      taricCommodityCode: '3120232190',
+      goodsDescription: 'CHICKEN 7000 KG',
+      netMass: '7000',
+      checks: [{ checkCode: 'H220', departmentCode: 'HMI' }]
     }]
   },
   clearanceDecision: {
@@ -72,6 +78,13 @@ const customsDeclarations = [{
       checks: [{
         checkCode: 'H220',
         decisionCode: 'X00'
+      }]
+    }, {
+      itemNumber: 4,
+      checks: [{
+        checkCode: 'H220',
+        decisionCode: 'X00',
+        decisionReasons: ['Needs a CHED']
       }]
     }]
   },
@@ -165,6 +178,12 @@ test('shows search results', async () => {
 
   const declaration = getByRole(document.body, 'group', { name: '24GB0Z8WEJ9ZBTL73B' })
   expect(declaration).toHaveAttribute('open')
+
+  const declarationRow4 = getByRole(declaration, 'row', {
+    name: '4 3120232190 CHICKEN 7000 KG 7000 Requires CHED Needs a CHED No No match (HMI)'
+  })
+  const requiresChedTooltip = declarationRow4.getElementsByTagName('span')
+  expect(requiresChedTooltip[0].innerHTML.trim()).toBe('Needs a CHED')
 
   const declarationRow3 = getByRole(declaration, 'row', {
     name: '3 1602321990 JBB VIENNESE ROAST 2 KG 87.07 CHEDP.BB.2025.NOMATCH This CHED reference cannot be found on the customs declaration. Please check that the reference is correct. No No match (HMI)'
