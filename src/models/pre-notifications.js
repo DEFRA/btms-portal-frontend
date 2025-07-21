@@ -6,11 +6,13 @@ import {
   PRODUCTS_OF_ANIMAL_ORIGIN,
   PLANT_HEALTH_SEEDS_INSPECTORATE,
   HORTICULTURAL_MARKETING_INSPECTORATE,
+  DECISION_NOT_GIVEN,
   chedStatusDescriptions,
   chedTypes,
   closedChedStatuses,
   DATE_FORMAT,
-  checkStatusToOutcome
+  checkStatusToOutcome,
+  iuuDecisionDisplay
 } from './model-constants.js'
 import { config } from '../config/config.js'
 
@@ -35,19 +37,21 @@ const getChecks = (preNotification, complementParameterSet) => {
   const decision =
     (['VALIDATED', 'REJECTED'].includes(preNotification.status) &&
       preNotification.partTwo?.decision?.decision) ||
-    'Decision not given'
+    DECISION_NOT_GIVEN
 
   const needsCatchCertificate = (
     preNotification.importNotificationType === chedTypes.CHEDP &&
     isCatchCertificateRequired(complementParameterSet.keyDataPair)
   )
 
+  const iuuDecision = (needsCatchCertificate && iuuDecisionDisplay[preNotification.partTwo?.controlAuthority?.iuuOption]) || DECISION_NOT_GIVEN
+
   const authority = authorities[preNotification.importNotificationType]
 
   return needsCatchCertificate
     ? [
         { decision, authority },
-        { decision, authority: ILLEGAL_UNREPORTED_UNREGULATED }
+        { decision: iuuDecision, authority: ILLEGAL_UNREPORTED_UNREGULATED }
       ]
     : [{ decision, authority }]
 }
@@ -71,7 +75,7 @@ const getChedPPChecks = (preNotification, complementParameterSet) => {
 
   return authorities.map((authority) => {
     if (!['VALIDATED', 'REJECTED', 'PARTIALLY_REJECTED'].includes(preNotification.status)) {
-      return { authority, decision: 'Decision not given' }
+      return { authority, decision: DECISION_NOT_GIVEN }
     }
 
     if (

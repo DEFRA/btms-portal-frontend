@@ -6,6 +6,7 @@ export const FOODS_NOT_ANIMAL_ORIGIN = 'FNAO'
 export const ILLEGAL_UNREPORTED_UNREGULATED = 'IUU'
 export const PRODUCTS_OF_ANIMAL_ORIGIN = 'POAO'
 export const PLANT_HEALTH_SEEDS_INSPECTORATE = 'PHSI'
+export const DECISION_NOT_GIVEN = 'Decision not given'
 
 export const chedTypes = {
   CHEDA: 'CVEDA',
@@ -92,4 +93,10 @@ export const finalStateMappings = {
   4: 'Seized',
   5: 'Released to King’s warehouse',
   6: 'Transferred to MSS'
+}
+
+export const iuuDecisionDisplay = {
+  IUUOK: 'IUU inspection complete',
+  IUUNotCompliant: 'IUU not compliant',
+  IUUNA: 'IUU inspection not applicable'
 }
