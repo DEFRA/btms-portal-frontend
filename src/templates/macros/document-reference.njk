@@ -4,10 +4,17 @@
   {% else %}
     {% set id = 'tooltip-' + decision.id %}
     <td class="govuk-table__cell btms-no-match" tabindex="0" aria-describedby="{{ id }}">
-      {{ decision.documentReference }}
-      <span role="tooltip" id="{{ id }}">
-        This CHED reference cannot be found on the customs declaration. Please check that the reference is correct.
-      </span>
+      {% if decision.outcome.requiresChed %}
+        Requires CHED
+        <span role="tooltip" id="{{ id }}">
+          {{ decision.outcome.decisionReason }}
+        </span>
+      {% else %}
+        {{ decision.documentReference }}
+        <span role="tooltip" id="{{ id }}">
+          This CHED reference cannot be found on the customs declaration. Please check that the reference is correct.
+        </span>
+      {% endif %}
     </td>
   {% endif %}
 {% endmacro%}

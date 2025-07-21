@@ -25,6 +25,7 @@ const isRefusalDecisionCode = (decisionCode) => {
 const isReleaseDecisionCode = (decisionCode) => {
   return hasDesiredPrefix(decisionCode, 'c0')
 }
+const requiresChed = (check, documents) => check.checkCode === 'H220' && check.decisionCode === 'X00' && documents.length === 0
 
 export const getDecision = (decisionCode) => {
   let decisionHighLevelDesc
@@ -113,8 +114,7 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
     return {
       ...check,
       decisionCode: decision?.decisionCode,
-      decisionReasons: decision?.decisionReasons,
-      decisionInternalFurtherDetail: decision?.decisionInternalFurtherDetail
+      decisionReasons: decision?.decisionReasons
     }
   })
 
@@ -138,7 +138,8 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
       decisionDetail: getDecisionDescription(check.decisionCode, notificationStatus, isIuuOutcome, allDecisionCodesAreNoMatch, iuuRelatedChedpCheck),
       decisionReason: check.decisionReasons?.length > 0 ? check.decisionReasons[0] : null,
       departmentCode: checkCodeToAuthorityMapping[check.checkCode],
-      isIuuOutcome: relevantDocuments.some(doc => IUUDocumentReferences.includes(doc))
+      isIuuOutcome: relevantDocuments.some(doc => IUUDocumentReferences.includes(doc)),
+      requiresChed: requiresChed(check, checkDocuments)
     }
 
     return {

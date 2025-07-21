@@ -68,7 +68,8 @@ test('MRN, open, finalised, using netMass, matched', () => {
             decisionDetail: 'Inspection complete',
             decisionReason: null,
             departmentCode: 'FNAO',
-            isIuuOutcome: false
+            isIuuOutcome: false,
+            requiresChed: false
           }
         }, {
           id: expect.any(String),
@@ -79,7 +80,8 @@ test('MRN, open, finalised, using netMass, matched', () => {
             decisionDetail: 'IUU inspection complete',
             decisionReason: null,
             departmentCode: 'IUU',
-            isIuuOutcome: true
+            isIuuOutcome: true,
+            requiresChed: false
           }
         }],
         documents: {
@@ -149,7 +151,8 @@ test('an MRN, with no CHED, with no documents returns expected response', () => 
             decisionDetail: 'No match',
             decisionReason: null,
             departmentCode: 'HMI',
-            isIuuOutcome: false
+            isIuuOutcome: false,
+            requiresChed: true
           }
         }],
         documents: {},
@@ -223,7 +226,8 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
             decisionReason: null,
             decisionDetail: undefined,
             departmentCode: 'PHSI',
-            isIuuOutcome: false
+            isIuuOutcome: false,
+            requiresChed: false
           }
         }, {
           id: expect.any(String),
@@ -235,7 +239,8 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
               decisionDetail: undefined,
               decisionReason: null,
               departmentCode: 'IUU',
-              isIuuOutcome: true
+              isIuuOutcome: true,
+              requiresChed: false
             }
         }],
         documents: {
@@ -301,7 +306,8 @@ test('de-dupes document references', () => {
           decisionDetail: undefined,
           decisionReason: null,
           departmentCode: 'POAO',
-          isIuuOutcome: false
+          isIuuOutcome: false,
+          requiresChed: false
         }
       }],
       documents: {
@@ -364,7 +370,8 @@ test('matches malformed references', () => {
           decisionDetail: undefined,
           decisionReason: null,
           departmentCode: 'FNAO',
-          isIuuOutcome: false
+          isIuuOutcome: false,
+          requiresChed: false
         }
       }],
       checks: [{ checkCode: 'H223' }],
