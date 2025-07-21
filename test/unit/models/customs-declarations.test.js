@@ -513,7 +513,8 @@ test.each([
             decisionDetail: options.chedDecisionDetail,
             decisionReason: null,
             departmentCode: 'POAO',
-            isIuuOutcome: false
+            isIuuOutcome: false,
+            requiresChed: false
           }
         }, {
           id: expect.any(String),
@@ -524,7 +525,8 @@ test.each([
             decisionDetail: options.iuuDecisionDetail,
             decisionReason: null,
             departmentCode: 'IUU',
-            isIuuOutcome: true
+            isIuuOutcome: true,
+            requiresChed: false
           }
         }],
         documents: {
