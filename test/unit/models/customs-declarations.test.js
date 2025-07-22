@@ -107,6 +107,244 @@ test('MRN, open, finalised, using netMass, matched', () => {
   expect(result).toEqual(expected)
 })
 
+test('a split consignment with a matching document returns expected response', () => {
+  const data = {
+    customsDeclarations: [{
+      movementReferenceNumber: 'GB251234567890ABCD',
+      clearanceRequest: {
+        declarationUcr: '5GB123456789000-BDOV123456',
+        commodities: [{
+          itemNumber: 1,
+          customsProcedureCode: '40001CG',
+          taricCommodityCode: '1601009105',
+          goodsDescription: 'FAT SAUSAGES',
+          consigneeId: 'GB930101485111',
+          consigneeName: 'GB930101485111',
+          netMass: 96,
+          supplementaryUnits: 0,
+          thirdQuantity: null,
+          originCountryCode: 'IT',
+          documents: [
+            {
+              documentCode: 'C640',
+              documentReference: 'GBCHD2025.1234567V',
+              documentStatus: 'AE',
+              documentControl: 'P',
+              documentQuantity: null
+            }
+          ],
+          checks: [
+            {
+              checkCode: 'H221',
+              departmentCode: 'AHVLA'
+            }
+          ]
+        }]
+      },
+      finalisation: {
+        isManualRelease: false,
+        finalState: 0
+      },
+      updated: '2025-05-12T11:13:17.330Z'
+    }],
+    clearanceDecision: {
+      items: [
+        {
+          itemNumber: 1,
+          checks: [
+            {
+              checkCode: 'H221',
+              decisionCode: 'C03',
+              decisionsValidUntil: null,
+              decisionReasons: [],
+              decisionInternalFurtherDetail: null
+            }
+          ]
+        }
+      ]
+    },
+    importPreNotifications: [{
+      importPreNotification: {
+        referenceNumber: 'CHEDP.GB.2025.1234567V',
+        status: 'VALIDATED'
+      }
+    }]
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  expect(result).toEqual([
+    {
+      commodities: [
+        {
+          checks: [
+            {
+              checkCode: 'H221',
+              departmentCode: 'AHVLA'
+            }
+          ],
+          consigneeId: 'GB930101485111',
+          consigneeName: 'GB930101485111',
+          customsProcedureCode: '40001CG',
+          decisions: [
+            {
+              documentReference: 'GBCHD2025.1234567V',
+              id: expect.any(String),
+              match: true,
+              outcome: {
+                decision: '',
+                decisionDetail: undefined,
+                decisionReason: null,
+                departmentCode: 'APHA',
+                isIuuOutcome: false,
+                requiresChed: false
+              }
+            }
+          ],
+          documents: {
+            'GBCHD2025.1234567V': [
+              'C640'
+            ]
+          },
+          goodsDescription: 'FAT SAUSAGES',
+          id: expect.any(String),
+          itemNumber: 1,
+          netMass: 96,
+          originCountryCode: 'IT',
+          supplementaryUnits: 0,
+          taricCommodityCode: '1601009105',
+          thirdQuantity: null,
+          weightOrQuantity: 96
+        }
+      ],
+      declarationUcr: '5GB123456789000-BDOV123456',
+      movementReferenceNumber: 'GB251234567890ABCD',
+      open: true,
+      status: 'Finalised - Released',
+      updated: '12 May 2025, 11:13'
+    }
+  ])
+})
+
+test('a split consignment without a matching document returns expected response', () => {
+  const data = {
+    customsDeclarations: [{
+      movementReferenceNumber: 'GB251234567890ABCD',
+      clearanceRequest: {
+        declarationUcr: '5GB123456789000-BDOV123456',
+        commodities: [{
+          itemNumber: 1,
+          customsProcedureCode: '40001CG',
+          taricCommodityCode: '1601009105',
+          goodsDescription: 'FAT SAUSAGES',
+          consigneeId: 'GB930101485111',
+          consigneeName: 'GB930101485111',
+          netMass: 96,
+          supplementaryUnits: 0,
+          thirdQuantity: null,
+          originCountryCode: 'IT',
+          documents: [
+            {
+              documentCode: 'C640',
+              documentReference: 'GBCHD2025.1999997V',
+              documentStatus: 'AE',
+              documentControl: 'P',
+              documentQuantity: null
+            }
+          ],
+          checks: [
+            {
+              checkCode: 'H221',
+              departmentCode: 'AHVLA'
+            }
+          ]
+        }]
+      },
+      finalisation: {
+        isManualRelease: false,
+        finalState: 0
+      },
+      updated: '2025-05-12T11:13:17.330Z'
+    }],
+    clearanceDecision: {
+      items: [
+        {
+          itemNumber: 1,
+          checks: [
+            {
+              checkCode: 'H221',
+              decisionCode: 'C03',
+              decisionsValidUntil: null,
+              decisionReasons: [],
+              decisionInternalFurtherDetail: null
+            }
+          ]
+        }
+      ]
+    },
+    importPreNotifications: [{
+      importPreNotification: {
+        referenceNumber: 'CHEDP.GB.2025.1234567V',
+        status: 'VALIDATED'
+      }
+    }]
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  expect(result).toEqual([
+    {
+      commodities: [
+        {
+          checks: [
+            {
+              checkCode: 'H221',
+              departmentCode: 'AHVLA'
+            }
+          ],
+          consigneeId: 'GB930101485111',
+          consigneeName: 'GB930101485111',
+          customsProcedureCode: '40001CG',
+          decisions: [
+            {
+              documentReference: 'GBCHD2025.1999997V',
+              id: expect.any(String),
+              match: false,
+              outcome: {
+                decision: '',
+                decisionDetail: undefined,
+                decisionReason: null,
+                departmentCode: 'APHA',
+                isIuuOutcome: false,
+                requiresChed: false
+              }
+            }
+          ],
+          documents: {
+            'GBCHD2025.1999997V': [
+              'C640'
+            ]
+          },
+          goodsDescription: 'FAT SAUSAGES',
+          id: expect.any(String),
+          itemNumber: 1,
+          netMass: 96,
+          originCountryCode: 'IT',
+          supplementaryUnits: 0,
+          taricCommodityCode: '1601009105',
+          thirdQuantity: null,
+          weightOrQuantity: 96
+        }
+      ],
+      declarationUcr: '5GB123456789000-BDOV123456',
+      movementReferenceNumber: 'GB251234567890ABCD',
+      open: true,
+      status: 'Finalised - Released',
+      updated: '12 May 2025, 11:13'
+    }
+  ])
+})
+
 test('an MRN, with no CHED, with no documents returns expected response', () => {
   const data = {
     customsDeclarations: [{

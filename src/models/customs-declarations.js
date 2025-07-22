@@ -10,6 +10,17 @@ import {
   DATE_FORMAT
 } from './model-constants.js'
 
+const documentReferenceRegex = /\d{7}[VR]?$/
+
+const extractDocumentReferenceId = (documentReference) => {
+  const match = documentReference.match(documentReferenceRegex)
+  if (match === null) {
+    return null
+  }
+
+  return match.length === 1 ? match[0] : null
+}
+
 const hasDesiredPrefix = (decisionCode, desiredPrefix) => {
   return decisionCode?.length && decisionCode.toLowerCase().startsWith(desiredPrefix)
 }
@@ -125,11 +136,11 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
   const iuuRelatedChedpCheck = checksWithDecisionCodes.find((check) => check.checkCode === 'H222')
 
   const decisions = checksWithDecisionCodes.map(check => {
-    const lastSeven = 7
     const relevantDocuments = checkCodeToDocumentCodeMapping[check.checkCode]
     const checkDocuments = (commodity.documents || []).filter(doc => relevantDocuments.includes(doc.documentCode))
     const documentReference = (checkDocuments.length > 0) ? checkDocuments[0].documentReference : null
-    const notificationStatus = documentReference ? notificationStatuses[documentReference.slice(-lastSeven)] : null
+    const documentReferenceId = documentReference ? extractDocumentReferenceId(documentReference) : null
+    const notificationStatus = documentReferenceId ? notificationStatuses[documentReferenceId] : null
 
     const isIuuOutcome = relevantDocuments.some(doc => IUUDocumentReferences.includes(doc))
 
