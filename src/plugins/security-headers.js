@@ -7,8 +7,8 @@ export const securityHeaders = {
           "default-src 'self'; " +
           `script-src 'self' 'nonce-${request.app.cspNonce}'; ` +
           "style-src 'self'; " +
-          "img-src 'self' data: www.googletagmanager.com; " +
-          "connect-src 'self' www.googletagmanager.com www.google.com; " +
+          "img-src 'self' https://*.google-analytics.com https://*.googletagmanager.com; " +
+          "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; " +
           "frame-ancestors 'none'; " +
           "base-uri 'self'; " +
           "form-action 'self';",
