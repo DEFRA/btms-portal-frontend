@@ -342,7 +342,7 @@ const config = convict({
     }
   },
   gtmId: {
-    doc: 'Google Tag Manager ID',
+    doc: 'Google Tag Manager container identifier',
     format: String,
     default: 'GTM-PSCS57N9',
     env: 'GTM_ID'

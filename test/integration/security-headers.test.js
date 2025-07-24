@@ -15,7 +15,7 @@ test('common responses', async () => {
 
   expect(headers)
     .toEqual({
-      'content-security-policy': "default-src 'self'; script-src 'self' 'nonce-random'; style-src 'self'; img-src 'self' data: www.googletagmanager.com; connect-src 'self' www.googletagmanager.com www.google.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';",
+      'content-security-policy': "default-src 'self'; script-src 'self' 'nonce-random'; style-src 'self'; img-src 'self' https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';",
       'cross-origin-opener-policy': 'same-origin',
       'cross-origin-resource-policy': 'same-origin',
       'origin-agent-cluster': '?1',
