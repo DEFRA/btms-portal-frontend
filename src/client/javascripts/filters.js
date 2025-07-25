@@ -1,7 +1,7 @@
 const filterTypes = {
   declaration: {
     all: ['decision', 'authority', 'match'],
-    list: ['decision', 'authority'],
+    list: ['decision', 'authority', 'match'],
     row: ['match']
   },
   notification: {
@@ -86,23 +86,7 @@ const setEmptyState = (table, type) => {
 }
 
 const setRow = (state, type, row) => {
-  const decisionsList = row.querySelector('ul')
-  const listItems = [...decisionsList.querySelectorAll('li')]
-
-  listItems.forEach((li) => {
-    li.hidden = filterTypes[type].list.some((key) =>
-      state[key] && li.dataset[key] !== state[key]
-    )
-  })
-
-  const rowHidden = filterTypes[type].row.some((key) =>
-    state[key] && row.dataset[key] !== state[key]
-  )
-
-  row.hidden = Boolean(
-    decisionsList.querySelectorAll('li:not([hidden])').length === 0 ||
-    rowHidden
-  )
+  row.hidden = filterTypes[type].list.some(key => state[key] && row.dataset[key] !== state[key])
 }
 
 const setRows = (state, type) => {

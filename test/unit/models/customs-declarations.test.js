@@ -63,31 +63,33 @@ test('MRN, open, finalised, using netMass, matched', () => {
           id: expect.any(String),
           documentReference: 'GBCHD2025.1234567',
           match: true,
-          outcome: {
-            decision: 'Release',
-            decisionDetail: 'Inspection complete',
-            decisionReason: null,
-            departmentCode: 'FNAO',
-            isIuuOutcome: false,
-            requiresChed: false
-          }
+          decision: 'Release',
+          decisionDetail: 'Inspection complete',
+          decisionReason: null,
+          departmentCode: 'FNAO',
+          isIuuOutcome: false,
+          requiresChed: false
         }, {
           id: expect.any(String),
           documentReference: null,
           match: null,
-          outcome: {
-            decision: 'Release',
-            decisionDetail: 'IUU inspection complete',
-            decisionReason: null,
-            departmentCode: 'IUU',
-            isIuuOutcome: true,
-            requiresChed: false
-          }
+          decision: 'Release',
+          decisionDetail: 'IUU inspection complete',
+          decisionReason: null,
+          departmentCode: 'IUU',
+          isIuuOutcome: true,
+          requiresChed: false
         }],
-        documents: {
-          'GBCHD2025.1234567': ['C678'],
-          'IGNORED IUUD DOCUMENT': ['C641']
-        },
+        documents: [
+          {
+            documentCode: 'C641',
+            documentReference: 'IGNORED IUUD DOCUMENT'
+          },
+          {
+            documentCode: 'C678',
+            documentReference: 'GBCHD2025.1234567'
+          }
+        ],
         checks: [
           { checkCode: 'H224' },
           { checkCode: 'H223' }
@@ -191,21 +193,23 @@ test('a split consignment with a matching document returns expected response', (
               documentReference: 'GBCHD2025.1234567V',
               id: expect.any(String),
               match: true,
-              outcome: {
-                decision: '',
-                decisionDetail: undefined,
-                decisionReason: null,
-                departmentCode: 'APHA',
-                isIuuOutcome: false,
-                requiresChed: false
-              }
+              decision: '',
+              decisionDetail: undefined,
+              decisionReason: null,
+              departmentCode: 'APHA',
+              isIuuOutcome: false,
+              requiresChed: false
             }
           ],
-          documents: {
-            'GBCHD2025.1234567V': [
-              'C640'
-            ]
-          },
+          documents: [
+            {
+              documentCode: 'C640',
+              documentControl: 'P',
+              documentQuantity: null,
+              documentReference: 'GBCHD2025.1234567V',
+              documentStatus: 'AE'
+            }
+          ],
           goodsDescription: 'FAT SAUSAGES',
           id: expect.any(String),
           itemNumber: 1,
@@ -310,21 +314,23 @@ test('a split consignment without a matching document returns expected response'
               documentReference: 'GBCHD2025.1999997V',
               id: expect.any(String),
               match: false,
-              outcome: {
-                decision: '',
-                decisionDetail: undefined,
-                decisionReason: null,
-                departmentCode: 'APHA',
-                isIuuOutcome: false,
-                requiresChed: false
-              }
+              decision: '',
+              decisionDetail: undefined,
+              decisionReason: null,
+              departmentCode: 'APHA',
+              isIuuOutcome: false,
+              requiresChed: false
             }
           ],
-          documents: {
-            'GBCHD2025.1999997V': [
-              'C640'
-            ]
-          },
+          documents: [
+            {
+              documentCode: 'C640',
+              documentControl: 'P',
+              documentQuantity: null,
+              documentReference: 'GBCHD2025.1999997V',
+              documentStatus: 'AE'
+            }
+          ],
           goodsDescription: 'FAT SAUSAGES',
           id: expect.any(String),
           itemNumber: 1,
@@ -384,16 +390,13 @@ test('an MRN, with no CHED, with no documents returns expected response', () => 
           id: expect.any(String),
           documentReference: null,
           match: false,
-          outcome: {
-            decision: '',
-            decisionDetail: 'No match',
-            decisionReason: null,
-            departmentCode: 'HMI',
-            isIuuOutcome: false,
-            requiresChed: true
-          }
+          decision: '',
+          decisionDetail: 'No match',
+          decisionReason: null,
+          departmentCode: 'HMI',
+          isIuuOutcome: false,
+          requiresChed: true
         }],
-        documents: {},
         checks: [
           { checkCode: 'H220' }
         ],
@@ -459,32 +462,47 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
           id: expect.any(String),
           documentReference: 'GBCHD2025.1234567',
           match: false,
-          outcome: {
-            decision: '',
-            decisionReason: null,
-            decisionDetail: undefined,
-            departmentCode: 'PHSI',
-            isIuuOutcome: false,
-            requiresChed: false
-          }
+          decision: '',
+          decisionReason: null,
+          decisionDetail: undefined,
+          departmentCode: 'PHSI',
+          isIuuOutcome: false,
+          requiresChed: false
+        }, {
+          id: expect.any(String),
+          documentReference: 'GBCHD2025.1234567',
+          match: false,
+          decision: '',
+          decisionReason: null,
+          decisionDetail: undefined,
+          departmentCode: 'PHSI',
+          isIuuOutcome: false,
+          requiresChed: false
         }, {
           id: expect.any(String),
           documentReference: null,
           match: null,
-          outcome:
-            {
-              decision: '',
-              decisionDetail: undefined,
-              decisionReason: null,
-              departmentCode: 'IUU',
-              isIuuOutcome: true,
-              requiresChed: false
-            }
+          decision: '',
+          decisionDetail: undefined,
+          decisionReason: null,
+          departmentCode: 'IUU',
+          isIuuOutcome: true,
+          requiresChed: false
         }],
-        documents: {
-          'GBCHD2025.1234567': ['N851', '9115'],
-          'IGNORED IUUD DOCUMENT': ['C641']
-        },
+        documents: [
+          {
+            documentCode: 'N851',
+            documentReference: 'GBCHD2025.1234567'
+          },
+          {
+            documentCode: '9115',
+            documentReference: 'GBCHD2025.1234567'
+          },
+          {
+            documentCode: 'C641',
+            documentReference: 'IGNORED IUUD DOCUMENT'
+          }
+        ],
         checks: [
           { checkCode: 'H224' },
           { checkCode: 'H219' }
@@ -499,68 +517,6 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
     open: true,
     status: 'Finalised - Manually released',
     updated: '12 May 2025, 12:42'
-  }]
-
-  expect(result).toEqual(expected)
-})
-
-test('de-dupes document references', () => {
-  const data = {
-    customsDeclarations: [{
-      movementReferenceNumber: 'GB2501010101010101',
-      clearanceRequest: {
-        declarationUcr: '5GB123456789000-BDOV123456',
-        commodities: [{
-          itemNumber: 1,
-          netMass: '1000',
-          documents: [{
-            documentCode: 'N853',
-            documentReference: 'GBCHD2025.0000001'
-          }, {
-            documentCode: 'N853',
-            documentReference: 'GBCHD2025.0000001'
-          }],
-          checks: [{ checkCode: 'H222' }]
-        }]
-      },
-      clearanceDecision: null,
-      finalisation: null,
-      updated: '2025-05-12T11:13:17.330Z'
-    }],
-    importPreNotifications: []
-  }
-
-  const result = mapCustomsDeclarations(data)
-
-  const expected = [{
-    commodities: [{
-      id: expect.any(String),
-      decisions: [{
-        id: expect.any(String),
-        documentReference: 'GBCHD2025.0000001',
-        match: false,
-        outcome: {
-          decision: '',
-          decisionDetail: undefined,
-          decisionReason: null,
-          departmentCode: 'POAO',
-          isIuuOutcome: false,
-          requiresChed: false
-        }
-      }],
-      documents: {
-        'GBCHD2025.0000001': ['N853']
-      },
-      checks: [{ checkCode: 'H222' }],
-      itemNumber: 1,
-      netMass: '1000',
-      weightOrQuantity: '1000'
-    }],
-    movementReferenceNumber: 'GB2501010101010101',
-    declarationUcr: '5GB123456789000-BDOV123456',
-    open: true,
-    status: 'Current',
-    updated: '12 May 2025, 11:13'
   }]
 
   expect(result).toEqual(expected)
@@ -603,19 +559,20 @@ test('matches malformed references', () => {
         id: expect.any(String),
         documentReference: 'GB.CHD.2025.0000002',
         match: true,
-        outcome: {
-          decision: '',
-          decisionDetail: undefined,
-          decisionReason: null,
-          departmentCode: 'FNAO',
-          isIuuOutcome: false,
-          requiresChed: false
-        }
+        decision: '',
+        decisionDetail: undefined,
+        decisionReason: null,
+        departmentCode: 'FNAO',
+        isIuuOutcome: false,
+        requiresChed: false
       }],
       checks: [{ checkCode: 'H223' }],
-      documents: {
-        'GB.CHD.2025.0000002': ['C678']
-      },
+      documents: [
+        {
+          documentCode: 'C678',
+          documentReference: 'GB.CHD.2025.0000002'
+        }
+      ],
       itemNumber: 1,
       netMass: '500',
       weightOrQuantity: '500'
@@ -624,6 +581,231 @@ test('matches malformed references', () => {
     declarationUcr: '5GB123456789000-BDOV123456',
     open: true,
     status: 'Current',
+    updated: '12 May 2025, 11:13'
+  }]
+
+  expect(result).toEqual(expected)
+})
+
+test('parses and returns document level decisions correctly', () => {
+  const data = {
+    customsDeclarations: [{
+      movementReferenceNumber: 'GB251234567890ABCD',
+      clearanceRequest: {
+        declarationUcr: '5GB123456789000-BDOV123456',
+        commodities: [{
+          itemNumber: 1,
+          netMass: '9999',
+          documents: [
+            {
+              documentCode: 'N851',
+              documentReference: 'GBCHD2025.9710001',
+              documentStatus: 'AE',
+              documentControl: 'P',
+              documentQuantity: null
+            },
+            {
+              documentCode: 'N851',
+              documentReference: 'GBCHD2025.9710002',
+              documentStatus: 'AE',
+              documentControl: 'P',
+              documentQuantity: null
+            },
+            {
+              documentCode: 'N851',
+              documentReference: 'GBCHD2025.9710003',
+              documentStatus: 'AE',
+              documentControl: 'P',
+              documentQuantity: null
+            },
+            {
+              documentCode: 'N851',
+              documentReference: 'GBCHD2025.9710004',
+              documentStatus: 'AE',
+              documentControl: 'P',
+              documentQuantity: null
+            }
+          ],
+          checks: [{
+            checkCode: 'H219',
+            departmentCode: 'PHSI'
+          }]
+        }]
+      },
+      clearanceDecision: {
+        items: [{
+          itemNumber: 1,
+          checks: [
+            {
+              checkCode: 'H219',
+              decisionCode: 'N02',
+              decisionsValidUntil: null,
+              decisionReasons: [],
+              decisionInternalFurtherDetail: null
+            }
+          ]
+        }],
+        results: [
+          {
+            itemNumber: 1,
+            importPreNotification: null,
+            documentReference: 'GBCHD2025.9710004',
+            checkCode: 'H219',
+            decisionCode: 'X00',
+            decisionReason: null,
+            internalDecisionCode: null
+          },
+          {
+            itemNumber: 1,
+            importPreNotification: 'CHEDPP.GB.2025.9710001',
+            documentReference: 'GBCHD2025.9710001',
+            checkCode: 'H219',
+            decisionCode: 'C03',
+            decisionReason: null,
+            internalDecisionCode: null
+          },
+          {
+            itemNumber: 1,
+            importPreNotification: 'CHEDPP.GB.2025.9710002',
+            documentReference: 'GBCHD2025.9710002',
+            checkCode: 'H219',
+            decisionCode: 'H01',
+            decisionReason: null,
+            internalDecisionCode: null
+          },
+          {
+            itemNumber: 1,
+            importPreNotification: 'CHEDPP.GB.2025.9710003',
+            documentReference: 'GBCHD2025.9710003',
+            checkCode: 'H219',
+            decisionCode: 'N02',
+            decisionReason: null,
+            internalDecisionCode: null
+          }
+
+        ]
+      },
+      finalisation: {
+        isManualRelease: false,
+        finalState: 0
+      },
+      updated: '2025-05-12T11:13:17.330Z'
+    }],
+    importPreNotifications: [{
+      importPreNotification: {
+        referenceNumber: 'CHEDP.GB.2025.9710001',
+        status: 'VALIDATED'
+      }
+    }, {
+      importPreNotification: {
+        referenceNumber: 'CHEDP.GB.2025.9710002',
+        status: 'VALIDATED'
+      }
+    }, {
+      importPreNotification: {
+        referenceNumber: 'CHEDP.GB.2025.9710003',
+        status: 'VALIDATED'
+      }
+    }]
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  const expected = [{
+    commodities: [
+      {
+        checks: [
+          {
+            checkCode: 'H219',
+            departmentCode: 'PHSI'
+          }
+        ],
+        decisions: [
+          {
+            decision: 'Refuse',
+            decisionDetail: 'Destroy',
+            decisionReason: null,
+            departmentCode: 'PHSI',
+            documentReference: 'GBCHD2025.9710001',
+            id: expect.any(String),
+            isIuuOutcome: false,
+            match: true,
+            requiresChed: false
+          },
+          {
+            decision: 'Refuse',
+            decisionDetail: 'Destroy',
+            decisionReason: null,
+            departmentCode: 'PHSI',
+            documentReference: 'GBCHD2025.9710002',
+            id: expect.any(String),
+            isIuuOutcome: false,
+            match: true,
+            requiresChed: false
+          },
+          {
+            decision: 'Refuse',
+            decisionDetail: 'Destroy',
+            decisionReason: null,
+            departmentCode: 'PHSI',
+            documentReference: 'GBCHD2025.9710003',
+            id: expect.any(String),
+            isIuuOutcome: false,
+            match: true,
+            requiresChed: false
+          },
+          {
+            decision: 'Refuse',
+            decisionDetail: 'Destroy',
+            decisionReason: null,
+            departmentCode: 'PHSI',
+            documentReference: 'GBCHD2025.9710004',
+            id: expect.any(String),
+            isIuuOutcome: false,
+            match: false,
+            requiresChed: false
+          }
+        ],
+        documents: [
+          {
+            documentCode: 'N851',
+            documentControl: 'P',
+            documentQuantity: null,
+            documentReference: 'GBCHD2025.9710001',
+            documentStatus: 'AE'
+          },
+          {
+            documentCode: 'N851',
+            documentControl: 'P',
+            documentQuantity: null,
+            documentReference: 'GBCHD2025.9710002',
+            documentStatus: 'AE'
+          },
+          {
+            documentCode: 'N851',
+            documentControl: 'P',
+            documentQuantity: null,
+            documentReference: 'GBCHD2025.9710003',
+            documentStatus: 'AE'
+          },
+          {
+            documentCode: 'N851',
+            documentControl: 'P',
+            documentQuantity: null,
+            documentReference: 'GBCHD2025.9710004',
+            documentStatus: 'AE'
+          }
+        ],
+        id: expect.any(String),
+        itemNumber: 1,
+        netMass: '9999',
+        weightOrQuantity: '9999'
+      }
+    ],
+    declarationUcr: '5GB123456789000-BDOV123456',
+    movementReferenceNumber: 'GB251234567890ABCD',
+    open: true,
+    status: 'Finalised - Released',
     updated: '12 May 2025, 11:13'
   }]
 
@@ -746,31 +928,33 @@ test.each([
           id: expect.any(String),
           documentReference: 'GBCHD2025.1234567',
           match: true,
-          outcome: {
-            decision: options.chedDecision,
-            decisionDetail: options.chedDecisionDetail,
-            decisionReason: null,
-            departmentCode: 'POAO',
-            isIuuOutcome: false,
-            requiresChed: false
-          }
+          decision: options.chedDecision,
+          decisionDetail: options.chedDecisionDetail,
+          decisionReason: null,
+          departmentCode: 'POAO',
+          isIuuOutcome: false,
+          requiresChed: false
         }, {
           id: expect.any(String),
           documentReference: null,
           match: null,
-          outcome: {
-            decision: options.iuuDecision,
-            decisionDetail: options.iuuDecisionDetail,
-            decisionReason: null,
-            departmentCode: 'IUU',
-            isIuuOutcome: true,
-            requiresChed: false
-          }
+          decision: options.iuuDecision,
+          decisionDetail: options.iuuDecisionDetail,
+          decisionReason: null,
+          departmentCode: 'IUU',
+          isIuuOutcome: true,
+          requiresChed: false
         }],
-        documents: {
-          'GBCHD2025.1234567': ['N853'],
-          'GBIUU-VARIOUS': ['C673']
-        },
+        documents: [
+          {
+            documentCode: 'N853',
+            documentReference: 'GBCHD2025.1234567'
+          },
+          {
+            documentCode: 'C673',
+            documentReference: 'GBIUU-VARIOUS'
+          }
+        ],
         checks: [
           { checkCode: 'H222' },
           { checkCode: 'H224' }
