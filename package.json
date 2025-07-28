@@ -23,7 +23,7 @@
     "test": "jest --coverage --verbose",
     "test:watch": "jest --watch",
     "test:lint": "standard",
-    "server:watch": "node --inspect=0.0.0.0 --watch --watch-path=src/templates --env-file-if-exists=.env.local src/index.js",
+    "server:watch": "node --inspect=0.0.0.0 --watch --watch-path=src --env-file-if-exists=.env.local src/index.js",
     "server:debug": "node --inspect-brk=0.0.0.0 --watch --env-file-if-exists=.env.local src/index.js",
     "prestart": "npm run build",
     "start": "NODE_ENV=production node --use-strict .",
