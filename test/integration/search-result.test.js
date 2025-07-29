@@ -23,7 +23,7 @@ const customsDeclarations = [{
       netMass: '17088.98',
       supplementaryUnits: 0,
       documents: [{
-        documentReference: 'CHEDA.GB.2025.0000001',
+        documentReference: 'GBCHD2025.0000001',
         documentCode: 'N002'
       }],
       checks: [
@@ -35,7 +35,7 @@ const customsDeclarations = [{
       goodsDescription: 'FROZEN MSC HADDOCK FILLETS',
       netMass: '4618.35',
       documents: [{
-        documentReference: 'CHEDP.GB.2025.0000002',
+        documentReference: 'GBCHD2025.0000002',
         documentCode: 'N853'
       }],
       checks: [{
@@ -61,32 +61,44 @@ const customsDeclarations = [{
     }]
   },
   clearanceDecision: {
-    items: [{
-      itemNumber: 1,
-      checks: [{
-        checkCode: 'H218',
-        decisionCode: 'C03'
-      }]
-    }, {
-      itemNumber: 2,
-      checks: [{
-        checkCode: 'H222',
-        decisionCode: 'H01'
-      }]
-    }, {
-      itemNumber: 3,
-      checks: [{
+    results: [
+      {
+        itemNumber: 1,
+        importPreNotification: 'CHEDA.GB.2025.0000001',
+        documentReference: 'CHEDA.GB.2025.0000001',
         checkCode: 'H220',
-        decisionCode: 'X00'
-      }]
-    }, {
-      itemNumber: 4,
-      checks: [{
+        decisionCode: 'C03',
+        decisionReason: null,
+        internalDecisionCode: null
+      },
+      {
+        itemNumber: 2,
+        importPreNotification: 'CHEDP.GB.2025.0000002',
+        documentReference: 'CHEDP.GB.2025.0000002',
+        checkCode: 'H222',
+        decisionCode: 'H01',
+        decisionReason: null,
+        internalDecisionCode: null
+      },
+      {
+        itemNumber: 3,
+        importPreNotification: null,
+        documentReference: 'CHEDP.BB.2025.NOMATCH',
         checkCode: 'H220',
         decisionCode: 'X00',
-        decisionReasons: ['Needs a CHED']
-      }]
-    }]
+        decisionReason: null,
+        internalDecisionCode: 'E80'
+      },
+      {
+        itemNumber: 4,
+        importPreNotification: null,
+        documentReference: null,
+        checkCode: 'H220',
+        decisionCode: 'X00',
+        decisionReason: 'Needs a CHED',
+        internalDecisionCode: 'E80'
+      }
+    ]
   },
   finalisation: {
     finalState: 0,

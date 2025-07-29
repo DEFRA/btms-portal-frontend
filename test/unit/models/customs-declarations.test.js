@@ -28,16 +28,26 @@ test('MRN, open, finalised, using netMass, matched', () => {
         }]
       },
       clearanceDecision: {
-        items: [{
-          itemNumber: 1,
-          checks: [{
-            decisionCode: 'C07',
-            checkCode: 'H224'
-          }, {
+        results: [
+          {
+            itemNumber: 1,
+            importPreNotification: 'CHEDP.GB.2025.1234567',
+            documentReference: 'GBCHD2025.1234567',
+            checkCode: 'H223',
             decisionCode: 'C03',
-            checkCode: 'H223'
-          }]
-        }]
+            decisionReason: null,
+            internalDecisionCode: null
+          },
+          {
+            itemNumber: 1,
+            importPreNotification: 'CHEDP.GB.2025.1234567',
+            documentReference: null,
+            checkCode: 'H224',
+            decisionCode: 'C07',
+            decisionReason: null,
+            internalDecisionCode: null
+          }
+        ]
       },
       finalisation: {
         isManualRelease: false,
@@ -143,28 +153,25 @@ test('a split consignment with a matching document returns expected response', (
           ]
         }]
       },
+      clearanceDecision: {
+        results: [
+          {
+            itemNumber: 1,
+            importPreNotification: 'CHEDP.GB.2025.1234567V',
+            documentReference: 'GBCHD2025.1234567V',
+            checkCode: 'H221',
+            decisionCode: 'C03',
+            decisionReason: null,
+            internalDecisionCode: null
+          }
+        ]
+      },
       finalisation: {
         isManualRelease: false,
         finalState: 0
       },
       updated: '2025-05-12T11:13:17.330Z'
     }],
-    clearanceDecision: {
-      items: [
-        {
-          itemNumber: 1,
-          checks: [
-            {
-              checkCode: 'H221',
-              decisionCode: 'C03',
-              decisionsValidUntil: null,
-              decisionReasons: [],
-              decisionInternalFurtherDetail: null
-            }
-          ]
-        }
-      ]
-    },
     importPreNotifications: [{
       importPreNotification: {
         referenceNumber: 'CHEDP.GB.2025.1234567V',
@@ -193,8 +200,8 @@ test('a split consignment with a matching document returns expected response', (
               documentReference: 'GBCHD2025.1234567V',
               id: expect.any(String),
               match: true,
-              decision: '',
-              decisionDetail: undefined,
+              decision: 'Release',
+              decisionDetail: 'Inspection complete',
               decisionReason: null,
               departmentCode: 'APHA',
               isIuuOutcome: false,
@@ -264,28 +271,25 @@ test('a split consignment without a matching document returns expected response'
           ]
         }]
       },
+      clearanceDecision: {
+        results: [
+          {
+            itemNumber: 1,
+            importPreNotification: 'CHEDP.GB.2025.1234567V',
+            documentReference: 'GBCHD2025.1999997V',
+            checkCode: 'H221',
+            decisionCode: 'C03',
+            decisionReason: null,
+            internalDecisionCode: 'E80'
+          }
+        ]
+      },
       finalisation: {
         isManualRelease: false,
         finalState: 0
       },
       updated: '2025-05-12T11:13:17.330Z'
     }],
-    clearanceDecision: {
-      items: [
-        {
-          itemNumber: 1,
-          checks: [
-            {
-              checkCode: 'H221',
-              decisionCode: 'C03',
-              decisionsValidUntil: null,
-              decisionReasons: [],
-              decisionInternalFurtherDetail: null
-            }
-          ]
-        }
-      ]
-    },
     importPreNotifications: [{
       importPreNotification: {
         referenceNumber: 'CHEDP.GB.2025.1234567V',
@@ -314,8 +318,8 @@ test('a split consignment without a matching document returns expected response'
               documentReference: 'GBCHD2025.1999997V',
               id: expect.any(String),
               match: false,
-              decision: '',
-              decisionDetail: undefined,
+              decision: 'Release',
+              decisionDetail: 'Inspection complete',
               decisionReason: null,
               departmentCode: 'APHA',
               isIuuOutcome: false,
@@ -366,13 +370,17 @@ test('an MRN, with no CHED, with no documents returns expected response', () => 
         }]
       },
       clearanceDecision: {
-        items: [{
-          itemNumber: 1,
-          checks: [{
+        results: [
+          {
+            itemNumber: 1,
+            importPreNotification: null,
+            documentReference: null,
+            checkCode: 'H220',
             decisionCode: 'X00',
-            checkCode: 'H220'
-          }]
-        }]
+            decisionReason: null,
+            internalDecisionCode: 'E80'
+          }
+        ]
       },
       finalisation: null,
       updated: '2025-05-12T11:13:17.330Z'
@@ -415,7 +423,7 @@ test('an MRN, with no CHED, with no documents returns expected response', () => 
   expect(result).toEqual(expected)
 })
 
-test('MRN, open, manual release, using supplementaryUnits, no decisions', () => {
+test('MRN, open, manual release, using supplementaryUnits, no Ipaffs records, all unmatched', () => {
   const data = {
     customsDeclarations: [{
       movementReferenceNumber: 'GB250123456789DCBA',
@@ -429,7 +437,7 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
             documentReference: 'GBCHD2025.1234567'
           }, {
             documentCode: '9115',
-            documentReference: 'GBCHD2025.1234567'
+            documentReference: 'GBCHD2025.1234568'
           }, {
             documentCode: 'C641',
             documentReference: 'IGNORED IUUD DOCUMENT'
@@ -438,12 +446,39 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
             { checkCode: 'H224' },
             { checkCode: 'H219' }
           ]
-        }],
-        finalisation: {
-          isManualRelease: true
-        }
+        }]
       },
-      clearanceDecision: null,
+      clearanceDecision: {
+        results: [
+          {
+            itemNumber: 1,
+            importPreNotification: null,
+            documentReference: 'GBCHD2025.1234567',
+            checkCode: 'H219',
+            decisionCode: 'X00',
+            decisionReason: null,
+            internalDecisionCode: 'E80'
+          },
+          {
+            itemNumber: 1,
+            importPreNotification: null,
+            documentReference: 'GBCHD2025.1234568',
+            checkCode: 'H219',
+            decisionCode: 'X00',
+            decisionReason: null,
+            internalDecisionCode: 'E80'
+          },
+          {
+            itemNumber: 1,
+            importPreNotification: null,
+            documentReference: 'IGNORED IUUD DOCUMENT',
+            checkCode: 'H224',
+            decisionCode: 'X00',
+            decisionReason: null,
+            internalDecisionCode: 'E80'
+          }
+        ]
+      },
       finalisation: {
         isManualRelease: true
       },
@@ -464,17 +499,17 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
           match: false,
           decision: '',
           decisionReason: null,
-          decisionDetail: undefined,
+          decisionDetail: 'No match',
           departmentCode: 'PHSI',
           isIuuOutcome: false,
           requiresChed: false
         }, {
           id: expect.any(String),
-          documentReference: 'GBCHD2025.1234567',
+          documentReference: 'GBCHD2025.1234568',
           match: false,
           decision: '',
           decisionReason: null,
-          decisionDetail: undefined,
+          decisionDetail: 'No match',
           departmentCode: 'PHSI',
           isIuuOutcome: false,
           requiresChed: false
@@ -483,7 +518,7 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
           documentReference: null,
           match: null,
           decision: '',
-          decisionDetail: undefined,
+          decisionDetail: 'No match',
           decisionReason: null,
           departmentCode: 'IUU',
           isIuuOutcome: true,
@@ -496,7 +531,7 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
           },
           {
             documentCode: '9115',
-            documentReference: 'GBCHD2025.1234567'
+            documentReference: 'GBCHD2025.1234568'
           },
           {
             documentCode: 'C641',
@@ -538,7 +573,19 @@ test('matches malformed references', () => {
           checks: [{ checkCode: 'H223' }]
         }]
       },
-      clearanceDecision: null,
+      clearanceDecision: {
+        results: [
+          {
+            itemNumber: 1,
+            importPreNotification: 'CHEDP.GB.2025.0000002',
+            documentReference: 'GB.CHD.2025.0000002',
+            checkCode: 'H223',
+            decisionCode: 'H01',
+            decisionReason: null,
+            internalDecisionCode: null
+          }
+        ]
+      },
       finalisation: null,
       updated: '2025-05-12T11:13:17.330Z'
     }],
@@ -559,8 +606,8 @@ test('matches malformed references', () => {
         id: expect.any(String),
         documentReference: 'GB.CHD.2025.0000002',
         match: true,
-        decision: '',
-        decisionDetail: undefined,
+        decision: 'Hold',
+        decisionDetail: 'Awaiting decision',
         decisionReason: null,
         departmentCode: 'FNAO',
         isIuuOutcome: false,
@@ -722,8 +769,19 @@ test('parses and returns document level decisions correctly', () => {
         ],
         decisions: [
           {
-            decision: 'Refuse',
-            decisionDetail: 'Destroy',
+            decision: '',
+            decisionDetail: 'No match',
+            decisionReason: null,
+            departmentCode: 'PHSI',
+            documentReference: 'GBCHD2025.9710004',
+            id: expect.any(String),
+            isIuuOutcome: false,
+            match: true,
+            requiresChed: false
+          },
+          {
+            decision: 'Release',
+            decisionDetail: 'Inspection complete',
             decisionReason: null,
             departmentCode: 'PHSI',
             documentReference: 'GBCHD2025.9710001',
@@ -733,8 +791,8 @@ test('parses and returns document level decisions correctly', () => {
             requiresChed: false
           },
           {
-            decision: 'Refuse',
-            decisionDetail: 'Destroy',
+            decision: 'Hold',
+            decisionDetail: 'Awaiting decision',
             decisionReason: null,
             departmentCode: 'PHSI',
             documentReference: 'GBCHD2025.9710002',
@@ -752,17 +810,6 @@ test('parses and returns document level decisions correctly', () => {
             id: expect.any(String),
             isIuuOutcome: false,
             match: true,
-            requiresChed: false
-          },
-          {
-            decision: 'Refuse',
-            decisionDetail: 'Destroy',
-            decisionReason: null,
-            departmentCode: 'PHSI',
-            documentReference: 'GBCHD2025.9710004',
-            id: expect.any(String),
-            isIuuOutcome: false,
-            match: false,
             requiresChed: false
           }
         ],
@@ -893,16 +940,26 @@ test.each([
         }]
       },
       clearanceDecision: {
-        items: [{
-          itemNumber: 1,
-          checks: [{
+        results: [
+          {
+            itemNumber: 1,
+            importPreNotification: 'CHEDP.GB.2025.1234567',
+            documentReference: 'GBCHD2025.1234567',
+            checkCode: 'H222',
             decisionCode: options.chedDecisionCode,
-            checkCode: 'H222'
-          }, {
+            decisionReason: null,
+            internalDecisionCode: null
+          },
+          {
+            itemNumber: 1,
+            importPreNotification: null,
+            documentReference: null,
+            checkCode: 'H224',
             decisionCode: options.iuuDecisionCode,
-            checkCode: 'H224'
-          }]
-        }]
+            decisionReason: null,
+            internalDecisionCode: null
+          }
+        ]
       },
       finalisation: {
         isManualRelease: false,
