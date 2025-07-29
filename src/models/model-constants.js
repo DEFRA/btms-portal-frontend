@@ -68,7 +68,7 @@ export const checkCodeToDocumentCodeMapping = {
   H224: ['C673', 'C641']
 }
 
-export const IUUDocumentReferences = ['C641', 'C673']
+export const IUUDocumentCodes = ['C641', 'C673']
 
 export const chedStatusDescriptions = {
   CANCELLED: 'Cancelled',
