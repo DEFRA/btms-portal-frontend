@@ -132,7 +132,9 @@ const mapLegacyDecisions = (commodity, clearanceDecision) => {
 }
 
 const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
-  const decisions = clearanceDecision?.results && clearanceDecision.results.length > 0 ? clearanceDecision.results : mapLegacyDecisions(commodity, clearanceDecision)
+  const documentLevelDecisions = clearanceDecision?.results && clearanceDecision.results.length > 0 ? clearanceDecision.results.filter(({ itemNumber }) => itemNumber === commodity.itemNumber) : null
+  const decisions = documentLevelDecisions || mapLegacyDecisions(commodity, (clearanceDecision?.items || []).find(({ itemNumber }) => itemNumber === commodity.itemNumber))
+
   const allDecisionCodesAreNoMatch = decisions.every(decision => decision.decisionCode === 'X00')
   const iuuRelatedChedpCheck = decisions.find(decision => decision.checkCode === 'H222')
 
@@ -170,7 +172,7 @@ const mapCustomsDeclaration = (declaration, notificationStatuses) => {
   const { clearanceRequest, clearanceDecision, finalisation } = declaration
   const updated = format(declaration.updated, DATE_FORMAT)
   const commodities = clearanceRequest.commodities
-    .map(commodity => mapCommodity(commodity, notificationStatuses, (clearanceDecision?.items || []).find(({ itemNumber }) => itemNumber === commodity.itemNumber)))
+    .map(commodity => mapCommodity(commodity, notificationStatuses, clearanceDecision))
 
   const status = getCustomsDeclarationStatus(finalisation)
   const open = getCustomsDeclarationOpenState(finalisation)
