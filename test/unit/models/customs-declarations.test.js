@@ -722,8 +722,19 @@ test('parses and returns document level decisions correctly', () => {
         ],
         decisions: [
           {
-            decision: 'Refuse',
-            decisionDetail: 'Destroy',
+            decision: '',
+            decisionDetail: 'No match',
+            decisionReason: null,
+            departmentCode: 'PHSI',
+            documentReference: 'GBCHD2025.9710004',
+            id: expect.any(String),
+            isIuuOutcome: false,
+            match: false,
+            requiresChed: false
+          },
+          {
+            decision: 'Release',
+            decisionDetail: 'Inspection complete',
             decisionReason: null,
             departmentCode: 'PHSI',
             documentReference: 'GBCHD2025.9710001',
@@ -733,8 +744,8 @@ test('parses and returns document level decisions correctly', () => {
             requiresChed: false
           },
           {
-            decision: 'Refuse',
-            decisionDetail: 'Destroy',
+            decision: 'Hold',
+            decisionDetail: 'Awaiting decision',
             decisionReason: null,
             departmentCode: 'PHSI',
             documentReference: 'GBCHD2025.9710002',
@@ -752,17 +763,6 @@ test('parses and returns document level decisions correctly', () => {
             id: expect.any(String),
             isIuuOutcome: false,
             match: true,
-            requiresChed: false
-          },
-          {
-            decision: 'Refuse',
-            decisionDetail: 'Destroy',
-            decisionReason: null,
-            departmentCode: 'PHSI',
-            documentReference: 'GBCHD2025.9710004',
-            id: expect.any(String),
-            isIuuOutcome: false,
-            match: false,
             requiresChed: false
           }
         ],
