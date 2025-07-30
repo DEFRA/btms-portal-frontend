@@ -11,11 +11,6 @@
   @include govuk-width-container(1200px);
 }
 
-.btms-header-nav {
-  float: right;
-  font-weight: 700;
-}
-
 .btms-heading-container {
   display: flex;
   align-items: end;
@@ -44,5 +39,23 @@
     height: 12px;
     top: 2px;
     right: -18px;
+  }
+}
+
+.govuk-template--rebranded  {
+  .btms-header-nav {
+    float: right;
+    margin-top: 19px;
+    margin-bottom: -19px;
+  }
+
+  .govuk-header__navigation-item {
+    a {
+      font-weight: 700;
+    }
+  }
+
+  .govuk-footer__crown {
+    margin-bottom: 0;
   }
 }
