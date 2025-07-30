@@ -4,10 +4,10 @@
   {% else %}
     {% set id = 'tooltip-' + decision.id %}
     <td class="govuk-table__cell btms-no-match" tabindex="0" aria-describedby="{{ id }}">
-      {% if decision.outcome.requiresChed %}
+      {% if decision.requiresChed %}
         Requires CHED
         <span role="tooltip" id="{{ id }}">
-          {{ decision.outcome.decisionReason }}
+          {{ decision.decisionReason }}
         </span>
       {% else %}
         {{ decision.documentReference }}
