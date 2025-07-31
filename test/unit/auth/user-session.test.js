@@ -197,17 +197,84 @@ describe('#userSession', () => {
       expect(result.isValid).toBeFalsy()
     })
 
+    test('Should catch errors, boom error, session still valid', async () => {
+      refreshAccessToken.mockRejectedValue({
+        isBoom: true,
+        payload: 'payload',
+        output: 'output'
+      })
+      const expiresAt = new Date().toISOString()
+      userSession = await setupAuthedUserSession(server, expiresAt)
+
+      const request = {
+        server,
+        state: {
+          userSession: {
+            sessionId: userSession.sessionId
+          }
+        },
+        logger: {
+          error: jest.fn()
+        }
+      }
+
+      const session = {
+        sessionId: userSession.sessionId
+      }
+
+      await validateUserSession(server, request, session)
+
+      expect(request.logger.error.mock.calls).toEqual([
+        [
+          JSON.stringify({
+            message: 'refreshing token',
+            sessionId: userSession.sessionId,
+            expiresAt,
+            payload: 'payload',
+            output: 'output'
+          })
+        ]
+      ])
+    })
+
+    test('Should catch errors, plain error, no user session', async () => {
+      refreshAccessToken.mockRejectedValue({ message: 'boom' })
+      userSession = await setupAuthedUserSession(server, new Date().toISOString())
+
+      const request = {
+        server,
+        state: {
+          userSession: {
+            sessionId: userSession.sessionId
+          }
+        },
+        logger: {
+          error: jest.fn()
+        }
+      }
+
+      const session = {
+        sessionId: userSession.sessionId
+      }
+
+      await validateUserSession(server, request, session)
+
+      expect(request.logger.error.mock.calls).toEqual([
+        [{ message: 'boom' }]
+      ])
+    })
+
     test('Should return valid if session token successfully refreshed', async () => {
       const refreshedToken = createRefreshedToken()
 
       refreshAccessToken.mockReturnValue({
         ok: true,
-        json: {
+        json: jest.fn().mockResolvedValue({
           id_token: refreshedToken,
           access_token: refreshedToken,
           refresh_token: refreshedToken,
           expires_in: sessionConfig.cache.ttl / 1000
-        }
+        })
       })
       userSession = await setupAuthedUserSession(server, new Date().toISOString())
 
