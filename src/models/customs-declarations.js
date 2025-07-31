@@ -133,7 +133,9 @@ const mapLegacyDecisions = (commodity, clearanceDecision) => {
 
 const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
   const documentLevelDecisions = clearanceDecision?.results && clearanceDecision.results.length > 0 ? clearanceDecision.results.filter(({ itemNumber }) => itemNumber === commodity.itemNumber) : null
-  const decisions = documentLevelDecisions || mapLegacyDecisions(commodity, (clearanceDecision?.items || []).find(({ itemNumber }) => itemNumber === commodity.itemNumber))
+  // Workaround until the DD outputs the checkCode as H220
+  const areAnyRequiresChedDecisions = documentLevelDecisions?.some(({ checkCode, decisionCode }) => decisionCode === 'X00' && checkCode === null) && (commodity.documents || []).length === 0
+  const decisions = (!areAnyRequiresChedDecisions && documentLevelDecisions) || mapLegacyDecisions(commodity, (clearanceDecision?.items || []).find(({ itemNumber }) => itemNumber === commodity.itemNumber))
 
   const allDecisionCodesAreNoMatch = decisions.every(decision => decision.decisionCode === 'X00')
   const iuuRelatedChedpCheck = decisions.find(decision => decision.checkCode === 'H222')
