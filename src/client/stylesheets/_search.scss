@@ -9,9 +9,16 @@
     padding: govuk-spacing(0);
   }
 
+  .govuk-input {
+    height: 50px;
+  }
+
   .govuk-hint .govuk-body-s {
-    color: inherit;
-    margin-bottom: 3px;
+    margin-bottom: 5px;
+  }
+
+  .govuk-error-message {
+    margin-bottom: 5px;
   }
 }
 

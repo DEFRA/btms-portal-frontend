@@ -22,6 +22,7 @@ const nunjucksEnvironment = nunjucks.configure(
     noCache: config.get('nunjucks.noCache')
   }
 )
+nunjucksEnvironment.addGlobal('govukRebrand', true)
 Object.entries(filters).forEach(([name, filter]) => {
   nunjucksEnvironment.addFilter(name, filter)
 })
