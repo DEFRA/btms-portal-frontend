@@ -36,6 +36,8 @@ const isRefusalDecisionCode = (decisionCode) => {
 const isReleaseDecisionCode = (decisionCode) => {
   return hasDesiredPrefix(decisionCode, 'c0')
 }
+const noMatchInternalDecisionCodes = ['E70', 'E71', 'E72', 'E73', 'E87']
+const internalDecisionCodeIsNoMatch = (internalDecisionCode) => noMatchInternalDecisionCodes.includes(internalDecisionCode)
 
 export const getDecision = (decisionCode) => {
   let decisionHighLevelDesc
@@ -99,34 +101,30 @@ export const getCustomsDeclarationOpenState = (finalisation) => !(
   (finalisation.finalState === '1' || finalisation.finalState === '2')
 )
 
+const createLegacyDecision = (commodity, check, document, decisionCheck) => ({
+  itemNumber: commodity.itemNumber,
+  documentReference: document?.documentReference || null,
+  checkCode: check.checkCode,
+  decisionCode: decisionCheck?.decisionCode,
+  decisionReason: decisionCheck?.decisionReasons?.length > 0 ? decisionCheck?.decisionReasons[0] : null,
+  internalDecisionCode: decisionCheck?.decisionInternalFurtherDetail?.length > 0 ? decisionCheck?.decisionInternalFurtherDetail[0] : null
+})
+
 const mapLegacyDecisions = (commodity, clearanceDecision) => {
   return commodity.checks.map(check => {
     const associatedDocumentCodes = checkCodeToDocumentCodeMapping[check.checkCode]
     const associatedDocuments = (commodity.documents || []).filter(doc => associatedDocumentCodes.includes(doc.documentCode))
 
+    // H220 - requires CHED
     if (associatedDocuments.length === 0) {
       const clearanceDecisionCheck = clearanceDecision?.checks.find(({ checkCode }) => checkCode === check.checkCode)
-      return [
-        {
-          itemNumber: commodity.itemNumber,
-          documentReference: null,
-          checkCode: check.checkCode,
-          decisionCode: clearanceDecisionCheck?.decisionCode,
-          decisionReason: clearanceDecisionCheck?.decisionReasons?.length > 0 ? clearanceDecisionCheck?.decisionReasons[0] : null
-        }
-      ]
+      return [createLegacyDecision(commodity, check, null, clearanceDecisionCheck)]
     }
 
     return associatedDocuments.map(doc => {
       const decision = clearanceDecision?.checks.find(({ checkCode }) => checkCode === check.checkCode)
 
-      return {
-        itemNumber: commodity.itemNumber,
-        documentReference: doc.documentReference,
-        checkCode: check.checkCode,
-        decisionCode: decision?.decisionCode,
-        decisionReason: decision?.decisionReasons?.length > 0 ? decision?.decisionReasons[0] : null
-      }
+      return createLegacyDecision(commodity, check, doc, decision)
     })
   }).flat()
 }
@@ -146,6 +144,8 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
       const notificationStatus = documentReferenceId ? notificationStatuses[documentReferenceId] : null
       const relevantDocCodes = checkCodeToDocumentCodeMapping[decision.checkCode]
       const isIuuOutcome = relevantDocCodes.some(code => IUUDocumentCodes.includes(code))
+      // H220 / requires CHED currently returns no decisionCode AND no internalDecisionCode in results[] which would match as YES
+      const isMatch = decision.decisionCode ? !internalDecisionCodeIsNoMatch(decision.internalDecisionCode) : false
 
       return {
         id: randomUUID(),
@@ -156,7 +156,7 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
         documentReference: isIuuOutcome ? null : decision.documentReference,
         isIuuOutcome,
         requiresChed: decision.documentReference == null && decision.checkCode === 'H220',
-        match: isIuuOutcome ? null : Boolean(notificationStatus)
+        match: isIuuOutcome ? null : isMatch
       }
     }).sort((a, b) => a.isIuuOutcome - b.isIuuOutcome)
 
