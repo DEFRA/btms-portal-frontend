@@ -100,3 +100,5 @@ export const iuuDecisionDisplay = {
   IUUNotCompliant: 'IUU not compliant',
   IUUNA: 'IUU inspection not applicable'
 }
+
+export const noMatchInternalDecisionCodes = ['E70', 'E71', 'E72', 'E73', 'E87']

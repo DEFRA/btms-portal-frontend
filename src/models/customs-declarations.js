@@ -6,6 +6,7 @@ import {
   closedChedStatuses,
   checkCodeToAuthorityMapping,
   finalStateMappings,
+  noMatchInternalDecisionCodes,
   IUUDocumentCodes,
   DATE_FORMAT
 } from './model-constants.js'
@@ -36,8 +37,6 @@ const isRefusalDecisionCode = (decisionCode) => {
 const isReleaseDecisionCode = (decisionCode) => {
   return hasDesiredPrefix(decisionCode, 'c0')
 }
-const noMatchInternalDecisionCodes = ['E70', 'E71', 'E72', 'E73', 'E87']
-const internalDecisionCodeIsNoMatch = (internalDecisionCode) => noMatchInternalDecisionCodes.includes(internalDecisionCode)
 
 export const getDecision = (decisionCode) => {
   let decisionHighLevelDesc
@@ -106,8 +105,8 @@ const createLegacyDecision = (commodity, check, document, decisionCheck) => ({
   documentReference: document?.documentReference || null,
   checkCode: check.checkCode,
   decisionCode: decisionCheck?.decisionCode,
-  decisionReason: decisionCheck?.decisionReasons?.length > 0 ? decisionCheck?.decisionReasons[0] : null,
-  internalDecisionCode: decisionCheck?.decisionInternalFurtherDetail?.length > 0 ? decisionCheck?.decisionInternalFurtherDetail[0] : null
+  decisionReason: decisionCheck?.decisionReasons?.[0] ?? null,
+  internalDecisionCode: decisionCheck?.decisionInternalFurtherDetail?.[0] ?? null
 })
 
 const mapLegacyDecisions = (commodity, clearanceDecision) => {
@@ -115,7 +114,7 @@ const mapLegacyDecisions = (commodity, clearanceDecision) => {
     const associatedDocumentCodes = checkCodeToDocumentCodeMapping[check.checkCode]
     const associatedDocuments = (commodity.documents || []).filter(doc => associatedDocumentCodes.includes(doc.documentCode))
 
-    // H220 - requires CHED
+    // This handles H220 - requires CHED cases where there are no docs, it creates a doc level decision with no doc ref
     if (associatedDocuments.length === 0) {
       const clearanceDecisionCheck = clearanceDecision?.checks.find(({ checkCode }) => checkCode === check.checkCode)
       return [createLegacyDecision(commodity, check, null, clearanceDecisionCheck)]
@@ -131,7 +130,7 @@ const mapLegacyDecisions = (commodity, clearanceDecision) => {
 
 const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
   const documentLevelDecisions = clearanceDecision?.results && clearanceDecision.results.length > 0 ? clearanceDecision.results.filter(({ itemNumber }) => itemNumber === commodity.itemNumber) : null
-  // Workaround until the DD outputs the checkCode as H220
+  // TODO: Remove - Workaround until the DD outputs the checkCode as H220
   const areAnyRequiresChedDecisions = documentLevelDecisions?.some(({ checkCode, decisionCode }) => decisionCode === 'X00' && checkCode === null) && (commodity.documents || []).length === 0
   const decisions = (!areAnyRequiresChedDecisions && documentLevelDecisions) || mapLegacyDecisions(commodity, (clearanceDecision?.items || []).find(({ itemNumber }) => itemNumber === commodity.itemNumber))
 
@@ -144,8 +143,9 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
       const notificationStatus = documentReferenceId ? notificationStatuses[documentReferenceId] : null
       const relevantDocCodes = checkCodeToDocumentCodeMapping[decision.checkCode]
       const isIuuOutcome = relevantDocCodes.some(code => IUUDocumentCodes.includes(code))
+      // TODO: Remove when DD outputs decisionCode
       // H220 / requires CHED currently returns no decisionCode AND no internalDecisionCode in results[] which would match as YES
-      const isMatch = decision.decisionCode ? !internalDecisionCodeIsNoMatch(decision.internalDecisionCode) : false
+      const isMatch = decision.decisionCode ? !noMatchInternalDecisionCodes.includes(decision.internalDecisionCode) : false
 
       return {
         id: randomUUID(),
