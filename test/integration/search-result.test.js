@@ -77,14 +77,16 @@ const customsDeclarations = [{
       itemNumber: 3,
       checks: [{
         checkCode: 'H220',
-        decisionCode: 'X00'
+        decisionCode: 'X00',
+        decisionInternalFurtherDetail: ['E70']
       }]
     }, {
       itemNumber: 4,
       checks: [{
         checkCode: 'H220',
         decisionCode: 'X00',
-        decisionReasons: ['Needs a CHED']
+        decisionReasons: ['Needs a CHED'],
+        decisionInternalFurtherDetail: ['E87']
       }]
     }]
   },
