@@ -1,0 +1,45 @@
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% if error %}
+  {% set errorMessage = { text: 'Choose how you want to sign in' } %}
+{% endif %}
+
+<form method="post" action="/sign-in-choose" class="btms-sign-in">
+  {{
+    govukRadios({
+      name: "authProvider",
+      value: provider,
+      fieldset: {
+        legend: {
+          text: pageTitle,
+          isPageHeading: LegendIsPageHeading,
+          classes: "govuk-fieldset__legend--l"
+        }
+      },
+      items: [
+        {
+          value: "entraId",
+          text: "Defra Single Sign-on",
+          hint: {
+            text: "If you have a Defra, APHA or FSA email address"
+          }
+        },
+        {
+          value: "defraId",
+          text: "Government Gateway",
+          hint: {
+            text: "If you have an HMRC or PHA email address"
+          }
+        }
+      ],
+      errorMessage: errorMessage
+    })
+  }}
+  {{
+    govukButton({
+      type: 'submit',
+      text: 'Sign in'
+    })
+  }}
+</form>
