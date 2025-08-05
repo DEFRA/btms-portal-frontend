@@ -32,7 +32,7 @@
   "author": "Defra DDTS",
   "license": "OGL-UK-3.0",
   "dependencies": {
-    "@babel/runtime": "^7.27.6",
+    "@babel/runtime": "^7.28.2",
     "@defra/hapi-tracing": "^1.26.0",
     "@elastic/ecs-pino-format": "^1.5.0",
     "@hapi/bell": "^13.1.0",
@@ -53,11 +53,11 @@
     "hapi-pino": "^12.1.0",
     "hapi-pulse": "^3.0.1",
     "https-proxy-agent": "^7.0.6",
-    "ioredis": "^5.6.1",
+    "ioredis": "^5.7.0",
     "joi": "^17.4.2",
     "nunjucks": "^3.2.4",
     "pino": "^9.7.0",
-    "pino-pretty": "^13.0.0"
+    "pino-pretty": "^13.1.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.28.0",
@@ -87,10 +87,10 @@
     "sass-loader": "^16.0.5",
     "source-map-loader": "^5.0.0",
     "standard": "^17.1.2",
-    "stylelint": "^16.21.1",
+    "stylelint": "^16.23.0",
     "stylelint-config-gds": "^2.0.0",
     "terser-webpack-plugin": "^5.3.10",
-    "webpack": "^5.100.2",
+    "webpack": "^5.101.0",
     "webpack-assets-manifest": "^5.2.1",
     "webpack-cli": "^6.0.1"
   },
