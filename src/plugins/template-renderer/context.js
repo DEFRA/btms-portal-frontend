@@ -36,7 +36,7 @@ export async function context (request) {
   if (authedUser?.isAuthenticated) {
     navigation.push({
       text: 'Sign out',
-      href: `${paths.SIGN_OUT}?provider=${authedUser.strategy}`
+      href: paths.SIGN_OUT
     })
   }
 
