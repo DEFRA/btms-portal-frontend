@@ -21,23 +21,27 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       <form id="search" class="btms-search-wrapper" action="/search-result">
+        <h1 class="govuk-label-wrapper">
+          <label class="govuk-label govuk-label--l" for="search-term">
+            Search by MRN, CHED or DUCR
+          </label>
+        </h1>
+        <div id="search-term-hint" class="govuk-hint govuk-body-s">
+          <p class="govuk-body-s">For example:</p>
+          <ul class="govuk-list govuk-body-s">
+            <li>MRN, 24GB6T3HFCIZV1HAR9</li>
+            <li>CHED, CHEDP.GB.2025.4433124 or GBCHD2025.4433124</li>
+            <li>DUCR, 4GB335031931000-WB2408-27WWL62745</li>
+          </ul>
+        </div>
         {{
           govukInput({
             errorMessage: {
               text: errors[errorCode],
               id: 'searchError'
             } if isValid == false,
-            label: {
-              text: pageTitle,
-              classes: "govuk-label--l",
-              isPageHeading: true
-            },
             id: "search-term",
             name: "searchTerm",
-            hint: {
-              html: searchHint,
-              classes: "govuk-body-s"
-            },
             spellcheck: false,
             formGroup: {
               afterInput: {

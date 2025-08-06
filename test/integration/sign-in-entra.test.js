@@ -5,35 +5,34 @@ import { config } from '../../src/config/config.js'
 
 const { oidcConfigurationUrl } = config.get('auth.entraId')
 
-test('redirects to search when authenticated', async () => {
+test('user not signed in', async () => {
+  const server = await initialiseServer()
+
+  const { headers, statusCode } = await server.inject({
+    method: 'get',
+    url: paths.SIGN_IN_ENTRA
+  })
+
+  const actualURL = new URL(headers.location)
+  const expectedURL = new URL(oidcConfigurationUrl)
+
+  expect(statusCode).toBe(302)
+  expect(actualURL.origin).toBe(expectedURL.origin)
+})
+
+test('user signed in', async () => {
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
 
   const { headers, statusCode } = await server.inject({
-    method: 'post',
-    url: paths.AUTH_DEFRA_ID_CALLBACK,
+    method: 'get',
     auth: {
-      strategy: 'defraId',
+      strategy: 'session',
       credentials
-    }
+    },
+    url: paths.SIGN_IN_ENTRA
   })
 
   expect(statusCode).toBe(302)
   expect(headers.location).toBe('/search')
-})
-
-test('redirects to auth provider when not authenticated', async () => {
-  const server = await initialiseServer()
-
-  const { headers, statusCode } = await server.inject({
-    method: 'post',
-    url: paths.AUTH_DEFRA_ID_CALLBACK
-  })
-
-  expect(statusCode).toBe(302)
-
-  const actualURL = new URL(headers.location)
-  const expectedUrl = new URL(oidcConfigurationUrl)
-
-  expect(actualURL.origin).toBe(expectedUrl.origin)
 })

@@ -74,28 +74,43 @@ async function validateUserSession (server, request, session) {
     return { isValid: false }
   }
 
-  const tokenHasExpired = isPast(
-    subMinutes(parseISO(authedUser.expiresAt), 1)
+  const minutesBeforeExpiry = 5
+  const tokenIsExpiring = isPast(
+    subMinutes(parseISO(authedUser.expiresAt), minutesBeforeExpiry)
   )
 
-  if (tokenHasExpired) {
-    const response = await refreshAccessToken(request)
+  if (tokenIsExpiring) {
+    try {
+      const response = await refreshAccessToken(request)
 
-    if (!response.ok) {
-      removeUserSession(request)
+      if (!response.ok) {
+        removeUserSession(request)
 
-      return { isValid: false }
-    }
+        return { isValid: false }
+      }
 
-    const refreshAccessTokenJson = await response.json
-    const updatedSession = await updateUserSession(
-      request,
-      refreshAccessTokenJson
-    )
+      const refreshAccessTokenJson = await response.json
+      const updatedSession = await updateUserSession(
+        request,
+        refreshAccessTokenJson
+      )
 
-    return {
-      isValid: true,
-      credentials: updatedSession
+      return {
+        isValid: true,
+        credentials: updatedSession
+      }
+    } catch (err) {
+      const error = err.isBoom
+        ? JSON.stringify({
+          message: 'refreshing token',
+          sessionId: session.sessionId,
+          expiresAt: authedUser.expiresAt,
+          payload: err.payload,
+          output: err.output
+        })
+        : err
+
+      request.logger.error(error)
     }
   }
 
