@@ -8,18 +8,20 @@
     {% include "./includes/google-tag-manager-head.njk" %}
   {% endif %}
   <link href="{{ getAssetPath('stylesheets/application.scss') }}" rel="stylesheet">
+  <link rel="icon" href="/public/assets/rebrand/images/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/public/assets/rebrand/images/favicon.svg" type="image/svg+xml">
 {% endblock %}
 
 {% set additionalHeaderOptions = {
   navigationClasses: 'btms-header-nav',
-  useTudorCrown: true
+  rebrand: true
 } %}
 
 {% set wrapperClass = 'govuk-main-wrapper' %}
 
 {% if landingPage %}
   {% set wrapperClass = 'btms-landing-page-wrapper' %}
-  {% set additionalHeaderOptions = additionalHeaderOptions | merge({ classes: 'btms-landing-page-header' }) %}
+  {% set additionalHeaderOptions = additionalHeaderOptions | merge({ classes: 'btms-landing-page-header', serviceName: null }) %}
 {% endif %}
 
 {% if resultsPage %}
