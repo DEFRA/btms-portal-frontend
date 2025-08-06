@@ -1,6 +1,9 @@
 import { initialiseServer } from '../utils/initialise-server.js'
 import { setupAuthedUserSession } from '../unit/utils/session-helper.js'
 import { paths } from '../../src/routes/route-constants.js'
+import { config } from '../../src/config/config.js'
+
+const { oidcConfigurationUrl } = config.get('auth.entraId')
 
 test('redirects to search when authenticated', async () => {
   const server = await initialiseServer()
@@ -29,5 +32,8 @@ test('redirects to auth provider when not authenticated', async () => {
 
   expect(statusCode).toBe(302)
 
-  expect(headers.location?.startsWith('https://')).toBe(true)
+  const actualURL = new URL(headers.location)
+  const expectedUrl = new URL(oidcConfigurationUrl)
+
+  expect(actualURL.origin).toBe(expectedUrl.origin)
 })
