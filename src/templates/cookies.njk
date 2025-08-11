@@ -1,11 +1,28 @@
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
 {% extends 'layout.njk' %}
 
 {% set pageTitle = 'Cookies' %}
 
 {% block content %}
-
-  {% if cookiePageConfirmation %}
+  {% if error %}
+    {% set errorMessage = { text: 'Choose your cookie preferences' } %}
+    {{
+      govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          {
+            text: errorMessage.text,
+            href: "#analytics"
+          }
+        ]
+      })
+    }}
+  {% endif %}
+  {% if showCookieConfirmationBanner %}
     {% set cookieNotificationBannerHtml %}
       <h3 class="govuk-notification-banner__heading">
         You’ve set your cookie preferences.
@@ -20,8 +37,6 @@
 
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
   <p>Cookies are small files saved on your phone, tablet or computer when you visit a website.</p>
-  <p>We use cookies to make Border Trade Matching Service (BTMS) work and to collect information about how you use the
-    service.</p>
   <h2 class="govuk-heading-m">Essential cookies</h2>
   <p>We use cookies to make Border Trade Matching Service (BTMS) work and to collect information about how you use the
     service.</p>
@@ -74,32 +89,31 @@
 
   <form action="/cookies" method="post">
     <input type="hidden" name="previousUrl" value="/cookies" />
-    <div class="govuk-form-group">
-      <fieldset class="govuk-fieldset">
-        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-          <h1 class="govuk-fieldset__heading">
-            Do you want to accept Google Tag Manager cookies?
-          </h1>
-        </legend>
-        <div class="govuk-radios" data-module="govuk-radios" data-govuk-radios-init="">
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="accept-analytics-cookies" name="cookies[analytics]" type="radio" value="yes" {% if acceptedCookies == true or (acceptCookies == undefined and cookiePolicy.analytics == true) %} checked {% endif %}>
-            <label class="govuk-label govuk-radios__label" for="accept-analytics-cookies">
-              Yes
-            </label>
-          </div>
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="reject-analytics-cookies" name="cookies[analytics]" type="radio" value="no" {% if acceptedCookies == false or (acceptedCookies == undefined and cookiePolicy.analytics == false) %} checked {% endif %}>
-            <label class="govuk-label govuk-radios__label" for="reject-analytics-cookies">
-              No
-            </label>
-          </div>
-        </div>
-      </fieldset>
-    </div>
-
-    <button type="submit" class="govuk-button" data-module="govuk-button">
-      Continue
-    </button>
+    {{
+      govukRadios({
+        name: 'analytics',
+        value: cookiePolicy.analytics,
+        fieldset: {
+          legend: {
+            text: 'Do you want to accept Google Tag Manager cookies?',
+            classes: "govuk-fieldset__legend--m"
+          }
+        },
+        items: [{
+          text:  'Yes',
+          value: 'yes'
+        }, {
+          text: 'No',
+          value: 'no'
+        }],
+        errorMessage: errorMessage
+      })
+    }}
+    {{
+      govukButton({
+        type: 'submit',
+        text: 'Continue'
+      })
+    }}
   </form>
 {% endblock %}

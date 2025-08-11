@@ -1,10 +1,9 @@
 import { paths } from '../../src/routes/route-constants.js'
 import { getByRole, queryByRole } from '@testing-library/dom'
 import globalJsdom from 'global-jsdom'
-import { constants as httpConstants } from 'http2'
 import { initialiseServer } from '../utils/initialise-server.js'
 
-test('cookies page renders', async () => {
+test('get: cookies page renders', async () => {
   const server = await initialiseServer()
 
   const { payload } = await server.inject({
@@ -21,7 +20,7 @@ test('cookies page renders', async () => {
   expect(document.title).toBe('Cookies - Border Trade Matching Service')
 })
 
-test('the cookie banner does not display on the cookies page', async () => {
+test('get: the cookie banner is not rendered', async () => {
   const server = await initialiseServer()
 
   const { payload } = await server.inject({
@@ -37,64 +36,38 @@ test('the cookie banner does not display on the cookies page', async () => {
   expect(cookieBanner).not.toBeInTheDocument()
 })
 
-test('agreeing to accept analytics cookies sets the cookie_policy cookie correctly', async () => {
+test('post: analytics sets the cookiePolicy & triggers confirmation', async () => {
   const server = await initialiseServer()
 
-  const { payload, request, statusCode } = await server.inject({
+  const { statusCode, request, headers } = await server.inject({
     method: 'post',
     url: paths.COOKIES,
     payload: {
-      'cookies[analytics]': 'yes',
-      previousUrl: '/cookies'
+      analytics: 'yes',
+      previousUrl: '/somewhere'
     }
   })
 
-  expect(statusCode).toBe(httpConstants.HTTP_STATUS_OK)
-  expect(payload).toContain('You’ve set your cookie preferences.')
-  expect(request._states.cookie_policy.value).toEqual({ analytics: true })
+  expect(statusCode).toBe(302)
+  expect(headers.location).toBe('/somewhere')
+
+  const [cookieString] = headers['set-cookie']
+  const { states } = await server.states.parse(cookieString)
+
+  expect(states.cookiePolicy).toEqual({ analytics: 'yes' })
+  expect(request.yar.flash('showCookieConfirmationBanner')).toEqual([true])
 })
 
-test('rejecting analytics cookies sets the cookie_policy cookie correctly', async () => {
+test('post: no cookie option chosen', async () => {
   const server = await initialiseServer()
-
-  const { payload, request, statusCode } = await server.inject({
+  const { headers, request, statusCode } = await server.inject({
     method: 'post',
     url: paths.COOKIES,
-    payload: {
-      'cookies[analytics]': 'no',
-      previousUrl: '/cookies'
-    }
+    payload: { previousUrl: '/cookies' }
   })
 
-  expect(statusCode).toBe(httpConstants.HTTP_STATUS_OK)
-  expect(payload).toContain('You’ve set your cookie preferences.')
-  expect(request._states.cookie_policy.value).toEqual({ analytics: false })
-})
+  expect(statusCode).toBe(302)
+  expect(headers.location).toBe('/cookies')
 
-test('POSTing to the /cookies endpoint with an invalid payload returns a 404', async () => {
-  const server = await initialiseServer()
-
-  const { statusCode } = await server.inject({
-    method: 'post',
-    url: paths.COOKIES,
-    payload: {
-      'cookies[analytics]': 'abcd'
-    }
-  })
-
-  expect(statusCode).toBe(httpConstants.HTTP_STATUS_BAD_REQUEST)
-})
-
-test('POSTing to the /cookies endpoint without a previousUrl returns a 404', async () => {
-  const server = await initialiseServer()
-
-  const { statusCode } = await server.inject({
-    method: 'post',
-    url: paths.COOKIES,
-    payload: {
-      'cookies[analytics]': 'yes'
-    }
-  })
-
-  expect(statusCode).toBe(httpConstants.HTTP_STATUS_BAD_REQUEST)
+  expect(request.yar.flash('cookiesError')).toEqual([true])
 })

@@ -169,7 +169,7 @@ test('shows search results', async () => {
       credentials
     },
     headers: {
-      Cookie: 'cookie_policy=' + Buffer.from('{"analytics":false}').toString('base64')
+      cookie: 'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
     }
   })
 
