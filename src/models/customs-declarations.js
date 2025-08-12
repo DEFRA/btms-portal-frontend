@@ -22,6 +22,23 @@ const extractDocumentReferenceId = (documentReference) => {
   return match.length === 1 ? match[0] : null
 }
 
+const determineWeightOrQuantity = (commodity, decisions) => {
+  // C640/CHEDA decisions should show the quantity, otherwise the weight
+  const hasC640Decision = decisions.some(decision => {
+    const relevantDocCodes = checkCodeToDocumentCodeMapping[decision.checkCode] || []
+    return relevantDocCodes.includes('C640')
+  })
+
+  const primary = hasC640Decision ? commodity.supplementaryUnits : commodity.netMass
+  const secondary = hasC640Decision ? commodity.netMass : commodity.supplementaryUnits
+
+  if (primary == null || primary === 0 || primary === '0') {
+    return Number(secondary)
+  }
+
+  return Number(primary)
+}
+
 const hasDesiredPrefix = (decisionCode, desiredPrefix) => {
   return decisionCode?.length && decisionCode.toLowerCase().startsWith(desiredPrefix)
 }
@@ -163,9 +180,7 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
   return {
     id: randomUUID(),
     ...commodity,
-    weightOrQuantity: Number(commodity.netMass)
-      ? commodity.netMass
-      : commodity.supplementaryUnits,
+    weightOrQuantity: determineWeightOrQuantity(commodity, decisions),
     decisions: clearanceDecisions
   }
 }
