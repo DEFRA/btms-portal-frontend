@@ -23,17 +23,16 @@ const extractDocumentReferenceId = (documentReference) => {
 }
 
 const determineWeightOrQuantity = (commodity, decisions) => {
-  // C640/CHEDA decisions should show the quantity, otherwise the weight
-  const hasC640Decision = decisions.some(decision => {
+  const showQuantity = decisions.some(decision => {
     const relevantDocCodes = checkCodeToDocumentCodeMapping[decision.checkCode] || []
     return relevantDocCodes.includes('C640')
   })
 
-  const primary = hasC640Decision ? commodity.supplementaryUnits : commodity.netMass
-  const secondary = hasC640Decision ? commodity.netMass : commodity.supplementaryUnits
+  const primary = showQuantity ? commodity.supplementaryUnits : commodity.netMass
+  const fallbackValue = showQuantity ? commodity.netMass : commodity.supplementaryUnits
 
   if (primary == null || primary === 0 || primary === '0') {
-    return Number(secondary)
+    return Number(fallbackValue)
   }
 
   return Number(primary)
