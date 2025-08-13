@@ -71,6 +71,7 @@ export const checkCodeToDocumentCodeMapping = {
 export const IUUDocumentCodes = ['C641', 'C673']
 
 export const chedStatusDescriptions = {
+  AMEND: 'Amend',
   CANCELLED: 'Cancelled',
   DELETED: 'Deleted',
   IN_PROGRESS: 'In progress',
