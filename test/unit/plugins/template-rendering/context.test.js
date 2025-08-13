@@ -13,7 +13,7 @@ jest.mock('node:fs', () => ({
   }))
 }))
 
-test('logged in: defraId', async () => {
+test('logged in', async () => {
   mockGetUserSession.mockReturnValue({
     strategy: 'defraId',
     isAuthenticated: true
@@ -29,30 +29,7 @@ test('logged in: defraId', async () => {
           text: 'Manage account',
           href: '#'
         },
-        { text: 'Sign out', href: '/sign-out?provider=defraId' }
-      ]
-    },
-    getAssetPath: expect.any(Function)
-  }
-
-  const result = await context({})
-
-  expect(result).toEqual(expected)
-})
-
-test('logged in: entraId', async () => {
-  mockGetUserSession.mockReturnValue({
-    strategy: 'entraId',
-    isAuthenticated: true
-  })
-
-  const expected = {
-    assetPath: '/public/assets',
-    defaultHeaderOptions: {
-      homepageUrl: 'https://www.gov.uk',
-      serviceName: 'Border Trade Matching Service',
-      navigation: [
-        { text: 'Sign out', href: '/sign-out?provider=entraId' }
+        { text: 'Sign out', href: '/sign-out' }
       ]
     },
     getAssetPath: expect.any(Function)

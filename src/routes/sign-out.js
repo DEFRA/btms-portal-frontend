@@ -12,7 +12,9 @@ export const signOut = {
       return h.redirect(paths.LANDING)
     }
 
-    const referrer = `${config.get('appBaseUrl')}${paths.SIGNED_OUT}`
+    const referrer = `${config.get('appBaseUrl')}${paths.SIGNED_OUT}?provider=${
+      authedUser.strategy
+    }`
     const idTokenHint = authedUser.idToken
 
     const logoutUrl = encodeURI(

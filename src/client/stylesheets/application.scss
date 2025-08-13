@@ -1,11 +1,12 @@
-@use "govuk-frontend" as *;
+@use 'govuk-frontend' as *;
 
-@use "variables" as *;
-@use "core";
-@use "search";
-@use "search-result";
-@use "landing-page";
-@use "filters";
+@use 'variables' as *;
+@use 'core';
+@use 'form-auth-provider';
+@use 'search';
+@use 'search-result';
+@use 'landing-page';
+@use 'filters';
 
 .btms-width-container--wide {
   @include govuk-width-container(1200px);

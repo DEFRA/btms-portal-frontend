@@ -7,6 +7,9 @@ export const home = {
     if (request.auth.isAuthenticated) {
       return h.redirect('/search')
     }
-    return h.view('home', { signInUrl: paths.SIGN_IN, landingPage: true })
+    return h.view('home', {
+      signInUrl: paths.SIGN_IN_CHOOSE,
+      landingPage: true
+    })
   }
 }
