@@ -40,7 +40,7 @@ test('401: unauthorized should redirect to /signed-out', async () => {
   })
 
   expect(statusCode).toBe(302)
-  expect(headers.location).toContain('/signed-out')
+  expect(headers.location).toContain('/sign-in-choose')
 })
 
 test('403: forbidden', async () => {
