@@ -49,6 +49,8 @@
     text-decoration: none;
     border: 1px solid $btms-light-to-mid-grey;
     margin-bottom: 0;
+    user-select: text;
+    pointer-events: none;
 
     &::before {
       content: none;
@@ -74,12 +76,17 @@
       width: 70px;
       align-items: center;
       justify-content: center;
-      border-left: 1px solid $btms-light-to-mid-grey
+      border-left: 1px solid $btms-light-to-mid-grey;
+      pointer-events: auto;
     }
 
     &:focus {
-      outline: 3px solid govuk-colour("yellow");
+      outline: none;
       box-shadow: none;
+
+      &::after {
+        outline: 3px solid govuk-colour("yellow");
+      }
     }
   }
 

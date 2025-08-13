@@ -1,4 +1,5 @@
 import { initialiseServer } from '../utils/initialise-server.js'
+import { config } from '../../src/config/config.js'
 
 jest.mock('node:crypto', () => ({
   randomBytes: jest.fn()
@@ -8,6 +9,9 @@ jest.mock('node:crypto', () => ({
 test('common responses', async () => {
   const server = await initialiseServer()
 
+  config.set('auth.defraId.oidcConfigurationUrl', 'https://defraId.com/ignored-path')
+  config.set('auth.entraId.oidcConfigurationUrl', 'https://entraId.com/ignored-path')
+
   const { headers } = await server.inject({
     method: 'get',
     url: '/'
@@ -15,7 +19,7 @@ test('common responses', async () => {
 
   expect(headers)
     .toEqual({
-      'content-security-policy': "default-src 'self'; script-src 'self' 'nonce-random'; style-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';",
+      'content-security-policy': "default-src 'self'; script-src 'self' 'nonce-random'; style-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://defraid.com https://entraid.com;",
       'cross-origin-opener-policy': 'same-origin',
       'cross-origin-resource-policy': 'same-origin',
       'origin-agent-cluster': '?1',
