@@ -9,8 +9,7 @@ jest.mock('node:crypto', () => ({
 test('common responses', async () => {
   const server = await initialiseServer()
 
-  config.set('auth.defraId.oidcConfigurationUrl', 'https://defraId.com/ignored-path')
-  config.set('auth.entraId.oidcConfigurationUrl', 'https://entraId.com/ignored-path')
+  config.set('auth.origins', ['https://defraid.com', 'https://entraid.com'])
 
   const { headers } = await server.inject({
     method: 'get',
