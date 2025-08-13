@@ -13,7 +13,6 @@ export const signedOut = {
   },
   handler: async (request, h) => {
     const { provider } = request.query
-    const signInUrl = provider === 'entraId' ? paths.SIGN_IN_ENTRA : paths.SIGN_IN
-    return h.view('signed-out', { signInUrl })
+    return h.view('signed-out', { provider })
   }
 }

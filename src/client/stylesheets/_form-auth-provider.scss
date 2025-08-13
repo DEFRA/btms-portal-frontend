@@ -1,0 +1,15 @@
+@use 'govuk-frontend' as *;
+
+.btms-sign-in {
+  .govuk-form-group {
+    &:not(.govuk-form-group--error) {
+      .govuk-fieldset__legend {
+        margin-bottom: govuk-spacing(6);
+      }
+    }
+  }
+
+  .govuk-label {
+    font-weight: 700;
+  }
+}

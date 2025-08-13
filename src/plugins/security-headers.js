@@ -1,7 +1,18 @@
+import { config } from '../config/config.js'
+
 export const securityHeaders = {
   name: 'security-headers',
   async register (server) {
     server.ext('onPreResponse', (request, h) => {
+      const { defraId, entraId } = config.get('auth')
+
+      const formActions = [defraId, entraId]
+        .map(({ oidcConfigurationUrl }) => {
+          const { origin } = new URL(oidcConfigurationUrl)
+          return origin
+        })
+        .join(' ')
+
       const headersToAdd = {
         'content-security-policy':
           "default-src 'self'; " +
@@ -11,7 +22,7 @@ export const securityHeaders = {
           "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; " +
           "frame-ancestors 'none'; " +
           "base-uri 'self'; " +
-          "form-action 'self';",
+          `form-action 'self' ${formActions};`,
         'cross-origin-opener-policy': 'same-origin',
         'cross-origin-resource-policy': 'same-origin',
         'origin-agent-cluster': '?1',
@@ -22,10 +33,9 @@ export const securityHeaders = {
         'x-download-options': 'noopen'
       }
 
-      Object.entries(headersToAdd)
-        .forEach(([key, value]) => {
-          request.response.headers[key] = value
-        })
+      Object.entries(headersToAdd).forEach(([key, value]) => {
+        request.response.headers[key] = value
+      })
 
       return h.continue
     })

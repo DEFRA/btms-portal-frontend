@@ -4,6 +4,7 @@ import { staticAssetRoutes } from './static-assets.js'
 import { home } from './home.js'
 import { signinOidc } from './signin-oidc.js'
 import { signIn } from './sign-in.js'
+import { signInChoose } from './sign-in-choose.js'
 import { signinOidcEntra } from './signin-oidc-entra.js'
 import { signInEntra } from './sign-in-entra.js'
 import { signOut } from './sign-out.js'
@@ -13,25 +14,21 @@ import { searchResult } from './search-result.js'
 import { chromeDevtools } from './chrome-devtools.js'
 import { cookiesGet, cookiesPost } from './cookies.js'
 
-const defaultRoutes = [
+export default [
   accessibility,
   cookiesGet,
   cookiesPost,
+  chromeDevtools,
   health,
   home,
-  chromeDevtools,
+  signIn,
+  ...signInChoose,
+  signInEntra,
+  signinOidc,
+  signinOidcEntra,
+  signedOut,
+  signOut,
+  search,
+  searchResult,
   ...staticAssetRoutes
 ]
-
-const appSpecificRoutes = [
-  signinOidc,
-  signIn,
-  signInEntra,
-  signinOidcEntra,
-  signOut,
-  signedOut,
-  search,
-  searchResult
-]
-
-export default defaultRoutes.concat(appSpecificRoutes)
