@@ -1,9 +1,31 @@
 import jwt from '@hapi/jwt'
 import { getOpenIdConfig } from './open-id-client.js'
 import { checkOrganisation } from './check-organisation.js'
+import { config } from '../config/config.js'
+
+const setOrigins = (providerEndpoints) => {
+  const { origins } = config.get('auth')
+
+  const newOrigins = providerEndpoints.filter(Boolean).map((endpoint) => {
+    const { origin } = new URL(endpoint)
+    return origin
+  })
+
+  const updatedOrigins = [...new Set([...origins, ...newOrigins])]
+
+  config.set('auth.origins', updatedOrigins)
+}
 
 export const openIdProvider = async (name, authConfig) => {
   const oidcConf = await getOpenIdConfig(authConfig.oidcConfigurationUrl)
+
+  const providerEndpoints = [
+    authConfig.oidcConfigurationUrl,
+    oidcConf.authorization_endpoint,
+    oidcConf.token_endpoint,
+    oidcConf.end_session_endpoint
+  ]
+  setOrigins(providerEndpoints)
 
   return {
     name,
