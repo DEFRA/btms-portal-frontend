@@ -331,6 +331,11 @@ const config = convict({
         env: 'AUTH_ENTRA_ID_SCOPES',
         default: ['openid', 'offline_access']
       }
+    },
+    origins: {
+      doc: 'Auth provider origins for CSP header',
+      format: Array,
+      default: []
     }
   },
   ipaffs: {

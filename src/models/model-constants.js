@@ -60,7 +60,7 @@ export const checkCodeToAuthorityMapping = {
 
 export const checkCodeToDocumentCodeMapping = {
   H218: ['N002'],
-  H219: ['N851', '9115'],
+  H219: ['N851', '9115', 'C085'],
   H220: ['N002'],
   H221: ['C640'],
   H222: ['N853'],
