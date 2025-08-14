@@ -4,14 +4,7 @@ export const securityHeaders = {
   name: 'security-headers',
   async register (server) {
     server.ext('onPreResponse', (request, h) => {
-      const { defraId, entraId } = config.get('auth')
-
-      const formActions = [defraId, entraId]
-        .map(({ oidcConfigurationUrl }) => {
-          const { origin } = new URL(oidcConfigurationUrl)
-          return origin
-        })
-        .join(' ')
+      const formActions = config.get('auth').origins.join(' ')
 
       const headersToAdd = {
         'content-security-policy':
