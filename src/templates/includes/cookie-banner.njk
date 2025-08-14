@@ -13,13 +13,13 @@
   <p class="govuk-body">You’ve rejected additional cookies. You can <a class="govuk-link" href="/cookies">change your cookie settings</a> at any time.</p>
 {% endset %}
 
-{% if cookieBannerConfirmation == "true" and cookiePolicy != null %}
+{% if showCookieConfirmationBanner and cookiePolicy != null %}
   {{ govukCookieBanner({
     ariaLabel: "Cookies on Border Trade Matching Service",
     messages: [
       {
         html: acceptHtml,
-        hidden: cookiePolicy.analytics == false,
+        hidden: cookiePolicy.analytics == 'no',
         actions: [
           {
             text: "Hide cookie message",
@@ -30,7 +30,7 @@
       },
       {
         html: rejectedHtml,
-        hidden: cookiePolicy.analytics == true,
+        hidden: cookiePolicy.analytics == 'yes',
         actions: [
         {
           text: "Hide cookie message",
@@ -43,7 +43,7 @@
   }) }}
 {% else %}
   <form method="post" action="/cookies">
-    <input type="hidden" id="previousUrl" name="previousUrl" value="{{ currentUrl }}" />
+    <input type="hidden" name="previousUrl" value="{{ currentUrl }}" />
     {{ govukCookieBanner({
       ariaLabel: "Cookies on Border Trade Matching Service",
       messages: [
@@ -54,13 +54,13 @@
             {
               text: "Accept analytics cookies",
               type: "submit",
-              name: "cookies[analytics]",
+              name: "analytics",
               value: "yes"
             },
             {
               text: "Reject analytics cookies",
               type: "submit",
-              name: "cookies[analytics]",
+              name: "analytics",
               value: "no"
             },
             {

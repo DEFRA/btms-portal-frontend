@@ -4,7 +4,7 @@
 {% set containerClasses = "" %}
 
 {% block head %}
-  {% if cookiePolicy.analytics == true %}
+  {% if cookiePolicy.analytics == 'yes' %}
     {% include "./includes/google-tag-manager-head.njk" %}
   {% endif %}
   <link href="{{ getAssetPath('stylesheets/application.scss') }}" rel="stylesheet">
@@ -32,13 +32,13 @@
 {% set headerOptions = defaultHeaderOptions | merge(additionalHeaderOptions) %}
 
 {% block bodyStart %}
-  {% if cookiePolicy.analytics == true %}
+  {% if cookiePolicy.analytics == 'yes' %}
     {% include "./includes/google-tag-manager-body.njk" %}
   {% endif %}
 {% endblock %}
 
 {% block header %}
-  {% if currentUrl != "/cookies" and (cookiePolicy == null or cookieBannerConfirmation != null) and hideCookieBanner != true %}
+  {% if currentUrl != "/cookies" and (cookiePolicy == null or showCookieConfirmationBanner) and hideCookieBanner != true %}
     {% include "./includes/cookie-banner.njk" %}
   {% endif %}
   {{ govukHeader(headerOptions) }}

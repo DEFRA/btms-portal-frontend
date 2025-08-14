@@ -1,38 +1,36 @@
 import { paths } from './route-constants.js'
-import Joi from 'joi'
+import joi from 'joi'
 
 export const cookiesGet = {
-  method: 'GET',
+  method: 'get',
   path: paths.COOKIES,
-  handler: (_, h) => {
-    return h.view('cookies')
+  handler: (request, h) => {
+    const [error] = request.yar.flash('cookiesError')
+    return h.view('cookies', { error })
   }
 }
 
 export const cookiesPost = {
-  method: 'POST',
+  method: 'post',
   path: paths.COOKIES,
   options: {
     validate: {
-      payload: Joi.object({
-        'cookies[analytics]': Joi.string().valid('yes', 'no').required(),
-        previousUrl: Joi.string().required()
-      }),
-      options: {
-        allowUnknown: true
+      payload: joi.object({
+        analytics: joi.string().valid('yes', 'no').required(),
+        previousUrl: joi.string().required()
+      }).unknown(),
+      failAction: (request, h) => {
+        request.yar.flash('cookiesError', true)
+
+        return h.redirect(paths.COOKIES).takeover()
       }
     }
   },
   handler: (request, h) => {
-    const { 'cookies[analytics]': acceptAnalyticsCookies, previousUrl } = request.payload
-    const acceptedCookies = acceptAnalyticsCookies === 'yes'
+    const { analytics, previousUrl } = request.payload
+    h.state('cookiePolicy', { analytics })
 
-    h.state('cookie_policy', { analytics: acceptedCookies })
-
-    if (previousUrl === '/cookies') {
-      return h.view('cookies', { acceptedCookies, cookiePageConfirmation: true })
-    }
-
-    return h.redirect(`${previousUrl}?cookieBannerConfirmation=true`)
+    request.yar.flash('showCookieConfirmationBanner', true)
+    return h.redirect(previousUrl)
   }
 }
