@@ -4,9 +4,9 @@ import { openIdProvider } from '../../../src/auth/open-id-provider.js'
 
 jest.mock('../../../src/auth/open-id-client.js', () => ({
   getOpenIdConfig: jest.fn().mockReturnValue({
-    authorization_endpoint: 'http://some-auth-endpoint',
-    token_endpoint: 'http://some-token-endpoint',
-    end_session_endpoint: 'http://some-end-session-endpoint'
+    authorization_endpoint: 'http://some-auth-endpoint/path',
+    token_endpoint: 'http://some-token-endpoint/path',
+    end_session_endpoint: 'http://some-end-session-endpoint/path'
   })
 }))
 
@@ -14,7 +14,7 @@ let provider
 
 beforeAll(async () => {
   provider = await openIdProvider('defraId', {
-    oidcConfigurationUrl: 'https://test.it'
+    oidcConfigurationUrl: 'https://test.it/path'
   })
 })
 
@@ -87,9 +87,17 @@ test('credentials exist', async () => {
     relationships: [`${currentRelationshipId}:${organisationId}`],
     roles: 'testRoles',
     idToken: 'test-id-token',
-    tokenUrl: 'http://some-token-endpoint',
-    logoutUrl: 'http://some-end-session-endpoint'
+    tokenUrl: 'http://some-token-endpoint/path',
+    logoutUrl: 'http://some-end-session-endpoint/path'
   })
+
+  expect(config.get('auth.origins'))
+    .toEqual([
+      'https://test.it',
+      'http://some-auth-endpoint',
+      'http://some-token-endpoint',
+      'http://some-end-session-endpoint'
+    ])
 })
 
 test('DefraId organisation not allowed', () => {

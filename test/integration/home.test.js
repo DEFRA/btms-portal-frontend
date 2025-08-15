@@ -40,3 +40,20 @@ test('authenticated', async () => {
   expect(headers.location)
     .toBe('/search')
 })
+
+test('footer links', async () => {
+  const server = await initialiseServer()
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: paths.LANDING
+  })
+
+  globalJsdom(payload)
+
+  expect(getByRole(document.body, 'link', { name: 'Accessibility statement' }))
+    .toHaveAttribute('href', '/accessibility-statement')
+
+  expect(getByRole(document.body, 'link', { name: 'Cookies' }))
+    .toHaveAttribute('href', '/cookies')
+})
