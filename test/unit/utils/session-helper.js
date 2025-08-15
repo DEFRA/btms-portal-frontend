@@ -13,9 +13,9 @@ export const setupAuthedUserSession = async (server, expiresAt) => {
   return authedUser
 }
 
-export const createAuthedUser = (expiresAt) => {
+export const createAuthedUser = (expiresAt, strategy) => {
   const expiresInSeconds = sessionConfig.cache.ttl / 1000
-  const authedUserProfile = createUserProfile()
+  const authedUserProfile = createUserProfile(strategy)
   authedUserProfile.expiresAt = expiresAt ?? authedUserProfile.expiresAt
 
   const dummyToken = createDummyToken(authedUserProfile, expiresInSeconds)
@@ -28,8 +28,8 @@ export const createAuthedUser = (expiresAt) => {
   }
 }
 
-export const createRefreshedToken = (sessionId) => {
-  const authedUserProfile = createUserProfile(sessionId)
+export const createRefreshedToken = () => {
+  const authedUserProfile = createUserProfile()
 
   return createDummyToken(authedUserProfile, sessionConfig.cache.ttl / 1000)
 }
@@ -53,7 +53,7 @@ function createDummyToken (authedUserProfile, ttl) {
   )
 }
 
-function createUserProfile (sessionId) {
+function createUserProfile (strategy) {
   const expiresInSeconds = sessionConfig.cache.ttl / 1000
   const expiresInMilliSeconds = sessionConfig.cache.ttl
   const expiresAt = addSeconds(new Date(), expiresInSeconds)
@@ -61,7 +61,7 @@ function createUserProfile (sessionId) {
   return {
     id: crypto.randomUUID(),
     correlationId: crypto.randomUUID(),
-    sessionId: sessionId ?? crypto.randomUUID(),
+    sessionId: crypto.randomUUID(),
     contactId: crypto.randomUUID(),
     serviceId: authConfig.defraId.serviceId,
     firstName: 'Test',
@@ -79,8 +79,8 @@ function createUserProfile (sessionId) {
     isAuthenticated: true,
     expiresIn: expiresInMilliSeconds,
     expiresAt: expiresAt.toISOString(),
-    tokenUrl: 'https://foo',
-    logoutUrl: 'https://bar',
-    strategy: 'defraId'
+    tokenUrl: strategy === 'entraId' ? 'https://entraid.foo' : 'https://defraid.foo',
+    logoutUrl: strategy === 'entraId' ? 'https://entraid.bar' : 'https://defraid.bar',
+    strategy: strategy === 'entraId' ? 'entraId' : 'defraId'
   }
 }

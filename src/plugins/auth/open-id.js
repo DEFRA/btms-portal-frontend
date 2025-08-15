@@ -12,7 +12,7 @@ const openId = {
     register: async (server) => {
       const defra = await openIdProvider('defraId', defraId)
       server.auth.strategy('defraId', 'bell', {
-        location: () => `${baseUrl}${paths.AUTH_DEFRA_ID_CALLBACK}`,
+        location: () => `${baseUrl}${paths.SIGNIN_DEFRA_ID_CALLBACK}`,
         provider: defra,
         password: cookie.password,
         clientId: defraId.clientId,

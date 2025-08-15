@@ -3,8 +3,8 @@ import { setUserSession } from '../auth/user-session.js'
 import { metricsCounter } from '../utils/metrics.js'
 
 export const signinOidc = {
-  method: ['GET', 'POST'],
-  path: paths.AUTH_DEFRA_ID_CALLBACK,
+  method: ['get', 'post'],
+  path: paths.SIGNIN_DEFRA_ID_CALLBACK,
   options: {
     auth: 'defraId'
   },

@@ -11,7 +11,7 @@ test('redirects to search when authenticated', async () => {
 
   const { headers, statusCode } = await server.inject({
     method: 'post',
-    url: paths.AUTH_DEFRA_ID_CALLBACK,
+    url: paths.SIGNIN_DEFRA_ID_CALLBACK,
     auth: {
       strategy: 'defraId',
       credentials
@@ -27,7 +27,7 @@ test('redirects to auth provider when not authenticated', async () => {
 
   const { headers, statusCode } = await server.inject({
     method: 'post',
-    url: paths.AUTH_DEFRA_ID_CALLBACK
+    url: paths.SIGNIN_DEFRA_ID_CALLBACK
   })
 
   expect(statusCode).toBe(302)
