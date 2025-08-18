@@ -13,6 +13,9 @@ test('accessibility statement', async () => {
 
   globalJsdom(payload)
 
-  getByRole(document.body, 'heading', { name: 'Accessibility statement' })
-  expect(document.title).toBe('Accessibility statement - Border Trade Matching Service')
+  getByRole(document.body, 'heading', {
+    name: 'Accessibility statement for the Border Trade Matching Service (BTMS)'
+  })
+  expect(document.title)
+    .toBe('Accessibility statement for the Border Trade Matching Service (BTMS) - Border Trade Matching Service')
 })
