@@ -1,0 +1,19 @@
+{%- macro cdsStatus(finalState) -%}
+  {%- set stateMap = {
+    "0": "green",
+    "1": "red",
+    "2": "red",
+    "3": "red",
+    "4": "red"
+  } -%}
+
+  {%- if finalState === null or finalState === undefined -%}
+    {%- set cdsStatusColour = "yellow" -%}
+  {%- else -%}
+    {%- set cdsStatusColour = stateMap[finalState] or "" -%}
+  {%- endif -%}
+
+  {%- if cdsStatusColour -%}
+    govuk-tag govuk-tag--{{ cdsStatusColour }}
+  {%- endif -%}
+{%- endmacro %}

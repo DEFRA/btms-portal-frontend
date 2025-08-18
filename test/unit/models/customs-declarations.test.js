@@ -103,7 +103,8 @@ test('MRN, open, finalised, using netMass, matched', () => {
     declarationUcr: '5GB123456789000-BDOV123456',
     open: true,
     status: 'Finalised - Released',
-    updated: '12 May 2025, 11:13'
+    updated: '12 May 2025, 11:13',
+    finalState: 0
   }]
 
   expect(result).toEqual(expected)
@@ -225,7 +226,8 @@ test('a split consignment with a matching document returns expected response', (
       movementReferenceNumber: 'GB251234567890ABCD',
       open: true,
       status: 'Finalised - Released',
-      updated: '12 May 2025, 11:13'
+      updated: '12 May 2025, 11:13',
+      finalState: 0
     }
   ])
 })
@@ -346,7 +348,8 @@ test('a split consignment without a matching document returns expected response'
       movementReferenceNumber: 'GB251234567890ABCD',
       open: true,
       status: 'Finalised - Released',
-      updated: '12 May 2025, 11:13'
+      updated: '12 May 2025, 11:13',
+      finalState: 0
     }
   ])
 })
@@ -411,7 +414,7 @@ test('an MRN, with no CHED, with no documents returns expected response', () => 
     movementReferenceNumber: 'GB251234567890ABCD',
     declarationUcr: '5GB123456789000-BDOV123456',
     open: true,
-    status: 'Current',
+    status: 'In-Progress',
     updated: '12 May 2025, 11:13'
   }]
 
@@ -600,7 +603,7 @@ test('matches malformed references', () => {
     movementReferenceNumber: 'GB2502020202020202',
     declarationUcr: '5GB123456789000-BDOV123456',
     open: true,
-    status: 'Current',
+    status: 'In-Progress',
     updated: '12 May 2025, 11:13'
   }]
 
@@ -823,6 +826,7 @@ test('parses and returns document level decisions correctly', () => {
       }
     ],
     declarationUcr: '5GB123456789000-BDOV123456',
+    finalState: 0,
     movementReferenceNumber: 'GB251234567890ABCD',
     open: true,
     status: 'Finalised - Released',
@@ -998,7 +1002,8 @@ test('the workaround for null checkCodes when a CHED is required to be created f
       movementReferenceNumber: 'GB251234567890ABCD',
       open: true,
       status: 'Finalised - Released',
-      updated: '12 May 2025, 11:13'
+      updated: '12 May 2025, 11:13',
+      finalState: 0
     }
   ]
 
@@ -1114,6 +1119,7 @@ test.each([
       }
     ],
     declarationUcr: '5GB123456789000-BDOV123456',
+    finalState: 0,
     movementReferenceNumber: 'GB251234567890ABCD',
     open: true,
     status: 'Finalised - Released',
@@ -1435,7 +1441,8 @@ test.each([
     declarationUcr: '5GB123456789000-BDOV123456',
     open: true,
     status: 'Finalised - Released',
-    updated: '12 May 2025, 11:13'
+    updated: '12 May 2025, 11:13',
+    finalState: 0
   }]
 
   expect(result).toEqual(expected)
