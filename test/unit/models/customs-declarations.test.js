@@ -96,7 +96,7 @@ test('MRN, open, finalised, using netMass, matched', () => {
         ],
         itemNumber: 1,
         netMass: '9999',
-        weightOrQuantity: '9999'
+        weightOrQuantity: 9999
       }
     ],
     movementReferenceNumber: 'GB251234567890ABCD',
@@ -123,7 +123,7 @@ test('a split consignment with a matching document returns expected response', (
           consigneeId: 'GB930101485111',
           consigneeName: 'GB930101485111',
           netMass: 96,
-          supplementaryUnits: 0,
+          supplementaryUnits: 5,
           thirdQuantity: null,
           originCountryCode: 'IT',
           documents: [
@@ -215,10 +215,10 @@ test('a split consignment with a matching document returns expected response', (
           itemNumber: 1,
           netMass: 96,
           originCountryCode: 'IT',
-          supplementaryUnits: 0,
+          supplementaryUnits: 5,
           taricCommodityCode: '1601009105',
           thirdQuantity: null,
-          weightOrQuantity: 96
+          weightOrQuantity: 5
         }
       ],
       declarationUcr: '5GB123456789000-BDOV123456',
@@ -244,7 +244,7 @@ test('a split consignment without a matching document returns expected response'
           consigneeId: 'GB930101485111',
           consigneeName: 'GB930101485111',
           netMass: 96,
-          supplementaryUnits: 0,
+          supplementaryUnits: 5,
           thirdQuantity: null,
           originCountryCode: 'IT',
           documents: [
@@ -336,10 +336,10 @@ test('a split consignment without a matching document returns expected response'
           itemNumber: 1,
           netMass: 96,
           originCountryCode: 'IT',
-          supplementaryUnits: 0,
+          supplementaryUnits: 5,
           taricCommodityCode: '1601009105',
           thirdQuantity: null,
-          weightOrQuantity: 96
+          weightOrQuantity: 5
         }
       ],
       declarationUcr: '5GB123456789000-BDOV123456',
@@ -405,7 +405,7 @@ test('an MRN, with no CHED, with no documents returns expected response', () => 
         ],
         itemNumber: 1,
         netMass: '9999',
-        weightOrQuantity: '9999'
+        weightOrQuantity: 9999
       }
     ],
     movementReferenceNumber: 'GB251234567890ABCD',
@@ -426,6 +426,7 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
         declarationUcr: '5GB123456789000-BDOV123456',
         commodities: [{
           itemNumber: 1,
+          netMass: 100,
           supplementaryUnits: '12',
           documents: [{
             documentCode: 'N851',
@@ -511,8 +512,9 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
           { checkCode: 'H219' }
         ],
         itemNumber: 1,
+        netMass: 100,
         supplementaryUnits: '12',
-        weightOrQuantity: '12'
+        weightOrQuantity: 100
       }
     ],
     movementReferenceNumber: 'GB250123456789DCBA',
@@ -593,7 +595,7 @@ test('matches malformed references', () => {
       ],
       itemNumber: 1,
       netMass: '500',
-      weightOrQuantity: '500'
+      weightOrQuantity: 500
     }],
     movementReferenceNumber: 'GB2502020202020202',
     declarationUcr: '5GB123456789000-BDOV123456',
@@ -817,7 +819,7 @@ test('parses and returns document level decisions correctly', () => {
         id: expect.any(String),
         itemNumber: 1,
         netMass: '9999',
-        weightOrQuantity: '9999'
+        weightOrQuantity: 9999
       }
     ],
     declarationUcr: '5GB123456789000-BDOV123456',
@@ -955,7 +957,7 @@ test('the workaround for null checkCodes when a CHED is required to be created f
           id: expect.any(String),
           itemNumber: 1,
           netMass: '9999',
-          weightOrQuantity: '9999'
+          weightOrQuantity: 9999
         },
         {
           checks: [
@@ -989,7 +991,7 @@ test('the workaround for null checkCodes when a CHED is required to be created f
           id: expect.any(String),
           itemNumber: 2,
           netMass: '9999',
-          weightOrQuantity: '9999'
+          weightOrQuantity: 9999
         }
       ],
       declarationUcr: '5GB123456789000-BDOV123456',
@@ -1108,7 +1110,7 @@ test.each([
         id: expect.any(String),
         itemNumber: 1,
         netMass: '9999',
-        weightOrQuantity: '9999'
+        weightOrQuantity: 9999
       }
     ],
     declarationUcr: '5GB123456789000-BDOV123456',
@@ -1164,6 +1166,162 @@ test('getCustomsDeclarationOpenState()', () => {
     finalState: '2'
   }))
     .toBe(false)
+})
+
+test('C640 document code uses supplementaryUnits for weightOrQuantity', () => {
+  const data = {
+    customsDeclarations: [{
+      movementReferenceNumber: 'GB251234567890ABCD',
+      clearanceRequest: {
+        declarationUcr: '5GB123456789000-BDOV123456',
+        commodities: [{
+          itemNumber: 1,
+          netMass: '500',
+          supplementaryUnits: '75',
+          documents: [{
+            documentCode: 'C640',
+            documentReference: 'GBCHD2025.1234567V'
+          }],
+          checks: [{
+            checkCode: 'H221'
+          }]
+        }]
+      },
+      clearanceDecision: {
+        items: [{
+          itemNumber: 1,
+          checks: [{
+            decisionCode: 'C03',
+            checkCode: 'H221'
+          }]
+        }]
+      },
+      finalisation: null,
+      updated: '2025-05-12T11:13:17.330Z'
+    }],
+    importPreNotifications: []
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  expect(result[0].commodities[0].weightOrQuantity).toBe(75)
+})
+
+test('C640 document code with zero supplementaryUnits falls back to netMass', () => {
+  const data = {
+    customsDeclarations: [{
+      movementReferenceNumber: 'GB251234567890ABCD',
+      clearanceRequest: {
+        declarationUcr: '5GB123456789000-BDOV123456',
+        commodities: [{
+          itemNumber: 1,
+          netMass: '400',
+          supplementaryUnits: 0,
+          documents: [{
+            documentCode: 'C640',
+            documentReference: 'GBCHD2025.1234567V'
+          }],
+          checks: [{
+            checkCode: 'H221'
+          }]
+        }]
+      },
+      clearanceDecision: {
+        items: [{
+          itemNumber: 1,
+          checks: [{
+            decisionCode: 'C03',
+            checkCode: 'H221'
+          }]
+        }]
+      },
+      finalisation: null,
+      updated: '2025-05-12T11:13:17.330Z'
+    }],
+    importPreNotifications: []
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  expect(result[0].commodities[0].weightOrQuantity).toBe(400)
+})
+
+test('non-C640 document code with zero netMass falls back to supplementaryUnits', () => {
+  const data = {
+    customsDeclarations: [{
+      movementReferenceNumber: 'GB251234567890ABCD',
+      clearanceRequest: {
+        declarationUcr: '5GB123456789000-BDOV123456',
+        commodities: [{
+          itemNumber: 1,
+          netMass: 0,
+          supplementaryUnits: '300',
+          documents: [{
+            documentCode: 'C678',
+            documentReference: 'GBCHD2025.1234567'
+          }],
+          checks: [{
+            checkCode: 'H223'
+          }]
+        }]
+      },
+      clearanceDecision: {
+        items: [{
+          itemNumber: 1,
+          checks: [{
+            decisionCode: 'C03',
+            checkCode: 'H223'
+          }]
+        }]
+      },
+      finalisation: null,
+      updated: '2025-05-12T11:13:17.330Z'
+    }],
+    importPreNotifications: []
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  expect(result[0].commodities[0].weightOrQuantity).toBe(300)
+})
+
+test('non-C640 document code uses netMass for weightOrQuantity', () => {
+  const data = {
+    customsDeclarations: [{
+      movementReferenceNumber: 'GB251234567890ABCD',
+      clearanceRequest: {
+        declarationUcr: '5GB123456789000-BDOV123456',
+        commodities: [{
+          itemNumber: 1,
+          netMass: '500',
+          supplementaryUnits: '75',
+          documents: [{
+            documentCode: 'C678',
+            documentReference: 'GBCHD2025.1234567'
+          }],
+          checks: [{
+            checkCode: 'H223'
+          }]
+        }]
+      },
+      clearanceDecision: {
+        items: [{
+          itemNumber: 1,
+          checks: [{
+            decisionCode: 'C03',
+            checkCode: 'H223'
+          }]
+        }]
+      },
+      finalisation: null,
+      updated: '2025-05-12T11:13:17.330Z'
+    }],
+    importPreNotifications: []
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  expect(result[0].commodities[0].weightOrQuantity).toBe(500)
 })
 
 test.each([
@@ -1270,7 +1428,7 @@ test.each([
         ],
         itemNumber: 1,
         netMass: '9999',
-        weightOrQuantity: '9999'
+        weightOrQuantity: 9999
       }
     ],
     movementReferenceNumber: 'GB251234567890ABCD',

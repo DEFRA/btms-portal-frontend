@@ -22,6 +22,22 @@ const extractDocumentReferenceId = (documentReference) => {
   return match.length === 1 ? match[0] : null
 }
 
+const determineWeightOrQuantity = (commodity, decisions) => {
+  const showQuantity = decisions.some(decision => {
+    const relevantDocCodes = checkCodeToDocumentCodeMapping[decision.checkCode] || []
+    return relevantDocCodes.includes('C640')
+  })
+
+  const primary = showQuantity ? commodity.supplementaryUnits : commodity.netMass
+  const fallbackValue = showQuantity ? commodity.netMass : commodity.supplementaryUnits
+
+  if (primary == null || primary === 0 || primary === '0') {
+    return Number(fallbackValue)
+  }
+
+  return Number(primary)
+}
+
 const hasDesiredPrefix = (decisionCode, desiredPrefix) => {
   return decisionCode?.length && decisionCode.toLowerCase().startsWith(desiredPrefix)
 }
@@ -163,9 +179,7 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
   return {
     id: randomUUID(),
     ...commodity,
-    weightOrQuantity: Number(commodity.netMass)
-      ? commodity.netMass
-      : commodity.supplementaryUnits,
+    weightOrQuantity: determineWeightOrQuantity(commodity, decisions),
     decisions: clearanceDecisions
   }
 }
