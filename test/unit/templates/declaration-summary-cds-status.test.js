@@ -22,6 +22,8 @@ describe('Declaration Summary - CDS Status Highlighting', () => {
     ['2', 'govuk-tag govuk-tag--red'],
     ['3', 'govuk-tag govuk-tag--red'],
     ['4', 'govuk-tag govuk-tag--red'],
+    ['5', ''],
+    ['6', ''],
     ['99', '']
   ])('Should set correct tag class when finalState is %s', (finalState, expectedClass) => {
     const viewContext = createDeclarationContext(finalState)

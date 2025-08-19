@@ -91,7 +91,7 @@ const customsDeclarations = [{
     }]
   },
   finalisation: {
-    finalState: 0,
+    finalState: '0',
     isManualRelease: false
   },
   updated: '2025-05-06T13:11:59.257Z'

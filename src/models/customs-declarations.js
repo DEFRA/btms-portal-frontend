@@ -100,7 +100,7 @@ export const getDecisionDescription = (decisionCode, notificationStatus, isIuuOu
 
 export const getCustomsDeclarationStatus = (finalisation) => {
   if (finalisation === null) {
-    return 'In-Progress'
+    return 'In progress'
   }
 
   if (finalisation.isManualRelease === true) {
