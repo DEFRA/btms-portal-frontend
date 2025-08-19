@@ -1,4 +1,5 @@
 import { constants } from 'node:http2'
+import { paths } from '../routes/route-constants.js'
 
 const {
   HTTP_STATUS_UNAUTHORIZED,
@@ -52,7 +53,7 @@ export const errorPage = {
       const { statusCode } = response.output
 
       if (statusCode === HTTP_STATUS_UNAUTHORIZED) {
-        return h.redirect('/signed-out')
+        return h.redirect(paths.SIGN_IN_CHOOSE)
       }
 
       if (statusCode >= HTTP_STATUS_INTERNAL_SERVER_ERROR) {
