@@ -52,12 +52,6 @@ const customsDeclarations = [{
         documentCode: 'N002'
       }],
       checks: [{ checkCode: 'H220', departmentCode: 'HMI' }]
-    }, {
-      itemNumber: 4,
-      taricCommodityCode: '3120232190',
-      goodsDescription: 'CHICKEN 7000 KG',
-      netMass: '7000',
-      checks: [{ checkCode: 'H220', departmentCode: 'HMI' }]
     }]
   },
   clearanceDecision: {
@@ -79,14 +73,6 @@ const customsDeclarations = [{
         checkCode: 'H220',
         decisionCode: 'X00',
         decisionInternalFurtherDetail: ['E70']
-      }]
-    }, {
-      itemNumber: 4,
-      checks: [{
-        checkCode: 'H220',
-        decisionCode: 'X00',
-        decisionReasons: ['Needs a CHED'],
-        decisionInternalFurtherDetail: ['E87']
       }]
     }]
   },
@@ -181,12 +167,6 @@ test('shows search results', async () => {
   const declaration = getByRole(document.body, 'group', { name: '24GB0Z8WEJ9ZBTL73B' })
   expect(declaration).toHaveAttribute('open')
 
-  const declarationRow4 = getByRole(declaration, 'row', {
-    name: '4 3120232190 CHICKEN 7000 KG 7000 Requires CHED Needs a CHED No No match (HMI)'
-  })
-  const requiresChedTooltip = declarationRow4.getElementsByTagName('span')
-  expect(requiresChedTooltip[0].innerHTML.trim()).toBe('Needs a CHED')
-
   const declarationRow3 = getByRole(declaration, 'row', {
     name: '3 1602321990 JBB VIENNESE ROAST 2 KG 87.07 CHEDP.BB.2025.NOMATCH This CHED reference cannot be found on the customs declaration. Please check that the reference is correct. No No match (HMI)'
   })
@@ -240,6 +220,80 @@ test('shows search results', async () => {
     .toBe(2)
   expect(document.title)
     .toBe('Showing result for 24GB0Z8WEJ9ZBTL73B - Border Trade Matching Service')
+})
+
+test('handles H220 1% check', async () => {
+  const h220Declaration = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: '25GBABCDEFGHIJKLMN',
+        clearanceRequest: {
+          declarationUcr: '2GB432144356000-ABC12345Y1BHX',
+          commodities: [
+            {
+              itemNumber: 1,
+              taricCommodityCode: '3120232190',
+              goodsDescription: 'CHICKEN 7000 KG',
+              netMass: '7000',
+              checks: [{ checkCode: 'H220', departmentCode: 'HMI' }],
+              documents: null
+            }
+          ]
+        },
+        clearanceDecision: {
+          items: [],
+          results: [
+            {
+              itemNumber: 1,
+              importPreNotification: null,
+              documentReference: '',
+              documentCode: null,
+              checkCode: 'H220',
+              decisionCode: 'X00',
+              decisionReason: 'Needs a CHED',
+              internalDecisionCode: 'E87'
+            }
+          ]
+        },
+        finalisation: null,
+        updated: '2025-05-06T13:11:59.257Z'
+      }
+    ],
+    importPreNotifications: []
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: h220Declaration })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=25GBABCDEFGHIJKLMN`,
+    auth: {
+      strategy: 'session',
+      credentials
+    },
+    headers: {
+      Cookie:
+        'cookie_policy=' + Buffer.from('{"analytics":false}').toString('base64')
+    }
+  })
+
+  globalJsdom(payload)
+
+  const notificationRow = getByRole(document.body, 'row', {
+    name: '1 3120232190 CHICKEN 7000 KG 7000 Requires CHED Needs a CHED No No match (HMI)'
+  })
+
+  expect(
+    getByRole(notificationRow, 'tooltip', {
+      name: 'Needs a CHED'
+    })
+  ).toBeInTheDocument()
 })
 
 test('redirects to search page if no results', async () => {
