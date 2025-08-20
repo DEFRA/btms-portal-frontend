@@ -376,7 +376,8 @@ test('an MRN, with no CHED, with no documents returns expected response', () => 
             decisionInternalFurtherDetail: [
               'E70'
             ],
-            checkCode: 'H220'
+            checkCode: 'H220',
+            decisionReasons: ['Decision Reason Here']
           }]
         }]
       },
@@ -398,7 +399,7 @@ test('an MRN, with no CHED, with no documents returns expected response', () => 
           match: false,
           decision: '',
           decisionDetail: 'No match',
-          decisionReason: null,
+          decisionReason: 'Decision Reason Here',
           departmentCode: 'HMI',
           isIuuOutcome: false,
           requiresChed: true
@@ -677,7 +678,7 @@ test('parses and returns document level decisions correctly', () => {
             documentReference: 'GBCHD2025.9710004',
             checkCode: 'H219',
             decisionCode: 'X00',
-            decisionReason: null,
+            decisionReason: 'Decision Reason Here',
             internalDecisionCode: 'E70'
           },
           {
@@ -749,7 +750,7 @@ test('parses and returns document level decisions correctly', () => {
           {
             decision: '',
             decisionDetail: 'No match',
-            decisionReason: null,
+            decisionReason: 'Decision Reason Here',
             departmentCode: 'PHSI',
             documentReference: 'GBCHD2025.9710004',
             id: expect.any(String),
@@ -901,7 +902,7 @@ test('the workaround for null checkCodes when a CHED is required to be created f
             documentReference: '',
             checkCode: null,
             decisionCode: 'X00',
-            decisionReason: null,
+            decisionReason: 'Decision Reason Here',
             internalDecisionCode: 'E70'
           },
           {
