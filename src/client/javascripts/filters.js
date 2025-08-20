@@ -1,14 +1,6 @@
 const filterTypes = {
-  declaration: {
-    all: ['decision', 'authority', 'match'],
-    list: ['decision', 'authority', 'match'],
-    row: ['match']
-  },
-  notification: {
-    all: ['chedAuthority'],
-    list: ['chedAuthority'],
-    row: []
-  }
+  declaration: ['decision', 'authority', 'match'],
+  notification: ['chedAuthority']
 }
 
 const resultTypes = {
@@ -37,11 +29,10 @@ const setState = (event) => {
 }
 
 const getState = (filterKeys) => {
-  const url = new URL(window.location.href)
-  const params = new URLSearchParams(url.search)
+  const { searchParams } = new URL(window.location.href)
 
   const entries = filterKeys
-    .map((key) => [key, params.get(key)])
+    .map((key) => [key, searchParams.get(key)])
     .filter(([_, value]) => value)
 
   return Object.fromEntries(entries)
@@ -85,8 +76,25 @@ const setEmptyState = (table, type) => {
   }
 }
 
-const setRow = (state, type, row) => {
-  row.hidden = filterTypes[type].list.some(key => state[key] && row.dataset[key] !== state[key])
+const setRow = {
+  declaration: (state, row) => {
+    row.hidden = filterTypes.declaration.some((key) =>
+      state[key] && row.dataset[key] !== state[key]
+    )
+  },
+  notification: (state, row) => {
+    const authorityList = row.querySelector('ul')
+    const listItems = [...authorityList.querySelectorAll('li')]
+
+    listItems.forEach((li) => {
+      li.hidden = filterTypes.notification.some((key) =>
+        state[key] && li.dataset[key] !== state[key]
+      )
+    })
+
+    row.hidden = authorityList
+      .querySelectorAll('li:not([hidden])').length === 0
+  }
 }
 
 const setRows = (state, type) => {
@@ -95,7 +103,7 @@ const setRows = (state, type) => {
   tables.forEach((table) => {
     const rows = [...table.querySelectorAll('tbody tr')]
 
-    rows.forEach((row) => setRow(state, type, row))
+    rows.forEach((row) => setRow[type](state, row))
     setEmptyState(table, type)
   })
 }
@@ -107,17 +115,17 @@ const setUpFilters = (type) => {
   const filters = document.getElementById(`${type}-filters`)
   filters.addEventListener('change', (event) => {
     setState(event)
-    const state = getState(filterTypes[type].all)
+    const state = getState(filterTypes[type])
     clearButton(state, `${type}-reset`)
     setRows(state, type)
   })
   filters.addEventListener('reset', () => {
-    const state = resetState(filterTypes[type].all)
+    const state = resetState(filterTypes[type])
     clearButton(state, `${type}-reset`)
     setRows(state, type)
   })
 
-  const initialState = getState(filterTypes[type].all)
+  const initialState = getState(filterTypes[type])
   clearButton(initialState, `${type}-reset`)
   selects(initialState)
   setRows(initialState, type)
