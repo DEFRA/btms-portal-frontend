@@ -14,16 +14,16 @@ const getOpenIdConfig = async (oidcConfigurationUrl) => {
 }
 
 const getOpenIdRefreshToken = async (refreshUrl, params) => {
-  const { res, payload } = await wreck.post(refreshUrl, {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Cache-Control': 'no-cache'
-    },
-    payload: querystring.stringify(params)
-  })
+  try {
+    const { res, payload } = await wreck.post(refreshUrl, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Cache-Control': 'no-cache'
+      },
+      payload: querystring.stringify(params)
+    })
 
-  if (res.statusCode === constants.HTTP_STATUS_OK) {
-    try {
+    if (res.statusCode === constants.HTTP_STATUS_OK) {
       const jsonResponse = JSON.parse(payload.toString())
 
       if (jsonResponse?.access_token &&
@@ -35,9 +35,9 @@ const getOpenIdRefreshToken = async (refreshUrl, params) => {
           json: jsonResponse
         }
       }
-    } catch (e) {
-      logger.error(e, 'Response from Open ID refresh call contains invalid JSON payload.')
     }
+  } catch (err) {
+    logger.error(err.data?.payload?.toString() || err)
   }
 
   return { ok: false }
