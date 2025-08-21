@@ -241,7 +241,7 @@ test('results are can be filtered', async () => {
     url: `${paths.SEARCH_RESULT}?${queryString}`,
     auth: { strategy: 'session', credentials },
     headers: {
-      cookie: 'cookie_policy=' + Buffer.from('{"analytics":false}').toString('base64')
+      cookie: 'cookiePolicy=' + Buffer.from('{"analytics":false}').toString('base64')
     }
   })
 
