@@ -8,7 +8,7 @@ export const search = {
     cache: CACHE_CONTROL_NO_STORE
   },
   handler: (request, h) => {
-    const searchError = request.yar.flash('searchError')?.at(0) ?? {}
+    const [searchError] = request.yar.flash('searchError')
 
     return h.view('search', searchError)
   }
