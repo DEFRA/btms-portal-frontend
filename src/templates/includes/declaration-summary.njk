@@ -1,8 +1,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% from "../macros/highlight-match.njk" import highlightMatch %}
+{% from "../macros/cds-status.njk" import cdsStatus %}
 
-{% set MRNClass = highlightMatch(customsDeclaration.movementReferenceNumber, searchTerm) %}
-{% set DUCRClass = highlightMatch(customsDeclaration.declarationUcr, searchTerm) %}
+{% set cdsStatusClass = cdsStatus(customsDeclaration.finalState) %}
 
 {{
   govukSummaryList({
@@ -10,17 +9,17 @@
     rows: [
       {
         key: { text: "MRN" },
-        value: {
-          html: '<span class="' ~ MRNClass ~ '">' ~ customsDeclaration.movementReferenceNumber ~ '</span>'
-        }
+        value: { text: customsDeclaration.movementReferenceNumber }
       },
       {
         key: { text: "DUCR" },
-        value: { html: '<span class="' ~ DUCRClass ~ '">' ~ customsDeclaration.declarationUcr ~ '</span>' }
+        value: { text: customsDeclaration.declarationUcr }
       },
       {
         key: { text: "CDS status" },
-        value: { text: customsDeclaration.status }
+        value: {
+          html: '<span class="' ~ cdsStatusClass ~ '">' ~ customsDeclaration.status ~ '</span>'
+        }
       },
       {
         key: { text: "Last updated" },
@@ -29,3 +28,4 @@
     ]
   })
 }}
+
