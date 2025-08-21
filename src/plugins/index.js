@@ -19,15 +19,15 @@ export default [
   requestTracing,
   secureContext,
   pulse,
-  sessionManager,
   wreckProxyConfiguration,
   openId,
   sessionCookie,
   vision,
   router,
   cspNonce,
-  errorPage,
-  securityHeaders,
   commonViewContext,
-  cookiePolicy
+  cookiePolicy,
+  sessionManager,
+  errorPage,
+  securityHeaders
 ]

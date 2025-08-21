@@ -6,7 +6,7 @@ const oneYearInMilliseconds = 60 * 60 * 24 * oneYearInDaysForSonar * 1000
 export const cookiePolicy = {
   name: 'cookie-policy',
   async register (server) {
-    server.state('cookie_policy', {
+    server.state('cookiePolicy', {
       clearInvalid: true,
       encoding: 'base64json',
       isSecure: config.get('isProduction'),
@@ -17,10 +17,14 @@ export const cookiePolicy = {
       const { response } = request
 
       if (response.variety === 'view') {
+        const [showCookieConfirmationBanner] = request.yar.flash(
+          'showCookieConfirmationBanner'
+        )
+
         response.source.context = {
           ...response.source.context,
-          cookieBannerConfirmation: request.query.cookieBannerConfirmation,
-          cookiePolicy: request.state?.cookie_policy
+          showCookieConfirmationBanner,
+          cookiePolicy: request.state.cookiePolicy
         }
       }
 
