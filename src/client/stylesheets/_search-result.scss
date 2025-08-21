@@ -90,9 +90,9 @@
     }
   }
 
-  .govuk-tag--yellow {
-    font-weight: 700;
-    padding: 2px;
+  .govuk-tag {
+    display: inline;
+    white-space: nowrap;
   }
 
   .govuk-table,

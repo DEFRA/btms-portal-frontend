@@ -100,7 +100,7 @@ export const getDecisionDescription = (decisionCode, notificationStatus, isIuuOu
 
 export const getCustomsDeclarationStatus = (finalisation) => {
   if (finalisation === null) {
-    return 'Current'
+    return 'In progress'
   }
 
   if (finalisation.isManualRelease === true) {
@@ -199,6 +199,7 @@ const mapCustomsDeclaration = (declaration, notificationStatuses) => {
     status,
     updated,
     open,
+    finalState: finalisation?.finalState,
     commodities
   }
 }
