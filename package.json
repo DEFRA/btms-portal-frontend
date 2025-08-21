@@ -54,7 +54,7 @@
     "hapi-pulse": "^3.0.1",
     "https-proxy-agent": "^7.0.6",
     "ioredis": "^5.7.0",
-    "joi": "^17.4.2",
+    "joi": "^18.0.1",
     "nunjucks": "^3.2.4",
     "pino": "^9.9.0",
     "pino-pretty": "^13.1.1"
