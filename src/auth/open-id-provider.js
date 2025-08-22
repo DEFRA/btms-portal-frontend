@@ -52,7 +52,7 @@ export const openIdProvider = async (name, authConfig) => {
       }
 
       if (credentials.provider === 'entraId') {
-        const { groups } = jwt.token.decode(params.id_token).decoded.payload
+        const { groups = [] } = jwt.token.decode(params.id_token).decoded.payload
         checkGroups(groups)
       }
 
