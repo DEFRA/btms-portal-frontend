@@ -365,20 +365,22 @@ test('an MRN, with no CHED, with no documents returns expected response', () => 
           netMass: '9999',
           checks: [{
             checkCode: 'H220'
-          }]
+          }],
+          documents: null
         }]
       },
       clearanceDecision: {
         items: [{
           itemNumber: 1,
-          checks: [{
-            decisionCode: 'X00',
-            decisionInternalFurtherDetail: [
-              'E70'
-            ],
-            checkCode: 'H220',
-            decisionReasons: ['Decision Reason Here']
-          }]
+          checks: [{}]
+        }],
+        results: [{
+          itemNumber: 1,
+          checkCode: 'H220',
+          documentReference: null,
+          decisionCode: 'X00',
+          decisionReason: 'reasons',
+          internalDecisionCode: 'E70'
         }]
       },
       finalisation: null,
@@ -399,7 +401,7 @@ test('an MRN, with no CHED, with no documents returns expected response', () => 
           match: false,
           decision: '',
           decisionDetail: 'No match',
-          decisionReason: 'Decision Reason Here',
+          decisionReason: 'reasons',
           departmentCode: 'HMI',
           isIuuOutcome: false,
           requiresChed: true
@@ -407,6 +409,7 @@ test('an MRN, with no CHED, with no documents returns expected response', () => 
         checks: [
           { checkCode: 'H220' }
         ],
+        documents: null,
         itemNumber: 1,
         netMass: '9999',
         weightOrQuantity: 9999
@@ -446,10 +449,7 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
             { checkCode: 'H224' },
             { checkCode: 'H219' }
           ]
-        }],
-        finalisation: {
-          isManualRelease: true
-        }
+        }]
       },
       clearanceDecision: null,
       finalisation: {
@@ -835,180 +835,6 @@ test('parses and returns document level decisions correctly', () => {
     status: 'Finalised - Released',
     updated: '12 May 2025, 11:13'
   }]
-
-  expect(result).toEqual(expected)
-})
-
-test('the workaround for null checkCodes when a CHED is required to be created falls back to item level decisions', () => {
-  const data = {
-    customsDeclarations: [{
-      movementReferenceNumber: 'GB251234567890ABCD',
-      clearanceRequest: {
-        declarationUcr: '5GB123456789000-BDOV123456',
-        commodities: [{
-          itemNumber: 1,
-          netMass: '9999',
-          documents: null,
-          checks: [{
-            checkCode: 'H220',
-            departmentCode: 'HMI'
-          }]
-        },
-        {
-          itemNumber: 2,
-          netMass: '9999',
-          documents: [
-            {
-              documentCode: 'N002',
-              documentReference: 'CHEDPP.GB.2025.1123456',
-              documentStatus: 'AE',
-              documentControl: 'P',
-              documentQuantity: null
-            }
-          ],
-          checks: [{
-            checkCode: 'H220',
-            departmentCode: 'HMI'
-          }]
-        }]
-      },
-      clearanceDecision: {
-        items: [{
-          itemNumber: 1,
-          checks: [
-            {
-              checkCode: 'H220',
-              decisionCode: 'X00',
-              decisionsValidUntil: null,
-              decisionReasons: ['We require you to make a CHED'],
-              decisionInternalFurtherDetail: ['E70']
-            }]
-        }, {
-          itemNumber: 2,
-          checks: [
-            {
-              checkCode: 'H220',
-              decisionCode: 'H01',
-              decisionsValidUntil: null,
-              decisionReasons: [],
-              decisionInternalFurtherDetail: null
-            }
-          ]
-        }],
-        results: [
-          {
-            itemNumber: 1,
-            importPreNotification: null,
-            documentReference: '',
-            checkCode: null,
-            decisionCode: 'X00',
-            decisionReason: 'Decision Reason Here',
-            internalDecisionCode: 'E70'
-          },
-          {
-            itemNumber: 2,
-            importPreNotification: null,
-            documentReference: 'GBCHD2025.1123456',
-            checkCode: 'H220',
-            decisionCode: 'H01',
-            decisionReason: null,
-            internalDecisionCode: null
-          }
-        ]
-      },
-      finalisation: {
-        isManualRelease: false,
-        finalState: '0'
-      },
-      updated: '2025-05-12T11:13:17.330Z'
-    }],
-    importPreNotifications: [{
-      importPreNotification: {
-        referenceNumber: 'CHEDP.GB.2025.9710001',
-        status: 'VALIDATED'
-      }
-    }, {
-      importPreNotification: {
-        referenceNumber: 'CHEDP.GB.2025.9710002',
-        status: 'VALIDATED'
-      }
-    }]
-  }
-
-  const result = mapCustomsDeclarations(data)
-
-  const expected = [
-    {
-      commodities: [
-        {
-          checks: [
-            {
-              checkCode: 'H220',
-              departmentCode: 'HMI'
-            }
-          ],
-          decisions: [
-            {
-              decision: '',
-              decisionDetail: 'No match',
-              decisionReason: 'We require you to make a CHED',
-              departmentCode: 'HMI',
-              documentReference: null,
-              id: expect.any(String),
-              isIuuOutcome: false,
-              match: false,
-              requiresChed: true
-            }
-          ],
-          documents: null,
-          id: expect.any(String),
-          itemNumber: 1,
-          netMass: '9999',
-          weightOrQuantity: 9999
-        },
-        {
-          checks: [
-            {
-              checkCode: 'H220',
-              departmentCode: 'HMI'
-            }
-          ],
-          decisions: [
-            {
-              decision: 'Hold',
-              decisionDetail: 'Awaiting decision',
-              decisionReason: null,
-              departmentCode: 'HMI',
-              documentReference: 'GBCHD2025.1123456',
-              id: expect.any(String),
-              isIuuOutcome: false,
-              match: true,
-              requiresChed: false
-            }
-          ],
-          documents: [
-            {
-              documentCode: 'N002',
-              documentControl: 'P',
-              documentQuantity: null,
-              documentReference: 'CHEDPP.GB.2025.1123456',
-              documentStatus: 'AE'
-            }
-          ],
-          id: expect.any(String),
-          itemNumber: 2,
-          netMass: '9999',
-          weightOrQuantity: 9999
-        }
-      ],
-      declarationUcr: '5GB123456789000-BDOV123456',
-      movementReferenceNumber: 'GB251234567890ABCD',
-      open: true,
-      status: 'Finalised - Released',
-      updated: '12 May 2025, 11:13',
-      finalState: '0'
-    }
-  ]
 
   expect(result).toEqual(expected)
 })
