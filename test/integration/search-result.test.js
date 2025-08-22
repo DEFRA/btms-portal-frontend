@@ -151,8 +151,6 @@ jest.mock('@hapi/wreck', () => ({
 }))
 
 test('shows search results', async () => {
-  const user = userEvent.setup()
-
   wreck.get
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
@@ -182,64 +180,124 @@ test('shows search results', async () => {
   expect(declaration).toHaveAttribute('open')
 
   const declarationRow4 = getByRole(declaration, 'row', {
-    name: '4 3120232190 CHICKEN 7000 KG 7000 Requires CHED Needs a CHED No No match (HMI)'
+    name: '4 3120232190 CHICKEN 7000 KG 7000 Requires CHED Needs a CHED No HMI No match'
   })
-  const requiresChedTooltip = declarationRow4.getElementsByTagName('span')
-  expect(requiresChedTooltip[0].innerHTML.trim()).toBe('Needs a CHED')
+  expect(getByRole(declarationRow4, 'tooltip', {
+    name: 'Needs a CHED'
+  })).toBeInTheDocument()
 
-  const declarationRow3 = getByRole(declaration, 'row', {
-    name: '3 1602321990 JBB VIENNESE ROAST 2 KG 87.07 CHEDP.BB.2025.NOMATCH This CHED reference cannot be found on the customs declaration. Please check that the reference is correct. No No match (HMI)'
-  })
-  const declarationMatchFilter = getByRole(document.body, 'combobox', { name: 'Match' })
-  await user.selectOptions(declarationMatchFilter, 'true')
-  expect(declarationRow3.hasAttribute('hidden')).toBe(true)
+  expect(getByRole(declaration, 'row', {
+    name: '3 1602321990 JBB VIENNESE ROAST 2 KG 87.07 CHEDP.BB.2025.NOMATCH This CHED reference cannot be found on the customs declaration. Please check that the reference is correct. No HMI No match'
+  })).toBeInTheDocument()
 
-  await user.selectOptions(declarationMatchFilter, '')
+  expect(getByRole(declaration, 'row', {
+    name: '2 0304720000 FROZEN MSC HADDOCK FILLE… FROZEN MSC HADDOCK FILLETS 4618.35 CHEDP.GB.2025.0000002 Yes POAO Hold - Awaiting decision'
+  })).toBeInTheDocument()
 
-  const declarationRow2 = getByRole(declaration, 'row', {
-    name: '2 0304720000 FROZEN MSC HADDOCK FILLE… FROZEN MSC HADDOCK FILLETS 4618.35 CHEDP.GB.2025.0000002 Yes Hold - Awaiting decision (POAO)'
-  })
-  const declarationDecisionFilter = getByRole(document.body, 'combobox', { name: 'Decision' })
-  await user.selectOptions(declarationDecisionFilter, 'Release')
-  expect(declarationRow2.hasAttribute('hidden')).toBe(true)
-
-  const declarationRow1 = getByRole(declaration, 'row', {
-    name: '1 0304719030 FROZEN MSC A COD FILLETS 17088.98 CHEDA.GB.2025.0000001 Yes Release - CHED cancelled (HMI)'
-  })
-  const [declarationAuthorityFilter] = getAllByRole(document.body, 'combobox', { name: 'Authority' })
-  await user.selectOptions(declarationAuthorityFilter, 'APHA')
-  expect(declarationRow1.hasAttribute('hidden')).toBe(true)
-
-  const [resetDeclaration] = await getAllByRole(document.body, 'button')
-  await user.click(resetDeclaration)
-  expect(declarationRow1.hasAttribute('hidden')).toBe(false)
-  expect(declarationRow2.hasAttribute('hidden')).toBe(false)
-  expect(declarationRow3.hasAttribute('hidden')).toBe(false)
+  expect(getByRole(declaration, 'row', {
+    name: '1 0304719030 FROZEN MSC A COD FILLETS 17088.98 CHEDA.GB.2025.0000001 Yes HMI Release - CHED cancelled'
+  })).toBeInTheDocument()
 
   const notification1 = getByRole(document.body, 'group', { name: 'CHEDP.GB.2025.0000002' })
   expect(notification1.hasAttribute('open')).toBe(true)
-  const notificationRow1 = getByRole(notification1, 'row', {
-    name: '2 0202 Dog Chew 4618.35 Decision not given (POAO)'
-  })
 
-  const notificationAuthorityFilter = getAllByRole(document.body, 'combobox', { name: 'Authority' })[1]
-  await user.selectOptions(notificationAuthorityFilter, 'HMI')
-  expect(notificationRow1.hasAttribute('hidden')).toBe(true)
-
-  const resetNotification = getByRole(document.body, 'button')
-  await user.click(resetNotification)
-  expect(notificationRow1.hasAttribute('hidden')).toBe(false)
+  expect(getByRole(notification1, 'row', {
+    name: '2 0202 Dog Chew 4618.35 POAO Decision not given'
+  })).toBeInTheDocument()
 
   const closedNotification = getByRole(document.body, 'group', { name: 'CHEDA.GB.2025.0000001' })
   expect(closedNotification.hasAttribute('open')).toBe(false)
+
   expect(getByRole(closedNotification, 'row', {
-    name: '1 0101 Equus asinus 2 Decision not given (APHA)'
+    name: '1 0101 Equus asinus 2 APHA Decision not given'
   })).not.toBeVisible()
 
   expect(document.querySelectorAll('script[nonce]').length)
     .toBe(2)
   expect(document.title)
     .toBe('Showing result for 24GB0Z8WEJ9ZBTL73B - Border Trade Matching Service')
+})
+
+test('results are can be filtered', async () => {
+  const user = userEvent.setup()
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: relatedImportDeclarations })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const query = {
+    [queryStringParams.SEARCH_TERM]: '24GB0Z8WEJ9ZBTL73B',
+    authority: 'APHA',
+    chedAuthority: 'HMI'
+  }
+  const queryString = new URLSearchParams(query).toString()
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryString}`,
+    auth: { strategy: 'session', credentials },
+    headers: {
+      cookie: 'cookiePolicy=' + Buffer.from('{"analytics":false}').toString('base64')
+    }
+  })
+
+  globalJsdom(payload)
+
+  const declarationRow1 = getByRole(document.body, 'row', {
+    name: '1 0304719030 FROZEN MSC A COD FILLETS 17088.98 CHEDA.GB.2025.0000001 Yes HMI Release - CHED cancelled'
+  })
+  const notificationRow1 = getByRole(document.body, 'row', {
+    name: '2 0202 Dog Chew 4618.35 POAO Decision not given'
+  })
+
+  window.history.pushState({}, 'test', `?${queryString}`)
+  initFilters()
+
+  const [
+    declarationMatchFilter,
+    declarationDecisionFilter,
+    declarationAuthorityFilter,
+    notificationAuthorityFilter
+  ] = getAllByRole(document.body, 'combobox')
+
+  const [
+    resetDeclaration,
+    resetNotification
+  ] = getAllByRole(document.body, 'button')
+
+  expect(declarationRow1.hasAttribute('hidden')).toBe(true)
+  await user.selectOptions(declarationAuthorityFilter, 'HMI')
+  expect(declarationRow1.hasAttribute('hidden')).toBe(false)
+  await user.selectOptions(declarationAuthorityFilter, 'APHA')
+  expect(declarationRow1.hasAttribute('hidden')).toBe(true)
+
+  await user.click(resetDeclaration)
+  expect(declarationRow1.hasAttribute('hidden')).toBe(false)
+
+  await user.selectOptions(declarationMatchFilter, 'false')
+  expect(declarationRow1.hasAttribute('hidden')).toBe(true)
+  await user.selectOptions(declarationMatchFilter, 'true')
+  expect(declarationRow1.hasAttribute('hidden')).toBe(false)
+
+  await user.selectOptions(declarationDecisionFilter, 'Hold')
+  expect(declarationRow1.hasAttribute('hidden')).toBe(true)
+  await user.selectOptions(declarationDecisionFilter, 'Release')
+  expect(declarationRow1.hasAttribute('hidden')).toBe(false)
+  await user.selectOptions(declarationDecisionFilter, '')
+  expect(declarationRow1.hasAttribute('hidden')).toBe(false)
+
+  expect(notificationRow1.hasAttribute('hidden')).toBe(true)
+  await user.selectOptions(notificationAuthorityFilter, 'POAO')
+  expect(notificationRow1.hasAttribute('hidden')).toBe(false)
+  await user.selectOptions(notificationAuthorityFilter, 'HMI')
+  expect(notificationRow1.hasAttribute('hidden')).toBe(true)
+
+  await user.click(resetNotification)
+  expect(notificationRow1.hasAttribute('hidden')).toBe(false)
 })
 
 test('redirects to search page if no results', async () => {
