@@ -319,6 +319,13 @@ const config = convict({
         env: 'AUTH_ENTRA_ID_CLIENT_SECRET',
         default: ''
       },
+      groups: {
+        doc: 'ENTRA ID user groups',
+        format: Array,
+        sensitive: true,
+        env: 'AUTH_ENTRA_ID_SECURITY_GROUPS',
+        default: []
+      },
       scopes: {
         doc: 'ENTRA ID scopes',
         format: Array,

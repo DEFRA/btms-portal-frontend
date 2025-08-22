@@ -10,24 +10,24 @@ jest.mock('../../../src/auth/open-id-client.js', () => ({
   })
 }))
 
-let provider
-
-beforeAll(async () => {
-  provider = await openIdProvider('defraId', {
-    oidcConfigurationUrl: 'https://test.it/path'
-  })
-})
-
 test.each([
   { credentials: null },
   { credentials: {} },
   { credentials: { token: null } }
 ])('credentials do not exist', async (credentials) => {
+  const provider = await openIdProvider('defraId', {
+    oidcConfigurationUrl: 'https://test.it/path'
+  })
+
   expect(provider.profile(credentials, {}, {})).rejects.toThrow(
     'defraId Auth Access Token not present. Unable to retrieve profile.')
 })
 
-test('credentials exist', async () => {
+test('defraId: credentials exist', async () => {
+  const provider = await openIdProvider('defraId', {
+    oidcConfigurationUrl: 'https://test.it/path'
+  })
+
   const currentRelationshipId = 'rel-id-909'
   const organisationId = 'org-id-123'
 
@@ -100,7 +100,11 @@ test('credentials exist', async () => {
     ])
 })
 
-test('DefraId organisation not allowed', () => {
+test('defraId: organisation not allowed', async () => {
+  const provider = await openIdProvider('defraId', {
+    oidcConfigurationUrl: 'https://test.it/path'
+  })
+
   config.set('auth.defraId.organisations', ['allowed-org'])
 
   const token = jwt.token.generate({
@@ -118,4 +122,34 @@ test('DefraId organisation not allowed', () => {
 
   expect(async () => provider.profile(credentials, {}, {}))
     .rejects.toThrow('organisation not allowed')
+})
+
+test('entraId: group not allowed', async () => {
+  const provider = await openIdProvider('entraId', {
+    oidcConfigurationUrl: 'https://test.it/path'
+  })
+
+  config.set('auth.entraId.groups', ['allowed-group'])
+
+  const token = jwt.token.generate({}, {
+    key: 'test',
+    algorithm: 'HS256'
+  })
+  const idToken = jwt.token.generate({
+    groups: ['not-allowed-group']
+  }, {
+    key: 'test',
+    algorithm: 'HS256'
+  })
+
+  const credentials = {
+    provider: 'entraId',
+    token
+  }
+  const params = {
+    id_token: idToken
+  }
+
+  expect(async () => provider.profile(credentials, params, {}))
+    .rejects.toThrow('group not allowed')
 })
