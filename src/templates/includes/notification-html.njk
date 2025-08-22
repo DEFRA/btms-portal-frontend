@@ -30,7 +30,7 @@
         <td class="govuk-table__cell">
           {% for check in commodity.checks %}
             {% if loop.first %} <ul class="govuk-list"> {% endif %}
-              <li>{{ check.decision }}</li>
+              <li data-ched-authority="{{ check.authority }}">{{ check.decision }}</li>
             {% if loop.last %} </ul> {% endif %}
           {% endfor %}
         </td>

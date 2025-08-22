@@ -84,7 +84,7 @@ const setRow = {
   },
   notification: (state, row) => {
     const authorityList = row.querySelector('ul')
-    const listItems = [...authorityList.querySelectorAll('li')]
+    const listItems = [...row.querySelectorAll('li')]
 
     listItems.forEach((li) => {
       li.hidden = filterTypes.notification.some((key) =>
