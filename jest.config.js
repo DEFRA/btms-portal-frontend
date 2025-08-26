@@ -9,7 +9,7 @@ export default {
   resetModules: true,
   clearMocks: true,
   silent: false,
-  testMatch: ['**/test/**/*.test.js'],
+  testMatch: ['<rootDir>/test/**/*.test.js'],
   reporters: ['default', ['github-actions', { silent: false }], 'summary'],
   setupFiles: ['<rootDir>/.jest/setup-file.js'],
   setupFilesAfterEnv: ['<rootDir>/.jest/setup-file-after-env.js'],
