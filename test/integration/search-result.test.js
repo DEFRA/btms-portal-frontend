@@ -72,7 +72,8 @@ const customsDeclarations = [{
       checks: [{
         checkCode: 'H220',
         decisionCode: 'X00',
-        decisionInternalFurtherDetail: ['E70']
+        decisionInternalFurtherDetail: ['E70'],
+        decisionReasons: ['This CHED reference cannot be found on the customs declaration. Please check that the reference is correct.']
       }]
     }]
   },
