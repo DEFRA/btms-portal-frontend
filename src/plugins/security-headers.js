@@ -2,7 +2,7 @@ import { config } from '../config/config.js'
 
 export const securityHeaders = {
   name: 'security-headers',
-  async register (server) {
+  async register(server) {
     server.ext('onPreResponse', (request, h) => {
       const formActions = config.get('auth').origins.join(' ')
 

@@ -34,7 +34,7 @@ export const createRefreshedToken = () => {
   return createDummyToken(authedUserProfile, sessionConfig.cache.ttl / 1000)
 }
 
-function createDummyToken (authedUserProfile, ttl) {
+function createDummyToken(authedUserProfile, ttl) {
   return jwt.token.generate(
     {
       ...authedUserProfile,
@@ -53,7 +53,7 @@ function createDummyToken (authedUserProfile, ttl) {
   )
 }
 
-function createUserProfile (strategy) {
+function createUserProfile(strategy) {
   const expiresInSeconds = sessionConfig.cache.ttl / 1000
   const expiresInMilliSeconds = sessionConfig.cache.ttl
   const expiresAt = addSeconds(new Date(), expiresInSeconds)
@@ -79,8 +79,10 @@ function createUserProfile (strategy) {
     isAuthenticated: true,
     expiresIn: expiresInMilliSeconds,
     expiresAt: expiresAt.toISOString(),
-    tokenUrl: strategy === 'entraId' ? 'https://entraid.foo' : 'https://defraid.foo',
-    logoutUrl: strategy === 'entraId' ? 'https://entraid.bar' : 'https://defraid.bar',
+    tokenUrl:
+      strategy === 'entraId' ? 'https://entraid.foo' : 'https://defraid.foo',
+    logoutUrl:
+      strategy === 'entraId' ? 'https://entraid.bar' : 'https://defraid.bar',
     strategy: strategy === 'entraId' ? 'entraId' : 'defraId'
   }
 }

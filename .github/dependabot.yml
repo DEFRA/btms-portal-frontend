@@ -7,17 +7,17 @@ updates:
     open-pull-requests-limit: 10
     schedule:
       interval: daily
-      time: "12:00"
-      timezone: "Europe/London"
+      time: '12:00'
+      timezone: 'Europe/London'
     # Single PR for patch and minor
     # Major will be one update per PR
     groups:
       patch:
         update-types:
-          - "patch"
+          - 'patch'
       minor:
         update-types:
-          - "minor"
+          - 'minor'
     allow:
       - dependency-type: direct
 

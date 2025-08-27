@@ -14,14 +14,16 @@ test('not authenticated', async () => {
 
   globalJsdom(payload)
 
-  expect(getByRole(document.body, 'link', { name: 'Sign in' }))
-    .toHaveAttribute('href', '/sign-in-choose')
+  expect(getByRole(document.body, 'link', { name: 'Sign in' })).toHaveAttribute(
+    'href',
+    '/sign-in-choose'
+  )
 
-  expect(document.querySelectorAll('script[nonce]').length)
-    .toBe(1)
+  expect(document.querySelectorAll('script[nonce]').length).toBe(1)
 
-  expect(document.title)
-    .toBe('Border Trade Matching Service - Border Trade Matching Service')
+  expect(document.title).toBe(
+    'Border Trade Matching Service - Border Trade Matching Service'
+  )
 })
 
 test('authenticated', async () => {
@@ -37,8 +39,7 @@ test('authenticated', async () => {
     }
   })
 
-  expect(headers.location)
-    .toBe('/search')
+  expect(headers.location).toBe('/search')
 })
 
 test('footer links', async () => {
@@ -51,9 +52,12 @@ test('footer links', async () => {
 
   globalJsdom(payload)
 
-  expect(getByRole(document.body, 'link', { name: 'Accessibility statement' }))
-    .toHaveAttribute('href', '/accessibility-statement')
+  expect(
+    getByRole(document.body, 'link', { name: 'Accessibility statement' })
+  ).toHaveAttribute('href', '/accessibility-statement')
 
-  expect(getByRole(document.body, 'link', { name: 'Cookies' }))
-    .toHaveAttribute('href', '/cookies')
+  expect(getByRole(document.body, 'link', { name: 'Cookies' })).toHaveAttribute(
+    'href',
+    '/cookies'
+  )
 })

@@ -16,6 +16,7 @@ test('accessibility statement', async () => {
   getByRole(document.body, 'heading', {
     name: 'Accessibility statement for the Border Trade Matching Service (BTMS)'
   })
-  expect(document.title)
-    .toBe('Accessibility statement for the Border Trade Matching Service (BTMS) - Border Trade Matching Service')
+  expect(document.title).toBe(
+    'Accessibility statement for the Border Trade Matching Service (BTMS) - Border Trade Matching Service'
+  )
 })

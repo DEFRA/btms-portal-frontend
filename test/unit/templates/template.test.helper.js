@@ -7,7 +7,9 @@ import * as filters from '../../../src/plugins/template-renderer/filters/filters
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const nunjucksTestEnv = nunjucks.configure(
   [
-    path.normalize(path.resolve(dirname, '../../../node_modules/govuk-frontend/dist')),
+    path.normalize(
+      path.resolve(dirname, '../../../node_modules/govuk-frontend/dist')
+    ),
     path.normalize(path.resolve(dirname, '../../../src/templates'))
   ],
   {
@@ -16,7 +18,9 @@ const nunjucksTestEnv = nunjucks.configure(
   }
 )
 
-nunjucksTestEnv.addGlobal('getAssetPath', (asset) => { return asset })
+nunjucksTestEnv.addGlobal('getAssetPath', (asset) => {
+  return asset
+})
 
 Object.entries(filters).forEach(([name, filter]) => {
   nunjucksTestEnv.addFilter(name, filter)
@@ -26,6 +30,4 @@ const renderTemplate = (template, viewContext) => {
   return load(nunjucksTestEnv.render(template, viewContext))
 }
 
-export {
-  renderTemplate
-}
+export { renderTemplate }

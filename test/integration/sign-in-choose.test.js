@@ -17,8 +17,7 @@ test('get: renders page', async () => {
     name: 'How do you want to sign in?'
   })
 
-  expect(fieldSet)
-    .not.toHaveAttribute('aria-describedby', 'authProvider-error')
+  expect(fieldSet).not.toHaveAttribute('aria-describedby', 'authProvider-error')
 })
 
 test('get: renders page with error', async () => {
@@ -39,8 +38,7 @@ test('get: renders page with error', async () => {
     name: 'How do you want to sign in?'
   })
 
-  expect(fieldSet)
-    .toHaveAttribute('aria-describedby', 'authProvider-error')
+  expect(fieldSet).toHaveAttribute('aria-describedby', 'authProvider-error')
 })
 
 test('post: redirects to EntraId sign in', async () => {

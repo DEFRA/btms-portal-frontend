@@ -20,7 +20,8 @@ test.each([
   })
 
   expect(provider.profile(credentials, {}, {})).rejects.toThrow(
-    'defraId Auth Access Token not present. Unable to retrieve profile.')
+    'defraId Auth Access Token not present. Unable to retrieve profile.'
+  )
 })
 
 test('defraId: credentials exist', async () => {
@@ -91,13 +92,12 @@ test('defraId: credentials exist', async () => {
     logoutUrl: 'http://some-end-session-endpoint/path'
   })
 
-  expect(config.get('auth.origins'))
-    .toEqual([
-      'https://test.it',
-      'http://some-auth-endpoint',
-      'http://some-token-endpoint',
-      'http://some-end-session-endpoint'
-    ])
+  expect(config.get('auth.origins')).toEqual([
+    'https://test.it',
+    'http://some-auth-endpoint',
+    'http://some-token-endpoint',
+    'http://some-end-session-endpoint'
+  ])
 })
 
 test('defraId: organisation not allowed', async () => {
@@ -107,21 +107,25 @@ test('defraId: organisation not allowed', async () => {
 
   config.set('auth.defraId.organisations', ['allowed-org'])
 
-  const token = jwt.token.generate({
-    currentRelationshipId: 'rel-1',
-    relationships: ['rel1:forbidden-org']
-  }, {
-    key: 'test',
-    algorithm: 'HS256'
-  })
+  const token = jwt.token.generate(
+    {
+      currentRelationshipId: 'rel-1',
+      relationships: ['rel1:forbidden-org']
+    },
+    {
+      key: 'test',
+      algorithm: 'HS256'
+    }
+  )
 
   const credentials = {
     provider: 'defraId',
     token
   }
 
-  expect(async () => provider.profile(credentials, {}, {}))
-    .rejects.toThrow('organisation not allowed')
+  expect(async () => provider.profile(credentials, {}, {})).rejects.toThrow(
+    'organisation not allowed'
+  )
 })
 
 test('entraId: group not allowed', async () => {
@@ -131,16 +135,22 @@ test('entraId: group not allowed', async () => {
 
   config.set('auth.entraId.groups', ['allowed-group'])
 
-  const token = jwt.token.generate({}, {
-    key: 'test',
-    algorithm: 'HS256'
-  })
-  const idToken = jwt.token.generate({
-    groups: ['not-allowed-group']
-  }, {
-    key: 'test',
-    algorithm: 'HS256'
-  })
+  const token = jwt.token.generate(
+    {},
+    {
+      key: 'test',
+      algorithm: 'HS256'
+    }
+  )
+  const idToken = jwt.token.generate(
+    {
+      groups: ['not-allowed-group']
+    },
+    {
+      key: 'test',
+      algorithm: 'HS256'
+    }
+  )
 
   const credentials = {
     provider: 'entraId',
@@ -150,6 +160,7 @@ test('entraId: group not allowed', async () => {
     id_token: idToken
   }
 
-  expect(async () => provider.profile(credentials, params, {}))
-    .rejects.toThrow('group not allowed')
+  expect(async () => provider.profile(credentials, params, {})).rejects.toThrow(
+    'group not allowed'
+  )
 })

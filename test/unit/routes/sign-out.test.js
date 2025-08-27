@@ -2,7 +2,10 @@ import { startServer } from '../../../src/utils/start-server.js'
 import { setupAuthedUserSession } from '../utils/session-helper.js'
 import { paths } from '../../../src/routes/route-constants.js'
 import { constants as httpConstants } from 'http2'
-import { getUserSession, dropUserSession } from '../../../src/auth/user-session.js'
+import {
+  getUserSession,
+  dropUserSession
+} from '../../../src/auth/user-session.js'
 
 jest.mock('../../../src/auth/user-session.js', () => ({
   getUserSession: jest.fn(),

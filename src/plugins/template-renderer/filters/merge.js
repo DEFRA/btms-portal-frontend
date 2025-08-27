@@ -1,3 +1,3 @@
-export function merge (original, additional) {
+export function merge(original, additional) {
   return { ...original, ...additional }
 }

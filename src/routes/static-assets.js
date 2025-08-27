@@ -13,10 +13,8 @@ export const staticAssetRoutes = [
     },
     method: 'GET',
     path: '/favicon.ico',
-    handler (_request, h) {
-      return h
-        .response()
-        .code(httpConstants.HTTP_STATUS_NO_CONTENT)
+    handler(_request, h) {
+      return h.response().code(httpConstants.HTTP_STATUS_NO_CONTENT)
     }
   },
   {

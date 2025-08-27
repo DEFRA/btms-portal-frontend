@@ -13,24 +13,31 @@ test('no cookiePolicy, the cookie banner is visible', async () => {
 
   globalJsdom(payload)
 
-  expect(getByRole(document.body, 'region', {
-    name: 'Cookies on Border Trade Matching Service'
-  })).toBeInTheDocument()
+  expect(
+    getByRole(document.body, 'region', {
+      name: 'Cookies on Border Trade Matching Service'
+    })
+  ).toBeInTheDocument()
 
-  expect(getByRole(document.body, 'button', {
-    name: 'Accept analytics cookies'
-  })).toHaveValue('yes')
+  expect(
+    getByRole(document.body, 'button', {
+      name: 'Accept analytics cookies'
+    })
+  ).toHaveValue('yes')
 
-  expect(getByRole(document.body, 'button', {
-    name: 'Reject analytics cookies'
-  })).toHaveValue('no')
+  expect(
+    getByRole(document.body, 'button', {
+      name: 'Reject analytics cookies'
+    })
+  ).toHaveValue('no')
 })
 
 test('cookiePolicy exists, the cookie banner is not visible', async () => {
   const server = await initialiseServer()
   const { payload } = await server.inject({
     headers: {
-      cookie: 'cookiePolicy=' + Buffer.from('{"analytics":"yes"}').toString('base64')
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics":"yes"}').toString('base64')
     },
     method: 'get',
     url: paths.LANDING
@@ -38,9 +45,11 @@ test('cookiePolicy exists, the cookie banner is not visible', async () => {
 
   globalJsdom(payload)
 
-  expect(queryByRole(document.body, 'region', {
-    name: 'Cookies on Border Trade Matching Service'
-  })).not.toBeInTheDocument()
+  expect(
+    queryByRole(document.body, 'region', {
+      name: 'Cookies on Border Trade Matching Service'
+    })
+  ).not.toBeInTheDocument()
 })
 
 test('cookiePolicy exists & flash status exists, confirmation visible', async () => {
@@ -51,7 +60,8 @@ test('cookiePolicy exists & flash status exists, confirmation visible', async ()
 
   const { payload } = await server.inject({
     headers: {
-      cookie: 'cookiePolicy=' + Buffer.from('{"analytics":"yes"}').toString('base64')
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics":"yes"}').toString('base64')
     },
     method: 'get',
     url: paths.LANDING
@@ -59,7 +69,9 @@ test('cookiePolicy exists & flash status exists, confirmation visible', async ()
 
   globalJsdom(payload)
 
-  expect(getByRole(document.body, 'button', {
-    name: 'Hide cookie message'
-  })).toBeInTheDocument()
+  expect(
+    getByRole(document.body, 'button', {
+      name: 'Hide cookie message'
+    })
+  ).toBeInTheDocument()
 })

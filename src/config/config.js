@@ -304,7 +304,8 @@ const config = convict({
         doc: 'Entra ID OIDC configuration URL',
         format: String,
         env: 'AUTH_ENTRA_ID_OIDC_CONFIGURATION_URL',
-        default: 'https://dcidmtest.b2clogin.com/dcidmtest.onmicrosoft.com/b2c_1a_cui_signin_stub/.well-known/openid-configuration'
+        default:
+          'https://dcidmtest.b2clogin.com/dcidmtest.onmicrosoft.com/b2c_1a_cui_signin_stub/.well-known/openid-configuration'
       },
       clientId: {
         doc: 'ENTRA ID client ID',
