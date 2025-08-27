@@ -12,121 +12,156 @@ const provider = {
   token_endpoint: 'https://token.endpoint'
 }
 
-const customsDeclarations = [{
-  movementReferenceNumber: '24GB0Z8WEJ9ZBTL73B',
-  clearanceRequest: {
-    declarationUcr: '1GB126344356000-ABC35932Y1BHX',
-    commodities: [{
-      itemNumber: 1,
-      taricCommodityCode: '0304719030',
-      goodsDescription: 'FROZEN MSC A COD FILLETS',
-      netMass: '17088.98',
-      supplementaryUnits: 0,
-      documents: [{
-        documentReference: 'CHEDA.GB.2025.0000001',
-        documentCode: 'N002'
-      }],
-      checks: [
-        { checkCode: 'H218', departmentCode: 'HMI' }
+const customsDeclarations = [
+  {
+    movementReferenceNumber: '24GB0Z8WEJ9ZBTL73B',
+    clearanceRequest: {
+      declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+      commodities: [
+        {
+          itemNumber: 1,
+          taricCommodityCode: '0304719030',
+          goodsDescription: 'FROZEN MSC A COD FILLETS',
+          netMass: '17088.98',
+          supplementaryUnits: 0,
+          documents: [
+            {
+              documentReference: 'CHEDA.GB.2025.0000001',
+              documentCode: 'N002'
+            }
+          ],
+          checks: [{ checkCode: 'H218', departmentCode: 'HMI' }]
+        },
+        {
+          itemNumber: 2,
+          taricCommodityCode: '0304720000',
+          goodsDescription: 'FROZEN MSC HADDOCK FILLETS',
+          netMass: '4618.35',
+          documents: [
+            {
+              documentReference: 'CHEDP.GB.2025.0000002',
+              documentCode: 'N853'
+            }
+          ],
+          checks: [
+            {
+              departmentCode: 'HMI',
+              checkCode: 'H222'
+            }
+          ]
+        },
+        {
+          itemNumber: 3,
+          taricCommodityCode: '1602321990',
+          goodsDescription: 'JBB VIENNESE ROAST 2 KG',
+          netMass: '87.07',
+          documents: [
+            {
+              documentReference: 'CHEDP.BB.2025.NOMATCH',
+              documentCode: 'N002'
+            }
+          ],
+          checks: [{ checkCode: 'H220', departmentCode: 'HMI' }]
+        }
       ]
-    }, {
-      itemNumber: 2,
-      taricCommodityCode: '0304720000',
-      goodsDescription: 'FROZEN MSC HADDOCK FILLETS',
-      netMass: '4618.35',
-      documents: [{
-        documentReference: 'CHEDP.GB.2025.0000002',
-        documentCode: 'N853'
-      }],
-      checks: [{
-        departmentCode: 'HMI',
-        checkCode: 'H222'
-      }]
-    }, {
-      itemNumber: 3,
-      taricCommodityCode: '1602321990',
-      goodsDescription: 'JBB VIENNESE ROAST 2 KG',
-      netMass: '87.07',
-      documents: [{
-        documentReference: 'CHEDP.BB.2025.NOMATCH',
-        documentCode: 'N002'
-      }],
-      checks: [{ checkCode: 'H220', departmentCode: 'HMI' }]
-    }]
-  },
-  clearanceDecision: {
-    items: [{
-      itemNumber: 1,
-      checks: [{
-        checkCode: 'H218',
-        decisionCode: 'C03'
-      }]
-    }, {
-      itemNumber: 2,
-      checks: [{
-        checkCode: 'H222',
-        decisionCode: 'H01'
-      }]
-    }, {
-      itemNumber: 3,
-      checks: [{
-        checkCode: 'H220',
-        decisionCode: 'X00',
-        decisionInternalFurtherDetail: ['E70'],
-        decisionReasons: ['This CHED reference cannot be found on the customs declaration. Please check that the reference is correct.']
-      }]
-    }]
-  },
-  finalisation: {
-    finalState: '0',
-    isManualRelease: false
-  },
-  updated: '2025-05-06T13:11:59.257Z'
-}]
+    },
+    clearanceDecision: {
+      items: [
+        {
+          itemNumber: 1,
+          checks: [
+            {
+              checkCode: 'H218',
+              decisionCode: 'C03'
+            }
+          ]
+        },
+        {
+          itemNumber: 2,
+          checks: [
+            {
+              checkCode: 'H222',
+              decisionCode: 'H01'
+            }
+          ]
+        },
+        {
+          itemNumber: 3,
+          checks: [
+            {
+              checkCode: 'H220',
+              decisionCode: 'X00',
+              decisionInternalFurtherDetail: ['E70'],
+              decisionReasons: [
+                'This CHED reference cannot be found on the customs declaration. Please check that the reference is correct.'
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    finalisation: {
+      finalState: '0',
+      isManualRelease: false
+    },
+    updated: '2025-05-06T13:11:59.257Z'
+  }
+]
 
-const importPreNotifications = [{
-  importPreNotification: {
-    referenceNumber: 'CHEDP.GB.2025.0000002',
-    importNotificationType: 'CVEDP',
-    status: 'VALIDATED',
-    updatedSource: '2025-04-22T16:55:17.330Z',
-    partOne: {
-      commodities: {
-        commodityComplements: [{
-          complementId: '2',
-          commodityId: '0202',
-          complementName: 'Dog Chew'
-        }],
-        complementParameterSets: [{
-          uniqueComplementId: 'bbdb5c23-0f7c-4c8f-ac1d-8d81aacdc0d9',
-          complementId: '2',
-          keyDataPair: [{ key: 'netweight', data: '4618.35' }]
-        }]
+const importPreNotifications = [
+  {
+    importPreNotification: {
+      referenceNumber: 'CHEDP.GB.2025.0000002',
+      importNotificationType: 'CVEDP',
+      status: 'VALIDATED',
+      updatedSource: '2025-04-22T16:55:17.330Z',
+      partOne: {
+        commodities: {
+          commodityComplements: [
+            {
+              complementId: '2',
+              commodityId: '0202',
+              complementName: 'Dog Chew'
+            }
+          ],
+          complementParameterSets: [
+            {
+              uniqueComplementId: 'bbdb5c23-0f7c-4c8f-ac1d-8d81aacdc0d9',
+              complementId: '2',
+              keyDataPair: [{ key: 'netweight', data: '4618.35' }]
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    importPreNotification: {
+      referenceNumber: 'CHEDA.GB.2025.0000001',
+      importNotificationType: 'CVEDA',
+      status: 'CANCELLED',
+      updatedSource: '2025-04-22T16:53:17.330Z',
+      partOne: {
+        commodities: {
+          commodityComplements: [
+            {
+              complementId: '1',
+              commodityId: '0101',
+              speciesName: 'Equus asinus'
+            }
+          ],
+          complementParameterSets: [
+            {
+              uniqueComplementId: '9604ce16-8352-4ead-ae8b-4828b3e022cb',
+              complementId: '1',
+              keyDataPair: [{ key: 'number_animal', data: '2' }]
+            }
+          ]
+        }
       }
     }
   }
-}, {
-  importPreNotification: {
-    referenceNumber: 'CHEDA.GB.2025.0000001',
-    importNotificationType: 'CVEDA',
-    status: 'CANCELLED',
-    updatedSource: '2025-04-22T16:53:17.330Z',
-    partOne: {
-      commodities: {
-        commodityComplements: [{
-          complementId: '1',
-          commodityId: '0101',
-          speciesName: 'Equus asinus'
-        }],
-        complementParameterSets: [{
-          uniqueComplementId: '9604ce16-8352-4ead-ae8b-4828b3e022cb',
-          complementId: '1',
-          keyDataPair: [{ key: 'number_animal', data: '2' }]
-        }]
-      }
-    }
-  }
-}]
+]
 
 const relatedImportDeclarations = {
   customsDeclarations,
@@ -154,7 +189,8 @@ test('shows search results', async () => {
       credentials
     },
     headers: {
-      cookie: 'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
     }
   })
 
@@ -163,39 +199,55 @@ test('shows search results', async () => {
   globalJsdom(payload)
   initFilters()
 
-  const declaration = getByRole(document.body, 'group', { name: '24GB0Z8WEJ9ZBTL73B' })
+  const declaration = getByRole(document.body, 'group', {
+    name: '24GB0Z8WEJ9ZBTL73B'
+  })
   expect(declaration).toHaveAttribute('open')
 
-  expect(getByRole(declaration, 'row', {
-    name: '3 1602321990 JBB VIENNESE ROAST 2 KG 87.07 CHEDP.BB.2025.NOMATCH This CHED reference cannot be found on the customs declaration. Please check that the reference is correct. No HMI No match'
-  })).toBeInTheDocument()
+  expect(
+    getByRole(declaration, 'row', {
+      name: '3 1602321990 JBB VIENNESE ROAST 2 KG 87.07 CHEDP.BB.2025.NOMATCH This CHED reference cannot be found on the customs declaration. Please check that the reference is correct. No HMI No match'
+    })
+  ).toBeInTheDocument()
 
-  expect(getByRole(declaration, 'row', {
-    name: '2 0304720000 FROZEN MSC HADDOCK FILLE… FROZEN MSC HADDOCK FILLETS 4618.35 CHEDP.GB.2025.0000002 Yes POAO Hold - Awaiting decision'
-  })).toBeInTheDocument()
+  expect(
+    getByRole(declaration, 'row', {
+      name: '2 0304720000 FROZEN MSC HADDOCK FILLE… FROZEN MSC HADDOCK FILLETS 4618.35 CHEDP.GB.2025.0000002 Yes POAO Hold - Awaiting decision'
+    })
+  ).toBeInTheDocument()
 
-  expect(getByRole(declaration, 'row', {
-    name: '1 0304719030 FROZEN MSC A COD FILLETS 17088.98 CHEDA.GB.2025.0000001 Yes HMI Release - CHED cancelled'
-  })).toBeInTheDocument()
+  expect(
+    getByRole(declaration, 'row', {
+      name: '1 0304719030 FROZEN MSC A COD FILLETS 17088.98 CHEDA.GB.2025.0000001 Yes HMI Release - CHED cancelled'
+    })
+  ).toBeInTheDocument()
 
-  const notification1 = getByRole(document.body, 'group', { name: 'CHEDP.GB.2025.0000002' })
+  const notification1 = getByRole(document.body, 'group', {
+    name: 'CHEDP.GB.2025.0000002'
+  })
   expect(notification1.hasAttribute('open')).toBe(true)
 
-  expect(getByRole(notification1, 'row', {
-    name: '2 0202 Dog Chew 4618.35 POAO Decision not given'
-  })).toBeInTheDocument()
+  expect(
+    getByRole(notification1, 'row', {
+      name: '2 0202 Dog Chew 4618.35 POAO Decision not given'
+    })
+  ).toBeInTheDocument()
 
-  const closedNotification = getByRole(document.body, 'group', { name: 'CHEDA.GB.2025.0000001' })
+  const closedNotification = getByRole(document.body, 'group', {
+    name: 'CHEDA.GB.2025.0000001'
+  })
   expect(closedNotification.hasAttribute('open')).toBe(false)
 
-  expect(getByRole(closedNotification, 'row', {
-    name: '1 0101 Equus asinus 2 APHA Decision not given'
-  })).not.toBeVisible()
+  expect(
+    getByRole(closedNotification, 'row', {
+      name: '1 0101 Equus asinus 2 APHA Decision not given'
+    })
+  ).not.toBeVisible()
 
-  expect(document.querySelectorAll('script[nonce]').length)
-    .toBe(2)
-  expect(document.title)
-    .toBe('Showing result for 24GB0Z8WEJ9ZBTL73B - Border Trade Matching Service')
+  expect(document.querySelectorAll('script[nonce]').length).toBe(2)
+  expect(document.title).toBe(
+    'Showing result for 24GB0Z8WEJ9ZBTL73B - Border Trade Matching Service'
+  )
 })
 
 test('results can be filtered', async () => {
@@ -221,7 +273,8 @@ test('results can be filtered', async () => {
     url: `${paths.SEARCH_RESULT}?${queryString}`,
     auth: { strategy: 'session', credentials },
     headers: {
-      cookie: 'cookiePolicy=' + Buffer.from('{"analytics":false}').toString('base64')
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics":false}').toString('base64')
     }
   })
 
@@ -244,10 +297,10 @@ test('results can be filtered', async () => {
     notificationAuthorityFilter
   ] = getAllByRole(document.body, 'combobox')
 
-  const [
-    resetDeclaration,
-    resetNotification
-  ] = getAllByRole(document.body, 'button')
+  const [resetDeclaration, resetNotification] = getAllByRole(
+    document.body,
+    'button'
+  )
 
   expect(declarationRow1.hasAttribute('hidden')).toBe(true)
   await user.selectOptions(declarationAuthorityFilter, 'HMI')
@@ -460,6 +513,9 @@ test('handles upstream errors', async () => {
 
   expect(statusCode).toBe(500)
 
-  expect(getByRole(document.body, 'heading', { name: 'Sorry, there is a problem with this service' }))
-    .toBeInTheDocument()
+  expect(
+    getByRole(document.body, 'heading', {
+      name: 'Sorry, there is a problem with this service'
+    })
+  ).toBeInTheDocument()
 })

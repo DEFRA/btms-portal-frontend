@@ -1,6 +1,17 @@
-import { removeUserSession, setUserSession, updateUserSession, validateUserSession, getUserSession, dropUserSession } from '../../../src/auth/user-session.js'
+import {
+  removeUserSession,
+  setUserSession,
+  updateUserSession,
+  validateUserSession,
+  getUserSession,
+  dropUserSession
+} from '../../../src/auth/user-session.js'
 import { startServer } from '../../../src/utils/start-server.js'
-import { createAuthedUser, createRefreshedToken, setupAuthedUserSession } from '../utils/session-helper.js'
+import {
+  createAuthedUser,
+  createRefreshedToken,
+  setupAuthedUserSession
+} from '../utils/session-helper.js'
 import { config } from '../../../src/config/config.js'
 import { refreshAccessToken } from '../../../src/auth/refesh-token.js'
 
@@ -110,15 +121,19 @@ describe('#userSession', () => {
         id_token: refreshedToken,
         access_token: refreshedToken,
         refresh_token: refreshedToken,
-        expires_in: (sessionConfig.cache.ttl / 1000) + 1 // Make sure the new session doesn't have the same expiry time when the test runs quick
+        expires_in: sessionConfig.cache.ttl / 1000 + 1 // Make sure the new session doesn't have the same expiry time when the test runs quick
       }
 
       await updateUserSession(request, refeshedSession)
 
-      const newCachedSession = await server.app.cache.get(originalCachedSession.sessionId)
+      const newCachedSession = await server.app.cache.get(
+        originalCachedSession.sessionId
+      )
 
       expect(newCachedSession).not.toBeNull()
-      expect(newCachedSession.expiresAt).not.toEqual(originalCachedSession.expiresAt)
+      expect(newCachedSession.expiresAt).not.toEqual(
+        originalCachedSession.expiresAt
+      )
     })
   })
 
@@ -135,7 +150,7 @@ describe('#userSession', () => {
     })
 
     test('Should return not valid if session does not exist', async () => {
-      const request = { }
+      const request = {}
 
       const session = {
         sessionId: 'a-test-session-id'
@@ -172,7 +187,10 @@ describe('#userSession', () => {
       refreshAccessToken.mockReturnValue({
         ok: false
       })
-      userSession = await setupAuthedUserSession(server, new Date().toISOString())
+      userSession = await setupAuthedUserSession(
+        server,
+        new Date().toISOString()
+      )
 
       const request = {
         server,
@@ -239,7 +257,10 @@ describe('#userSession', () => {
 
     test('Should catch errors, plain error, no user session', async () => {
       refreshAccessToken.mockRejectedValue({ message: 'boom' })
-      userSession = await setupAuthedUserSession(server, new Date().toISOString())
+      userSession = await setupAuthedUserSession(
+        server,
+        new Date().toISOString()
+      )
 
       const request = {
         server,
@@ -259,9 +280,7 @@ describe('#userSession', () => {
 
       await validateUserSession(server, request, session)
 
-      expect(request.logger.error.mock.calls).toEqual([
-        [{ message: 'boom' }]
-      ])
+      expect(request.logger.error.mock.calls).toEqual([[{ message: 'boom' }]])
     })
 
     test('Should return valid if session token successfully refreshed', async () => {
@@ -276,7 +295,10 @@ describe('#userSession', () => {
           expires_in: sessionConfig.cache.ttl / 1000
         }
       })
-      userSession = await setupAuthedUserSession(server, new Date().toISOString())
+      userSession = await setupAuthedUserSession(
+        server,
+        new Date().toISOString()
+      )
 
       const request = {
         server,

@@ -5,7 +5,7 @@ const oneYearInMilliseconds = 60 * 60 * 24 * oneYearInDaysForSonar * 1000
 
 export const cookiePolicy = {
   name: 'cookie-policy',
-  async register (server) {
+  async register(server) {
     server.state('cookiePolicy', {
       clearInvalid: true,
       encoding: 'base64json',

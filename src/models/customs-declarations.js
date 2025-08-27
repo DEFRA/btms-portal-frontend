@@ -168,8 +168,8 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
   const documentLevelDecisions =
     clearanceDecision?.results && clearanceDecision.results.length > 0
       ? clearanceDecision.results.filter(
-        ({ itemNumber }) => itemNumber === commodity.itemNumber
-      )
+          ({ itemNumber }) => itemNumber === commodity.itemNumber
+        )
       : null
 
   const decisions =

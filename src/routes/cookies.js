@@ -15,10 +15,12 @@ export const cookiesPost = {
   path: paths.COOKIES,
   options: {
     validate: {
-      payload: joi.object({
-        analytics: joi.string().valid('yes', 'no').required(),
-        previousUrl: joi.string().required()
-      }).unknown(),
+      payload: joi
+        .object({
+          analytics: joi.string().valid('yes', 'no').required(),
+          previousUrl: joi.string().required()
+        })
+        .unknown(),
       failAction: (request, h) => {
         request.yar.flash('cookiesError', true)
 

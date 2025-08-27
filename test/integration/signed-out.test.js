@@ -35,8 +35,9 @@ test('signed out', async () => {
   await user.click(submitButton)
   expect(formdata()).toEqual({ authProvider: 'defraId' })
 
-  expect(document.title)
-    .toBe('You are signed out - Border Trade Matching Service')
+  expect(document.title).toBe(
+    'You are signed out - Border Trade Matching Service'
+  )
 })
 
 test('signed out from entraId', async () => {

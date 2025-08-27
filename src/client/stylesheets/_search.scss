@@ -54,7 +54,7 @@
     background-color: transparent;
 
     &::after {
-      content: '×';
+      content: "×";
       position: absolute;
       display: flex;
       justify-content: center;
@@ -84,8 +84,7 @@
 
   .btms-search-icon {
     fill: none;
-    stroke: govuk-colour('white');
+    stroke: govuk-colour("white");
     stroke-width: 2;
   }
 }
-

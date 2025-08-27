@@ -26,10 +26,12 @@ const getOpenIdRefreshToken = async (refreshUrl, params) => {
     if (res.statusCode === constants.HTTP_STATUS_OK) {
       const jsonResponse = JSON.parse(payload.toString())
 
-      if (jsonResponse?.access_token &&
+      if (
+        jsonResponse?.access_token &&
         jsonResponse?.expires_in &&
         jsonResponse?.id_token &&
-        jsonResponse?.refresh_token) {
+        jsonResponse?.refresh_token
+      ) {
         return {
           ok: true,
           json: jsonResponse
@@ -43,7 +45,4 @@ const getOpenIdRefreshToken = async (refreshUrl, params) => {
   return { ok: false }
 }
 
-export {
-  getOpenIdConfig,
-  getOpenIdRefreshToken
-}
+export { getOpenIdConfig, getOpenIdRefreshToken }

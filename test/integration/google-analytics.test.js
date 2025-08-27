@@ -12,16 +12,19 @@ test('when analytics accepted, google tag manager is present', async () => {
     method: 'get',
     url: paths.LANDING,
     headers: {
-      cookie: 'cookiePolicy=' + Buffer.from('{"analytics":"yes"}').toString('base64')
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics":"yes"}').toString('base64')
     }
   })
 
   globalJsdom(payload)
 
-  expect(document.querySelector(`script[data-id='${gtmId}']`))
-    .toBeInTheDocument()
-  expect(document.querySelector(`noscript[data-id='${gtmId}']`))
-    .toBeInTheDocument()
+  expect(
+    document.querySelector(`script[data-id='${gtmId}']`)
+  ).toBeInTheDocument()
+  expect(
+    document.querySelector(`noscript[data-id='${gtmId}']`)
+  ).toBeInTheDocument()
 })
 
 test('when analytics not accepted, google tag manager is not present', async () => {
@@ -31,14 +34,17 @@ test('when analytics not accepted, google tag manager is not present', async () 
     method: 'get',
     url: paths.LANDING,
     headers: {
-      cookie: 'cookiePolicy=' + Buffer.from('{"analytics":"no"}').toString('base64')
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics":"no"}').toString('base64')
     }
   })
 
   globalJsdom(payload)
 
-  expect(document.querySelector(`script[data-id='${gtmId}']`))
-    .not.toBeInTheDocument()
-  expect(document.querySelector(`noscript[data-id='${gtmId}']`))
-    .not.toBeInTheDocument()
+  expect(
+    document.querySelector(`script[data-id='${gtmId}']`)
+  ).not.toBeInTheDocument()
+  expect(
+    document.querySelector(`noscript[data-id='${gtmId}']`)
+  ).not.toBeInTheDocument()
 })

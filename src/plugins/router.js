@@ -3,7 +3,7 @@ import routes from '../routes/index.js'
 
 export const router = {
   name: 'router',
-  async register (server) {
+  async register(server) {
     await server.register([inert])
 
     server.route(routes)

@@ -8,7 +8,10 @@ let webpackManifest
 // once we move to Eslint 9.19+ we can use import with { type: json }
 const getManifest = () => {
   if (!webpackManifest) {
-    const manifestPath = path.resolve(config.get('root'), '.public/assets-manifest.json')
+    const manifestPath = path.resolve(
+      config.get('root'),
+      '.public/assets-manifest.json'
+    )
     webpackManifest = JSON.parse(readFileSync(manifestPath, 'utf-8'))
   }
   return webpackManifest
@@ -17,7 +20,7 @@ const getManifest = () => {
 /**
  * @param {Request} request
  */
-export async function context (request) {
+export async function context(request) {
   const manifest = getManifest()
   const assetPath = config.get('assetPath')
   const serviceName = config.get('serviceName')
@@ -51,7 +54,7 @@ export async function context (request) {
     /**
      * @param {string} asset
      */
-    getAssetPath (asset) {
+    getAssetPath(asset) {
       const hashed = manifest[asset]
       if (!hashed) {
         request.logger.error(`Asset ${asset} not found in manifest`)

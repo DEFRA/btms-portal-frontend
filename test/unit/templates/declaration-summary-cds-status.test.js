@@ -25,11 +25,17 @@ describe('Declaration Summary - CDS Status Highlighting', () => {
     ['5', ''],
     ['6', ''],
     ['99', '']
-  ])('Should set correct tag class when finalState is %s', (finalState, expectedClass) => {
-    const viewContext = createDeclarationContext(finalState)
-    const renderedTemplate = renderTemplate('includes/declaration-summary.njk', viewContext)
-    const statusSpan = renderedTemplate('span:contains("Current")')
+  ])(
+    'Should set correct tag class when finalState is %s',
+    (finalState, expectedClass) => {
+      const viewContext = createDeclarationContext(finalState)
+      const renderedTemplate = renderTemplate(
+        'includes/declaration-summary.njk',
+        viewContext
+      )
+      const statusSpan = renderedTemplate('span:contains("Current")')
 
-    expect(statusSpan.attr('class')).toBe(expectedClass)
-  })
+      expect(statusSpan.attr('class')).toBe(expectedClass)
+    }
+  )
 })

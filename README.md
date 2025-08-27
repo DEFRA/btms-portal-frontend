@@ -30,9 +30,9 @@ The BTMS Portal Frontend provides search for DEFRA Import Notifications (IPAFFS)
 
 ## Prerequisites
 
-* [Node.js](http://nodejs.org/) `>= v22`
-* [npm](https://nodejs.org/) `>= v10.5.1` (installed with Node.js)
-* [Docker](https://www.docker.com/)
+- [Node.js](http://nodejs.org/) `>= v22`
+- [npm](https://nodejs.org/) `>= v10.5.1` (installed with Node.js)
+- [Docker](https://www.docker.com/)
 
 You may find it easier to manage Node.js versions using a version manager such as [nvm](https://github.com/creationix/nvm) or [n](https://www.npmjs.com/package/n). From within the project folder you can then either run `nvm use` or `n auto` to install the required version.
 
@@ -70,6 +70,7 @@ To view them in your command line run:
 ```bash
 npm run
 ```
+
 ### Authentication
 
 For local authentication, we use the [cdp-defra-id-stub](https://github.com/DEFRA/cdp-defra-id-stub). If you run this as within Docker you will also get an instance of Redis, which can be used for session caching. You should also delete the [reference to localstack](https://github.com/DEFRA/cdp-defra-id-stub/blob/main/compose.yml#L20-L21) within the stubs `compose.yml` file.
