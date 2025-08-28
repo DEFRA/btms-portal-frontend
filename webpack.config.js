@@ -25,6 +25,9 @@ export default {
   entry: {
     application: {
       import: ['./javascripts/application.js', './stylesheets/application.scss']
+    },
+    charts: {
+      import: ['./javascripts/charts.js']
     }
   },
   experiments: {

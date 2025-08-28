@@ -1,0 +1,68 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% extends 'layout.njk' %}
+
+{% set pageTitle = 'Charts reporting spike' %}
+
+{% block head %}
+  {{ super() }}
+  <script nonce="{{ cspNonce }}" src="/public/javascripts/charts.js"></script>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">{{ pageTitle }}
+        <label class="btms-charts-spike">
+          Show table
+          <input id="toggle" type="checkbox" />
+        </label>
+      </h1>
+    </div>
+  </div>
+  <div id="graph" class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h2 class="govuk-heading-m">Matches</h2>
+      <canvas id="matches"></canvas>
+    </div>
+  </div>
+  <div id="table" class="govuk-grid-row" hidden>
+    <div class="govuk-grid-column-two-thirds">
+      {{
+        govukTable({
+          caption: 'Matches',
+          firstCellIsHeader: true,
+          classes: 'btms-charts-spike',
+          head: table.head,
+          rows: table.rows
+        })
+      }}
+    </div>
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <details class="govuk-details">
+        <summary class="govuk-details__summary">
+          <span class="govuk-details__summary-text">
+            Show raw data
+          </span>
+        </summary>
+        <div class="govuk-details__text">
+          <pre class="btms-charts-spike">{{ raw }}</pre>
+        </div>
+      </details>
+    </div>
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <form>
+        <button type="submit" class="govuk-button">reload</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block bodyEnd %}
+  {{ super() }}
+  <script nonce="{{ cspNonce }}" id="data" type="application/json">{{ data | dump | safe }}</script>
+  <script nonce="{{ cspNonce }}">BTMS.initCharts()</script>
+{% endblock %}

@@ -60,3 +60,21 @@
     margin-bottom: 0;
   }
 }
+
+.btms-charts-spike {
+  caption {
+    margin-top: -1px;
+    font-size: 24px;
+    padding-bottom: 10px;
+  }
+  font-size: 11px;
+}
+table.btms-charts-spike, #graph {
+  margin-bottom: 26px;
+}
+.govuk-heading-l .btms-charts-spike {
+  padding-left: 20px;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: anchor-center;
+}

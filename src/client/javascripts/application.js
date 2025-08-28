@@ -17,7 +17,9 @@ createAll(Header)
 createAll(Radios)
 createAll(SkipLink)
 
+window.BTMS = window.BTMS || {}
 window.BTMS = {
+  ...window.BTMS,
   initFilters,
   initSearch
 }
