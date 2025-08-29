@@ -17,6 +17,7 @@ const sessionCookie = {
           path: '/',
           password: sessionConfig.cookie.password,
           isSecure: sessionConfig.cookie.secure,
+          isSameSite: false,
           ttl: sessionConfig.cookie.ttl
         },
         keepAlive: true,

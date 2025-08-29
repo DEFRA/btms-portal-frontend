@@ -18,6 +18,7 @@ const openId = {
         clientId: defraId.clientId,
         clientSecret: defraId.clientSecret,
         isSecure: cookie.secure,
+        isSameSite: false,
         providerParams: {
           serviceId: defraId.serviceId
         }
@@ -30,7 +31,8 @@ const openId = {
         password: cookie.password,
         clientId: entraId.clientId,
         clientSecret: entraId.clientSecret,
-        isSecure: cookie.secure
+        isSecure: cookie.secure,
+        isSameSite: false,
       })
     }
   }
