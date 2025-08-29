@@ -80,17 +80,6 @@ test('MRN, open, finalised, using netMass, matched', () => {
           decisions: [
             {
               id: expect.any(String),
-              documentReference: 'GBCHD2025.1234567',
-              match: true,
-              decision: 'Release',
-              decisionDetail: 'Inspection complete',
-              decisionReason: null,
-              departmentCode: 'FNAO',
-              isIuuOutcome: false,
-              requiresChed: false
-            },
-            {
-              id: expect.any(String),
               documentReference: null,
               match: null,
               decision: 'Release',
@@ -98,6 +87,17 @@ test('MRN, open, finalised, using netMass, matched', () => {
               decisionReason: null,
               departmentCode: 'IUU',
               isIuuOutcome: true,
+              requiresChed: false
+            },
+            {
+              id: expect.any(String),
+              documentReference: 'GBCHD2025.1234567',
+              match: true,
+              decision: 'Release',
+              decisionDetail: 'Inspection complete',
+              decisionReason: null,
+              departmentCode: 'FNAO',
+              isIuuOutcome: false,
               requiresChed: false
             }
           ],
@@ -519,28 +519,6 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
           decisions: [
             {
               id: expect.any(String),
-              documentReference: 'GBCHD2025.1234567',
-              match: false,
-              decision: '',
-              decisionReason: null,
-              decisionDetail: undefined,
-              departmentCode: 'PHSI',
-              isIuuOutcome: false,
-              requiresChed: false
-            },
-            {
-              id: expect.any(String),
-              documentReference: 'GBCHD2025.1234567',
-              match: false,
-              decision: '',
-              decisionReason: null,
-              decisionDetail: undefined,
-              departmentCode: 'PHSI',
-              isIuuOutcome: false,
-              requiresChed: false
-            },
-            {
-              id: expect.any(String),
               documentReference: null,
               match: null,
               decision: '',
@@ -548,6 +526,28 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
               decisionReason: null,
               departmentCode: 'IUU',
               isIuuOutcome: true,
+              requiresChed: false
+            },
+            {
+              id: expect.any(String),
+              documentReference: 'GBCHD2025.1234567',
+              match: false,
+              decision: '',
+              decisionReason: null,
+              decisionDetail: undefined,
+              departmentCode: 'PHSI',
+              isIuuOutcome: false,
+              requiresChed: false
+            },
+            {
+              id: expect.any(String),
+              documentReference: 'GBCHD2025.1234567',
+              match: false,
+              decision: '',
+              decisionReason: null,
+              decisionDetail: undefined,
+              departmentCode: 'PHSI',
+              isIuuOutcome: false,
               requiresChed: false
             }
           ],
