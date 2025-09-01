@@ -69,12 +69,50 @@
   }
   font-size: 11px;
 }
-table.btms-charts-spike, #graph {
-  margin-bottom: 26px;
+
+table.btms-charts-spike,
+#raw {
+  margin-top: 26px;
 }
+
 .govuk-heading-l .btms-charts-spike {
   padding-left: 20px;
   font-size: 11px;
   display: inline-flex;
   align-items: anchor-center;
+}
+
+.btms-graph-definitions {
+  display: flex;
+  flex-direction: row;
+  gap: 5rem;
+
+  dt {
+    margin-bottom: 10px;
+    font-size: 14px;
+
+    &.key:before {
+      content: '';
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      margin-right: 4px;
+      border-radius: 4px;
+    }
+
+    &.match:before {
+      background-color: #5694CA;
+    }
+    &.nomatch:before {
+      background-color: #2BA8A3
+    }
+  }
+
+  dd {
+    margin: 0;
+
+    &.percentage {
+      font-size: 14px;
+    }
+  }
 }

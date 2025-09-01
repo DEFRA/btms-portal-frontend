@@ -20,12 +20,32 @@ function initToggle() {
 
 function initCharts() {
   const data = JSON.parse(document.getElementById('data')?.innerText)
-  const matches = document.getElementById('matches')
 
+  const matches = document.getElementById('matches')
   /* eslint-disable no-new */
   new Chart(matches, {
     type: 'line',
-    data,
+    data: {
+      labels: data.labels,
+      datasets: [data.matches, data.noMatches]
+    },
+    options: {
+      elements: {
+        line: {
+          tension: 0.3
+        }
+      }
+    }
+  })
+
+  const releases = document.getElementById('releases')
+  /* eslint-disable no-new */
+  new Chart(releases, {
+    type: 'line',
+    data: {
+      labels: data.labels,
+      datasets: [data.autoReleases, data.manualReleases]
+    },
     options: {
       elements: {
         line: {

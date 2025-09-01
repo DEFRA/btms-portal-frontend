@@ -33,20 +33,60 @@
           firstCellIsHeader: true,
           classes: 'btms-charts-spike',
           head: table.head,
-          rows: table.rows
+          rows: table.matchAndNoMatch
         })
       }}
     </div>
   </div>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <dl>
-        <dt>Matches</dt>
-        <dd>
-      </dl>
+      <div class="btms-graph-definitions govuk-body">
+        {% set matchesAndNoMatchesTotal = data.matches.total + data.noMatches.total %}
+        <dl>
+          <dt class="govuk-heading-s key match">Matches</dt>
+          <dd class="govuk-heading-m">{{ data.matches.total }}</dd>
+          <dd class="percentage">({{ ((data.matches.total / matchesAndNoMatchesTotal) * 100) | round(2) }}%)</dd>
+        </dl>
+        <dl>
+          <dt class="govuk-heading-s key nomatch">No Matches</dt>
+          <dd class="govuk-heading-m">{{ data.noMatches.total }}</dd>
+          <dd class="percentage">({{ ((data.noMatches.total / matchesAndNoMatchesTotal) * 100) | round(2) }}%)</dd>
+        </dl>
+        <dl>
+          <dt class="govuk-heading-s">Total</dt>
+          <dd class="govuk-heading-m">{{ matchesAndNoMatchesTotal }}</dd>
+        </dl>
+      </div>
     </div>
   </div>
   <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h2 class="govuk-heading-m">Releases</h2>
+      <canvas id="releases"></canvas>
+    </div>
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="btms-graph-definitions govuk-body">
+        {% set autoAndManualReleases = data.autoReleases.total + data.manualReleases.total %}
+        <dl>
+          <dt class="govuk-heading-s key match">Automatic</dt>
+          <dd class="govuk-heading-m">{{ data.autoReleases.total }}</dd>
+          <dd class="percentage">({{ ((data.autoReleases.total / autoAndManualReleases) * 100) | round(2) }}%)</dd>
+        </dl>
+        <dl>
+          <dt class="govuk-heading-s key nomatch">Manual</dt>
+          <dd class="govuk-heading-m">{{ data.manualReleases.total }}</dd>
+          <dd class="percentage">({{ ((data.manualReleases.total / autoAndManualReleases) * 100) | round(2) }}%)</dd>
+        </dl>
+        <dl>
+          <dt class="govuk-heading-s">Total</dt>
+          <dd class="govuk-heading-m">{{ autoAndManualReleases }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  <div id="raw" class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       <details class="govuk-details">
         <summary class="govuk-details__summary">
