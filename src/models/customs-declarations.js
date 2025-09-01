@@ -227,7 +227,6 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
         match: isIuuOutcome ? null : isMatch
       }
     })
-    .sort((a, b) => a.isIuuOutcome - b.isIuuOutcome)
 
   return {
     id: randomUUID(),
