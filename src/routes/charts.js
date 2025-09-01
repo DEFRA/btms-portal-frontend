@@ -10,31 +10,40 @@ const labels = [...new Array(24)].map(
   (_, i) => `${String(i).padStart(2, '0')}:00`
 )
 
-const getDatasets = () => {
+const getChartData = () => {
   let prevMatch = getRandomInt(250)
+  let totalMatches = prevMatch
   const matches = [...new Array(24)].map(() => {
     const next = getRandomIntInRange(prevMatch, 20, 250)
     prevMatch = next
+    totalMatches += next
     return next
   })
 
   let prevNoMatch = getRandomInt(15)
+  let totalNoMatches = prevNoMatch
   const noMatches = [...new Array(24)].map(() => {
     const next = getRandomIntInRange(prevNoMatch, 3, 15)
     prevNoMatch = next
+    totalNoMatches += next
     return next
   })
 
-  return [
-    {
-      label: 'match',
-      data: matches
-    },
-    {
-      label: 'no match',
-      data: noMatches
-    }
-  ]
+  return {
+    totalMatches,
+    totalNoMatches,
+    total: totalMatches + totalNoMatches,
+    datasets: [
+      {
+        label: 'match',
+        data: matches
+      },
+      {
+        label: 'no match',
+        data: noMatches
+      }
+    ]
+  }
 }
 
 const getTableData = (datasets) => {
@@ -100,11 +109,10 @@ export const charts = {
   method: 'get',
   path: '/charts',
   handler: (_, h) => {
-    const datasets = getDatasets()
-    const table = getTableData(datasets)
-    const data = { labels, datasets }
-    const raw = renderData({ labels, datasets })
-
+    const chartData = getChartData()
+    const table = getTableData(chartData.datasets)
+    const data = { labels, ...chartData }
+    const raw = renderData(data)
     return h.view('charts', {
       data,
       table,
