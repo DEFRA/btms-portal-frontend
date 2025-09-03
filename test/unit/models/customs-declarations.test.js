@@ -1,7 +1,8 @@
 import {
   mapCustomsDeclarations,
   getDecision,
-  getCustomsDeclarationOpenState
+  getCustomsDeclarationOpenState,
+  getDecisionDescription
 } from '../../../src/models/customs-declarations.js'
 
 test('MRN, open, finalised, using netMass, matched', () => {
@@ -1225,3 +1226,10 @@ test.each([
     expect(result).toEqual(expected)
   }
 )
+
+test('getDecisionDescription(): awaiting IPAFFS', () => {
+  const internalDecisionCode = 'E88'
+
+  const description = getDecisionDescription(null, internalDecisionCode)
+  expect(description).toBe('Awaiting IPAFFS update')
+})
