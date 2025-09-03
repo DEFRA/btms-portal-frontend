@@ -87,7 +87,7 @@ export const getDecisionDescription = (
   iuuRelatedChedpCheck
 ) => {
   if (internalDecisionCode === 'E88') {
-    return 'Awaiting IPAFFS update'
+    return 'Hold - Awaiting IPAFFS update'
   }
 
   if (closedChedStatuses.includes(notificationStatus)) {

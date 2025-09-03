@@ -1231,5 +1231,5 @@ test('getDecisionDescription(): awaiting IPAFFS', () => {
   const internalDecisionCode = 'E88'
 
   const description = getDecisionDescription(null, internalDecisionCode)
-  expect(description).toBe('Awaiting IPAFFS update')
+  expect(description).toBe('Hold - Awaiting IPAFFS update')
 })
