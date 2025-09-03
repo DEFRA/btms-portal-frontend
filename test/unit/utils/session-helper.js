@@ -1,4 +1,5 @@
 import { addSeconds } from 'date-fns'
+import iron from '@hapi/iron'
 import jwt from '@hapi/jwt'
 import { config } from '../../../src/config/config.js'
 
@@ -85,4 +86,10 @@ function createUserProfile(strategy) {
       strategy === 'entraId' ? 'https://entraid.bar' : 'https://defraid.bar',
     strategy: strategy === 'entraId' ? 'entraId' : 'defraId'
   }
+}
+
+export const getSessionCookie = async (sessionId) => {
+  const password = config.get('session.cookie.password')
+  const value = await iron.seal({ sessionId }, password, iron.defaults)
+  return `userSession=${value}`
 }
