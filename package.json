@@ -20,7 +20,7 @@
     "lint:fix": "eslint --fix",
     "lint:scss": "stylelint \"src/**/*.scss\" --cache --cache-location .cache/stylelint --cache-strategy content --color --ignore-path .gitignore",
     "postversion": "git add package.json package-lock.json && git commit -m $npm_package_version",
-    "test": "jest --coverage --verbose",
+    "test": "jest --coverage --verbose --maxWorkers=50%",
     "test:watch": "jest --watch",
     "test:lint": "eslint",
     "server:watch": "node --inspect=0.0.0.0 --watch --watch-path=src --env-file-if-exists=.env.local src/index.js",

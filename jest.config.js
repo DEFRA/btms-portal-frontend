@@ -30,8 +30,7 @@ export default {
     `node_modules/(?!${[
       '@defra/hapi-tracing' // Supports ESM only
     ].join('|')}/)`
-  ],
-  testTimeout: 7000
+  ]
 }
 
 /**
