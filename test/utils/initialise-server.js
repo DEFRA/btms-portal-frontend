@@ -1,6 +1,6 @@
 import { createServer } from '../../src/server'
 
-export async function initialiseServer(state) {
+export async function initialiseServer(state, keepAlive) {
   const server = await createServer()
 
   if (state) {
@@ -12,9 +12,11 @@ export async function initialiseServer(state) {
 
   await server.initialize()
 
-  server.ext('onPostResponse', async () => {
-    await server.stop()
-  })
+  if (!keepAlive) {
+    server.ext('onPostResponse', async () => {
+      await server.stop()
+    })
+  }
 
   return server
 }
