@@ -19,8 +19,7 @@ const openId = {
         clientSecret: defraId.clientSecret,
         isSecure: cookie.secure,
         providerParams: {
-          serviceId: defraId.serviceId,
-          scope: defraId.scopes
+          serviceId: defraId.serviceId
         }
       })
 
