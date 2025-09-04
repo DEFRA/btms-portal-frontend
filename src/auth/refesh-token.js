@@ -5,7 +5,6 @@ import { paths } from '../routes/route-constants.js'
 
 async function refreshAccessToken(request) {
   const authedUser = await getUserSession(request)
-  request.logger.setBindings({ refreshingAccessToken: authedUser.strategy })
 
   const authConfig = config.get('auth')[authedUser.strategy]
   const refreshToken = authedUser.refreshToken
@@ -17,6 +16,14 @@ async function refreshAccessToken(request) {
       ? paths.SIGNIN_DEFRA_ID_CALLBACK
       : paths.SIGNIN_ENTRA_ID_CALLBACK
   const redirectUri = config.get('appBaseUrl') + callbackPath
+
+  if (!authedUser.refreshToken) {
+    request.logger.error(
+      `missing ${authedUser.strategy} refresh token scopes: ${scopes}`
+    )
+
+    return {}
+  }
 
   const params = {
     client_id: clientId,
