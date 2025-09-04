@@ -24,13 +24,7 @@ test('refreshes user signed in with DefraId', async () => {
 
   getUserSession.mockReturnValue(authedUser)
 
-  const request = {
-    logger: {
-      setBindings: jest.fn()
-    }
-  }
-
-  await refreshAccessToken(request)
+  await refreshAccessToken({})
 
   expect(mockGetOpenIdRefreshToken.mock.calls).toEqual([
     [
@@ -55,13 +49,7 @@ test('refreshes user signed in with EntraId', async () => {
 
   getUserSession.mockReturnValue(authedUser)
 
-  const request = {
-    logger: {
-      setBindings: jest.fn()
-    }
-  }
-
-  await refreshAccessToken(request)
+  await refreshAccessToken({})
 
   expect(mockGetOpenIdRefreshToken.mock.calls).toEqual([
     [
@@ -76,4 +64,16 @@ test('refreshes user signed in with EntraId', async () => {
       }
     ]
   ])
+})
+
+test('logs missing if refresh token missing', async () => {
+  const { refreshToken, ...authedUser } = createAuthedUser()
+  getUserSession.mockReturnValue(authedUser)
+  const request = { logger: { error: jest.fn() } }
+  const expected = await refreshAccessToken(request)
+
+  expect(request.logger.error.mock.calls).toEqual([
+    ['missing defraId refresh token scopes: openid offline_access']
+  ])
+  expect(expected).toEqual({})
 })
