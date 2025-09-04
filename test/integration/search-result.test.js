@@ -66,37 +66,27 @@ const customsDeclarations = [
       ]
     },
     clearanceDecision: {
-      items: [
+      results: [
         {
           itemNumber: 1,
-          checks: [
-            {
-              checkCode: 'H218',
-              decisionCode: 'C03'
-            }
-          ]
+          checkCode: 'H218',
+          decisionCode: 'C03',
+          documentReference: 'CHEDA.GB.2025.0000001'
         },
         {
           itemNumber: 2,
-          checks: [
-            {
-              checkCode: 'H222',
-              decisionCode: 'H01'
-            }
-          ]
+          checkCode: 'H222',
+          decisionCode: 'H01',
+          documentReference: 'CHEDP.GB.2025.0000002'
         },
         {
           itemNumber: 3,
-          checks: [
-            {
-              checkCode: 'H220',
-              decisionCode: 'X00',
-              decisionInternalFurtherDetail: ['E70'],
-              decisionReasons: [
-                'This CHED reference cannot be found on the customs declaration. Please check that the reference is correct.'
-              ]
-            }
-          ]
+          checkCode: 'H220',
+          decisionCode: 'X00',
+          documentReference: 'CHEDP.BB.2025.NOMATCH',
+          decisionReason:
+            'This CHED reference cannot be found on the customs declaration. Please check that the reference is correct.',
+          internalDecisionCode: 'E70'
         }
       ]
     },
