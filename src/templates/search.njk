@@ -8,7 +8,7 @@
   "SEARCH_TERM_NOT_FOUND": searchTerm ~ " cannot be found"
 } %}
 
-{% set pageTitle = "Search by MRN, CHED or DUCR" %}
+{% set pageTitle = "Search by MRN, CHED, DUCR or GMR ID" %}
 
 {% set searchHint %}
   {% include "./includes/search-hint.njk" %}
@@ -23,7 +23,7 @@
       <form id="search" class="btms-search-wrapper" action="/search-result">
         <h1 class="govuk-label-wrapper">
           <label class="govuk-label govuk-label--l" for="search-term">
-            Search by MRN, CHED or DUCR
+            Search by MRN, CHED, DUCR or GMR ID
           </label>
         </h1>
         <div id="search-term-hint" class="govuk-hint govuk-body-s">
@@ -32,6 +32,7 @@
             <li>MRN, 24GB6T3HFCIZV1HAR9</li>
             <li>CHED, CHEDP.GB.2025.4433124 or GBCHD2025.4433124</li>
             <li>DUCR, 4GB335031931000-WB2408-27WWL62745</li>
+            <li>GMR ID, GMRB00000A9C</li>
           </ul>
         </div>
         {{
