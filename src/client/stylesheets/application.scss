@@ -7,6 +7,7 @@
 @use "search-result";
 @use "landing-page";
 @use "filters";
+@use "reporting";
 
 .btms-width-container--wide {
   @include govuk-width-container(1200px);

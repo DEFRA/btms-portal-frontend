@@ -1,0 +1,39 @@
+{% extends 'layout.njk' %}
+
+{% set pageTitle = 'BTMS reporting data' %}
+
+{% block content %}
+
+<h1 class="govuk-heading-l">BTMS reporting data</h1>
+
+<span class="govuk-caption-m">Showing results from</span>
+<h2 class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-5">yesterday for all ports</h2>
+
+<h2 class="govuk-heading-m">Releases</h2>
+
+<div class="stat-card-group btms-summary-releases">
+    <div class="stat-card stat-card--blue btms-summary-releases-automatic">
+        <div class="stat-card__label">Auto</div>
+        <div class="stat-card__value-wrapper">
+            <span class="stat-card__value">{{ summary.releases.automatic }}</span>
+            <span class="stat-card__percentage percentage">({{ summary.releases.automaticPercentage }}%)</span>
+        </div>
+    </div>
+    
+    <div class="stat-card stat-card--blue btms-summary-releases-manual">
+        <div class="stat-card__label">Manual</div>
+        <div class="stat-card__value-wrapper">
+            <span class="stat-card__value">{{ summary.releases.manual }}</span>
+            <span class="stat-card__percentage percentage">({{ summary.releases.manualPercentage }}%)</span>
+        </div>
+    </div>
+
+    <div class="stat-card stat-card--blue btms-summary-releases-total">
+        <div class="stat-card__label">Total</div>
+        <div class="stat-card__value-wrapper">
+            <span class="stat-card__value">{{ summary.releases.total }}</span>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
