@@ -13,9 +13,11 @@ import { search } from './search.js'
 import { searchResult } from './search-result.js'
 import { chromeDevtools } from './chrome-devtools.js'
 import { cookiesGet, cookiesPost } from './cookies.js'
+import { charts } from './charts.js'
 
 export default [
   accessibility,
+  charts,
   cookiesGet,
   cookiesPost,
   chromeDevtools,
