@@ -80,11 +80,16 @@ export const getDecision = (decisionCode) => {
 
 export const getDecisionDescription = (
   decisionCode,
+  internalDecisionCode,
   notificationStatus,
   isIuuOutcome,
   allDecisionCodesAreNoMatch,
   iuuRelatedChedpCheck
 ) => {
+  if (internalDecisionCode === 'E88') {
+    return 'Hold - Awaiting IPAFFS update'
+  }
+
   if (closedChedStatuses.includes(notificationStatus)) {
     return `CHED ${notificationStatus.toLowerCase()}`
   }
@@ -169,6 +174,7 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
       decision: getDecision(decision.decisionCode),
       decisionDetail: getDecisionDescription(
         decision.decisionCode,
+        decision.internalDecisionCode,
         notificationStatus,
         isIuuOutcome,
         allDecisionCodesAreNoMatch,
