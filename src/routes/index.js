@@ -2,6 +2,7 @@ import { accessibility } from './accessibility.js'
 import { health } from './health.js'
 import { staticAssetRoutes } from './static-assets.js'
 import { home } from './home.js'
+import { reporting } from './reporting.js'
 import { signinOidc } from './signin-oidc.js'
 import { signIn } from './sign-in.js'
 import { signInChoose } from './sign-in-choose.js'
@@ -21,6 +22,7 @@ export default [
   chromeDevtools,
   health,
   home,
+  reporting,
   signIn,
   ...signInChoose,
   signInEntra,

@@ -1,0 +1,50 @@
+@use "govuk-frontend" as *;
+@use "variables" as *;
+
+.btms-reporting-filters {
+  background-color: govuk-colour("light-grey");
+  padding: govuk-spacing(4);
+}
+
+.btms-heading-prefix {
+  display: block;
+  margin-bottom: 0;
+}
+
+.btms-report {
+  .btms-tiles {
+    &:nth-child(even) {
+      .btms-tile {
+        background-color: $btms-light-grey;
+      }
+    }
+
+    &:nth-child(odd) {
+      .btms-tile {
+        background-color: $btms-light-blue;
+      }
+    }
+  }
+}
+
+.btms-tiles {
+  display: flex;
+  flex-direction: row;
+  gap: govuk-spacing(4);
+
+  .btms-tile {
+    margin: 0;
+    @include govuk-font-size($size: 16);
+    padding: govuk-spacing(3);
+    width: 200px;
+    box-sizing: border-box;
+
+    dd {
+      margin: 0;
+    }
+
+    .govuk-heading-s {
+      margin-bottom: govuk-spacing(2);
+    }
+  }
+}
