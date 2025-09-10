@@ -1,48 +1,50 @@
-.stat-card-group {
-    color: #0b0c0c;
-    display: flex;
-    flex-wrap: wrap;
-    font-family: GDS Transport, arial, sans-serif;
-    gap: 1rem;
-    margin-bottom: 2rem;
+@use "govuk-frontend" as *;
+@use "variables" as *;
+
+.btms-reporting-filters {
+  background-color: govuk-colour("light-grey");
+  padding: govuk-spacing(4);
 }
 
+.btms-heading-prefix {
+  display: block;
+  margin-bottom: 0;
+}
 
-.stat-card {
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    justify-content: flex-start;
-    padding: 16px;
+.btms-report {
+  .btms-tiles {
+    &:nth-child(even) {
+      .btms-tile {
+        background-color: $btms-light-grey;
+      }
+    }
+
+    &:nth-child(odd) {
+      .btms-tile {
+        background-color: $btms-light-blue;
+      }
+    }
+  }
+}
+
+.btms-tiles {
+  display: flex;
+  flex-direction: row;
+  gap: govuk-spacing(4);
+
+  .btms-tile {
+    margin: 0;
+    @include govuk-font-size($size: 16);
+    padding: govuk-spacing(3);
     width: 200px;
-}
+    box-sizing: border-box;
 
-.stat-card__label {
-    font-weight: 700;
-    font-size: 18px;
-}
+    dd {
+      margin: 0;
+    }
 
-.stat-card__percentage {
-    display: block;
-    font-size: 14px;
-    margin-top: 2px;
+    .govuk-heading-s {
+      margin-bottom: govuk-spacing(2);
+    }
+  }
 }
-
-.stat-card__value-wrapper {
-    align-items: flex-start;
-    display: flex;
-    flex-direction: column;
-    margin-top: 4px;
-}
-
-.stat-card__value {
-    font-size: 2rem;
-    font-weight: 700;
-    line-height: 1.1;
-}
-
-.stat-card--blue {
-    background-color: #d5e1f0;
-}
-

@@ -21,14 +21,33 @@ export const getSummary = async (request, from, to) => {
       }
     )
 
-    return {
-      releases: {
-        ...payload.releases,
-        manualPercentage: calculatePercentage(payload.releases.manual, payload.releases.total),
-        automaticPercentage: calculatePercentage(payload.releases.automatic, payload.releases.total)
-      },
-      matches: payload.matches
-    }
+    return [
+      {
+        label: 'Releases',
+        tiles: [
+          {
+            label: 'Auto',
+            total: payload.releases.automatic,
+            percentage: calculatePercentage(
+              payload.releases.automatic,
+              payload.releases.total
+            )
+          },
+          {
+            label: 'Manual',
+            total: payload.releases.manual,
+            percentage: calculatePercentage(
+              payload.releases.manual,
+              payload.releases.total
+            )
+          },
+          {
+            label: 'Total',
+            total: payload.releases.total
+          }
+        ]
+      }
+    ]
   } catch (error) {
     request.logger.setBindings({ error })
     throw error
