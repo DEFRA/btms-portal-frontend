@@ -21,14 +21,25 @@ test('renders reporting summary', async () => {
 
   const summary = {
     releases: {
-      automatic: 25,
-      manual: 50,
+      automatic: 70,
+      manual: 5,
       total: 75
     },
     matches: {
-      match: 60,
-      noMatch: 54,
-      total: 114
+      match: 180,
+      noMatch: 20,
+      total: 200
+    },
+    clearanceRequests: {
+      unique: 75,
+      total: 100
+    },
+    notifications: {
+      chedA: 100,
+      chedP: 50,
+      chedPp: 25,
+      chedD: 25,
+      total: 200
     }
   }
 
@@ -58,25 +69,106 @@ test('renders reporting summary', async () => {
     })
   ).toBeInTheDocument()
 
-  const [auto, manual, releases] = getAllByRole(document.body, 'term')
+  const matchesRegion = getByRole(document.body, 'region', { name: 'Matches' })
+  expect(getByRole(matchesRegion, 'paragraph')).toBeInTheDocument()
+
+  const [match, noMatch, matches] = getAllByRole(matchesRegion, 'term')
+  const [
+    matchTotal,
+    matchPercentage,
+    noMatchTotal,
+    noMatchPercentage,
+    matchesTotal
+  ] = getAllByRole(matchesRegion, 'definition')
+
+  expect(match.textContent.trim()).toBe('Matches')
+  expect(matchTotal.textContent.trim()).toBe('180')
+  expect(matchPercentage.textContent.trim()).toBe('(90.00%)')
+
+  expect(noMatch.textContent.trim()).toBe('No matches')
+  expect(noMatchTotal.textContent.trim()).toBe('20')
+  expect(noMatchPercentage.textContent.trim()).toBe('(10.00%)')
+
+  expect(matches.textContent.trim()).toBe('Total')
+  expect(matchesTotal.textContent.trim()).toBe('200')
+
+  const releasesRegion = getByRole(document.body, 'region', {
+    name: 'Releases'
+  })
+
+  const [auto, manual, releases] = getAllByRole(releasesRegion, 'term')
   const [
     autoTotal,
     autoPercentage,
     manualTotal,
     manualPercentage,
     releasesTotal
-  ] = getAllByRole(document.body, 'definition')
+  ] = getAllByRole(releasesRegion, 'definition')
 
   expect(auto.textContent.trim()).toBe('Auto')
-  expect(autoTotal.textContent.trim()).toBe('25')
-  expect(autoPercentage.textContent.trim()).toBe('(33.33%)')
+  expect(autoTotal.textContent.trim()).toBe('70')
+  expect(autoPercentage.textContent.trim()).toBe('(93.33%)')
 
   expect(manual.textContent.trim()).toBe('Manual')
-  expect(manualTotal.textContent.trim()).toBe('50')
-  expect(manualPercentage.textContent.trim()).toBe('(66.67%)')
+  expect(manualTotal.textContent.trim()).toBe('5')
+  expect(manualPercentage.textContent.trim()).toBe('(6.67%)')
 
   expect(releases.textContent.trim()).toBe('Total')
   expect(releasesTotal.textContent.trim()).toBe('75')
+
+  const requestsRegion = getByRole(document.body, 'region', {
+    name: 'Unique clearance requests'
+  })
+  expect(getByRole(requestsRegion, 'paragraph')).toBeInTheDocument()
+
+  const [unique, requests] = getAllByRole(requestsRegion, 'term')
+  const [uniqueTotal, uniquePercentage, requestsTotal] = getAllByRole(
+    requestsRegion,
+    'definition'
+  )
+
+  expect(unique.textContent.trim()).toBe('Unique clearances')
+  expect(uniqueTotal.textContent.trim()).toBe('75')
+  expect(uniquePercentage.textContent.trim()).toBe('(75.00%)')
+
+  expect(requests.textContent.trim()).toBe('Total')
+  expect(requestsTotal.textContent.trim()).toBe('100')
+
+  const chedsRegion = getByRole(document.body, 'region', {
+    name: 'Pre-notifications by CHED type'
+  })
+
+  const [chedA, chedP, chedPp, chedD, cheds] = getAllByRole(chedsRegion, 'term')
+  const [
+    chedATotal,
+    chedAPercentage,
+    chedPTotal,
+    chedPPercentage,
+    chedPpTotal,
+    chedPpPercentage,
+    chedDTotal,
+    chedDPercentage,
+    chedsTotal
+  ] = getAllByRole(chedsRegion, 'definition')
+
+  expect(chedA.textContent.trim()).toBe('CHED A')
+  expect(chedATotal.textContent.trim()).toBe('100')
+  expect(chedAPercentage.textContent.trim()).toBe('(50.00%)')
+
+  expect(chedP.textContent.trim()).toBe('CHED P')
+  expect(chedPTotal.textContent.trim()).toBe('50')
+  expect(chedPPercentage.textContent.trim()).toBe('(25.00%)')
+
+  expect(chedPp.textContent.trim()).toBe('CHED PP')
+  expect(chedPpTotal.textContent.trim()).toBe('25')
+  expect(chedPpPercentage.textContent.trim()).toBe('(12.50%)')
+
+  expect(chedD.textContent.trim()).toBe('CHED D')
+  expect(chedDTotal.textContent.trim()).toBe('25')
+  expect(chedDPercentage.textContent.trim()).toBe('(12.50%)')
+
+  expect(cheds.textContent.trim()).toBe('Total')
+  expect(chedsTotal.textContent.trim()).toBe('200')
 
   const [apiURL] = wreck.get.mock.calls[2]
 
