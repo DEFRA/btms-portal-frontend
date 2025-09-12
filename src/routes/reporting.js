@@ -1,5 +1,6 @@
 import { paths, CACHE_CONTROL_NO_STORE } from './route-constants.js'
 import { getSummary } from '../services/reporting.js'
+import { mapReports } from '../models/reports.js'
 
 export const reporting = {
   method: 'get',
@@ -21,8 +22,9 @@ export const reporting = {
     const to = today.toISOString()
 
     const summary = await getSummary(request, from, to)
+    const reports = mapReports(summary)
 
     const timePeriod = 'yesterday'
-    return h.view('reporting', { summary, timePeriod })
+    return h.view('reporting', { reports, timePeriod })
   }
 }
