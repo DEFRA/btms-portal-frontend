@@ -1,8 +1,11 @@
 const calculatePercentage = (part, total) => {
   if (total === 0) {
-    return '0.00'
+    return '0'
   }
-  return ((part / total) * 100).toFixed(2)
+
+  const value = (part / total) * 100
+  const decimalPlaces = Number.isInteger(value) ? 0 : 2
+  return value.toFixed(decimalPlaces)
 }
 
 const headings = {
@@ -42,7 +45,7 @@ const mapTiles = ([key, value], total) => {
   }
 }
 
-export const mapSummary = (summary) =>
+export const mapReports = (summary) =>
   Object.entries(summary)
     .map(([key, value]) => {
       const type = key

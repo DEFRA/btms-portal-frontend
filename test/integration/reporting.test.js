@@ -83,11 +83,11 @@ test('renders reporting summary', async () => {
 
   expect(match.textContent.trim()).toBe('Matches')
   expect(matchTotal.textContent.trim()).toBe('180')
-  expect(matchPercentage.textContent.trim()).toBe('(90.00%)')
+  expect(matchPercentage.textContent.trim()).toBe('(90%)')
 
   expect(noMatch.textContent.trim()).toBe('No matches')
   expect(noMatchTotal.textContent.trim()).toBe('20')
-  expect(noMatchPercentage.textContent.trim()).toBe('(10.00%)')
+  expect(noMatchPercentage.textContent.trim()).toBe('(10%)')
 
   expect(matches.textContent.trim()).toBe('Total')
   expect(matchesTotal.textContent.trim()).toBe('200')
@@ -129,7 +129,7 @@ test('renders reporting summary', async () => {
 
   expect(unique.textContent.trim()).toBe('Unique clearances')
   expect(uniqueTotal.textContent.trim()).toBe('75')
-  expect(uniquePercentage.textContent.trim()).toBe('(75.00%)')
+  expect(uniquePercentage.textContent.trim()).toBe('(75%)')
 
   expect(requests.textContent.trim()).toBe('Total')
   expect(requestsTotal.textContent.trim()).toBe('100')
@@ -153,11 +153,11 @@ test('renders reporting summary', async () => {
 
   expect(chedA.textContent.trim()).toBe('CHED A')
   expect(chedATotal.textContent.trim()).toBe('100')
-  expect(chedAPercentage.textContent.trim()).toBe('(50.00%)')
+  expect(chedAPercentage.textContent.trim()).toBe('(50%)')
 
   expect(chedP.textContent.trim()).toBe('CHED P')
   expect(chedPTotal.textContent.trim()).toBe('50')
-  expect(chedPPercentage.textContent.trim()).toBe('(25.00%)')
+  expect(chedPPercentage.textContent.trim()).toBe('(25%)')
 
   expect(chedPp.textContent.trim()).toBe('CHED PP')
   expect(chedPpTotal.textContent.trim()).toBe('25')

@@ -35,7 +35,7 @@
                       <dl class="govuk-body btms-tile">
                         <dt class="govuk-heading-s">{{ tile.label }}</dt>
                         <dd class="govuk-heading-l">{{ tile.total }}</dd>
-                        {% if tile.percentage %}
+                        {% if tile.percentage !== null %}
                           <dd class="btms-percentage">({{ tile.percentage }}%)</dd>
                         {% endif %}
                       </dl>

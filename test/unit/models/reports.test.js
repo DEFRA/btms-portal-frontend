@@ -1,4 +1,4 @@
-import { mapSummary } from '../../../src/models/map-summary'
+import { mapReports } from '../../../src/models/reports'
 
 test('total of 0', () => {
   const summary = {
@@ -8,12 +8,12 @@ test('total of 0', () => {
     }
   }
 
-  const actual = mapSummary(summary)
+  const actual = mapReports(summary)
   const expected = [
     {
       heading: 'Unique clearance requests',
       tiles: [
-        { label: 'Unique clearances', percentage: '0.00', total: 0 },
+        { label: 'Unique clearances', percentage: '0', total: 0 },
         { label: 'Total', percentage: null, total: 0 }
       ],
       type: 'clearanceRequests'
