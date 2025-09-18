@@ -392,6 +392,48 @@ test('invalid date range', async () => {
   ).toHaveAttribute('href', '#endDate')
 })
 
+test('endDate in the future', async () => {
+  jest
+    .useFakeTimers({ doNotFake: ['nextTick'] })
+    .setSystemTime(new Date('2025-09-18'))
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const invalidDatesQuery = new URLSearchParams({
+    startDate: '18/09/2025',
+    endDate: '19/09/2026'
+  })
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.REPORTING}?${invalidDatesQuery}`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(
+    getByRole(document.body, 'heading', {
+      name: 'There is a problem',
+      level: 2
+    })
+  ).toBeInTheDocument()
+
+  expect(
+    getByRole(document.body, 'link', {
+      name: 'End date must be today or in the past'
+    })
+  ).toHaveAttribute('href', '#endDate')
+})
+
 test('invalid dates', async () => {
   wreck.get
     .mockResolvedValueOnce({ payload: provider })

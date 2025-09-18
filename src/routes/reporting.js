@@ -74,9 +74,11 @@ export const reporting = {
             .default(endOfYesterday)
             .custom((value) => (isToday(value) ? new Date() : endOfDay(value)))
             .min(joi.ref('startDate'))
+            .max('now')
             .messages({
               'date.format': 'Enter a valid end date',
-              'date.min': 'End date must be after or the same as start date'
+              'date.min': 'End date must be after or the same as start date',
+              'date.max': 'End date must be today or in the past'
             })
         })
         .unknown(),
