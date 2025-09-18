@@ -1,0 +1,30 @@
+{% set descriptions = {
+  matches: 'Matches are shown by the date the MRN was created, not when the status changed. For example, an MRN created on 1 September but matched on 2 September will appear in the 1 September report.',
+  clearanceRequests: 'Each clearance request is a message from CDS to BTMS about an MRN. An MRN can have multiple requests if updated. ‘Total’ counts all messages. ‘Unique’ counts distinct MRNs.'
+} %}
+
+<div class="btms-reports">
+  {% for report in reports %}
+    <section aria-labelledBy="{{ report.type }}" class="govuk-grid-row govuk-!-margin-bottom-6 btms-report">
+      <div class="govuk-grid-column-full">
+        <heading>
+          <h3 id="{{ report.type }}" class="govuk-heading-m">{{ report.heading }}</h3>
+          {% if descriptions[report.type] %}
+            <p class="govuk-body-s">{{ descriptions[report.type] }}</p>
+          {% endif %}
+        </heading>
+        <div class="btms-tiles">
+          {% for tile in report.tiles %}
+            <dl class="govuk-body btms-tile">
+              <dt class="govuk-heading-s">{{ tile.label }}</dt>
+              <dd class="govuk-heading-l">{{ tile.total }}</dd>
+              {% if tile.percentage !== null %}
+                <dd class="btms-percentage">({{ tile.percentage }}%)</dd>
+              {% endif %}
+            </dl>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endfor %}
+</div>

@@ -14,7 +14,9 @@ jest.mock('@hapi/wreck', () => ({
   get: jest.fn()
 }))
 
-test('renders reporting summary', async () => {
+afterEach(jest.useRealTimers)
+
+test('reporting summary', async () => {
   jest
     .useFakeTimers({ doNotFake: ['nextTick'] })
     .setSystemTime(new Date('2025-09-09'))
@@ -62,9 +64,49 @@ test('renders reporting summary', async () => {
 
   globalJsdom(payload)
 
+  const today = new URLSearchParams({
+    startDate: '09/09/2025',
+    endDate: '09/09/2025'
+  })
+  expect(
+    getByRole(document.body, 'link', {
+      name: 'Today'
+    })
+  ).toHaveAttribute('href', `/reporting?${today}`)
+
+  const yesterday = new URLSearchParams({
+    startDate: '08/09/2025',
+    endDate: '08/09/2025'
+  })
+  expect(
+    getByRole(document.body, 'link', {
+      name: 'Yesterday'
+    })
+  ).toHaveAttribute('href', `/reporting?${yesterday}`)
+
+  const lastWeek = new URLSearchParams({
+    startDate: '03/09/2025',
+    endDate: '09/09/2025'
+  })
+  expect(
+    getByRole(document.body, 'link', {
+      name: 'Last week'
+    })
+  ).toHaveAttribute('href', `/reporting?${lastWeek}`)
+
+  const lastMonth = new URLSearchParams({
+    startDate: '11/08/2025',
+    endDate: '09/09/2025'
+  })
+  expect(
+    getByRole(document.body, 'link', {
+      name: 'Last month'
+    })
+  ).toHaveAttribute('href', `/reporting?${lastMonth}`)
+
   expect(
     getByRole(document.body, 'heading', {
-      name: 'Showing results from yesterday for all ports',
+      name: 'Showing results from 8 September 2025 at 00:00 to 8 September 2025 at 23:59',
       level: 2
     })
   ).toBeInTheDocument()
@@ -176,12 +218,222 @@ test('renders reporting summary', async () => {
 
   expect(Object.fromEntries(searchParams)).toEqual({
     from: '2025-09-08T00:00:00.000Z',
-    to: '2025-09-09T00:00:00.000Z'
+    to: '2025-09-08T23:59:59.999Z'
   })
 
   expect(document.title).toBe(
     'BTMS reporting data - Border Trade Matching Service'
   )
+})
+
+test('today up to this minute', async () => {
+  jest
+    .useFakeTimers({ doNotFake: ['nextTick'] })
+    .setSystemTime(new Date('2025-09-18:10:30'))
+
+  const summary = {
+    releases: {},
+    matches: {},
+    clearanceRequests: {},
+    notifications: {}
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: summary })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const today = new URLSearchParams({
+    startDate: '18/09/2025',
+    endDate: '18/09/2025'
+  })
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.REPORTING}?${today}`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(
+    getByRole(document.body, 'heading', {
+      name: 'Showing results from 18 September 2025 at 00:00 to 18 September 2025 at 10:30',
+      level: 2
+    })
+  ).toBeInTheDocument()
+})
+
+test('empty date fields', async () => {
+  jest
+    .useFakeTimers({ doNotFake: ['nextTick'] })
+    .setSystemTime(new Date('2025-09-18:13:00'))
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const emptyQuery = new URLSearchParams({
+    startDate: '',
+    endDate: ''
+  })
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.REPORTING}?${emptyQuery}`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  const today = new URLSearchParams({
+    startDate: '18/09/2025',
+    endDate: '18/09/2025'
+  })
+  expect(
+    getByRole(document.body, 'link', {
+      name: 'Today'
+    })
+  ).toHaveAttribute('href', `/reporting?${today}`)
+
+  const yesterday = new URLSearchParams({
+    startDate: '17/09/2025',
+    endDate: '17/09/2025'
+  })
+  expect(
+    getByRole(document.body, 'link', {
+      name: 'Yesterday'
+    })
+  ).toHaveAttribute('href', `/reporting?${yesterday}`)
+
+  const lastWeek = new URLSearchParams({
+    startDate: '12/09/2025',
+    endDate: '18/09/2025'
+  })
+  expect(
+    getByRole(document.body, 'link', {
+      name: 'Last week'
+    })
+  ).toHaveAttribute('href', `/reporting?${lastWeek}`)
+
+  const lastMonth = new URLSearchParams({
+    startDate: '20/08/2025',
+    endDate: '18/09/2025'
+  })
+  expect(
+    getByRole(document.body, 'link', {
+      name: 'Last month'
+    })
+  ).toHaveAttribute('href', `/reporting?${lastMonth}`)
+
+  expect(
+    getByRole(document.body, 'heading', {
+      name: 'There is a problem',
+      level: 2
+    })
+  ).toBeInTheDocument()
+
+  expect(
+    getByRole(document.body, 'link', { name: 'Enter a start date' })
+  ).toHaveAttribute('href', '#startDate')
+
+  expect(
+    getByRole(document.body, 'link', { name: 'Enter an end date' })
+  ).toHaveAttribute('href', '#endDate')
+})
+
+test('invalid date range', async () => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const invalidRangeQuery = new URLSearchParams({
+    startDate: '18/09/2025',
+    endDate: '17/09/2025'
+  })
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.REPORTING}?${invalidRangeQuery}`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(
+    getByRole(document.body, 'heading', {
+      name: 'There is a problem',
+      level: 2
+    })
+  ).toBeInTheDocument()
+
+  expect(
+    getByRole(document.body, 'link', {
+      name: 'End date must be after or the same as start date'
+    })
+  ).toHaveAttribute('href', '#endDate')
+})
+
+test('invalid dates', async () => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const invalidDatesQuery = new URLSearchParams({
+    startDate: 'foo',
+    endDate: 'bar'
+  })
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.REPORTING}?${invalidDatesQuery}`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(
+    getByRole(document.body, 'heading', {
+      name: 'There is a problem',
+      level: 2
+    })
+  ).toBeInTheDocument()
+
+  expect(
+    getByRole(document.body, 'link', {
+      name: 'Enter a valid start date'
+    })
+  ).toHaveAttribute('href', '#startDate')
+
+  expect(
+    getByRole(document.body, 'link', {
+      name: 'Enter a valid end date'
+    })
+  ).toHaveAttribute('href', '#endDate')
 })
 
 test('handles upstream errors', async () => {
