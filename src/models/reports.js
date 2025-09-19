@@ -40,7 +40,7 @@ const mapTiles = ([key, value], total) => {
 
   return {
     label: labels[key],
-    total: value,
+    total: value.toLocaleString('en-GB'),
     percentage
   }
 }

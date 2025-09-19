@@ -20,11 +20,6 @@
   @include govuk-font-size($size: 16);
 }
 
-.btms-heading-prefix {
-  display: block;
-  margin-bottom: 0;
-}
-
 .btms-reports {
   .btms-report:nth-child(odd) {
     .btms-tile {
