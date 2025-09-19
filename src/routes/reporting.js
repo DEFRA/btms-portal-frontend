@@ -133,9 +133,7 @@ export const reporting = {
   handler: async (request, h) => {
     const { startDate, endDate } = request.query
 
-    const from = startDate.toISOString()
-    const to = endDate.toISOString()
-    const summary = await getSummary(request, from, to)
+    const summary = await getSummary(request, startDate, endDate)
     const reports = mapReports(summary)
 
     const fromPeriod = formatReportingDate(startDate)

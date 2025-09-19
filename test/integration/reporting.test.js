@@ -218,7 +218,7 @@ test('reporting summary', async () => {
 
   expect(Object.fromEntries(searchParams)).toEqual({
     from: '2025-09-08T00:00:00.000Z',
-    to: '2025-09-08T23:59:59.999Z'
+    to: '2025-09-09T00:00:00.000Z'
   })
 
   expect(document.title).toBe(
