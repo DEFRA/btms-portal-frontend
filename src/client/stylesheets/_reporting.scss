@@ -1,14 +1,23 @@
 @use "govuk-frontend" as *;
+@use "@ministryofjustice/frontend/moj/components/date-picker/date-picker";
 @use "variables" as *;
 
 .btms-reporting-filters {
   background-color: govuk-colour("light-grey");
   padding: govuk-spacing(4);
+
+  .govuk-fieldset__legend {
+    @include govuk-font-size($size: 16);
+  }
+
+  .govuk-error-message {
+    font-size: 14px;
+  }
 }
 
-.btms-heading-prefix {
-  display: block;
-  margin-bottom: 0;
+.moj-datepicker .govuk-label {
+  font-weight: bold;
+  @include govuk-font-size($size: 16);
 }
 
 .btms-reports {

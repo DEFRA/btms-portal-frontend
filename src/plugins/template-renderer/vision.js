@@ -2,7 +2,6 @@ import { fileURLToPath } from 'node:url'
 import path from 'path'
 import nunjucks from 'nunjucks'
 import hapiVision from '@hapi/vision'
-
 import { config } from '../../config/config.js'
 import { context } from './context.js'
 import * as filters from './filters/filters.js'
@@ -11,6 +10,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
 const nunjucksEnvironment = nunjucks.configure(
   [
     'node_modules/govuk-frontend/dist/',
+    'node_modules/@ministryofjustice/frontend',
     path.resolve(dirname, '../../templates')
   ],
   {

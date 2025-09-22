@@ -1,0 +1,35 @@
+{% from "moj/components/date-picker/macro.njk" import mojDatePicker %}
+
+<form>
+  {{
+    mojDatePicker({
+      name: "startDate",
+      label: { text: 'Start date' },
+      value: startDate,
+      minDate: '02/09/2025',
+      maxDate: todaysDate,
+      errorMessage: {
+        text: errors.startDate
+      } if errors.startDate
+    })
+  }}
+  {{
+    mojDatePicker({
+      name: "endDate",
+      label: { text: "End date" },
+      value: endDate,
+      minDate: '02/09/2025',
+      maxDate: todaysDate,
+      errorMessage: {
+        text: errors.endDate
+      } if errors.endDate
+    })
+  }}
+  {{
+    govukButton({
+      type: 'submit',
+      text: 'Update',
+      classes: 'govuk-!-margin-bottom-4'
+    })
+  }}
+</form>

@@ -25,6 +25,9 @@ export default {
   entry: {
     application: {
       import: ['./javascripts/application.js', './stylesheets/application.scss']
+    },
+    reporting: {
+      import: ['./javascripts/reporting.js']
     }
   },
   experiments: {
@@ -109,6 +112,9 @@ export default {
             options: {
               sassOptions: {
                 loadPaths: [
+                  '.',
+                  'node_modules/@ministryofjustice/frontend',
+                  'node_modules/govuk-frontend/dist',
                   path.join(dirname, 'src/client/stylesheets'),
                   path.join(dirname, 'src/templates/common')
                 ],
