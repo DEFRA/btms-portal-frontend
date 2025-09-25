@@ -3,6 +3,11 @@
   clearanceRequests: 'Each clearance request is a message from CDS to BTMS about an MRN. An MRN can have multiple requests if updated. ‘Total’ counts all messages. ‘Unique’ counts distinct MRNs.'
 } %}
 
+{% set downloadUrls = {
+  noMatch: '/reporting/no-matches.csv?' ~ csvQuery,
+  manual: '/reporting/manual-releases.csv?' ~ csvQuery
+} %}
+
 <div class="btms-reports">
   {% for report in reports %}
     <section aria-labelledBy="{{ report.type }}" class="govuk-grid-row govuk-!-margin-bottom-6 btms-report">
@@ -15,13 +20,18 @@
         </heading>
         <div class="btms-tiles">
           {% for tile in report.tiles %}
-            <dl class="govuk-body btms-tile">
-              <dt class="govuk-heading-s">{{ tile.label }}</dt>
-              <dd class="govuk-heading-l">{{ tile.total }}</dd>
-              {% if tile.percentage !== null %}
-                <dd class="btms-percentage">({{ tile.percentage }}%)</dd>
+            <div class="govuk-body btms-tile">
+              <dl>
+                <dt class="govuk-heading-s">{{ tile.label }}</dt>
+                <dd class="govuk-heading-l">{{ tile.total }}</dd>
+                {% if tile.percentage !== null %}
+                  <dd class="btms-percentage">({{ tile.percentage }}%)</dd>
+                {% endif %}
+              </dl>
+              {% if downloadUrls[tile.type] and tile.total > 0 %}
+                <a href="{{ downloadUrls[tile.type] }}">Download csv</a>
               {% endif %}
-            </dl>
+            </div>
           {% endfor %}
         </div>
       </div>

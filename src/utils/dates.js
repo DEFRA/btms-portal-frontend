@@ -1,4 +1,10 @@
-import { format, startOfToday, startOfYesterday, subDays } from 'date-fns'
+import {
+  addMilliseconds,
+  format,
+  startOfToday,
+  startOfYesterday,
+  subDays
+} from 'date-fns'
 
 export const dateFormat = 'dd/MM/yyyy'
 
@@ -11,3 +17,12 @@ export const formatDayInPast = (days) =>
 
 export const formatReportingDate = (date) =>
   format(date, "d MMMM yyyy 'at' HH:mm")
+
+export const getFromAndTo = (startDate, endDate) => {
+  const oneMillisecond = 1
+
+  return [
+    startDate.toISOString(),
+    addMilliseconds(endDate, oneMillisecond).toISOString()
+  ]
+}

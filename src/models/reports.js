@@ -39,6 +39,7 @@ const mapTiles = ([key, value], total) => {
   const percentage = key !== 'total' ? calculatePercentage(value, total) : null
 
   return {
+    type: key,
     label: labels[key],
     total: value.toLocaleString('en-GB'),
     percentage

@@ -224,6 +224,26 @@ test('reporting summary', async () => {
   expect(document.title).toBe(
     'BTMS reporting data - Border Trade Matching Service'
   )
+
+  const [noMatchesLink, manualReleasesLink] = getAllByRole(
+    document.body,
+    'link',
+    {
+      name: 'Download csv'
+    }
+  )
+  const csvQuery = new URLSearchParams({
+    startDate: '8/9/2025',
+    endDate: '8/9/2025'
+  })
+  expect(noMatchesLink).toHaveAttribute(
+    'href',
+    `/reporting/no-matches.csv?${csvQuery}`
+  )
+  expect(manualReleasesLink).toHaveAttribute(
+    'href',
+    `/reporting/manual-releases.csv?${csvQuery}`
+  )
 })
 
 test('today up to this minute', async () => {
