@@ -165,7 +165,7 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
 
     const isMatch = Boolean(
       decision.decisionCode &&
-        !internalNoMatchDecisionCodes.includes(decision.internalDecisionCode)
+        !internalNoMatchDecisionCodes.has(decision.internalDecisionCode)
     )
 
     return {
