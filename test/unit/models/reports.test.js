@@ -13,8 +13,13 @@ test('total of 0', () => {
     {
       heading: 'Unique clearance requests',
       tiles: [
-        { label: 'Unique clearances', percentage: '0', total: '0' },
-        { label: 'Total', percentage: null, total: '0' }
+        {
+          label: 'Unique clearances',
+          percentage: '0',
+          total: '0',
+          type: 'unique'
+        },
+        { label: 'Total', percentage: null, total: '0', type: 'total' }
       ],
       type: 'clearanceRequests'
     }
