@@ -1,23 +1,19 @@
 import wreck from '@hapi/wreck'
 import { config } from '../config/config.js'
-import { addMilliseconds } from 'date-fns'
+import { authorization } from './reporting-auth.js'
+import { getFromAndTo } from '../utils/dates.js'
 
-const { baseUrl, password, username } = config.get('btmsReportingApi')
-const token = Buffer.from(`${username}:${password}`).toString('base64')
-const oneMillisecond = 1
+const { baseUrl } = config.get('btmsReportingApi')
 
 export const getSummary = async (request, startDate, endDate) => {
-  const from = startDate.toISOString()
-  const to = addMilliseconds(endDate, oneMillisecond).toISOString()
+  const [from, to] = getFromAndTo(startDate, endDate)
 
+  const query = new URLSearchParams({ from, to })
   try {
-    const { payload } = await wreck.get(
-      `${baseUrl}/summary?from=${from}&to=${to}`,
-      {
-        headers: { authorization: `Basic ${token}` },
-        json: 'strict'
-      }
-    )
+    const { payload } = await wreck.get(`${baseUrl}/summary?${query}`, {
+      headers: { authorization },
+      json: 'strict'
+    })
 
     return payload
   } catch (error) {
