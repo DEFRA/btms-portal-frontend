@@ -7,11 +7,17 @@
 
 {% set pageTitle = 'Cookies' %}
 
+{% block backLink %}
+  {% include "./includes/back-link.njk" %}
+{% endblock %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       {% if error %}
-        {% set errorMessage = { text: 'Choose your cookie preferences' } %}
+        {% set errorMessage = {
+          text: 'Choose your cookie preferences'
+        } %}
         {{
           govukErrorSummary({
             titleText: "There is a problem",
@@ -26,7 +32,7 @@
       {% endif %}
       {% if showCookieConfirmationBanner %}
         {% set cookieNotificationBannerHtml %}
-          <h3 class="govuk-notification-banner__heading">
+        <h3 class="govuk-notification-banner__heading">
             You’ve set your cookie preferences.
           </h3>
         {% endset %}
@@ -44,18 +50,18 @@
         service.</p>
       <table class="govuk-table">
         <thead class="govuk-table__head">
-        <tr class="govuk-table__row">
-          <th scope="col" class="govuk-table__header">Cookie name</th>
-          <th scope="col" class="govuk-table__header">Purpose</th>
-          <th scope="col" class="govuk-table__header">Expires</th>
-        </tr>
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Cookie name</th>
+            <th scope="col" class="govuk-table__header">Purpose</th>
+            <th scope="col" class="govuk-table__header">Expires</th>
+          </tr>
         </thead>
         <tbody class="govuk-table__body">
-        <tr class="govuk-table__row">
-          <th scope="row" class="govuk-table__header">Session cookie</th>
-          <td class="govuk-table__cell">Stores encrypted session data</td>
-          <td class="govuk-table__cell">After 4 hours</td>
-        </tr>
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Session cookie</th>
+            <td class="govuk-table__cell">Stores encrypted session data</td>
+            <td class="govuk-table__cell">After 4 hours</td>
+          </tr>
         </tbody>
       </table>
 
@@ -74,23 +80,23 @@
       </ul>
       <table class="govuk-table">
         <thead class="govuk-table__head">
-        <tr class="govuk-table__row">
-          <th scope="col" class="govuk-table__header">Cookie name</th>
-          <th scope="col" class="govuk-table__header">Purpose</th>
-          <th scope="col" class="govuk-table__header">Expires</th>
-        </tr>
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Cookie name</th>
+            <th scope="col" class="govuk-table__header">Purpose</th>
+            <th scope="col" class="govuk-table__header">Expires</th>
+          </tr>
         </thead>
         <tbody class="govuk-table__body">
-        <tr class="govuk-table__row">
-          <th scope="row" class="govuk-table__header">Google Tag Manager</th>
-          <td class="govuk-table__cell">Measures service use</td>
-          <td class="govuk-table__cell">2 years</td>
-        </tr>
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Google Tag Manager</th>
+            <td class="govuk-table__cell">Measures service use</td>
+            <td class="govuk-table__cell">2 years</td>
+          </tr>
         </tbody>
       </table>
 
       <form action="/cookies" method="post">
-        <input type="hidden" name="previousUrl" value="/cookies" />
+        <input type="hidden" name="previousUrl" value="/cookies"/>
         {{
           govukRadios({
             name: 'analytics',

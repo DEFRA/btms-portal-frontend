@@ -1,6 +1,6 @@
 import { format, startOfToday, startOfYesterday, subDays } from 'date-fns'
 
-const dateFormat = 'dd/MM/yyyy'
+export const dateFormat = 'dd/MM/yyyy'
 
 export const formatToday = () => format(startOfToday(), dateFormat)
 
