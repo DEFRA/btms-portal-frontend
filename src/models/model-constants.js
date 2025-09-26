@@ -102,4 +102,11 @@ export const iuuDecisionDisplay = {
   IUUNA: 'IUU inspection not applicable'
 }
 
-export const internalNoMatchDecisionCodes = ['E70', 'E71', 'E72', 'E73', 'E87']
+export const internalNoMatchDecisionCodes = new Set([
+  'E70',
+  'E71',
+  'E72',
+  'E73',
+  'E83',
+  'E87'
+])
