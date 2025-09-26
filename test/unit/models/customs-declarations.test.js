@@ -650,6 +650,7 @@ test.each([
   { internalDecisionCode: 'E71' },
   { internalDecisionCode: 'E72' },
   { internalDecisionCode: 'E73' },
+  { internalDecisionCode: 'E83' },
   { internalDecisionCode: 'E87' }
 ])(
   'the match indicator is set correctly depending on the internal decision code $internalDecisionCode',
