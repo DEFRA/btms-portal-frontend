@@ -2,6 +2,10 @@
 
 {% set pageTitle = 'Accessibility statement for the Border Trade Matching Service (BTMS)' %}
 
+{% block backLink %}
+  {% include "./includes/back-link.njk" %}
+{% endblock %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -14,7 +18,8 @@
         <li>Use the application on GDS Compliant browsers</li>
         <li>We have also made the website text as simple as possible to understand</li>
       </ul>
-      <p><a href="https://mcmw.abilitynet.org.uk/">AbilityNet</a> has advice on making your device easier to use if you have a disability.</p>
+      <p>
+        <a href="https://mcmw.abilitynet.org.uk/">AbilityNet</a> has advice on making your device easier to use if you have a disability.</p>
       <h2 class="govuk-heading-m">How accessible this website is</h2>
       <p>BTMS is fully accessible.</p>
       <h2 class="govuk-heading-m">What to do if you cannot access parts of this website</h2>
