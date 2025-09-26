@@ -229,7 +229,7 @@ test('reporting summary', async () => {
     document.body,
     'link',
     {
-      name: 'Download csv'
+      name: 'Download CSV'
     }
   )
   const csvQuery = new URLSearchParams({
