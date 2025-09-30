@@ -26,7 +26,7 @@
 
 {% if resultsPage %}
   {% set containerClasses = 'btms-width-container--wide' %}
-  {% set additionalHeaderOptions = additionalHeaderOptions | merge({ containerClasses: containerClasses }) %}
+  {% set additionalHeaderOptions = additionalHeaderOptions | merge({containerClasses: containerClasses}) %}
 {% endif %}
 
 {% set headerOptions = defaultHeaderOptions | merge(additionalHeaderOptions) %}
@@ -38,7 +38,7 @@
 {% endblock %}
 
 {% block header %}
-  {% if currentUrl != "/cookies" and (cookiePolicy == null or showCookieConfirmationBanner) and hideCookieBanner != true %}
+  {% if currentUrl != "/cookies" and(cookiePolicy == null or showCookieConfirmationBanner)and hideCookieBanner != true %}
     {% include "./includes/cookie-banner.njk" %}
   {% endif %}
   {{ govukHeader(headerOptions) }}
@@ -50,34 +50,37 @@
 
 {% block main %}
   <main role="main" id="main-content">
+    {% block backLink %}{% endblock %}
     <div class="{{ wrapperClass }}">
       <div class="govuk-width-container {{ containerClasses }}">
         {% block content %}{% endblock %}
       </div>
     </div>
-  <div>
+  </main>
 {% endblock %}
 
 {% block footer %}
+  {% set items = [{
+    href: "https://www.gov.uk/help/privacy-notice",
+    text: "Privacy"
+  }]%}
+  {% if isAuthenticated %}
+    {% set items = items.concat([{
+      href: "/reporting",
+      text: "BTMS reporting data"
+    }])%}
+  {% endif %}
+  {% set items = items.concat([{
+    href: "/cookies",
+    text: "Cookies"
+  }, {
+    href: "/accessibility-statement",
+    text: "Accessibility statement"
+  }])%}
   {{
     govukFooter({
       containerClasses: containerClasses,
-      meta: {
-        items: [
-          {
-            href: "https://www.gov.uk/help/privacy-notice",
-            text: "Privacy"
-          },
-          {
-            href: "/cookies",
-            text: "Cookies"
-          },
-          {
-            href: "/accessibility-statement",
-            text: "Accessibility statement"
-          }
-        ]
-      }
+      meta: { items: items }
     })
   }}
 {% endblock %}
