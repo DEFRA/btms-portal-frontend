@@ -250,6 +250,26 @@ const config = convict({
       env: 'BTMS_API_PASSWORD'
     }
   },
+  btmsReportingApi: {
+    baseUrl: {
+      doc: 'BTMS Reporting API base URL.',
+      format: String,
+      default: 'http://localhost:9080/reporting-api',
+      env: 'BTMS_REPORTING_API_BASE_URL'
+    },
+    username: {
+      doc: 'BTMS Reporting API username for authentication.',
+      format: String,
+      default: '',
+      env: 'BTMS_REPORTING_API_USERNAME'
+    },
+    password: {
+      doc: 'BTMS Reporting API password for authentication.',
+      format: String,
+      default: '',
+      env: 'BTMS_REPORTING_API_PASSWORD'
+    }
+  },
   auth: {
     defraId: {
       oidcConfigurationUrl: {

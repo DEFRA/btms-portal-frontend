@@ -16,10 +16,10 @@
       {% include "./includes/declaration-filters.njk" %}
       {% for customsDeclaration in customsDeclarations %}
         {% set declarationSummaryHTML %}
-          {% include "./includes/declaration-summary.njk" %}
+        {% include "./includes/declaration-summary.njk" %}
         {% endset %}
         {% set declarationHTML %}
-         {% include "./includes/declaration-html.njk" %}
+        {% include "./includes/declaration-html.njk" %}
         {% endset %}
         {{
           govukDetails({
@@ -39,10 +39,10 @@
       {% include "./includes/notification-filters.njk" %}
       {% for preNotification in preNotifications %}
         {% set notificationSummaryHTML %}
-          {% include "./includes/notification-summary.njk" %}
+        {% include "./includes/notification-summary.njk" %}
         {% endset %}
         {% set notificationHTML %}
-          {% include "./includes/notification-html.njk" %}
+        {% include "./includes/notification-html.njk" %}
         {% endset %}
         {{
           govukDetails({
@@ -63,5 +63,7 @@
 {% endblock %}
 {% block bodyEnd %}
   {{ super() }}
-  <script nonce="{{ cspNonce }}">BTMS.initFilters()</script>
+  <script nonce="{{ cspNonce }}">
+    BTMS.initFilters()
+  </script>
 {% endblock %}

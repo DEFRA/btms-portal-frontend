@@ -3,6 +3,8 @@ const paths = {
   HEALTH: '/health',
   LANDING: '/',
   ACCESSIBILITY: '/accessibility-statement',
+  REPORTING: '/reporting',
+  REPORTING_CSV: '/reporting/{name}',
   SIGN_IN: '/sign-in',
   SIGN_IN_CHOOSE: '/sign-in-choose',
   SIGN_IN_ENTRA: '/sign-in-entra',
@@ -23,5 +25,8 @@ const CACHE_CONTROL_NO_STORE = {
   privacy: 'default',
   otherwise: 'no-store'
 }
+
+export const NO_MATCH_CSV = 'no-matches.csv'
+export const MANUAL_RELEASE_CSV = 'manual-releases.csv'
 
 export { paths, queryStringParams, CACHE_CONTROL_NO_STORE }

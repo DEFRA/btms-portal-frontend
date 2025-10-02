@@ -107,6 +107,7 @@ Ask a member of the team to provide you with values.
 | AUTH_ENTRA_ID_CLIENT_SECRET          | Secret for EntraId                                       |
 | SESSION_CACHE_ENGINE                 | Location of session storage ('redis' or 'memory')        |
 | IPAFFS_URL                           | URL for links out to IPAFFS from notifications           |
+| TZ                                   | Europe/London                                            |
 
 ### Formatting
 

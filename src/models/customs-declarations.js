@@ -80,11 +80,16 @@ export const getDecision = (decisionCode) => {
 
 export const getDecisionDescription = (
   decisionCode,
+  internalDecisionCode,
   notificationStatus,
   isIuuOutcome,
   allDecisionCodesAreNoMatch,
   iuuRelatedChedpCheck
 ) => {
+  if (internalDecisionCode === 'E88') {
+    return 'Hold - Awaiting IPAFFS update'
+  }
+
   if (closedChedStatuses.includes(notificationStatus)) {
     return `CHED ${notificationStatus.toLowerCase()}`
   }
@@ -132,107 +137,64 @@ export const getCustomsDeclarationOpenState = (finalisation) =>
     (finalisation.finalState === '1' || finalisation.finalState === '2')
   )
 
-const createItemLevelDecision = (
-  commodity,
-  check,
-  document,
-  decisionCheck
-) => ({
-  itemNumber: commodity.itemNumber,
-  documentReference: document?.documentReference || null,
-  checkCode: check.checkCode,
-  decisionCode: decisionCheck?.decisionCode,
-  decisionReason: decisionCheck?.decisionReasons?.[0] ?? null,
-  internalDecisionCode:
-    decisionCheck?.decisionInternalFurtherDetail?.[0] ?? null
-})
-
-const mapItemLevelDecisions = (commodity, clearanceDecision) => {
-  return commodity.checks.flatMap((check) => {
-    const associatedDocumentCodes =
-      checkCodeToDocumentCodeMapping[check.checkCode]
-    const associatedDocuments = (commodity.documents || []).filter((doc) =>
-      associatedDocumentCodes.includes(doc.documentCode)
-    )
-    const clearanceDecisionCheck = clearanceDecision?.checks.find(
-      ({ checkCode }) => checkCode === check.checkCode
-    )
-
-    return associatedDocuments.map((doc) =>
-      createItemLevelDecision(commodity, check, doc, clearanceDecisionCheck)
-    )
-  })
-}
-
 const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
-  const documentLevelDecisions =
-    clearanceDecision?.results && clearanceDecision.results.length > 0
-      ? clearanceDecision.results.filter(
-          ({ itemNumber }) => itemNumber === commodity.itemNumber
-        )
-      : null
+  const clearanceDecisions =
+    clearanceDecision?.results.filter(
+      ({ itemNumber }) => itemNumber === commodity.itemNumber
+    ) || []
 
-  const decisions =
-    documentLevelDecisions ||
-    mapItemLevelDecisions(
-      commodity,
-      clearanceDecision?.items.find(
-        ({ itemNumber }) => itemNumber === commodity.itemNumber
-      )
-    )
-
-  const allDecisionCodesAreNoMatch = decisions.every(
+  const allDecisionCodesAreNoMatch = clearanceDecisions.every(
     (decision) => decision.decisionCode === 'X00'
   )
-  const iuuRelatedChedpCheck = decisions.find(
+  const iuuRelatedChedpCheck = clearanceDecisions.find(
     (decision) => decision.checkCode === 'H222'
   )
 
-  const clearanceDecisions = decisions
-    .filter((result) => result.itemNumber === commodity.itemNumber)
-    .map((decision) => {
-      const documentReferenceId = decision.documentReference
-        ? extractDocumentReferenceId(decision.documentReference)
-        : null
-      const notificationStatus = documentReferenceId
-        ? notificationStatuses[documentReferenceId]
-        : null
-      const relevantDocCodes =
-        checkCodeToDocumentCodeMapping[decision.checkCode] || []
-      const isIuuOutcome = relevantDocCodes.some((code) =>
-        IUUDocumentCodes.includes(code)
-      )
+  const decisions = clearanceDecisions.map((decision) => {
+    const documentReferenceId = decision.documentReference
+      ? extractDocumentReferenceId(decision.documentReference)
+      : null
+    const notificationStatus = documentReferenceId
+      ? notificationStatuses[documentReferenceId]
+      : null
+    const relevantDocCodes =
+      checkCodeToDocumentCodeMapping[decision.checkCode] || []
+    const isIuuOutcome = relevantDocCodes.some((code) =>
+      IUUDocumentCodes.includes(code)
+    )
 
-      const isMatch = Boolean(
-        decision.decisionCode &&
-          !internalNoMatchDecisionCodes.includes(decision.internalDecisionCode)
-      )
+    const isMatch = Boolean(
+      decision.decisionCode &&
+        !internalNoMatchDecisionCodes.has(decision.internalDecisionCode)
+    )
 
-      return {
-        id: randomUUID(),
-        decision: getDecision(decision.decisionCode),
-        decisionDetail: getDecisionDescription(
-          decision.decisionCode,
-          notificationStatus,
-          isIuuOutcome,
-          allDecisionCodesAreNoMatch,
-          iuuRelatedChedpCheck
-        ),
-        decisionReason: decision.decisionReason,
-        departmentCode: checkCodeToAuthorityMapping[decision.checkCode],
-        documentReference: isIuuOutcome ? null : decision.documentReference,
+    return {
+      id: randomUUID(),
+      checkCode: decision.checkCode,
+      decision: getDecision(decision.decisionCode),
+      decisionDetail: getDecisionDescription(
+        decision.decisionCode,
+        decision.internalDecisionCode,
+        notificationStatus,
         isIuuOutcome,
-        requiresChed:
-          decision.checkCode === 'H220' && commodity.documents === null,
-        match: isIuuOutcome ? null : isMatch
-      }
-    })
+        allDecisionCodesAreNoMatch,
+        iuuRelatedChedpCheck
+      ),
+      decisionReason: decision.decisionReason,
+      departmentCode: checkCodeToAuthorityMapping[decision.checkCode],
+      documentReference: isIuuOutcome ? null : decision.documentReference,
+      isIuuOutcome,
+      requiresChed:
+        decision.checkCode === 'H220' && commodity.documents === null,
+      match: isIuuOutcome ? null : isMatch
+    }
+  })
 
   return {
     id: randomUUID(),
     ...commodity,
     weightOrQuantity: determineWeightOrQuantity(commodity, decisions),
-    decisions: clearanceDecisions
+    decisions
   }
 }
 

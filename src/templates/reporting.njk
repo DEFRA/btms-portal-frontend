@@ -1,0 +1,52 @@
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% extends 'layout.njk' %}
+
+{% set pageTitle = 'BTMS reporting data' %}
+
+{% block backLink %}
+  {% include "./includes/back-link.njk" %}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+      <div class="govuk-grid-row">
+        <aside class="govuk-grid-column-one-quarter btms-reporting-filters">
+          <h2 class="govuk-heading-m">Filters</h2>
+          <h3 class="govuk-heading-s">Date and time</h3>
+          {% include "./includes/reporting-filters-shortcuts.njk" %}
+          {% include "./includes/reporting-filters.njk" %}
+        </aside>
+        <div class="govuk-grid-column-three-quarters">
+          {% if errorList %}
+            {{
+              govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errorList
+              })
+            }}
+          {% else %}
+            <h2 class="govuk-heading-s">
+              <span class="btms-heading-prefix govuk-caption-m">Showing results from</span>
+              {{ timePeriod }}
+            </h2>
+            {% include "./includes/reporting-reports.njk" %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block bodyEnd %}
+  {{ super() }}
+  <script src="{{ getAssetPath('reporting.js') }}"></script>
+  <script nonce="{{ cspNonce }}">
+    BTMS.initReporting()
+  </script>
+{% endblock %}

@@ -467,3 +467,64 @@ test('CHEDPP: null commodity checks', () => {
 
   expect(result).toEqual(expected)
 })
+
+test('CHEDPP: null partTwo', () => {
+  const data = {
+    importPreNotifications: [
+      {
+        importPreNotification: {
+          referenceNumber: 'CHEDPP.GB.2025.7654321',
+          importNotificationType: 'CHEDPP',
+          status: 'SUBMITTED',
+          updatedSource: '2025-07-11T10:30:27.330Z',
+          partOne: {
+            commodities: {
+              commodityComplements: [
+                {
+                  complementId: 1,
+                  commodityId: '1234',
+                  complementName: 'Actinidia chinensis'
+                }
+              ],
+              complementParameterSets: [
+                {
+                  complementId: 1,
+                  uniqueComplementId: 'dea2a61b-fd08-4269-858d-69d75b4960de',
+                  keyDataPair: [
+                    { key: 'netweight', data: '1024' },
+                    { key: 'regulatory_authority', data: 'HMI' }
+                  ]
+                }
+              ]
+            }
+          },
+          partTwo: null
+        }
+      }
+    ]
+  }
+
+  const result = mapPreNotifications(data)
+
+  const expected = [
+    {
+      commodities: [
+        {
+          checks: [{ authority: 'HMI', decision: 'Decision not given' }],
+          commodityDesc: 'Actinidia chinensis',
+          commodityId: '1234',
+          complementId: 1,
+          id: 'dea2a61b-fd08-4269-858d-69d75b4960de',
+          weightOrQuantity: '1024'
+        }
+      ],
+      ipaffsUrl: 'https://ipaffs/CHEDPP.GB.2025.7654321/ched',
+      open: true,
+      referenceNumber: 'CHEDPP.GB.2025.7654321',
+      status: 'New',
+      updated: '11 July 2025, 10:30'
+    }
+  ]
+
+  expect(result).toEqual(expected)
+})

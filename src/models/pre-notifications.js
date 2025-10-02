@@ -70,7 +70,7 @@ const getChedPPChecks = (preNotification, complementParameterSet) => {
       : [data]
 
   const { commodityChecks, phsiAutoCleared, hmiAutoCleared } =
-    preNotification.partTwo
+    preNotification?.partTwo ?? {}
 
   const commodityCheck = commodityChecks?.find(({ uniqueComplementId }) => {
     return uniqueComplementId === complementParameterSet.uniqueComplementId

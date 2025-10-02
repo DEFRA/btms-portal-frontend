@@ -1,0 +1,58 @@
+@use "govuk-frontend" as *;
+@use "@ministryofjustice/frontend/moj/components/date-picker/date-picker";
+@use "variables" as *;
+
+.btms-reporting-filters {
+  background-color: govuk-colour("light-grey");
+  padding: govuk-spacing(4);
+
+  .govuk-fieldset__legend {
+    @include govuk-font-size($size: 16);
+  }
+
+  .govuk-error-message {
+    font-size: 14px;
+  }
+}
+
+.moj-datepicker .govuk-label {
+  font-weight: bold;
+  @include govuk-font-size($size: 16);
+}
+
+.btms-reports {
+  .btms-report:nth-child(odd) {
+    .btms-tile {
+      background-color: $btms-light-grey;
+    }
+  }
+
+  .btms-report:nth-child(even) {
+    .btms-tile {
+      background-color: $btms-light-blue;
+    }
+  }
+}
+
+.btms-tiles {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: govuk-spacing(4);
+}
+
+.btms-tile {
+  margin: 0;
+  @include govuk-font-size($size: 16);
+  padding: govuk-spacing(3);
+  min-width: 200px;
+  box-sizing: border-box;
+
+  dd {
+    margin: 0;
+  }
+
+  .govuk-heading-s {
+    margin-bottom: govuk-spacing(2);
+  }
+}
