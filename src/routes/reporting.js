@@ -1,35 +1,42 @@
 import { dateRange } from './schemas/date-range.js'
 import { paths, CACHE_CONTROL_NO_STORE } from './route-constants.js'
-import { getSummary } from '../services/reporting.js'
+import { getReports } from '../services/reporting.js'
 import { mapReports } from '../models/reports.js'
 import { format } from 'date-fns'
 import {
+  getFromAndTo,
+  getIntervals,
   formatDayInPast,
   formatToday,
   formatYesterday,
   formatReportingDate
 } from '../utils/dates.js'
 
-const getQueryString = (startDate, endDate) =>
-  new URLSearchParams({
+const getQueryString = (startDate, endDate, tab) => {
+  const query = new URLSearchParams({
     startDate,
     endDate
-  }).toString()
+  })
+  if (tab) {
+    query.set('tab', tab)
+  }
+  return query
+}
 
 const dateFormat = 'd/M/yyyy'
 
-const getDateProps = () => {
+const getDateProps = (tab) => {
   const daysToLastWeek = 6
   const daysToLastMonth = 29
 
   const todaysDate = formatToday()
-  const today = getQueryString(todaysDate, todaysDate)
+  const today = getQueryString(todaysDate, todaysDate, tab)
   const yesterdaysDate = formatYesterday()
-  const yesterday = getQueryString(yesterdaysDate, yesterdaysDate)
+  const yesterday = getQueryString(yesterdaysDate, yesterdaysDate, tab)
   const lastWeekDate = formatDayInPast(daysToLastWeek)
-  const lastWeek = getQueryString(lastWeekDate, todaysDate)
+  const lastWeek = getQueryString(lastWeekDate, todaysDate, tab)
   const lastMonthDate = formatDayInPast(daysToLastMonth)
-  const lastMonth = getQueryString(lastMonthDate, todaysDate)
+  const lastMonth = getQueryString(lastMonthDate, todaysDate, tab)
 
   return {
     todaysDate,
@@ -84,7 +91,7 @@ export const reporting = {
           }
         })
 
-        const dateProps = getDateProps()
+        const dateProps = getDateProps(request.query.tab)
         return h
           .view('reporting', {
             ...request.query,
@@ -97,10 +104,14 @@ export const reporting = {
     }
   },
   handler: async (request, h) => {
-    const { startDate, endDate } = request.query
+    const { startDate, endDate, tab } = request.query
 
-    const summary = await getSummary(request, startDate, endDate)
-    const reports = mapReports(summary)
+    const [from, to] = getFromAndTo(startDate, endDate)
+    const intervals = getIntervals(startDate, endDate)
+    const payload = await getReports(request, from, to, intervals)
+
+    const labels = intervals.map((interval) => format(interval, 'dd MMM HH:mm'))
+    const reports = mapReports(payload, labels)
 
     const fromPeriod = formatReportingDate(startDate)
     const toPeriod = formatReportingDate(endDate)
@@ -110,15 +121,17 @@ export const reporting = {
       format(startDate, dateFormat),
       format(endDate, dateFormat)
     )
-    const dateProps = getDateProps()
+    const dateProps = getDateProps(tab)
 
     return h.view('reporting', {
       reports,
+      labels,
       ...dateProps,
       csvQuery,
       timePeriod,
       startDate: format(startDate, dateFormat),
-      endDate: format(endDate, dateFormat)
+      endDate: format(endDate, dateFormat),
+      tab
     })
   }
 }
