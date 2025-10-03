@@ -1,0 +1,16 @@
+<div class="btms-tiles">
+  {% for tile in report.tiles %}
+    <div class="govuk-body btms-tile">
+      <dl class="govuk-list">
+        <dt class="govuk-heading-s {% if tile.type != 'total' %}key{% endif %} {{ tile.type | lower }}">{{ tile.label }}</dt>
+        <dd class="govuk-heading-l">{{ tile.total }}</dd>
+        {% if tile.percentage !== null %}
+          <dd class="btms-percentage">({{ tile.percentage }}%)</dd>
+        {% endif %}
+      </dl>
+      {% if downloadUrls[tile.type] and tile.total > 0 %}
+        <a href="{{ downloadUrls[tile.type] }}">Download CSV</a>
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>

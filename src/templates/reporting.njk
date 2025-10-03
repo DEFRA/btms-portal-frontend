@@ -2,6 +2,7 @@
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/tabs/macro.njk" import govukTabs %}
 
 {% extends 'layout.njk' %}
 
@@ -10,6 +11,13 @@
 {% block backLink %}
   {% include "./includes/back-link.njk" %}
 {% endblock %}
+
+{% set summaryView %}
+{% include "./includes/reporting-reports.njk" %}
+{% endset %}
+{% set chartsView %}
+{% include "./includes/reporting-charts.njk" %}
+{% endset %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -35,7 +43,25 @@
               <span class="btms-heading-prefix govuk-caption-m">Showing results from</span>
               {{ timePeriod }}
             </h2>
-            {% include "./includes/reporting-reports.njk" %}
+            {{ govukTabs({
+              classes: 'btms-tabs',
+              items: [
+                {
+                  label: 'Summary view',
+                  id: 'summary-view',
+                  panel: {
+                    html: summaryView
+                  }
+                },
+                {
+                  label: 'Chart view',
+                  id: 'charts-view',
+                  panel: {
+                    html: chartsView
+                  }
+                }
+              ]
+            }) }}
           </div>
         {% endif %}
       </div>
