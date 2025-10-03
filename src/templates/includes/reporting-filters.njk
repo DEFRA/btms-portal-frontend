@@ -1,6 +1,7 @@
 {% from "moj/components/date-picker/macro.njk" import mojDatePicker %}
 
 <form>
+  <input type="hidden" id="tab" name="tab" value="{{ tab }}"/>
   {{
     mojDatePicker({
       name: "startDate",

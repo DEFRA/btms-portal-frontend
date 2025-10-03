@@ -1,0 +1,31 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+<div class="btms-reports">
+  {% for report in reports %}
+    <section aria-labelledBy="{{ report.type }}-charts-heading" class="govuk-grid-row govuk-!-margin-bottom-6 btms-chart">
+      <div class="govuk-grid-column-full">
+        <heading>
+          <h3 id="{{ report.type }}-charts-heading" class="govuk-heading-m">{{ report.heading }}</h3>
+        </heading>
+        <div class="govuk-grid-row btms-row">
+          {{
+            govukTable({
+              caption: report.label,
+              firstCellIsHeader: true,
+              head: report.head,
+              rows: report.rows
+            })
+          }}
+        </div>
+        <canvas id="{{ report.type }}"></canvas>
+        {% include "./tiles.njk" %}
+      </div>
+    </section>
+    <script id="{{ report.type }}-data" nonce="{{ cspNonce }}" type="application/json">
+      {{ report.charts | dump | safe }}
+    </script>
+  {% endfor %}
+  <script id="chart-labels" nonce="{{ cspNonce }}" type="application/json">
+    {{ labels | dump | safe }}
+  </script>
+</div>
