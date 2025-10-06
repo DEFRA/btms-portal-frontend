@@ -1,7 +1,9 @@
 {% extends "govuk/template.njk" %}
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
 
 {% set containerClasses = "" %}
+{% set navClass = "" %}
 
 {% block head %}
   {% if cookiePolicy.analytics == 'yes' %}
@@ -26,6 +28,7 @@
 
 {% if resultsPage %}
   {% set containerClasses = 'btms-width-container--wide' %}
+  {% set navClass = ' btms-service-navigation--wide' %}
   {% set additionalHeaderOptions = additionalHeaderOptions | merge({containerClasses: containerClasses}) %}
 {% endif %}
 
@@ -37,11 +40,28 @@
   {% endif %}
 {% endblock %}
 
+{% set navSlots %}
+{% include './includes/service-navigation-extras.njk' %}
+{% endset %}
+
 {% block header %}
   {% if currentUrl != "/cookies" and(cookiePolicy == null or showCookieConfirmationBanner)and hideCookieBanner != true %}
     {% include "./includes/cookie-banner.njk" %}
   {% endif %}
   {{ govukHeader(headerOptions) }}
+  {{ govukServiceNavigation({
+    classes: 'btms-service-navigation' ~ navClass,
+    navigation: [{
+      href: '/search',
+      text: 'Search'
+    }, {
+      href: '/reporting',
+      text: 'Reporting'
+    }],
+    slots: {
+      end: navSlots
+    }
+  }) }}
 {% endblock %}
 
 {% block pageTitle %}
@@ -50,7 +70,6 @@
 
 {% block main %}
   <main role="main" id="main-content">
-    {% block backLink %}{% endblock %}
     <div class="{{ wrapperClass }}">
       <div class="govuk-width-container {{ containerClasses }}">
         {% block content %}{% endblock %}

@@ -17,6 +17,16 @@ const getManifest = () => {
   return webpackManifest
 }
 
+const accountManagementUrl = config.get('auth.defraId.accountManagementUrl')
+const manageAccountLink = {
+  text: 'Manage account',
+  href: accountManagementUrl
+}
+const signOutLink = {
+  text: 'Sign out',
+  href: paths.SIGN_OUT
+}
+
 /**
  * @param {Request} request
  */
@@ -27,29 +37,14 @@ export async function context(request) {
 
   const authedUser = await getUserSession(request)
 
-  const navigation = []
-
-  if (authedUser?.strategy === 'defraId') {
-    const accountManagementUrl = config.get('auth.defraId.accountManagementUrl')
-    navigation.push({
-      text: 'Manage account',
-      href: accountManagementUrl
-    })
-  }
-  if (authedUser?.isAuthenticated) {
-    navigation.push({
-      text: 'Sign out',
-      href: paths.SIGN_OUT
-    })
-  }
-
   return {
     assetPath: `${assetPath}/assets`,
     defaultHeaderOptions: {
       homepageUrl: 'https://www.gov.uk',
-      serviceName,
-      navigation
+      serviceName
     },
+    ...(authedUser?.strategy === 'defraId' && { manageAccountLink }),
+    ...(authedUser?.isAuthenticated && { signOutLink }),
 
     /**
      * @param {string} asset

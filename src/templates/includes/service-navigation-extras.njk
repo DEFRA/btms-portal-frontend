@@ -1,0 +1,14 @@
+{% if manageAccountLink or signOutLink %}
+  <ul class="govuk-service-navigation__list govuk-service-navigation__list--right">
+    {% if manageAccountLink %}
+      <li class="govuk-service-navigation__item">
+        <a class="govuk-service-navigation__link" href="{{ manageAccountLink.href }}">{{ manageAccountLink.text }}</a>
+      </li>
+    {% endif %}
+    {% if signOutLink %}
+      <li class="govuk-service-navigation__item">
+        <a class="govuk-service-navigation__link" href="{{ signOutLink.href }}">{{ signOutLink.text }}</a>
+      </li>
+    {% endif %}
+  </ul>
+{% endif %}

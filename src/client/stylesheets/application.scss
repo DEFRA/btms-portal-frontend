@@ -9,6 +9,12 @@
 @use "filters";
 @use "reporting";
 
+.btms-service-navigation .govuk-width-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btms-service-navigation--wide .govuk-width-container,
 .btms-width-container--wide {
   @include govuk-width-container(1200px);
 }
