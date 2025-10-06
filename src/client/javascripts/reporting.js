@@ -87,6 +87,9 @@ const initCharts = () => {
             title: {
               display: true,
               text: 'Volume'
+            },
+            ticks: {
+              precision: 0
             }
           }
         }
