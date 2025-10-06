@@ -19,7 +19,10 @@ const preventScroll = () => {
 
 const hideTables = () => {
   const tables = document.querySelectorAll('table')
-  tables.forEach((table) => (table.hidden = true))
+  tables.forEach((table) => {
+    const parent = table.parentElement
+    parent.hidden = true
+  })
 }
 
 const initDatePickers = () => {

@@ -16,7 +16,7 @@ const headings = {
 }
 
 const labels = {
-  automatic: 'Auto',
+  automatic: 'Automatic',
   manual: 'Manual',
   match: 'Matches',
   noMatch: 'No matches',

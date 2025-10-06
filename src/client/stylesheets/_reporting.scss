@@ -41,6 +41,12 @@
   .btms-chart:not(:last-of-type) {
     border-bottom: 1px solid govuk-colour("light-grey");
   }
+
+  .btms-chart:nth-child(-n + 3) {
+    .btms-tile {
+      min-width: 30%;
+    }
+  }
 }
 
 .btms-chart {

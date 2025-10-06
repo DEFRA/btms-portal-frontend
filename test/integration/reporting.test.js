@@ -192,7 +192,7 @@ test('reporting data', async () => {
     releasesTotal
   ] = getAllByRole(releasesSummaryRegion, 'definition')
 
-  expect(auto.textContent.trim()).toBe('Auto')
+  expect(auto.textContent.trim()).toBe('Automatic')
   expect(autoTotal.textContent.trim()).toBe('70')
   expect(autoPercentage.textContent.trim()).toBe('(93.33%)')
 
