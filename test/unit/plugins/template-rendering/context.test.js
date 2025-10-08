@@ -27,15 +27,27 @@ test('logged in', async () => {
       homepageUrl: 'https://www.gov.uk',
       serviceName: 'Border Trade Matching Service'
     },
-    getAssetPath: expect.any(Function),
-    manageAccountLink: {
-      href: '#',
-      text: 'Manage account'
-    },
-    signOutLink: {
-      href: '/sign-out',
-      text: 'Sign out'
-    }
+    navigation: [
+      {
+        href: '/search',
+        text: 'Search'
+      },
+      {
+        href: '/reporting',
+        text: 'Reporting'
+      }
+    ],
+    accountNavigation: [
+      {
+        href: '#',
+        text: 'Manage account'
+      },
+      {
+        href: '/sign-out',
+        text: 'Sign out'
+      }
+    ],
+    getAssetPath: expect.any(Function)
   }
 
   const result = await context({})
@@ -56,6 +68,17 @@ test('not logged in', async () => {
       homepageUrl: 'https://www.gov.uk',
       serviceName: 'Border Trade Matching Service'
     },
+    navigation: [
+      {
+        href: '/search',
+        text: 'Search'
+      },
+      {
+        href: '/reporting',
+        text: 'Reporting'
+      }
+    ],
+    accountNavigation: [],
     getAssetPath: expect.any(Function)
   }
 

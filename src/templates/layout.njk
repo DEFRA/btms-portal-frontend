@@ -40,8 +40,8 @@
   {% endif %}
 {% endblock %}
 
-{% set navSlots %}
-{% include './includes/service-navigation-extras.njk' %}
+{% set accountNavigation %}
+{% include './includes/account-navigation.njk' %}
 {% endset %}
 
 {% block header %}
@@ -51,15 +51,9 @@
   {{ govukHeader(headerOptions) }}
   {{ govukServiceNavigation({
     classes: 'btms-service-navigation' ~ navClass,
-    navigation: [{
-      href: '/search',
-      text: 'Search'
-    }, {
-      href: '/reporting',
-      text: 'Reporting'
-    }],
+    navigation: navigation,
     slots: {
-      end: navSlots
+      end: accountNavigation
     }
   }) }}
 {% endblock %}

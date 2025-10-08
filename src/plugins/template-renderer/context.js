@@ -27,6 +27,17 @@ const signOutLink = {
   href: paths.SIGN_OUT
 }
 
+const navigation = [
+  {
+    href: paths.SEARCH,
+    text: 'Search'
+  },
+  {
+    href: paths.REPORTING,
+    text: 'Reporting'
+  }
+]
+
 /**
  * @param {Request} request
  */
@@ -36,6 +47,10 @@ export async function context(request) {
   const serviceName = config.get('serviceName')
 
   const authedUser = await getUserSession(request)
+  const accountNavigation = [
+    authedUser?.strategy === 'defraId' && manageAccountLink,
+    authedUser?.isAuthenticated && signOutLink
+  ].filter(Boolean)
 
   return {
     assetPath: `${assetPath}/assets`,
@@ -43,9 +58,8 @@ export async function context(request) {
       homepageUrl: 'https://www.gov.uk',
       serviceName
     },
-    ...(authedUser?.strategy === 'defraId' && { manageAccountLink }),
-    ...(authedUser?.isAuthenticated && { signOutLink }),
-
+    navigation,
+    accountNavigation,
     /**
      * @param {string} asset
      */
