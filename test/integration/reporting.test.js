@@ -16,46 +16,85 @@ jest.mock('@hapi/wreck', () => ({
 
 afterEach(jest.useRealTimers)
 
-test('reporting summary', async () => {
+test('reporting data', async () => {
   jest
     .useFakeTimers({ doNotFake: ['nextTick'] })
     .setSystemTime(new Date('2025-09-09'))
 
-  const summary = {
+  const reportingData = {
     releases: {
-      automatic: 70,
-      manual: 5,
-      total: 75
+      intervals: [
+        {
+          interval: '2025-09-07T23:00:00Z',
+          summary: { automatic: 30, manual: 3, total: 33 }
+        },
+        {
+          interval: '2025-09-08T05:00:00Z',
+          summary: { automatic: 40, manual: 2, total: 42 }
+        }
+      ]
     },
     matches: {
-      match: 180,
-      noMatch: 20,
-      total: 200
+      intervals: [
+        {
+          interval: '2025-09-07T23:00:00Z',
+          summary: { match: 100, noMatch: 10, total: 110 }
+        },
+        {
+          interval: '2025-09-08T05:00:00Z',
+          summary: { match: 80, noMatch: 10, total: 90 }
+        }
+      ]
     },
     clearanceRequests: {
-      unique: 75,
-      total: 100
+      intervals: [
+        {
+          interval: '2025-09-07T23:00:00Z',
+          summary: { unique: 50, total: 50 }
+        },
+        {
+          interval: '2025-09-08T05:00:00Z',
+          summary: { unique: 25, total: 50 }
+        }
+      ]
     },
     notifications: {
-      chedA: 100,
-      chedP: 50,
-      chedPp: 25,
-      chedD: 25,
-      total: 200
+      intervals: [
+        {
+          interval: '2025-09-07T23:00:00Z',
+          summary: {
+            chedA: 50,
+            chedP: 25,
+            chedPp: 15,
+            chedD: 20,
+            total: 110
+          }
+        },
+        {
+          interval: '2025-09-08T05:00:00Z',
+          summary: {
+            chedA: 50,
+            chedP: 25,
+            chedPp: 10,
+            chedD: 5,
+            total: 90
+          }
+        }
+      ]
     }
   }
 
   wreck.get
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
-    .mockResolvedValueOnce({ payload: summary })
+    .mockResolvedValueOnce({ payload: reportingData })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
 
   const { payload } = await server.inject({
     method: 'get',
-    url: paths.REPORTING,
+    url: `${paths.REPORTING}?tab=summary-view`,
     auth: {
       strategy: 'session',
       credentials
@@ -66,7 +105,8 @@ test('reporting summary', async () => {
 
   const today = new URLSearchParams({
     startDate: '09/09/2025',
-    endDate: '09/09/2025'
+    endDate: '09/09/2025',
+    tab: 'summary-view'
   })
   expect(
     getByRole(document.body, 'link', {
@@ -76,7 +116,8 @@ test('reporting summary', async () => {
 
   const yesterday = new URLSearchParams({
     startDate: '08/09/2025',
-    endDate: '08/09/2025'
+    endDate: '08/09/2025',
+    tab: 'summary-view'
   })
   expect(
     getByRole(document.body, 'link', {
@@ -86,7 +127,8 @@ test('reporting summary', async () => {
 
   const lastWeek = new URLSearchParams({
     startDate: '03/09/2025',
-    endDate: '09/09/2025'
+    endDate: '09/09/2025',
+    tab: 'summary-view'
   })
   expect(
     getByRole(document.body, 'link', {
@@ -96,7 +138,8 @@ test('reporting summary', async () => {
 
   const lastMonth = new URLSearchParams({
     startDate: '11/08/2025',
-    endDate: '09/09/2025'
+    endDate: '09/09/2025',
+    tab: 'summary-view'
   })
   expect(
     getByRole(document.body, 'link', {
@@ -111,17 +154,19 @@ test('reporting summary', async () => {
     })
   ).toBeInTheDocument()
 
-  const matchesRegion = getByRole(document.body, 'region', { name: 'Matches' })
-  expect(getByRole(matchesRegion, 'paragraph')).toBeInTheDocument()
+  const [matchesSummaryRegion] = getAllByRole(document.body, 'region', {
+    name: 'Matches'
+  })
+  expect(getByRole(matchesSummaryRegion, 'paragraph')).toBeInTheDocument()
 
-  const [match, noMatch, matches] = getAllByRole(matchesRegion, 'term')
+  const [match, noMatch, matches] = getAllByRole(matchesSummaryRegion, 'term')
   const [
     matchTotal,
     matchPercentage,
     noMatchTotal,
     noMatchPercentage,
     matchesTotal
-  ] = getAllByRole(matchesRegion, 'definition')
+  ] = getAllByRole(matchesSummaryRegion, 'definition')
 
   expect(match.textContent.trim()).toBe('Matches')
   expect(matchTotal.textContent.trim()).toBe('180')
@@ -134,20 +179,20 @@ test('reporting summary', async () => {
   expect(matches.textContent.trim()).toBe('Total')
   expect(matchesTotal.textContent.trim()).toBe('200')
 
-  const releasesRegion = getByRole(document.body, 'region', {
+  const [releasesSummaryRegion] = getAllByRole(document.body, 'region', {
     name: 'Releases'
   })
 
-  const [auto, manual, releases] = getAllByRole(releasesRegion, 'term')
+  const [auto, manual, releases] = getAllByRole(releasesSummaryRegion, 'term')
   const [
     autoTotal,
     autoPercentage,
     manualTotal,
     manualPercentage,
     releasesTotal
-  ] = getAllByRole(releasesRegion, 'definition')
+  ] = getAllByRole(releasesSummaryRegion, 'definition')
 
-  expect(auto.textContent.trim()).toBe('Auto')
+  expect(auto.textContent.trim()).toBe('Automatic')
   expect(autoTotal.textContent.trim()).toBe('70')
   expect(autoPercentage.textContent.trim()).toBe('(93.33%)')
 
@@ -158,14 +203,14 @@ test('reporting summary', async () => {
   expect(releases.textContent.trim()).toBe('Total')
   expect(releasesTotal.textContent.trim()).toBe('75')
 
-  const requestsRegion = getByRole(document.body, 'region', {
+  const [requestsSummaryRegion] = getAllByRole(document.body, 'region', {
     name: 'Unique clearance requests'
   })
-  expect(getByRole(requestsRegion, 'paragraph')).toBeInTheDocument()
+  expect(getByRole(requestsSummaryRegion, 'paragraph')).toBeInTheDocument()
 
-  const [unique, requests] = getAllByRole(requestsRegion, 'term')
+  const [unique, requests] = getAllByRole(requestsSummaryRegion, 'term')
   const [uniqueTotal, uniquePercentage, requestsTotal] = getAllByRole(
-    requestsRegion,
+    requestsSummaryRegion,
     'definition'
   )
 
@@ -176,11 +221,14 @@ test('reporting summary', async () => {
   expect(requests.textContent.trim()).toBe('Total')
   expect(requestsTotal.textContent.trim()).toBe('100')
 
-  const chedsRegion = getByRole(document.body, 'region', {
+  const [chedsSummaryRegion] = getAllByRole(document.body, 'region', {
     name: 'Pre-notifications by CHED type'
   })
 
-  const [chedA, chedP, chedPp, chedD, cheds] = getAllByRole(chedsRegion, 'term')
+  const [chedA, chedP, chedPp, chedD, cheds] = getAllByRole(
+    chedsSummaryRegion,
+    'term'
+  )
   const [
     chedATotal,
     chedAPercentage,
@@ -191,7 +239,7 @@ test('reporting summary', async () => {
     chedDTotal,
     chedDPercentage,
     chedsTotal
-  ] = getAllByRole(chedsRegion, 'definition')
+  ] = getAllByRole(chedsSummaryRegion, 'definition')
 
   expect(chedA.textContent.trim()).toBe('CHED A')
   expect(chedATotal.textContent.trim()).toBe('100')
@@ -215,11 +263,34 @@ test('reporting summary', async () => {
   const [apiURL] = wreck.get.mock.calls[2]
 
   const { searchParams } = new URL(apiURL)
-
-  expect(Object.fromEntries(searchParams)).toEqual({
-    from: '2025-09-08T00:00:00.000Z',
-    to: '2025-09-09T00:00:00.000Z'
-  })
+  expect(searchParams.get('from')).toBe('2025-09-08T00:00:00.000Z')
+  expect(searchParams.get('to')).toBe('2025-09-09T00:00:00.000Z')
+  expect(searchParams.getAll('intervals')).toEqual([
+    '2025-09-08T01:00:00.000Z',
+    '2025-09-08T02:00:00.000Z',
+    '2025-09-08T03:00:00.000Z',
+    '2025-09-08T04:00:00.000Z',
+    '2025-09-08T05:00:00.000Z',
+    '2025-09-08T06:00:00.000Z',
+    '2025-09-08T07:00:00.000Z',
+    '2025-09-08T08:00:00.000Z',
+    '2025-09-08T09:00:00.000Z',
+    '2025-09-08T10:00:00.000Z',
+    '2025-09-08T11:00:00.000Z',
+    '2025-09-08T12:00:00.000Z',
+    '2025-09-08T13:00:00.000Z',
+    '2025-09-08T14:00:00.000Z',
+    '2025-09-08T15:00:00.000Z',
+    '2025-09-08T16:00:00.000Z',
+    '2025-09-08T17:00:00.000Z',
+    '2025-09-08T18:00:00.000Z',
+    '2025-09-08T19:00:00.000Z',
+    '2025-09-08T20:00:00.000Z',
+    '2025-09-08T21:00:00.000Z',
+    '2025-09-08T22:00:00.000Z',
+    '2025-09-08T23:00:00.000Z',
+    '2025-09-09T00:00:00.000Z'
+  ])
 
   expect(document.title).toBe(
     'BTMS reporting data - Border Trade Matching Service'
@@ -251,17 +322,17 @@ test('today up to this minute', async () => {
     .useFakeTimers({ doNotFake: ['nextTick'] })
     .setSystemTime(new Date('2025-09-18:10:30'))
 
-  const summary = {
-    releases: {},
-    matches: {},
-    clearanceRequests: {},
-    notifications: {}
+  const reportingData = {
+    releases: { intervals: [] },
+    matches: { intervals: [] },
+    clearanceRequests: { intervals: [] },
+    notifications: { intervals: [] }
   }
 
   wreck.get
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
-    .mockResolvedValueOnce({ payload: summary })
+    .mockResolvedValueOnce({ payload: reportingData })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)

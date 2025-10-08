@@ -20,6 +20,11 @@
   @include govuk-font-size($size: 16);
 }
 
+.btms-tabs .govuk-tabs__panel {
+  border: none;
+  padding: 30px 10px;
+}
+
 .btms-reports {
   .btms-report:nth-child(odd) {
     .btms-tile {
@@ -31,6 +36,69 @@
     .btms-tile {
       background-color: $btms-light-blue;
     }
+  }
+
+  .btms-chart:not(:last-of-type) {
+    border-bottom: 1px solid govuk-colour("light-grey");
+  }
+
+  .btms-chart:nth-child(-n + 3) {
+    .btms-tile {
+      min-width: 30%;
+    }
+  }
+}
+
+.btms-chart {
+  table {
+    @include govuk-font-size($size: 16);
+  }
+
+  .btms-row {
+    overflow-x: scroll;
+  }
+
+  .btms-tile {
+    min-width: auto;
+    @include govuk-font-size($size: 16);
+  }
+
+  .govuk-heading-l {
+    font-size: 24px;
+  }
+
+  .key::before {
+    content: "";
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 6px;
+    border-radius: 4px;
+  }
+
+  .automatic,
+  .chedpp,
+  .match,
+  .unique {
+    &::before {
+      background-color: $btms-chart-blue;
+    }
+  }
+
+  .chedp,
+  .manual,
+  .nomatch {
+    &::before {
+      background-color: $btms-chart-green;
+    }
+  }
+
+  .chedd::before {
+    background-color: $btms-chart-orange;
+  }
+
+  .cheda::before {
+    background-color: $btms-chart-pink;
   }
 }
 
@@ -52,7 +120,20 @@
     margin: 0;
   }
 
+  .govuk-heading-l {
+    font-size: 32px;
+  }
+
   .govuk-heading-s {
+    font-size: 18px;
     margin-bottom: govuk-spacing(2);
+  }
+
+  .btms-percentage {
+    font-size: 14px;
+  }
+
+  .govuk-list {
+    margin-bottom: 14px;
   }
 }
