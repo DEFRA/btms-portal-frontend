@@ -40,7 +40,7 @@
   {% endif %}
 {% endblock %}
 
-{% set accountNavigation %}
+{% set accountNavigationSlot %}
 {% include './includes/account-navigation.njk' %}
 {% endset %}
 
@@ -53,7 +53,7 @@
     classes: 'btms-service-navigation' ~ navClass,
     navigation: navigation,
     slots: {
-      end: accountNavigation
+      end: accountNavigationSlot
     }
   }) }}
 {% endblock %}
