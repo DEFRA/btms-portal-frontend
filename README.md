@@ -102,6 +102,7 @@ Ask a member of the team to provide you with values.
 | AUTH_DEFRA_ID_OIDC_CONFIGURATION_URL | Configuration URL for DefraId                            |
 | AUTH_DEFRA_ID_CLIENT_SECRET          | Secret for DefraId                                       |
 | AUTH_DEFRA_ID_ORGANISATIONS          | List of DefraId organisations with access to the service |
+| AUTH_DEFRA_ID_ACCOUNT_MANAGEMENT_URL | DefraId (Gov Gateway) account management URL             |
 | AUTH_ENTRA_ID_OIDC_CONFIGURATION_URL | Configuration URL for EntraId                            |
 | AUTH_ENTRA_ID_CLIENT_ID              | Client ID for EntraId                                    |
 | AUTH_ENTRA_ID_CLIENT_SECRET          | Secret for EntraId                                       |

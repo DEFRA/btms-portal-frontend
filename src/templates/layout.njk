@@ -49,13 +49,15 @@
     {% include "./includes/cookie-banner.njk" %}
   {% endif %}
   {{ govukHeader(headerOptions) }}
-  {{ govukServiceNavigation({
-    classes: 'btms-service-navigation' ~ navClass,
-    navigation: navigation,
-    slots: {
-      end: accountNavigationSlot
-    }
-  }) }}
+  {% if isAuthenticated %}
+    {{ govukServiceNavigation({
+      classes: 'btms-service-navigation' ~ navClass,
+      navigation: navigation,
+      slots: {
+        end: accountNavigationSlot
+      }
+    }) }}
+  {% endif %}
 {% endblock %}
 
 {% block pageTitle %}
@@ -76,20 +78,13 @@
   {% set items = [{
     href: "https://www.gov.uk/help/privacy-notice",
     text: "Privacy"
-  }]%}
-  {% if isAuthenticated %}
-    {% set items = items.concat([{
-      href: "/reporting",
-      text: "BTMS reporting data"
-    }])%}
-  {% endif %}
-  {% set items = items.concat([{
+  }, {
     href: "/cookies",
     text: "Cookies"
   }, {
     href: "/accessibility-statement",
     text: "Accessibility statement"
-  }])%}
+  }] %}
   {{
     govukFooter({
       containerClasses: containerClasses,
