@@ -30,11 +30,13 @@ test('logged in', async () => {
     navigation: [
       {
         href: '/search',
-        text: 'Search'
+        text: 'Search',
+        active: true
       },
       {
         href: '/reporting',
-        text: 'Reporting'
+        text: 'Reporting',
+        active: false
       }
     ],
     accountNavigation: [
@@ -50,7 +52,7 @@ test('logged in', async () => {
     getAssetPath: expect.any(Function)
   }
 
-  const result = await context({})
+  const result = await context({ url: { pathname: '/search' } })
 
   expect(result).toEqual(expected)
 })
@@ -59,6 +61,7 @@ test('not logged in', async () => {
   mockGetUserSession.mockReturnValue(null)
 
   const request = {
+    url: { pathname: '/reporting' },
     logger: { error: jest.fn() }
   }
 
@@ -71,11 +74,13 @@ test('not logged in', async () => {
     navigation: [
       {
         href: '/search',
-        text: 'Search'
+        text: 'Search',
+        active: false
       },
       {
         href: '/reporting',
-        text: 'Reporting'
+        text: 'Reporting',
+        active: true
       }
     ],
     accountNavigation: [],
@@ -91,7 +96,7 @@ test('getAssetPath(): returns hashed path', async () => {
   mockGetUserSession.mockReturnValue(null)
   config.set('assetPath', '/test')
 
-  const { getAssetPath } = await context({})
+  const { getAssetPath } = await context({ url: {} })
 
   expect(getAssetPath('application.js')).toBe(
     '/test/javascripts/application.HASH.js'
@@ -103,6 +108,7 @@ test('getAssetPath(): logs error for unmapped files', async () => {
   config.set('assetPath', '/test')
 
   const request = {
+    url: {},
     logger: { error: jest.fn() }
   }
 

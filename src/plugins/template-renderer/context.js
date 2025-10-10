@@ -27,14 +27,16 @@ const signOutLink = {
   href: paths.SIGN_OUT
 }
 
-const navigation = [
+const getNavigation = (pathname) => [
   {
     href: paths.SEARCH,
-    text: 'Search'
+    text: 'Search',
+    active: pathname === paths.SEARCH
   },
   {
     href: paths.REPORTING,
-    text: 'Reporting'
+    text: 'Reporting',
+    active: pathname === paths.REPORTING
   }
 ]
 
@@ -51,6 +53,8 @@ export async function context(request) {
     authedUser?.strategy === 'defraId' && manageAccountLink,
     authedUser?.isAuthenticated && signOutLink
   ].filter(Boolean)
+
+  const navigation = getNavigation(request.url.pathname)
 
   return {
     assetPath: `${assetPath}/assets`,
