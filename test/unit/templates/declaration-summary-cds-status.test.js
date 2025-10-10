@@ -15,13 +15,13 @@ const createDeclarationContext = (finalState) => {
 
 describe('Declaration Summary - CDS Status Highlighting', () => {
   test.each([
-    [null, 'btms-status-tag govuk-tag govuk-tag--yellow'],
-    [undefined, 'btms-status-tag govuk-tag govuk-tag--yellow'],
-    ['0', 'btms-status-tag govuk-tag govuk-tag--green'],
-    ['1', 'btms-status-tag govuk-tag govuk-tag--red'],
-    ['2', 'btms-status-tag govuk-tag govuk-tag--red'],
-    ['3', 'btms-status-tag govuk-tag govuk-tag--red'],
-    ['4', 'btms-status-tag govuk-tag govuk-tag--red'],
+    [null, 'govuk-!-font-weight-bold govuk-tag govuk-tag--yellow'],
+    [undefined, 'govuk-!-font-weight-bold govuk-tag govuk-tag--yellow'],
+    ['0', 'govuk-!-font-weight-bold govuk-tag govuk-tag--green'],
+    ['1', 'govuk-!-font-weight-bold govuk-tag govuk-tag--red'],
+    ['2', 'govuk-!-font-weight-bold govuk-tag govuk-tag--red'],
+    ['3', 'govuk-!-font-weight-bold govuk-tag govuk-tag--red'],
+    ['4', 'govuk-!-font-weight-bold govuk-tag govuk-tag--red'],
     ['5', ''],
     ['6', ''],
     ['99', '']
