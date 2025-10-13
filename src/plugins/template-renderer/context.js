@@ -17,6 +17,29 @@ const getManifest = () => {
   return webpackManifest
 }
 
+const accountManagementUrl = config.get('auth.defraId.accountManagementUrl')
+const manageAccountLink = {
+  text: 'Manage account',
+  href: accountManagementUrl
+}
+const signOutLink = {
+  text: 'Sign out',
+  href: paths.SIGN_OUT
+}
+
+const getNavigation = (pathname) => [
+  {
+    href: paths.SEARCH,
+    text: 'Search',
+    active: pathname === paths.SEARCH
+  },
+  {
+    href: paths.REPORTING,
+    text: 'Reporting',
+    active: pathname === paths.REPORTING
+  }
+]
+
 /**
  * @param {Request} request
  */
@@ -26,31 +49,21 @@ export async function context(request) {
   const serviceName = config.get('serviceName')
 
   const authedUser = await getUserSession(request)
+  const accountNavigation = [
+    authedUser?.strategy === 'defraId' && manageAccountLink,
+    authedUser?.isAuthenticated && signOutLink
+  ].filter(Boolean)
 
-  const navigation = []
-
-  if (authedUser?.strategy === 'defraId') {
-    const accountManagementUrl = config.get('auth.defraId.accountManagementUrl')
-    navigation.push({
-      text: 'Manage account',
-      href: accountManagementUrl
-    })
-  }
-  if (authedUser?.isAuthenticated) {
-    navigation.push({
-      text: 'Sign out',
-      href: paths.SIGN_OUT
-    })
-  }
+  const navigation = getNavigation(request.url.pathname)
 
   return {
     assetPath: `${assetPath}/assets`,
     defaultHeaderOptions: {
       homepageUrl: 'https://www.gov.uk',
-      serviceName,
-      navigation
+      serviceName
     },
-
+    navigation,
+    accountNavigation,
     /**
      * @param {string} asset
      */
