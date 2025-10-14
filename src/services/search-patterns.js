@@ -28,5 +28,10 @@ export const searchPatterns = [
     key: 'ducr',
     pattern: /^\dGB\d{12}-(?:[0-9A-Z()-]{1,19})$/,
     description: 'DUCR'
+  },
+  {
+    key: 'gmrId',
+    pattern: /^GMR[A-Z][0-9A-Z]{8}$/,
+    description: 'GMR ID'
   }
 ]
