@@ -2,6 +2,7 @@ const paths = {
   COOKIES: '/cookies',
   HEALTH: '/health',
   LANDING: '/',
+  LATEST_ACTIVITY: '/latest-activity',
   ACCESSIBILITY: '/accessibility-statement',
   REPORTING: '/reporting',
   REPORTING_CSV: '/reporting/{name}',

@@ -24,3 +24,26 @@ export const getReports = async (request, from, to, intervals) => {
     throw error
   }
 }
+
+export const getLatestActivity = async (request) => {
+  try {
+    const [lastSent, lastReceived] = await Promise.all([
+      wreck.get(`${baseUrl}/last-sent`, {
+        headers: { authorization },
+        json: 'strict'
+      }),
+      wreck.get(`${baseUrl}/last-received`, {
+        headers: { authorization },
+        json: 'strict'
+      })
+    ])
+
+    return {
+      lastSent: lastSent.payload,
+      lastReceived: lastReceived.payload
+    }
+  } catch (error) {
+    request.logger.setBindings({ error })
+    throw error
+  }
+}
