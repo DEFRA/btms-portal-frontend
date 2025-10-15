@@ -12,13 +12,8 @@ export const latestActivity = {
   handler: async (request, h) => {
     const { lastSent, lastReceived } = await getLatestActivity(request)
 
-    try {
-      return h.view('latest-activity', {
-        latestActivity: mapLatestActivity(lastSent, lastReceived)
-      })
-    } catch (error) {
-      request.logger.setBindings({ error })
-      throw error
-    }
+    return h.view('latest-activity', {
+      latestActivity: mapLatestActivity(lastSent, lastReceived)
+    })
   }
 }
