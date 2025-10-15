@@ -1,5 +1,5 @@
 import { mapLatestActivity } from '../models/latest-activity.js'
-import { getLastReceived, getLastSent } from '../services/reporting.js'
+import { getLatestActivity } from '../services/reporting.js'
 import { CACHE_CONTROL_NO_STORE, paths } from './route-constants.js'
 
 export const latestActivity = {
@@ -10,10 +10,7 @@ export const latestActivity = {
     cache: CACHE_CONTROL_NO_STORE
   },
   handler: async (request, h) => {
-    const [lastSent, lastReceived] = await Promise.all([
-      getLastSent(request),
-      getLastReceived(request)
-    ])
+    const { lastSent, lastReceived } = await getLatestActivity(request)
 
     try {
       return h.view('latest-activity', {
