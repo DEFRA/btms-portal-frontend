@@ -4,7 +4,7 @@
 
 {% set containerClasses = "" %}
 {% set navClass = "" %}
-
+{% set navigationRequired = navigationRequired | default(true) %}
 {% block head %}
   {% if cookiePolicy.analytics == 'yes' %}
     {% include "./includes/google-tag-manager-head.njk" %}
@@ -49,7 +49,7 @@
     {% include "./includes/cookie-banner.njk" %}
   {% endif %}
   {{ govukHeader(headerOptions) }}
-  {% if isAuthenticated %}
+  {% if navigationRequired and isAuthenticated %}
     {{ govukServiceNavigation({
       classes: 'btms-service-navigation' ~ navClass,
       navigation: navigation,
