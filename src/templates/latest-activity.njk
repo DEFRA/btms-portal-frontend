@@ -1,0 +1,35 @@
+{% extends 'layout.njk' %}
+
+{% set pageTitle = 'Latest activity' %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
+      <p>
+        Latest messages received and sent by BTMS.
+      </p>
+
+      {% for service in latestActivity.services %}
+        <h2 class="govuk-heading-m">{{ service.name }}</h2>
+
+        <table class="govuk-table" aria-label="Latest activity for {{ service.name }}">
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">Message type</th>
+              <th scope="col" class="govuk-table__header govuk-!-width-one-quarter govuk-table__header--numeric">Last {{ service.direction }}</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            {% for message in service.messages %}
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell">{{ message.type }}</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">{{ message.timestamp }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}
