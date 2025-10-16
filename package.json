@@ -59,7 +59,7 @@
     "ioredis": "^5.7.0",
     "joi": "^18.0.1",
     "nunjucks": "^3.2.4",
-    "pino": "^9.9.0",
+    "pino": "^10.0.0",
     "pino-pretty": "^13.1.2",
     "stream-json": "1.9.1"
   },
