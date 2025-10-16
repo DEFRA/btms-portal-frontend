@@ -25,19 +25,16 @@
           <td class="govuk-table__cell">{{ commodity.taricCommodityCode }}</td>
           <td class="govuk-table__cell">{{ commodityDescription(commodity.goodsDescription, commodity.id, maxLength) }}</td>
           <td class="govuk-table__cell">{{ commodity.weightOrQuantity }}</td>
-          {% if not decision.isIuuOutcome %}
-            {{ documentReference(decision) }}
-            <td class="govuk-table__cell">{{ decisionMatch(decision.match) }}</td>
-          {% else %}
-            <td class="govuk-table__cell" colspan="2"></td>
-          {% endif %}
+          {{ documentReference(decision) }}
+          <td class="govuk-table__cell">{{ decisionMatch(decision.match) }}</td>
           <td class="govuk-table__cell">
             {{ decision.departmentCode }}
           </td>
           <td class="govuk-table__cell">
             {% if decision.decision %}
               {{ decision.decision }} -
-            {% endif %} {{ decision.decisionDetail }}
+            {% endif %}
+            {{ decision.decisionDetail }}
           </td>
         </tr>
       {% endfor %}

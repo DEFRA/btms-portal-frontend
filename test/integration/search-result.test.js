@@ -196,7 +196,7 @@ test('shows search results', async () => {
 
   expect(
     getByRole(declaration, 'row', {
-      name: '3 1602321990 JBB VIENNESE ROAST 2 KG 87.07 CHEDP.BB.2025.NOMATCH This CHED reference cannot be found on the customs declaration. Please check that the reference is correct. No HMI No match'
+      name: '3 1602321990 JBB VIENNESE ROAST 2 KG 87.07 CHEDP.BB.2025.NOMATCH This CHED reference cannot be found on the customs declaration. Please check that the reference is correct. No HMI No match - CHED cannot be found'
     })
   ).toBeInTheDocument()
 
@@ -387,7 +387,7 @@ test('handles H220 1% check', async () => {
   globalJsdom(payload)
 
   const notificationRow = getByRole(document.body, 'row', {
-    name: '1 3120232190 CHICKEN 7000 KG 7000 Requires CHED Needs a CHED No HMI No match'
+    name: '1 3120232190 CHICKEN 7000 KG 7000 Requires CHED Needs a CHED No HMI No match - Selected for HMI GMS inspection'
   })
 
   expect(
