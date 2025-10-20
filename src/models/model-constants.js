@@ -125,8 +125,8 @@ export const internalDecisionCodeDescriptions = {
   E82: 'No match - Selected for HMI GMS inspection',
   E83: 'No match',
   E84: 'No match - Incorrect CHED type',
-  E85: 'Hold - PHSI check not provided',
-  E86: 'Hold - HMI check not provided',
+  E85: 'Hold - PHSI decision not provided',
+  E86: 'Hold - HMI decision not provided',
   E87: 'No match - Selected for HMI GMS inspection',
   E88: 'Hold - Awaiting IPAFFS update',
   E99: 'No match - Unknown error'
