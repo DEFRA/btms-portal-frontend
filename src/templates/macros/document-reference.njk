@@ -1,7 +1,5 @@
 {% macro documentReference(decision) %}
-  {% if decision.match == true %}
-    <td class="govuk-table__cell">{{ decision.documentReference }}</td>
-  {% elif decision.match == false %}
+  {% if decision.decisionReason %}
     {% set id = 'tooltip-' + decision.id %}
     <td class="govuk-table__cell btms-no-match" tabindex="0" aria-describedby="{{ id }}">
       {{ decision.documentReference }}
@@ -10,6 +8,6 @@
       </span>
     </td>
   {% else %}
-    <td class="govuk-table__cell"></td>
+    <td class="govuk-table__cell">{{ decision.documentReference }}</td>
   {% endif %}
 {% endmacro %}
