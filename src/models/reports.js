@@ -69,7 +69,7 @@ const dataSetKeys = {
 }
 
 export const mapReports = (reports, tableHeadings) => {
-  const tablesHeader = [{ text: '' }].concat(
+  const tablesHeader = [{ text: 'Counts' }].concat(
     tableHeadings.map((interval) => ({
       text: interval
     }))
