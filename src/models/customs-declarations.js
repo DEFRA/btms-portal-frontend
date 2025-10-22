@@ -125,9 +125,9 @@ export const getDecisionDetail = (
   return decisionCodeDescriptions[decisionCode]
 }
 
-export const getCustomsDeclarationStatus = (finalisation) => {
+export const getCustomsDeclarationStatus = (finalisation, clearanceDecision) => {
   if (finalisation === null) {
-    return 'In progress'
+    return `In progress${getInProgressDetail(clearanceDecision)}`
   }
 
   if (finalisation.isManualRelease === true) {
@@ -141,6 +141,22 @@ const getDocumentReference = (decision) =>
   hmiGmsInternalDecisionCodes.has(decision.internalDecisionCode)
     ? 'Requires CHED'
     : decision.documentReference
+
+const getInProgressDetail = (clearanceDecision) => {
+  if (clearanceDecision.items?.some(item => item.checks?.some(check => check.decisionCode === 'X00' && check.checkCode !== 'H224'))) {
+    return ' - Awaiting trader'
+  }
+
+  if (clearanceDecision.items?.some(item => item.checks?.some(check => check.decisionCode?.startsWith('H0')))) {
+    return ' - Awaiting IPAFFS'
+  }
+
+  if (clearanceDecision.items?.every(item => item.checks?.every(check => check.decisionCode?.startsWith('C0') || check.decisionCode?.startsWith('N0')))) {
+    return ' - Awaiting CDS'
+  }
+
+  return ''
+}
 
 export const getCustomsDeclarationOpenState = (finalisation) =>
   !(
@@ -217,7 +233,7 @@ const mapCustomsDeclaration = (declaration, notificationStatuses) => {
     mapCommodity(commodity, notificationStatuses, clearanceDecision)
   )
 
-  const status = getCustomsDeclarationStatus(finalisation)
+  const status = getCustomsDeclarationStatus(finalisation, clearanceDecision)
   const open = getCustomsDeclarationOpenState(finalisation)
 
   return {

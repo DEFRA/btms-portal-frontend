@@ -95,10 +95,13 @@ For local development some environment variables can to be added to a `.env.loca
 Ask a member of the team to provide you with values.
 
 | name                                 | purpose                                                  |
-| ------------------------------------ | -------------------------------------------------------- |
+| ------------------------------------ |----------------------------------------------------------|
 | BTMS_API_BASE_URL                    | Search queries use this API for results                  |
 | BTMS_API_USERNAME                    | Username for calls to search API                         |
 | BTMS_API_PASSWORD                    | Password for calls to search API                         |
+| BTMS_REPORTING_API_BASE_URL          | Reporting section use this API for reporting data        |
+| BTMS_REPORTING_API_USERNAME          | Username for calls to reporting API                      |
+| BTMS_REPORTING_API_PASSWORD          | Password for calls to reporting API                      |
 | AUTH_DEFRA_ID_OIDC_CONFIGURATION_URL | Configuration URL for DefraId                            |
 | AUTH_DEFRA_ID_CLIENT_SECRET          | Secret for DefraId                                       |
 | AUTH_DEFRA_ID_ORGANISATIONS          | List of DefraId organisations with access to the service |
