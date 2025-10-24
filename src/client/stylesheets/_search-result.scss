@@ -183,7 +183,10 @@
     visibility: hidden;
   }
 
-  .btms-declaration tbody tr:not(:last-of-type) > td:nth-last-child(-n + 3) {
+  .btms-declaration
+    tbody
+    tr:not(:last-of-type):not(:has(+ tr[data-authority="IUU"]))
+    > td:nth-last-child(-n + 4) {
     border-bottom: 1px dashed $btms-light-to-mid-grey;
   }
 

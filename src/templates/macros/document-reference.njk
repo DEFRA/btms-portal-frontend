@@ -1,17 +1,13 @@
 {% macro documentReference(decision) %}
-  {% if decision.match %}
-    <td class="govuk-table__cell">{{ decision.documentReference }}</td>
-  {% else %}
+  {% if decision.decisionReason %}
     {% set id = 'tooltip-' + decision.id %}
     <td class="govuk-table__cell btms-no-match" tabindex="0" aria-describedby="{{ id }}">
-      {% if decision.requiresChed %}
-        Requires CHED
-      {% else %}
-        {{ decision.documentReference }}
-      {% endif %}
+      {{ decision.documentReference }}
       <span role="tooltip" id="{{ id }}">
         {{ decision.decisionReason }}
       </span>
     </td>
+  {% else %}
+    <td class="govuk-table__cell">{{ decision.documentReference }}</td>
   {% endif %}
-{% endmacro%}
+{% endmacro %}

@@ -3,8 +3,7 @@
 {% macro decisionMatch(match) %}
   {% if match === true %}
     {{ govukTag({ text: "Yes", classes: "govuk-tag--green" }) }}
-  {% endif %}
-  {% if match === false %}
+  {% elif match === false %}
     {{ govukTag({ text: "No", classes: "govuk-tag--red" }) }}
   {% endif %}
 {% endmacro %}

@@ -102,11 +102,32 @@ export const iuuDecisionDisplay = {
   IUUNA: 'IUU inspection not applicable'
 }
 
-export const internalNoMatchDecisionCodes = new Set([
+export const hmiGmsInternalDecisionCodes = new Set(['E87', 'E82'])
+export const noMatchInternalDecisionCodes = new Set([
   'E70',
   'E71',
   'E72',
   'E73',
+  'E75',
+  'E82',
   'E83',
-  'E87'
+  'E84',
+  'E87',
+  'E99'
 ])
+export const internalDecisionCodeDescriptions = {
+  E70: 'No match - CHED cannot be found',
+  E71: 'No match - CHED cancelled',
+  E72: 'No match - CHED replaced',
+  E73: 'No match - CHED deleted',
+  E74: 'Hold - Partially rejected',
+  E75: 'No match - Split consignment',
+  E82: 'No match - Selected for HMI GMS inspection',
+  E83: 'No match',
+  E84: 'No match - Incorrect CHED type',
+  E85: 'Hold - PHSI decision not provided',
+  E86: 'Hold - HMI decision not provided',
+  E87: 'No match - Selected for HMI GMS inspection',
+  E88: 'Hold - Awaiting IPAFFS update',
+  E99: 'No match - Unknown error'
+}
