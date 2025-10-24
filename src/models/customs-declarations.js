@@ -8,7 +8,8 @@ import {
   finalStateMappings,
   internalNoMatchDecisionCodes,
   IUUDocumentCodes,
-  DATE_FORMAT
+  DATE_FORMAT,
+  NO_MATCH_DECISION_CODE
 } from './model-constants.js'
 
 const documentReferenceRegex = /\d{7}[VR]?$/
@@ -94,7 +95,7 @@ export const getDecisionDescription = (
     return `CHED ${notificationStatus.toLowerCase()}`
   }
 
-  if (isIuuOutcome && decisionCode === 'X00') {
+  if (isIuuOutcome && decisionCode === NO_MATCH_DECISION_CODE) {
     if (allDecisionCodesAreNoMatch) {
       return 'No match'
     }
@@ -118,9 +119,9 @@ export const getDecisionDescription = (
   return decisionCodeDescriptions[decisionCode]
 }
 
-export const getCustomsDeclarationStatus = (finalisation) => {
+export const getCustomsDeclarationStatus = (finalisation, clearanceDecision) => {
   if (finalisation === null) {
-    return 'In progress'
+    return `In progress${getInProgressDetail(clearanceDecision)}`
   }
 
   if (finalisation.isManualRelease === true) {
@@ -128,6 +129,22 @@ export const getCustomsDeclarationStatus = (finalisation) => {
   }
 
   return `Finalised - ${finalStateMappings[finalisation.finalState]}`
+}
+
+const getInProgressDetail = (clearanceDecision) => {
+  if (clearanceDecision.items?.some(item => item.checks?.some(check => check.decisionCode === NO_MATCH_DECISION_CODE && check.checkCode !== 'H224'))) {
+    return ' - Awaiting trader'
+  }
+
+  if (clearanceDecision.items?.some(item => item.checks?.some(check => isHoldDecisionCode(check.decisionCode)))) {
+    return ' - Awaiting IPAFFS'
+  }
+
+  if (clearanceDecision.items?.every(item => item.checks?.every(check => isReleaseDecisionCode(check.decisionCode) || isRefusalDecisionCode(check.decisionCode)))) {
+    return ' - Awaiting CDS'
+  }
+
+  return ''
 }
 
 export const getCustomsDeclarationOpenState = (finalisation) =>
@@ -144,7 +161,7 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
     ) || []
 
   const allDecisionCodesAreNoMatch = clearanceDecisions.every(
-    (decision) => decision.decisionCode === 'X00'
+    (decision) => decision.decisionCode === NO_MATCH_DECISION_CODE
   )
   const iuuRelatedChedpCheck = clearanceDecisions.find(
     (decision) => decision.checkCode === 'H222'
@@ -205,7 +222,7 @@ const mapCustomsDeclaration = (declaration, notificationStatuses) => {
     mapCommodity(commodity, notificationStatuses, clearanceDecision)
   )
 
-  const status = getCustomsDeclarationStatus(finalisation)
+  const status = getCustomsDeclarationStatus(finalisation, clearanceDecision)
   const open = getCustomsDeclarationOpenState(finalisation)
 
   return {
