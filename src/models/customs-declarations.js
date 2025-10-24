@@ -8,7 +8,8 @@ import {
   finalStateMappings,
   internalNoMatchDecisionCodes,
   IUUDocumentCodes,
-  DATE_FORMAT
+  DATE_FORMAT,
+  NO_MATCH_DECISION_CODE
 } from './model-constants.js'
 
 const documentReferenceRegex = /\d{7}[VR]?$/
@@ -94,7 +95,7 @@ export const getDecisionDescription = (
     return `CHED ${notificationStatus.toLowerCase()}`
   }
 
-  if (isIuuOutcome && decisionCode === 'X00') {
+  if (isIuuOutcome && decisionCode === NO_MATCH_DECISION_CODE) {
     if (allDecisionCodesAreNoMatch) {
       return 'No match'
     }
@@ -131,15 +132,15 @@ export const getCustomsDeclarationStatus = (finalisation, clearanceDecision) => 
 }
 
 const getInProgressDetail = (clearanceDecision) => {
-  if (clearanceDecision.items?.some(item => item.checks?.some(check => check.decisionCode === 'X00' && check.checkCode !== 'H224'))) {
+  if (clearanceDecision.items?.some(item => item.checks?.some(check => check.decisionCode === NO_MATCH_DECISION_CODE && check.checkCode !== 'H224'))) {
     return ' - Awaiting trader'
   }
 
-  if (clearanceDecision.items?.some(item => item.checks?.some(check => check.decisionCode?.startsWith('H0')))) {
+  if (clearanceDecision.items?.some(item => item.checks?.some(check => isHoldDecisionCode(check.decisionCode)))) {
     return ' - Awaiting IPAFFS'
   }
 
-  if (clearanceDecision.items?.every(item => item.checks?.every(check => check.decisionCode?.startsWith('C0') || check.decisionCode?.startsWith('N0')))) {
+  if (clearanceDecision.items?.every(item => item.checks?.every(check => isReleaseDecisionCode(check.decisionCode) || isRefusalDecisionCode(check.decisionCode)))) {
     return ' - Awaiting CDS'
   }
 
@@ -160,7 +161,7 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
     ) || []
 
   const allDecisionCodesAreNoMatch = clearanceDecisions.every(
-    (decision) => decision.decisionCode === 'X00'
+    (decision) => decision.decisionCode === NO_MATCH_DECISION_CODE
   )
   const iuuRelatedChedpCheck = clearanceDecisions.find(
     (decision) => decision.checkCode === 'H222'

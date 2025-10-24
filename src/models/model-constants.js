@@ -7,6 +7,7 @@ export const ILLEGAL_UNREPORTED_UNREGULATED = 'IUU'
 export const PRODUCTS_OF_ANIMAL_ORIGIN = 'POAO'
 export const PLANT_HEALTH_SEEDS_INSPECTORATE = 'PHSI'
 export const DECISION_NOT_GIVEN = 'Decision not given'
+export const NO_MATCH_DECISION_CODE = 'X00'
 
 export const chedTypes = {
   CHEDA: 'CVEDA',
