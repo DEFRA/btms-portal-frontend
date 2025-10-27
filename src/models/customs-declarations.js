@@ -6,7 +6,9 @@ import {
   closedChedStatuses,
   checkCodeToAuthorityMapping,
   finalStateMappings,
-  internalNoMatchDecisionCodes,
+  hmiGmsInternalDecisionCodes,
+  noMatchInternalDecisionCodes,
+  internalDecisionCodeDescriptions,
   IUUDocumentCodes,
   DATE_FORMAT
 } from './model-constants.js'
@@ -61,8 +63,13 @@ const isReleaseDecisionCode = (decisionCode) => {
   return hasDesiredPrefix(decisionCode, 'c0')
 }
 
-export const getDecision = (decisionCode) => {
+export const getDecision = (decisionCode, internalDecisionCode) => {
   let decisionHighLevelDesc
+
+  if (internalDecisionCodeDescriptions[internalDecisionCode]) {
+    return ''
+  }
+
   if (isReleaseDecisionCode(decisionCode)) {
     decisionHighLevelDesc = 'Release'
   } else if (isRefusalDecisionCode(decisionCode)) {
@@ -78,7 +85,7 @@ export const getDecision = (decisionCode) => {
   return decisionHighLevelDesc
 }
 
-export const getDecisionDescription = (
+export const getDecisionDetail = (
   decisionCode,
   internalDecisionCode,
   notificationStatus,
@@ -86,8 +93,8 @@ export const getDecisionDescription = (
   allDecisionCodesAreNoMatch,
   iuuRelatedChedpCheck
 ) => {
-  if (internalDecisionCode === 'E88') {
-    return 'Hold - Awaiting IPAFFS update'
+  if (internalDecisionCodeDescriptions[internalDecisionCode]) {
+    return internalDecisionCodeDescriptions[internalDecisionCode]
   }
 
   if (closedChedStatuses.includes(notificationStatus)) {
@@ -130,6 +137,11 @@ export const getCustomsDeclarationStatus = (finalisation) => {
   return `Finalised - ${finalStateMappings[finalisation.finalState]}`
 }
 
+const getDocumentReference = (decision) =>
+  hmiGmsInternalDecisionCodes.has(decision.internalDecisionCode)
+    ? 'Requires CHED'
+    : decision.documentReference
+
 export const getCustomsDeclarationOpenState = (finalisation) =>
   !(
     finalisation !== null &&
@@ -165,14 +177,17 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
 
     const isMatch = Boolean(
       decision.decisionCode &&
-        !internalNoMatchDecisionCodes.has(decision.internalDecisionCode)
+        !noMatchInternalDecisionCodes.has(decision.internalDecisionCode)
     )
 
     return {
       id: randomUUID(),
       checkCode: decision.checkCode,
-      decision: getDecision(decision.decisionCode),
-      decisionDetail: getDecisionDescription(
+      decision: getDecision(
+        decision.decisionCode,
+        decision.internalDecisionCode
+      ),
+      decisionDetail: getDecisionDetail(
         decision.decisionCode,
         decision.internalDecisionCode,
         notificationStatus,
@@ -182,10 +197,7 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
       ),
       decisionReason: decision.decisionReason,
       departmentCode: checkCodeToAuthorityMapping[decision.checkCode],
-      documentReference: isIuuOutcome ? null : decision.documentReference,
-      isIuuOutcome,
-      requiresChed:
-        decision.checkCode === 'H220' && commodity.documents === null,
+      documentReference: isIuuOutcome ? null : getDocumentReference(decision),
       match: isIuuOutcome ? null : isMatch
     }
   })
