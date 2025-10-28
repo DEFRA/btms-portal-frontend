@@ -2,7 +2,7 @@ import {
   mapCustomsDeclarations,
   getDecision,
   getCustomsDeclarationOpenState,
-  getDecisionDescription
+  getDecisionDetail
 } from '../../../src/models/customs-declarations.js'
 
 test('MRN, open, finalised, using netMass, matched', () => {
@@ -94,9 +94,7 @@ test('MRN, open, finalised, using netMass, matched', () => {
               decisionDetail: 'Inspection complete',
               decisionReason: null,
               checkCode: 'H223',
-              departmentCode: 'FNAO',
-              isIuuOutcome: false,
-              requiresChed: false
+              departmentCode: 'FNAO'
             },
             {
               id: expect.any(String),
@@ -106,9 +104,7 @@ test('MRN, open, finalised, using netMass, matched', () => {
               decision: 'Release',
               decisionDetail: 'IUU inspection complete',
               decisionReason: 'IUU Compliant',
-              departmentCode: 'IUU',
-              isIuuOutcome: true,
-              requiresChed: false
+              departmentCode: 'IUU'
             }
           ],
           documents: [
@@ -139,7 +135,7 @@ test('MRN, open, finalised, using netMass, matched', () => {
   expect(result).toEqual(expected)
 })
 
-test('a split consignment with a matching document returns expected response', () => {
+test('a split consignment with a matching document', () => {
   const data = {
     customsDeclarations: [
       {
@@ -230,9 +226,7 @@ test('a split consignment with a matching document returns expected response', (
               decision: 'Release',
               decisionDetail: 'Inspection complete',
               decisionReason: 'reasons',
-              departmentCode: 'APHA',
-              isIuuOutcome: false,
-              requiresChed: false
+              departmentCode: 'APHA'
             }
           ],
           documents: [
@@ -265,7 +259,7 @@ test('a split consignment with a matching document returns expected response', (
   ])
 })
 
-test('a split consignment without a matching document returns expected response', () => {
+test('a split consignment without a matching document', () => {
   const data = {
     customsDeclarations: [
       {
@@ -353,12 +347,10 @@ test('a split consignment without a matching document returns expected response'
               id: expect.any(String),
               checkCode: 'H221',
               match: false,
-              decision: 'Release',
-              decisionDetail: 'Inspection complete',
+              decision: '',
+              decisionDetail: 'No match - CHED cannot be found',
               decisionReason: 'CHED mismatch',
-              departmentCode: 'APHA',
-              isIuuOutcome: false,
-              requiresChed: false
+              departmentCode: 'APHA'
             }
           ],
           documents: [
@@ -391,7 +383,7 @@ test('a split consignment without a matching document returns expected response'
   ])
 })
 
-test('an MRN, with no CHED, with no documents returns expected response', () => {
+test('an MRN, with no CHED, with no documents', () => {
   const data = {
     customsDeclarations: [
       {
@@ -444,11 +436,9 @@ test('an MRN, with no CHED, with no documents returns expected response', () => 
               match: false,
               checkCode: 'H220',
               decision: '',
-              decisionDetail: 'No match',
+              decisionDetail: 'No match - CHED cannot be found',
               decisionReason: 'reasons',
-              departmentCode: 'HMI',
-              isIuuOutcome: false,
-              requiresChed: true
+              departmentCode: 'HMI'
             }
           ],
           checks: [{ checkCode: 'H220' }],
@@ -616,9 +606,7 @@ test('matches malformed references', () => {
               decision: 'Release',
               decisionDetail: 'Inspection complete',
               decisionReason: 'LGTM',
-              departmentCode: 'FNAO',
-              isIuuOutcome: false,
-              requiresChed: false
+              departmentCode: 'FNAO'
             }
           ],
           checks: [{ checkCode: 'H223' }],
@@ -646,15 +634,51 @@ test('matches malformed references', () => {
 })
 
 test.each([
-  { internalDecisionCode: 'E70' },
-  { internalDecisionCode: 'E71' },
-  { internalDecisionCode: 'E72' },
-  { internalDecisionCode: 'E73' },
-  { internalDecisionCode: 'E83' },
-  { internalDecisionCode: 'E87' }
+  {
+    internalDecisionCode: 'E70',
+    decisionDetail: 'No match - CHED cannot be found'
+  },
+  {
+    internalDecisionCode: 'E71',
+    decisionDetail: 'No match - CHED cancelled'
+  },
+  {
+    internalDecisionCode: 'E72',
+    decisionDetail: 'No match - CHED replaced'
+  },
+  {
+    internalDecisionCode: 'E73',
+    decisionDetail: 'No match - CHED deleted'
+  },
+  {
+    internalDecisionCode: 'E75',
+    decisionDetail: 'No match - Split consignment'
+  },
+  {
+    internalDecisionCode: 'E82',
+    decisionDetail: 'No match - Selected for HMI GMS inspection',
+    documentReference: 'Requires CHED'
+  },
+  {
+    internalDecisionCode: 'E83',
+    decisionDetail: 'No match'
+  },
+  {
+    internalDecisionCode: 'E84',
+    decisionDetail: 'No match - Incorrect CHED type'
+  },
+  {
+    internalDecisionCode: 'E87',
+    decisionDetail: 'No match - Selected for HMI GMS inspection',
+    documentReference: 'Requires CHED'
+  },
+  {
+    internalDecisionCode: 'E99',
+    decisionDetail: 'No match - Unknown error'
+  }
 ])(
   'the match indicator is set correctly depending on the internal decision code $internalDecisionCode',
-  ({ internalDecisionCode }) => {
+  ({ internalDecisionCode, decisionDetail, documentReference }) => {
     const data = {
       customsDeclarations: [
         {
@@ -741,16 +765,14 @@ test.each([
             ],
             decisions: [
               {
-                decision: 'Release',
-                decisionDetail: 'Inspection complete',
+                decision: '',
+                decisionDetail,
                 decisionReason: null,
                 checkCode: 'H219',
                 departmentCode: 'PHSI',
-                documentReference: 'GBCHD2025.9710001',
+                documentReference: documentReference || 'GBCHD2025.9710001',
                 id: expect.any(String),
-                isIuuOutcome: false,
-                match: false,
-                requiresChed: false
+                match: false
               }
             ],
             documents: [
@@ -1182,9 +1204,7 @@ test.each([
                 decision: options.chedDecision,
                 decisionDetail: options.chedDecisionDetail,
                 decisionReason: 'LGTM',
-                departmentCode: 'POAO',
-                isIuuOutcome: false,
-                requiresChed: false
+                departmentCode: 'POAO'
               },
               {
                 id: expect.any(String),
@@ -1194,9 +1214,7 @@ test.each([
                 decision: options.iuuDecision,
                 decisionDetail: options.iuuDecisionDetail,
                 decisionReason: 'LGTM',
-                departmentCode: 'IUU',
-                isIuuOutcome: true,
-                requiresChed: false
+                departmentCode: 'IUU'
               }
             ],
             documents: [
@@ -1228,9 +1246,9 @@ test.each([
   }
 )
 
-test('getDecisionDescription(): awaiting IPAFFS', () => {
+test('getDecisionDetail(): awaiting IPAFFS', () => {
   const internalDecisionCode = 'E88'
 
-  const description = getDecisionDescription(null, internalDecisionCode)
-  expect(description).toBe('Hold - Awaiting IPAFFS update')
+  const detail = getDecisionDetail(null, internalDecisionCode)
+  expect(detail).toBe('Hold - Awaiting IPAFFS update')
 })

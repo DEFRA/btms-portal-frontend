@@ -37,6 +37,11 @@ const getNavigation = (pathname) => [
     href: paths.REPORTING,
     text: 'Reporting',
     active: pathname === paths.REPORTING
+  },
+  {
+    href: paths.LATEST_ACTIVITY,
+    text: 'Latest activity',
+    active: pathname === paths.LATEST_ACTIVITY
   }
 ]
 

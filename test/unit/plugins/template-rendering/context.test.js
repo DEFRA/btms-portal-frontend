@@ -37,6 +37,11 @@ test('logged in', async () => {
         href: '/reporting',
         text: 'Reporting',
         active: false
+      },
+      {
+        href: '/latest-activity',
+        text: 'Latest activity',
+        active: false
       }
     ],
     accountNavigation: [
@@ -81,6 +86,11 @@ test('not logged in', async () => {
         href: '/reporting',
         text: 'Reporting',
         active: true
+      },
+      {
+        href: '/latest-activity',
+        text: 'Latest activity',
+        active: false
       }
     ],
     accountNavigation: [],
