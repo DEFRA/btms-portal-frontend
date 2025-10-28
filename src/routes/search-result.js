@@ -1,7 +1,7 @@
 import joi from 'joi'
 import { CACHE_CONTROL_NO_STORE, paths } from './route-constants.js'
 import { searchPatterns } from '../services/search-patterns.js'
-import { getRelatedImportDeclarations } from '../services/related-import-declarations.js'
+import { getRelatedImportDeclarations } from '../services/trade-imports-api.js'
 import { mapCustomsDeclarations } from '../models/customs-declarations.js'
 import { mapPreNotifications } from '../models/pre-notifications.js'
 import { metricsCounter } from '../utils/metrics.js'
@@ -54,7 +54,10 @@ export const searchResult = {
     ],
     handler: async (request, h) => {
       const searchTerm = request.query.searchTerm.trim()
-      const data = await getRelatedImportDeclarations(request)
+      const data = await getRelatedImportDeclarations(
+        request,
+        request.pre.searchQuery
+      )
 
       if (
         data.customsDeclarations.length === 0 &&

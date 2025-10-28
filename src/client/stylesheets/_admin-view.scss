@@ -1,0 +1,52 @@
+@use "govuk-frontend" as *;
+@use "variables" as *;
+
+.admin-view-table-container {
+  overflow-x: auto;
+}
+
+.admin-view-table {
+  display: block;
+  @include govuk-font-size($size: 14);
+  font-family: monospace;
+  position: relative;
+  width: max-content;
+
+  .token.property {
+    color: $btms-support-json-key;
+  }
+
+  .token.number {
+    color: $btms-support-json-number;
+  }
+
+  .token.boolean {
+    color: $btms-support-json-boolean;
+  }
+
+  .token.string {
+    color: $btms-support-json-string;
+  }
+
+  .token.keyword {
+    color: $btms-support-json-null;
+  }
+
+  .row {
+    content-visibility: auto;
+    contain-intrinsic-size: 19px;
+    display: grid;
+    grid-template-columns: 4ch 1fr;
+  }
+
+  .line-number {
+    background-color: #ffffff;
+    color: $btms-support-line-numbers;
+    position: sticky;
+    left: 0;
+  }
+
+  .code {
+    white-space: pre;
+  }
+}
