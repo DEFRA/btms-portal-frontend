@@ -1354,6 +1354,34 @@ test.each([
     },
     expectedStatus: 'Finalised - Manually released'
   },
+  {
+    clearanceDecisionResults: [
+      {
+        decisionCode: 'C03',
+        checkCode: 'H222'
+      },
+      {
+        decisionCode: 'C07',
+        checkCode: 'H224'
+      }
+    ],
+    finalised: null,
+    expectedStatus: 'In progress - Awaiting CDS'
+  },
+  {
+    clearanceDecisionResults: [
+      {
+        decisionCode: 'C03',
+        checkCode: 'H222'
+      },
+      {
+        decisionCode: 'X00',
+        checkCode: 'H224'
+      }
+    ],
+    finalised: null,
+    expectedStatus: 'In progress'
+  },
 ])('In Progress Customs Declaration detail', (options) => {
   const data = {
     customsDeclarations: [
