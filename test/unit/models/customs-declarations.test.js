@@ -1252,3 +1252,229 @@ test('getDecisionDetail(): awaiting IPAFFS', () => {
   const detail = getDecisionDetail(null, internalDecisionCode)
   expect(detail).toBe('Hold - Awaiting IPAFFS update')
 })
+
+test.each([
+  {
+    clearanceDecisionResults: [
+      {
+        decisionCode: 'X00',
+        checkCode: 'H222'
+      },
+      {
+        decisionCode: 'X00',
+        checkCode: 'H224'
+      }
+    ],
+    finalised: null,
+    expectedStatus: 'In progress - Awaiting trader'
+  },
+  {
+    clearanceDecisionResults: [
+      {
+        decisionCode: 'X00',
+        checkCode: 'H224'
+      },
+      {
+        decisionCode: 'H01',
+        checkCode: 'H222'
+      }
+    ],
+    finalised: null,
+    expectedStatus: 'In progress - Awaiting IPAFFS'
+  },
+  {
+    clearanceDecisionResults: [
+      {
+        decisionCode: 'C01',
+        checkCode: 'H224'
+      },
+      {
+        decisionCode: 'C01',
+        checkCode: 'H222'
+      }
+    ],
+    finalised: null,
+    expectedStatus: 'In progress - Awaiting CDS'
+  },
+  {
+    clearanceDecisionResults: [
+      {
+        decisionCode: 'N01',
+        checkCode: 'H224'
+      },
+      {
+        decisionCode: 'N01',
+        checkCode: 'H222'
+      }
+    ],
+    finalised: null,
+    expectedStatus: 'In progress - Awaiting CDS'
+  },
+  {
+    clearanceDecisionResults: [
+      {
+        decisionCode: 'C01',
+        checkCode: 'H224'
+      },
+      {
+        decisionCode: 'N01',
+        checkCode: 'H222'
+      }
+    ],
+    finalised: null,
+    expectedStatus: 'In progress - Awaiting CDS'
+  },
+  {
+    clearanceDecisionResults: [
+      {
+        decisionCode: 'X00',
+        checkCode: 'H224'
+      },
+      {
+        decisionCode: 'X00',
+        checkCode: 'H224'
+      }
+    ],
+    finalised: null,
+    expectedStatus: 'In progress'
+  },
+  {
+    clearanceDecisionResults: [
+      {
+        decisionCode: 'X00',
+        checkCode: 'H222'
+      },
+      {
+        decisionCode: 'X00',
+        checkCode: 'H224'
+      }
+    ],
+    finalised: {
+      isManualRelease: true
+    },
+    expectedStatus: 'Finalised - Manually released'
+  },
+  {
+    clearanceDecisionResults: [
+      {
+        decisionCode: 'C03',
+        checkCode: 'H222'
+      },
+      {
+        decisionCode: 'C07',
+        checkCode: 'H224'
+      }
+    ],
+    finalised: null,
+    expectedStatus: 'In progress - Awaiting CDS'
+  },
+  {
+    clearanceDecisionResults: [
+      {
+        decisionCode: 'C03',
+        checkCode: 'H222'
+      },
+      {
+        decisionCode: 'X00',
+        checkCode: 'H224'
+      }
+    ],
+    finalised: null,
+    expectedStatus: 'In progress'
+  },
+])('In Progress Customs Declaration detail', (options) => {
+  const data = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: 'GB251234567890ABCD',
+        clearanceRequest: {
+          declarationUcr: '5GB123456789000-BDOV123456',
+          commodities: [
+            {
+              itemNumber: 1,
+              netMass: '9999',
+              documents: [
+                {
+                  documentCode: 'N853',
+                  documentReference: 'GBCHD2025.1234567'
+                }
+              ],
+              checks: [
+                {
+                  checkCode: options.clearanceDecisionResults[0].checkCode
+                }
+              ]
+            },
+            {
+              itemNumber: 2,
+              netMass: '9999',
+              documents: [
+                {
+                  documentCode: 'N853',
+                  documentReference: 'GBCHD2025.1234568'
+                }
+              ],
+              checks: [
+                {
+                  checkCode: options.clearanceDecisionResults[1].checkCode
+                }
+              ]
+            }
+          ]
+        },
+        clearanceDecision: {
+          items: [
+            {
+              itemNumber: 1,
+              checks: [
+                {
+                  checkCode: options.clearanceDecisionResults[0].checkCode,
+                  decisionCode: options.clearanceDecisionResults[0].decisionCode
+                }
+              ]
+            },
+            {
+              itemNumber: 2,
+              checks: [
+                {
+                  checkCode: options.clearanceDecisionResults[1].checkCode,
+                  decisionCode: options.clearanceDecisionResults[1].decisionCode
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              decisionCode: options.clearanceDecisionResults[0].decisionCode,
+              documentReference: 'GBCHD2025.1234567',
+              decisionReason: 'LGTM',
+              checkCode: options.clearanceDecisionResults[0].checkCode
+            },
+            {
+              itemNumber: 2,
+              decisionCode: options.clearanceDecisionResults[1].decisionCode,
+              documentReference: 'GBCHD2025.1234567',
+              decisionReason: 'LGTM',
+              checkCode: options.clearanceDecisionResults[1].checkCode
+            }
+          ]
+        },
+        finalisation: options.finalised,
+        updated: '2025-05-12T11:13:17.330Z'
+      }
+    ],
+    importPreNotifications: [
+      {
+        importPreNotification: {
+          referenceNumber: 'CHEDP.GB.2025.1234567',
+          status: 'VALIDATED'
+        }
+      }
+    ]
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  expect(result[0].status).toEqual(options.expectedStatus)
+})
