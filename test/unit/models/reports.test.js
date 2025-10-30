@@ -24,7 +24,7 @@ test('total of 0', () => {
           borderColor: '#5694ca'
         }
       ],
-      head: [{ text: '' }, { text: '03 Sep 10:47' }],
+      head: [{ text: 'Type' }, { text: '03 Sep 10:47' }],
       rows: [[{ text: 'Unique clearances' }, { text: 0 }]],
       tiles: [
         {
