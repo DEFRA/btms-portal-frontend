@@ -25,19 +25,39 @@ test('logged in', async () => {
     assetPath: '/public/assets',
     defaultHeaderOptions: {
       homepageUrl: 'https://www.gov.uk',
-      serviceName: 'Border Trade Matching Service',
-      navigation: [
-        {
-          text: 'Manage account',
-          href: '#'
-        },
-        { text: 'Sign out', href: '/sign-out' }
-      ]
+      serviceName: 'Border Trade Matching Service'
     },
+    navigation: [
+      {
+        href: '/search',
+        text: 'Search',
+        active: true
+      },
+      {
+        href: '/reporting',
+        text: 'Reporting',
+        active: false
+      },
+      {
+        href: '/latest-activity',
+        text: 'Latest activity',
+        active: false
+      }
+    ],
+    accountNavigation: [
+      {
+        href: '#',
+        text: 'Manage account'
+      },
+      {
+        href: '/sign-out',
+        text: 'Sign out'
+      }
+    ],
     getAssetPath: expect.any(Function)
   }
 
-  const result = await context({})
+  const result = await context({ url: { pathname: '/search' } })
 
   expect(result).toEqual(expected)
 })
@@ -46,6 +66,7 @@ test('not logged in', async () => {
   mockGetUserSession.mockReturnValue(null)
 
   const request = {
+    url: { pathname: '/reporting' },
     logger: { error: jest.fn() }
   }
 
@@ -53,9 +74,26 @@ test('not logged in', async () => {
     assetPath: '/public/assets',
     defaultHeaderOptions: {
       homepageUrl: 'https://www.gov.uk',
-      serviceName: 'Border Trade Matching Service',
-      navigation: []
+      serviceName: 'Border Trade Matching Service'
     },
+    navigation: [
+      {
+        href: '/search',
+        text: 'Search',
+        active: false
+      },
+      {
+        href: '/reporting',
+        text: 'Reporting',
+        active: true
+      },
+      {
+        href: '/latest-activity',
+        text: 'Latest activity',
+        active: false
+      }
+    ],
+    accountNavigation: [],
     getAssetPath: expect.any(Function)
   }
 
@@ -68,7 +106,7 @@ test('getAssetPath(): returns hashed path', async () => {
   mockGetUserSession.mockReturnValue(null)
   config.set('assetPath', '/test')
 
-  const { getAssetPath } = await context({})
+  const { getAssetPath } = await context({ url: {} })
 
   expect(getAssetPath('application.js')).toBe(
     '/test/javascripts/application.HASH.js'
@@ -80,6 +118,7 @@ test('getAssetPath(): logs error for unmapped files', async () => {
   config.set('assetPath', '/test')
 
   const request = {
+    url: {},
     logger: { error: jest.fn() }
   }
 

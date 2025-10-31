@@ -1,8 +1,10 @@
 {% extends "govuk/template.njk" %}
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
 
 {% set containerClasses = "" %}
-
+{% set navClass = "" %}
+{% set navigationRequired = navigationRequired | default(true) %}
 {% block head %}
   {% if cookiePolicy.analytics == 'yes' %}
     {% include "./includes/google-tag-manager-head.njk" %}
@@ -26,6 +28,7 @@
 
 {% if resultsPage %}
   {% set containerClasses = 'btms-width-container--wide' %}
+  {% set navClass = ' btms-service-navigation--wide' %}
   {% set additionalHeaderOptions = additionalHeaderOptions | merge({containerClasses: containerClasses}) %}
 {% endif %}
 
@@ -37,11 +40,24 @@
   {% endif %}
 {% endblock %}
 
+{% set accountNavigationSlot %}
+{% include './includes/account-navigation.njk' %}
+{% endset %}
+
 {% block header %}
   {% if currentUrl != "/cookies" and(cookiePolicy == null or showCookieConfirmationBanner)and hideCookieBanner != true %}
     {% include "./includes/cookie-banner.njk" %}
   {% endif %}
   {{ govukHeader(headerOptions) }}
+  {% if navigationRequired and isAuthenticated %}
+    {{ govukServiceNavigation({
+      classes: 'btms-service-navigation' ~ navClass,
+      navigation: navigation,
+      slots: {
+        end: accountNavigationSlot
+      }
+    }) }}
+  {% endif %}
 {% endblock %}
 
 {% block pageTitle %}
@@ -50,7 +66,6 @@
 
 {% block main %}
   <main role="main" id="main-content">
-    {% block backLink %}{% endblock %}
     <div class="{{ wrapperClass }}">
       <div class="govuk-width-container {{ containerClasses }}">
         {% block content %}{% endblock %}
@@ -63,20 +78,13 @@
   {% set items = [{
     href: "https://www.gov.uk/help/privacy-notice",
     text: "Privacy"
-  }]%}
-  {% if isAuthenticated %}
-    {% set items = items.concat([{
-      href: "/reporting",
-      text: "BTMS reporting data"
-    }])%}
-  {% endif %}
-  {% set items = items.concat([{
+  }, {
     href: "/cookies",
     text: "Cookies"
   }, {
     href: "/accessibility-statement",
     text: "Accessibility statement"
-  }])%}
+  }] %}
   {{
     govukFooter({
       containerClasses: containerClasses,
