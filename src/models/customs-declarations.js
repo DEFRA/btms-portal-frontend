@@ -400,8 +400,8 @@ export const mapGmrCustomsDeclarations = ({
     return {
       isKnownMrn,
       mrn: gmrCustomsDeclaration.id,
-      cdsStatus: cdsStatus,
-      btmsDecision: btmsDecision,
+      cdsStatus,
+      btmsDecision,
       finalState: customsDeclaration?.finalisation?.finalState
     }
   })
