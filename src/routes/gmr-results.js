@@ -2,22 +2,22 @@ import joi from 'joi'
 import { CACHE_CONTROL_NO_STORE, paths } from './route-constants.js'
 import { searchPatterns } from '../services/search-patterns.js'
 import { getRelatedImportDeclarations } from '../services/related-import-declarations.js'
-import { mapCustomsDeclarations } from '../models/customs-declarations.js'
-import { mapPreNotifications } from '../models/pre-notifications.js'
+import { mapVehicleDetails } from '../models/vehicle-details.js'
+import { mapGmrCustomsDeclarations } from '../models/customs-declarations.js'
 import { metricsCounter } from '../utils/metrics.js'
 
-export const searchResult = {
+export const gmrResults = {
   method: 'get',
-  path: paths.SEARCH_RESULT,
+  path: paths.GMR_RESULTS,
   options: {
     auth: 'session',
     cache: CACHE_CONTROL_NO_STORE,
     validate: {
       query: joi
-        .object({
-          searchTerm: joi.string().required()
-        })
-        .unknown(),
+      .object({
+        searchTerm: joi.string().required()
+      })
+      .unknown(),
       failAction: async (request, h, error) => {
         request.logger.setBindings({ error })
         request.yar.flash('searchError', {
@@ -33,7 +33,7 @@ export const searchResult = {
         method: (request, h) => {
           const value = request.query.searchTerm.trim().toUpperCase()
           const match = searchPatterns.find(({ key, pattern }) =>
-            key !== 'gmrId' && pattern.test(value)
+            key === 'gmrId' && pattern.test(value)
           )
 
           if (!match) {
@@ -56,10 +56,7 @@ export const searchResult = {
       const searchTerm = request.query.searchTerm.trim()
       const data = await getRelatedImportDeclarations(request)
 
-      if (
-        data.customsDeclarations.length === 0 &&
-        data.importPreNotifications.length === 0
-      ) {
+      if (data.goodsVehicleMovements.length === 0) {
         request.yar.flash('searchError', {
           searchTerm,
           isValid: false,
@@ -69,17 +66,16 @@ export const searchResult = {
         return h.redirect(paths.SEARCH).takeover()
       }
 
-      const customsDeclarations = mapCustomsDeclarations(data)
-      const preNotifications = mapPreNotifications(data)
+      const vehicleDetails = mapVehicleDetails(data)
+      const linkedCustomsDeclarations = mapGmrCustomsDeclarations(data)
 
       const viewModel = {
-        resultsPage: true,
         searchTerm,
-        customsDeclarations,
-        preNotifications
+        vehicleDetails,
+        linkedCustomsDeclarations
       }
 
-      return h.view('search-result', viewModel)
+      return h.view('gmr-results', viewModel)
     }
   }
 }
