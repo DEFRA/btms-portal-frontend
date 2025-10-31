@@ -1,0 +1,95 @@
+@use "govuk-frontend" as *;
+@use "variables" as *;
+
+.gmr {
+  .govuk-summary-list__key,
+  .govuk-summary-list__value {
+    font-size: 16px;
+  }
+
+  .gmr-number-plate {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid #0b0c0c;
+    border-radius: 4px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.2;
+    white-space: nowrap;
+    width: 100px;
+    text-align: center;
+  }
+
+  .gmr-number-plate__rear {
+    background: #ffdf00;
+    color: #0b0c0c;
+    display: block;
+  }
+
+  .gmr-number-plate__front {
+    background: #ffffff;
+    color: #0b0c0c;
+  }
+
+  .govuk-summary-list__value .gmr-number-plate {
+    margin-top: 0.1rem;
+  }
+
+  .govuk-\!-margin-top-3 {
+    margin-top: 15px;
+  }
+
+  .govuk-table__header,
+  .govuk-table__cell,
+  .govuk-table__caption {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .govuk-tag {
+    font-weight: 700;
+    max-width: none;
+    font-size: 16px;
+    display: inline;
+    white-space: nowrap;
+  }
+
+  [aria-describedby] {
+    cursor: help;
+    position: relative;
+
+    [role="tooltip"] {
+      display: none;
+    }
+
+    &:hover,
+    &:focus {
+      [role="tooltip"] {
+        display: block;
+        position: absolute;
+        left: 0;
+        width: 300px;
+        padding: govuk-spacing(2);
+        color: $govuk-text-colour;
+        background-color: govuk-colour("light-grey");
+        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+        text-decoration: none;
+        z-index: 10000;
+      }
+    }
+  }
+
+  .gmr-mrn__tooltip {
+    font-size: 14px;
+  }
+
+  .gmr-mrn__unknown {
+    color: $govuk-error-colour;
+    text-decoration: underline dashed $govuk-error-colour;
+    text-underline-offset: 4px;
+  }
+}

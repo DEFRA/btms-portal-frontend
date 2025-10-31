@@ -1,0 +1,9 @@
+{% macro gmrMrn(customsDeclaration) %}
+  {% set unknownMrnTooltipText = 'This MRN cannot be found in BTMS. The MRN may not have SPS goods associated with it or HMRC have not sent details of this MRN to BTMS.' %}
+
+  {% if customsDeclaration.isKnownMrn %}
+    <a href="/search-result?searchTerm={{customsDeclaration.mrn}}">{{customsDeclaration.mrn}}</a>
+  {% else %}
+    <div class="tooltiplink gmr-mrn__unknown" aria-describedby="{{customsDeclaration.mrn}}">{{customsDeclaration.mrn}}<div class="gmr-mrn__tooltip" role="tooltip" id="{{customsDeclaration.mrn}}">{{unknownMrnTooltipText}}</div></div>
+  {% endif %}
+{% endmacro %}

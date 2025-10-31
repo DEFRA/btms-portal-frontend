@@ -12,7 +12,8 @@ test.each([
   ['GBCHD2024.5286242', true],
   ['GBCHD2024.528624', false],
   ['GBCHD2024.5286242V', true],
-  ['GBCHD2024.5286242R', true]
+  ['GBCHD2024.5286242R', true],
+  ['GMRA00000AB1', true]
 ])('The search pattern test for %s should equal %s', (search, expected) => {
   const searchPattern = searchPatterns.find(({ pattern }) =>
     pattern.test(search)

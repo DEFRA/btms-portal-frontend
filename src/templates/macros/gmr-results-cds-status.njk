@@ -1,0 +1,10 @@
+{% from "macros/cds-status.njk" import cdsStatus %}
+
+{% macro gmrCdsStatus(customsDeclaration) %}
+  {% if customsDeclaration.isKnownMrn %}
+    {% set cdsStatusClass = cdsStatus(customsDeclaration.finalState) %}
+  {% else %}
+    {% set cdsStatusClass = 'govuk-!-font-weight-bold govuk-tag govuk-tag--grey' %}
+  {% endif %}
+  <span class="{{cdsStatusClass}}">{{customsDeclaration.cdsStatus}}</span>
+{% endmacro %}

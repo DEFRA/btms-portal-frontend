@@ -1,0 +1,63 @@
+{% extends 'layout.njk' %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "macros/vehicle-registration-number.njk" import vehicleRegistrationNumber %}
+{% from "macros/trailer-registration-numbers.njk" import trailerRegistrationNumbers %}
+{% from "macros/gmr-results-mrn.njk" import gmrMrn %}
+{% from "macros/gmr-results-cds-status.njk" import gmrCdsStatus %}
+
+{% set pageTitle = "Showing result for " ~ searchTerm %}
+
+{% set customsDeclarationsRows = [] %}
+{% for linkedCustomsDeclaration in linkedCustomsDeclarations %}
+  {% set customsDeclarationsRows = (customsDeclarationsRows.push([{ html: gmrMrn(linkedCustomsDeclaration) }, { html: gmrCdsStatus(linkedCustomsDeclaration) }, { text: linkedCustomsDeclaration.btmsDecision }]), customsDeclarationsRows) %}
+{% endfor %}
+
+{% block content %}
+  <div class="govuk-grid-row gmr">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l">
+        <span class="govuk-caption-l">Showing result for</span>{{ searchTerm }}
+      </h1>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+          <h2 class="govuk-heading-m">Vehicle details</h2>
+          {{
+            govukSummaryList({
+              rows: [
+                {
+                  key: { text: 'Vehicle Registration Number (VRN)' },
+                  value: { html: vehicleRegistrationNumber(vehicleDetails.vehicleRegistrationNumber) }
+                },
+                {
+                  key: { text: 'Trailer Registration Number (TRN)' },
+                  value: { html: trailerRegistrationNumbers(vehicleDetails.trailerRegistrationNumbers) }
+                }
+              ]
+            })
+          }}
+        </div>
+      </div>
+
+      <h3 class="govuk-heading-m govuk-!-margin-top-3">Linked customs declarations</h3>
+      {{
+        govukTable({
+          caption: 'MRNs linked to this GMR and their CDS status',
+          captionClasses: 'govuk-visually-hidden',
+          head: [
+            {
+              text: 'MRN'
+            },
+            {
+              text: 'CDS status'
+            },
+            {
+              text: 'BTMS decision'
+            }
+          ],
+          rows: customsDeclarationsRows
+        })
+      }}
+    </div>
+  </div>
+{% endblock %}
