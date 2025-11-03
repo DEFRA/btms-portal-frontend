@@ -79,7 +79,7 @@
     "cheerio": "^1.1.2",
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^13.0.1",
-    "eslint": "9.38.0",
+    "eslint": "9.39.0",
     "global-jsdom": "27.0.0",
     "husky": "^9.1.7",
     "jest": "30.2.0",
