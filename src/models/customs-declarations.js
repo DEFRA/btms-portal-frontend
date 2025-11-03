@@ -268,18 +268,13 @@ export const mapCustomsDeclarations = ({
 
 const getBtmsDecision = (clearanceDecision) => {
   for (const decisionCheck of btmsDecisionChecks) {
-    if (decisionCheck.checkType === 'item') {
-      if (clearanceDecision.items.some(item =>
-        item.checks.some(check =>
-          check.decisionCode === decisionCheck.decisionCode && (decisionCheck.checkCode === undefined || check.checkCode === decisionCheck.checkCode)))) {
-        return decisionCheck.decision
-      }
+    if (decisionCheck.checkType === 'item' && clearanceDecision.items.some(item => item.checks.some(itemCheck =>
+        itemCheck.decisionCode === decisionCheck.decisionCode && (decisionCheck.checkCode === undefined || itemCheck.checkCode === decisionCheck.checkCode)))) {
+      return decisionCheck.decision
     }
 
-    if (decisionCheck.checkType === 'result') {
-      if (clearanceDecision.results.some(result => result.internalDecisionCode === decisionCheck.decisionCode)) {
-        return decisionCheck.decision
-      }
+    if (decisionCheck.checkType === 'result' && clearanceDecision.results.some(result => result.internalDecisionCode === decisionCheck.decisionCode)) {
+      return decisionCheck.decision
     }
   }
 

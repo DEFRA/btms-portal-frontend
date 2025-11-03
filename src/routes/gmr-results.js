@@ -1,81 +1,31 @@
-import joi from 'joi'
-import { CACHE_CONTROL_NO_STORE, paths } from './route-constants.js'
-import { searchPatterns } from '../services/search-patterns.js'
+import { paths } from './route-constants.js'
+import { results } from './results.js'
 import { getRelatedImportDeclarations } from '../services/related-import-declarations.js'
 import { mapVehicleDetails } from '../models/vehicle-details.js'
 import { mapGmrCustomsDeclarations } from '../models/customs-declarations.js'
-import { metricsCounter } from '../utils/metrics.js'
 
-export const gmrResults = {
-  method: 'get',
-  path: paths.GMR_RESULTS,
-  options: {
-    auth: 'session',
-    cache: CACHE_CONTROL_NO_STORE,
-    validate: {
-      query: joi
-      .object({
-        searchTerm: joi.string().required()
-      })
-      .unknown(),
-      failAction: async (request, h, error) => {
-        request.logger.setBindings({ error })
-        request.yar.flash('searchError', {
-          searchTerm: '',
-          isValid: false,
-          errorCode: 'SEARCH_TERM_REQUIRED'
-        })
-        return h.redirect(paths.SEARCH).takeover()
-      }
-    },
-    pre: [
-      {
-        method: (request, h) => {
-          const value = request.query.searchTerm.trim().toUpperCase()
-          const match = searchPatterns.find(({ key, pattern }) =>
-            key === 'gmrId' && pattern.test(value)
-          )
+export const gmrResults = results(true, paths.GMR_RESULTS, async (request, h) => {
+  const searchTerm = request.query.searchTerm.trim()
+  const data = await getRelatedImportDeclarations(request)
 
-          if (!match) {
-            request.yar.flash('searchError', {
-              searchTerm: request.orig.query.searchTerm,
-              isValid: false,
-              errorCode: 'SEARCH_TERM_INVALID'
-            })
+  if (data.goodsVehicleMovements.length === 0) {
+    request.yar.flash('searchError', {
+      searchTerm,
+      isValid: false,
+      errorCode: 'SEARCH_TERM_NOT_FOUND'
+    })
 
-            return h.redirect(paths.SEARCH).takeover()
-          }
-
-          metricsCounter(`search.${match.key}`)
-          return { [match.key]: value }
-        },
-        assign: 'searchQuery'
-      }
-    ],
-    handler: async (request, h) => {
-      const searchTerm = request.query.searchTerm.trim()
-      const data = await getRelatedImportDeclarations(request)
-
-      if (data.goodsVehicleMovements.length === 0) {
-        request.yar.flash('searchError', {
-          searchTerm,
-          isValid: false,
-          errorCode: 'SEARCH_TERM_NOT_FOUND'
-        })
-
-        return h.redirect(paths.SEARCH).takeover()
-      }
-
-      const vehicleDetails = mapVehicleDetails(data)
-      const linkedCustomsDeclarations = mapGmrCustomsDeclarations(data)
-
-      const viewModel = {
-        searchTerm,
-        vehicleDetails,
-        linkedCustomsDeclarations
-      }
-
-      return h.view('gmr-results', viewModel)
-    }
+    return h.redirect(paths.SEARCH).takeover()
   }
-}
+
+  const vehicleDetails = mapVehicleDetails(data)
+  const linkedCustomsDeclarations = mapGmrCustomsDeclarations(data)
+
+  const viewModel = {
+    searchTerm,
+    vehicleDetails,
+    linkedCustomsDeclarations
+  }
+
+  return h.view('gmr-results', viewModel)
+})
