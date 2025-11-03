@@ -267,132 +267,64 @@ export const mapCustomsDeclarations = ({
 }
 
 const getBtmsDecision = (clearanceDecision) => {
-  // Order of these checks matter. It returns the 'worst' case of all the item decisions first.
-  if (clearanceDecision.items.some(item => item.checks.some(check => check.decisionCode === 'E03'))) {
-    return 'Data Error - Unexpected data - transit, transhipment or specific warehouse'
-  }
+  for (const decisionCheck of btmsDecisionChecks) {
+    if (decisionCheck.checkType === 'item') {
+      if (clearanceDecision.items.some(item =>
+        item.checks.some(check =>
+          check.decisionCode === decisionCheck.decisionCode && (decisionCheck.checkCode === undefined || check.checkCode === decisionCheck.checkCode)))) {
+        return decisionCheck.decision
+      }
+    }
 
-  if (clearanceDecision.items.some(item => item.checks.some(check => check.decisionCode === 'N01'))) {
-    return 'Refuse - Not acceptable'
-  }
-
-  if (clearanceDecision.items.some(item => item.checks.some(check => check.decisionCode === 'N02'))) {
-    return 'Refuse - Destroy'
-  }
-
-  if (clearanceDecision.items.some(item => item.checks.some(check => check.decisionCode === 'N03'))) {
-    return 'Refuse - Transform'
-  }
-
-  if (clearanceDecision.items.some(item => item.checks.some(check => check.decisionCode === 'N04'))) {
-    return 'Refuse - Re-export or re-dispatch'
-  }
-
-  if (clearanceDecision.items.some(item => item.checks.some(check => check.decisionCode === 'N05'))) {
-    return 'Refuse - Use for other purposes'
-  }
-
-  if (clearanceDecision.items.some(item => item.checks.some(check => check.decisionCode === 'N06'))) {
-    return 'Refuse - Refused'
-  }
-
-  if (clearanceDecision.items.some(item => item.checks.some(check => check.decisionCode === 'N07'))) {
-    return 'Refuse - Not acceptable'
-  }
-
-  if (clearanceDecision.items.some(item => item.checks.some(check => check.decisionCode === 'X00' && check.checkCode === 'H224'))) {
-    return 'Refuse - IUU not compliant'
-  }
-
-  if (clearanceDecision.results.some(result => result.internalDecisionCode === 'E70')) {
-    return 'No match - CHED cannot be found'
-  }
-
-  if (clearanceDecision.results.some(result => result.internalDecisionCode === 'E71')) {
-    return 'No match - CHED cancelled'
-  }
-
-  if (clearanceDecision.results.some(result => result.internalDecisionCode === 'E72')) {
-    return 'No match - CHED replaced'
-  }
-
-  if (clearanceDecision.results.some(result => result.internalDecisionCode === 'E73')) {
-    return 'No match - CHED deleted'
-  }
-
-  if (clearanceDecision.results.some(result => result.internalDecisionCode === 'E75')) {
-    return 'No match - Split consignment'
-  }
-
-  if (clearanceDecision.results.some(result => result.internalDecisionCode === 'E87')) {
-    return 'No match - Selected for HMI GMS inspection'
-  }
-
-  if (clearanceDecision.results.some(result => result.internalDecisionCode === 'E84')) {
-    return 'No match - Incorrect CHED type'
-  }
-
-  if (clearanceDecision.results.some(result => result.internalDecisionCode === 'E99')) {
-    return 'No match - Unknown error'
-  }
-
-  if (clearanceDecision.items.some(item => item.checks.some(check => check.decisionCode === 'H01'))) {
-    return 'Hold - Decision not given'
-  }
-
-  if (clearanceDecision.items.some(item => item.checks.some(check => check.decisionCode === 'H02'))) {
-    return 'Hold - To be inspected'
-  }
-
-  if (clearanceDecision.results.some(result => result.internalDecisionCode === 'E88')) {
-    return 'Hold - Awaiting IPAFFS update'
-  }
-
-  if (clearanceDecision.results.some(result => result.internalDecisionCode === 'E74')) {
-    return 'Hold - Partially rejected'
-  }
-
-  if (clearanceDecision.results.some(result => result.internalDecisionCode === 'E85')) {
-    return 'Hold - PHSI decision not provided'
-  }
-
-  if (clearanceDecision.results.some(result => result.internalDecisionCode === 'E86')) {
-    return 'Hold - HMI decision not provided'
-  }
-
-  if (clearanceDecision.items.some(item => item.checks.some(check => check.decisionCode === 'C02'))) {
-    return 'Release - No inspection required'
-  }
-
-  if (clearanceDecision.items.some(item => item.checks.some(check => check.decisionCode === 'C03'))) {
-    return 'Release - Inspection complete'
-  }
-
-  if (clearanceDecision.items.some(item => item.checks.some(check => check.decisionCode === 'C05'))) {
-    return 'Release - Inspection complete temporary admission'
-  }
-
-  if (clearanceDecision.items.some(item => item.checks.some(check => check.decisionCode === 'C06'))) {
-    return 'Release - Inspection complete T5 procedure'
-  }
-
-  if (clearanceDecision.items.some(item => item.checks.some(check => check.decisionCode === 'C07'))) {
-    return 'Release - IUU inspection complete'
-  }
-
-  if (clearanceDecision.items.some(item => item.checks.some(check => check.decisionCode === 'C08'))) {
-    return 'Release - IUU inspection not applicable'
+    if (decisionCheck.checkType === 'result') {
+      if (clearanceDecision.results.some(result => result.internalDecisionCode === decisionCheck.decisionCode)) {
+        return decisionCheck.decision
+      }
+    }
   }
 
   return ''
 }
+
+// Order of these checks matter. It returns the 'worst' case of all the item decisions first.
+const btmsDecisionChecks = [
+  { checkType: 'item', decisionCode: 'E03', decision: 'Data Error - Unexpected data - transit, transhipment or specific warehouse' },
+  { checkType: 'item', decisionCode: 'N01', decision: 'Refuse - Not acceptable' },
+  { checkType: 'item', decisionCode: 'N02', decision: 'Refuse - Destroy' },
+  { checkType: 'item', decisionCode: 'N03', decision: 'Refuse - Transform' },
+  { checkType: 'item', decisionCode: 'N04', decision: 'Refuse - Re-export or re-dispatch' },
+  { checkType: 'item', decisionCode: 'N05', decision: 'Refuse - Use for other purposes' },
+  { checkType: 'item', decisionCode: 'N06', decision: 'Refuse - Refused' },
+  { checkType: 'item', decisionCode: 'N07', decision: 'Refuse - Not acceptable' },
+  { checkType: 'item', decisionCode: 'X00', checkCode: 'H224', decision: 'Refuse - IUU not compliant' },
+  { checkType: 'result', decisionCode: 'E70', decision: 'No match - CHED cannot be found' },
+  { checkType: 'result', decisionCode: 'E71', decision: 'No match - CHED cancelled' },
+  { checkType: 'result', decisionCode: 'E72', decision: 'No match - CHED replaced' },
+  { checkType: 'result', decisionCode: 'E73', decision: 'No match - CHED deleted' },
+  { checkType: 'result', decisionCode: 'E75', decision: 'No match - Split consignment' },
+  { checkType: 'result', decisionCode: 'E87', decision: 'No match - Selected for HMI GMS inspection' },
+  { checkType: 'result', decisionCode: 'E84', decision: 'No match - Incorrect CHED type' },
+  { checkType: 'result', decisionCode: 'E99', decision: 'No match - Unknown error' },
+  { checkType: 'item', decisionCode: 'H01', decision: 'Hold - Decision not given' },
+  { checkType: 'item', decisionCode: 'H02', decision: 'Hold - To be inspected' },
+  { checkType: 'result', decisionCode: 'E88', decision: 'Hold - Awaiting IPAFFS update' },
+  { checkType: 'result', decisionCode: 'E74', decision: 'Hold - Partially rejected' },
+  { checkType: 'result', decisionCode: 'E85', decision: 'Hold - PHSI decision not provided' },
+  { checkType: 'result', decisionCode: 'E86', decision: 'Hold - HMI decision not provided' },
+  { checkType: 'item', decisionCode: 'C02', decision: 'Release - No inspection required' },
+  { checkType: 'item', decisionCode: 'C03', decision: 'Release - Inspection complete' },
+  { checkType: 'item', decisionCode: 'C05', decision: 'Release - Inspection complete temporary admission' },
+  { checkType: 'item', decisionCode: 'C06', decision: 'Release - Inspection complete T5 procedure' },
+  { checkType: 'item', decisionCode: 'C07', decision: 'Release - IUU inspection complete' },
+  { checkType: 'item', decisionCode: 'C08', decision: 'Release - IUU inspection not applicable' }
+]
 
 export const mapGmrCustomsDeclarations = ({
   customsDeclarations,
   goodsVehicleMovements
 }) => {
   return goodsVehicleMovements[0]?.gmr?.declarations.customs.map((gmrCustomsDeclaration) => {
-    const customsDeclaration = customsDeclarations.find(customsDeclaration => customsDeclaration.movementReferenceNumber?.toLowerCase() === gmrCustomsDeclaration.id?.toLowerCase())
+    const customsDeclaration = customsDeclarations.find(declaration => declaration.movementReferenceNumber?.toLowerCase() === gmrCustomsDeclaration.id?.toLowerCase())
     const isKnownMrn = customsDeclaration !== undefined
     const cdsStatus = isKnownMrn ? getCustomsDeclarationStatus(customsDeclaration.finalisation, customsDeclaration.clearanceDecision) : 'Unknown'
     const btmsDecision = isKnownMrn ? getBtmsDecision(customsDeclaration?.clearanceDecision) : 'Unknown'
