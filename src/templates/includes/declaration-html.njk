@@ -28,7 +28,7 @@
           {{ documentReference(decision) }}
           <td class="govuk-table__cell">{{ decisionMatch(decision.match) }}</td>
           <td class="govuk-table__cell">
-            {{ decision.departmentCode }}
+            {{ decision.departmentCode }}{{ decision.departmentCodeDetail }}
           </td>
           <td class="govuk-table__cell">
             {% if decision.decision %}

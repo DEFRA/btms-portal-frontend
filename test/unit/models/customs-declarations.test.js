@@ -94,7 +94,8 @@ test('MRN, open, finalised, using netMass, matched', () => {
               decisionDetail: 'Inspection complete',
               decisionReason: null,
               checkCode: 'H223',
-              departmentCode: 'FNAO'
+              departmentCode: 'FNAO',
+              departmentCodeDetail: ''
             },
             {
               id: expect.any(String),
@@ -104,7 +105,8 @@ test('MRN, open, finalised, using netMass, matched', () => {
               decision: 'Release',
               decisionDetail: 'IUU inspection complete',
               decisionReason: 'IUU Compliant',
-              departmentCode: 'IUU'
+              departmentCode: 'IUU',
+              departmentCodeDetail: ''
             }
           ],
           documents: [
@@ -226,7 +228,8 @@ test('a split consignment with a matching document', () => {
               decision: 'Release',
               decisionDetail: 'Inspection complete',
               decisionReason: 'reasons',
-              departmentCode: 'APHA'
+              departmentCode: 'APHA',
+              departmentCodeDetail: ''
             }
           ],
           documents: [
@@ -350,7 +353,8 @@ test('a split consignment without a matching document', () => {
               decision: '',
               decisionDetail: 'No match - CHED cannot be found',
               decisionReason: 'CHED mismatch',
-              departmentCode: 'APHA'
+              departmentCode: 'APHA',
+              departmentCodeDetail: ''
             }
           ],
           documents: [
@@ -438,7 +442,8 @@ test('an MRN, with no CHED, with no documents', () => {
               decision: '',
               decisionDetail: 'No match - CHED cannot be found',
               decisionReason: 'reasons',
-              departmentCode: 'HMI'
+              departmentCode: 'HMI',
+              departmentCodeDetail: ' - GMS'
             }
           ],
           checks: [{ checkCode: 'H220' }],
@@ -606,7 +611,8 @@ test('matches malformed references', () => {
               decision: 'Release',
               decisionDetail: 'Inspection complete',
               decisionReason: 'LGTM',
-              departmentCode: 'FNAO'
+              departmentCode: 'FNAO',
+              departmentCodeDetail: ''
             }
           ],
           checks: [{ checkCode: 'H223' }],
@@ -770,6 +776,7 @@ test.each([
                 decisionReason: null,
                 checkCode: 'H219',
                 departmentCode: 'PHSI',
+                departmentCodeDetail: '',
                 documentReference: documentReference || 'GBCHD2025.9710001',
                 id: expect.any(String),
                 match: false
@@ -1204,7 +1211,8 @@ test.each([
                 decision: options.chedDecision,
                 decisionDetail: options.chedDecisionDetail,
                 decisionReason: 'LGTM',
-                departmentCode: 'POAO'
+                departmentCode: 'POAO',
+                departmentCodeDetail: ''
               },
               {
                 id: expect.any(String),
@@ -1214,7 +1222,8 @@ test.each([
                 decision: options.iuuDecision,
                 decisionDetail: options.iuuDecisionDetail,
                 decisionReason: 'LGTM',
-                departmentCode: 'IUU'
+                departmentCode: 'IUU',
+                departmentCodeDetail: ''
               }
             ],
             documents: [
@@ -1477,4 +1486,121 @@ test.each([
   const result = mapCustomsDeclarations(data)
 
   expect(result[0].status).toEqual(options.expectedStatus)
+})
+
+test('an MRN, with HMI authorities', () => {
+  const data = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: 'GB251234567890ABCD',
+        clearanceRequest: {
+          declarationUcr: '5GB123456789000-BDOV123456',
+          commodities: [
+            {
+              itemNumber: 1,
+              netMass: '9999',
+              checks: [
+                {
+                  checkCode: 'H218'
+                }
+              ],
+              documents: null
+            },
+            {
+              itemNumber: 2,
+              netMass: '9999',
+              checks: [
+                {
+                  checkCode: 'H220'
+                }
+              ],
+              documents: null
+            }
+          ]
+        },
+        clearanceDecision: {
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: 'H218',
+              documentReference: null,
+              decisionCode: 'X00',
+              decisionReason: 'reasons',
+              internalDecisionCode: 'E70'
+            },
+            {
+              itemNumber: 2,
+              checkCode: 'H220',
+              documentReference: null,
+              decisionCode: 'X00',
+              decisionReason: 'reasons',
+              internalDecisionCode: 'E70'
+            }
+          ]
+        },
+        finalisation: null,
+        updated: '2025-05-12T11:13:17.330Z'
+      }
+    ],
+    importPreNotifications: []
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  const expected = [
+    {
+      commodities: [
+        {
+          id: expect.any(String),
+          decisions: [
+            {
+              id: expect.any(String),
+              documentReference: null,
+              match: false,
+              checkCode: 'H218',
+              decision: '',
+              decisionDetail: 'No match - CHED cannot be found',
+              decisionReason: 'reasons',
+              departmentCode: 'HMI',
+              departmentCodeDetail: ' - SMS'
+            }
+          ],
+          checks: [{ checkCode: 'H218' }],
+          documents: null,
+          itemNumber: 1,
+          netMass: '9999',
+          weightOrQuantity: 9999
+        },
+        {
+          id: expect.any(String),
+          decisions: [
+            {
+              id: expect.any(String),
+              documentReference: null,
+              match: false,
+              checkCode: 'H220',
+              decision: '',
+              decisionDetail: 'No match - CHED cannot be found',
+              decisionReason: 'reasons',
+              departmentCode: 'HMI',
+              departmentCodeDetail: ' - GMS'
+            }
+          ],
+          checks: [{ checkCode: 'H220' }],
+          documents: null,
+          itemNumber: 2,
+          netMass: '9999',
+          weightOrQuantity: 9999
+        }
+      ],
+      movementReferenceNumber: 'GB251234567890ABCD',
+      finalState: undefined,
+      declarationUcr: '5GB123456789000-BDOV123456',
+      open: true,
+      status: 'In progress',
+      updated: '12 May 2025, 11:13'
+    }
+  ]
+
+  expect(result).toEqual(expected)
 })

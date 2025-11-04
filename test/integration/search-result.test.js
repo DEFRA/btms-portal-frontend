@@ -196,7 +196,7 @@ test('shows search results', async () => {
 
   expect(
     getByRole(declaration, 'row', {
-      name: '3 1602321990 JBB VIENNESE ROAST 2 KG 87.07 CHEDP.BB.2025.NOMATCH This CHED reference cannot be found on the customs declaration. Please check that the reference is correct. No HMI No match - CHED cannot be found'
+      name: '3 1602321990 JBB VIENNESE ROAST 2 KG 87.07 CHEDP.BB.2025.NOMATCH This CHED reference cannot be found on the customs declaration. Please check that the reference is correct. No HMI - GMS No match - CHED cannot be found'
     })
   ).toBeInTheDocument()
 
@@ -208,7 +208,7 @@ test('shows search results', async () => {
 
   expect(
     getByRole(declaration, 'row', {
-      name: '1 0304719030 FROZEN MSC A COD FILLETS 17088.98 CHEDA.GB.2025.0000001 Yes HMI Release - CHED cancelled'
+      name: '1 0304719030 FROZEN MSC A COD FILLETS 17088.98 CHEDA.GB.2025.0000001 Yes HMI - SMS Release - CHED cancelled'
     })
   ).toBeInTheDocument()
 
@@ -271,7 +271,7 @@ test('results can be filtered', async () => {
   globalJsdom(payload)
 
   const declarationRow1 = getByRole(document.body, 'row', {
-    name: '1 0304719030 FROZEN MSC A COD FILLETS 17088.98 CHEDA.GB.2025.0000001 Yes HMI Release - CHED cancelled'
+    name: '1 0304719030 FROZEN MSC A COD FILLETS 17088.98 CHEDA.GB.2025.0000001 Yes HMI - SMS Release - CHED cancelled'
   })
   const notificationRow1 = getByRole(document.body, 'row', {
     name: '2 0202 Dog Chew 4618.35 POAO Decision not given'
@@ -387,7 +387,7 @@ test('handles H220 1% check', async () => {
   globalJsdom(payload)
 
   const notificationRow = getByRole(document.body, 'row', {
-    name: '1 3120232190 CHICKEN 7000 KG 7000 Requires CHED Needs a CHED No HMI No match - Selected for HMI GMS inspection'
+    name: '1 3120232190 CHICKEN 7000 KG 7000 Requires CHED Needs a CHED No HMI - GMS No match - Selected for HMI GMS inspection'
   })
 
   expect(

@@ -5,6 +5,7 @@ import {
   decisionCodeDescriptions,
   closedChedStatuses,
   checkCodeToAuthorityMapping,
+  checkCodeToAuthorityDetailMapping,
   finalStateMappings,
   hmiGmsInternalDecisionCodes,
   noMatchInternalDecisionCodes,
@@ -214,6 +215,7 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
       ),
       decisionReason: decision.decisionReason,
       departmentCode: checkCodeToAuthorityMapping[decision.checkCode],
+      departmentCodeDetail: checkCodeToAuthorityDetailMapping[decision.checkCode],
       documentReference: isIuuOutcome ? null : getDocumentReference(decision),
       match: isIuuOutcome ? null : isMatch
     }
