@@ -8,7 +8,7 @@ import {
 } from '@testing-library/dom'
 import { initialiseServer } from '../utils/initialise-server.js'
 import { setupAuthedUserSession } from '../unit/utils/session-helper.js'
-import { paths } from '../../src/routes/route-constants.js'
+import { paths, queryStringParams } from '../../src/routes/route-constants.js'
 import { initSearch } from '../../src/client/javascripts/search.js'
 
 test('renders search page', async () => {
@@ -176,4 +176,43 @@ test('redirect non authorised requests', async () => {
   })
 
   expect(statusCode).toBe(302)
+})
+
+test('redirects to GMR results page if valid GMR search term', async () => {
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { statusCode, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH}?${queryStringParams.SEARCH_TERM}=GMRA00000AB1`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(302)
+  expect(headers.location).toBe(`${paths.GMR_RESULTS}?${queryStringParams.SEARCH_TERM}=GMRA00000AB1`)
+})
+
+test.each([
+  '24GB6T3HFCIZV1HAR9',
+  'CHEDP.GB.2025.4433124',
+  'GBCHD2025.4433124',
+  '4GB335031931000-WB2408-27WWL62745'
+])('redirects to search results page if valid non GMR search term', async (searchTerm) => {
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { statusCode, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH}?${queryStringParams.SEARCH_TERM}=${searchTerm}`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(302)
+  expect(headers.location).toBe(`${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${searchTerm}`)
 })
