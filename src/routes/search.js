@@ -16,7 +16,7 @@ export const search = {
         method: (request, h) => {
           const value = request?.query?.searchTerm?.trim().toUpperCase()
           if (value !== undefined) {
-            const match = searchPatterns.find(({ key, pattern }) =>
+            const match = searchPatterns.find(({ pattern }) =>
               pattern.test(value)
             )
 
