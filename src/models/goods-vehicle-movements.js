@@ -14,39 +14,20 @@ const getBtmsDecision = (clearanceDecision) => {
       return true
     }
 
-    return false;
+    return false
   })?.description
 }
 
-export const mapGoodsVehicleMovements = ({
-  customsDeclarations,
-  goodsVehicleMovements
-}) => {
-  const vehicleGoodsMovement = goodsVehicleMovements[0]?.gmr
-
-  if (!vehicleGoodsMovement) {
-    throw boom.badImplementation('Invalid GMR returned')
-  }
-
-  const linkedCustomsDeclarations = mapCustomsDeclarations(customsDeclarations, vehicleGoodsMovement)
-
-  return {
-    vehicleRegistrationNumber: vehicleGoodsMovement.vehicleRegistrationNumber,
-    trailerRegistrationNumbers: vehicleGoodsMovement.trailerRegistrationNums,
-    linkedCustomsDeclarations
-  }
-}
-
-const mapGmrDeclaration = (customsDeclarations, gmrDeclaration) => {
-  const customsDeclaration = customsDeclarations.find(declaration => declaration.movementReferenceNumber?.toLowerCase() === gmrDeclaration.id?.toLowerCase())
+const mapGmrDeclaration = (customsDeclarations, gvmDeclaration) => {
+  const customsDeclaration = customsDeclarations.find(declaration => declaration.movementReferenceNumber?.toLowerCase() === gvmDeclaration.id?.toLowerCase())
   const isKnownMrn = customsDeclaration !== undefined
   const cdsStatus = isKnownMrn ? getCustomsDeclarationStatus(customsDeclaration.finalisation, customsDeclaration.clearanceDecision) : 'Unknown'
   const btmsDecision = isKnownMrn ? getBtmsDecision(customsDeclaration?.clearanceDecision) : 'Unknown'
-  const knownMrnLink = isKnownMrn ? `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${gmrDeclaration.id}` : undefined
+  const knownMrnLink = isKnownMrn ? `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${gvmDeclaration.id}` : undefined
 
   return {
     isKnownMrn,
-    mrn: gmrDeclaration.id,
+    mrn: gvmDeclaration.id,
     knownMrnLink,
     cdsStatus,
     btmsDecision,
@@ -67,4 +48,23 @@ const mapCustomsDeclarations = (
   })
 
   return (gmrCustoms || []).concat(gmrTransits || [])
+}
+
+export const mapGoodsVehicleMovements = ({
+  customsDeclarations,
+  goodsVehicleMovements
+}) => {
+  const vehicleGoodsMovement = goodsVehicleMovements[0]?.gmr
+
+  if (!vehicleGoodsMovement) {
+    throw boom.badImplementation('Invalid GMR returned')
+  }
+
+  const linkedCustomsDeclarations = mapCustomsDeclarations(customsDeclarations, vehicleGoodsMovement)
+
+  return {
+    vehicleRegistrationNumber: vehicleGoodsMovement.vehicleRegistrationNumber,
+    trailerRegistrationNumbers: vehicleGoodsMovement.trailerRegistrationNums,
+    linkedCustomsDeclarations
+  }
 }

@@ -1,6 +1,6 @@
 import { renderTemplate } from './template.test.helper.js'
 
-describe('GMR Results', () => {
+describe('GMR search result', () => {
   let $renderedTemplate
 
   test('Should render page', () => {
