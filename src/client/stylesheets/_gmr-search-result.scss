@@ -1,19 +1,20 @@
 @use "govuk-frontend" as *;
 @use "variables" as *;
 
-.gmr {
+.btms-gmr-search-result {
   .govuk-summary-list__key,
   .govuk-summary-list__value {
-    font-size: 16px;
+    @include govuk-font-size($size: 16);
+    line-height: 1.3158;
   }
 
-  .gmr-number-plate {
+  .vehicle-number-plate {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.4rem;
     padding: 0.25rem 0.6rem;
-    border: 1px solid #0b0c0c;
+    border: 1px solid govuk-colour("black");
     border-radius: 4px;
     font-weight: 700;
     letter-spacing: 0.06em;
@@ -24,36 +25,36 @@
     text-align: center;
   }
 
-  .gmr-number-plate__rear {
+  .vehicle-number-plate--rear {
     background: #ffdf00;
-    color: #0b0c0c;
+    color: govuk-colour("black");
     display: block;
   }
 
-  .gmr-number-plate__front {
-    background: #ffffff;
-    color: #0b0c0c;
+  .vehicle-number-plate--front {
+    background: govuk-colour("white");
+    color: govuk-colour("black");
   }
 
-  .govuk-summary-list__value .gmr-number-plate {
+  .govuk-summary-list__value .vehicle-number-plate {
     margin-top: 0.1rem;
   }
 
-  .govuk-\!-margin-top-3 {
-    margin-top: 15px;
+  h3 {
+    margin-top: govuk-spacing(3)
   }
 
   .govuk-table__header,
   .govuk-table__cell,
   .govuk-table__caption {
-    font-size: 16px;
+    @include govuk-font-size($size: 16);
     line-height: 1.5;
   }
 
   .govuk-tag {
     font-weight: 700;
     max-width: none;
-    font-size: 16px;
+    @include govuk-font-size($size: 16);
     display: inline;
     white-space: nowrap;
   }
@@ -83,11 +84,11 @@
     }
   }
 
-  .gmr-mrn__tooltip {
-    font-size: 14px;
+  .mrn__tooltip {
+    @include govuk-font-size($size: 14);
   }
 
-  .gmr-mrn__unknown {
+  .mrn--unknown {
     color: $govuk-error-colour;
     text-decoration: underline dashed $govuk-error-colour;
     text-underline-offset: 4px;

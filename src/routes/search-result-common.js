@@ -1,12 +1,12 @@
 import joi from 'joi'
-import { CACHE_CONTROL_NO_STORE, paths } from './route-constants.js'
-import { searchKeys, searchPatterns } from '../services/search-patterns.js'
+import { CACHE_CONTROL_NO_STORE, paths, queryStringParams } from './route-constants.js'
+import { searchPatterns } from '../services/search-patterns.js'
 import { metricsCounter } from '../utils/metrics.js'
 
-export const results = (isGmrResults, resultsPath, requestHandler) => {
+export const createRouteConfig = (searchTermValidator, requestPath, requestHandler) => {
   return {
     method: 'get',
-    path: resultsPath,
+    path: requestPath,
     options: {
       auth: 'session',
       cache: CACHE_CONTROL_NO_STORE,
@@ -29,11 +29,8 @@ export const results = (isGmrResults, resultsPath, requestHandler) => {
       pre: [
         {
           method: (request, h) => {
-            const value = request.query.searchTerm.trim().toUpperCase()
-            const match = searchPatterns.find(({ key, pattern }) =>
-              (isGmrResults && key === searchKeys.GMR_ID && pattern.test(value))
-              || (!isGmrResults && key !== searchKeys.GMR_ID && pattern.test(value))
-            )
+            const value = request.query[queryStringParams.SEARCH_TERM].trim().toUpperCase()
+            const match = searchPatterns.find(({ key, pattern }) => searchTermValidator(key, pattern, value))
 
             if (!match) {
               request.yar.flash('searchError', {

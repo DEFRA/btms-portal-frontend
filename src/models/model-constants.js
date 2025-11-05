@@ -132,3 +132,36 @@ export const internalDecisionCodeDescriptions = {
   E88: 'Hold - Awaiting IPAFFS update',
   E99: 'No match - Unknown error'
 }
+
+// Order of these checks matter. It returns the 'worst' case of all the item decisions first.
+export const ORDERED_CLEARANCE_DECISIONS = [
+  { type: 'item', code: 'E03', description: 'Data Error - Unexpected data - transit, transhipment or specific warehouse' },
+  { type: 'item', code: 'N01', description: 'Refuse - Not acceptable' },
+  { type: 'item', code: 'N02', description: 'Refuse - Destroy' },
+  { type: 'item', code: 'N03', description: 'Refuse - Transform' },
+  { type: 'item', code: 'N04', description: 'Refuse - Re-export or re-dispatch' },
+  { type: 'item', code: 'N05', description: 'Refuse - Use for other purposes' },
+  { type: 'item', code: 'N06', description: 'Refuse - Refused' },
+  { type: 'item', code: 'N07', description: 'Refuse - Not acceptable' },
+  { type: 'item', code: 'X00', checkCode: 'H224', description: 'Refuse - IUU not compliant' },
+  { type: 'result', code: 'E70', description: 'No match - CHED cannot be found' },
+  { type: 'result', code: 'E71', description: 'No match - CHED cancelled' },
+  { type: 'result', code: 'E72', description: 'No match - CHED replaced' },
+  { type: 'result', code: 'E73', description: 'No match - CHED deleted' },
+  { type: 'result', code: 'E75', description: 'No match - Split consignment' },
+  { type: 'result', code: 'E87', description: 'No match - Selected for HMI GMS inspection' },
+  { type: 'result', code: 'E84', description: 'No match - Incorrect CHED type' },
+  { type: 'result', code: 'E99', description: 'No match - Unknown error' },
+  { type: 'item', code: 'H01', description: 'Hold - Decision not given' },
+  { type: 'item', code: 'H02', description: 'Hold - To be inspected' },
+  { type: 'result', code: 'E88', description: 'Hold - Awaiting IPAFFS update' },
+  { type: 'result', code: 'E74', description: 'Hold - Partially rejected' },
+  { type: 'result', code: 'E85', description: 'Hold - PHSI decision not provided' },
+  { type: 'result', code: 'E86', description: 'Hold - HMI decision not provided' },
+  { type: 'item', code: 'C02', description: 'Release - No inspection required' },
+  { type: 'item', code: 'C03', description: 'Release - Inspection complete' },
+  { type: 'item', code: 'C05', description: 'Release - Inspection complete temporary admission' },
+  { type: 'item', code: 'C06', description: 'Release - Inspection complete T5 procedure' },
+  { type: 'item', code: 'C07', description: 'Release - IUU inspection complete' },
+  { type: 'item', code: 'C08', description: 'Release - IUU inspection not applicable' }
+]

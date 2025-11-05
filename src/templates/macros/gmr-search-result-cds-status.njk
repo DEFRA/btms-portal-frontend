@@ -1,6 +1,6 @@
 {% from "macros/cds-status.njk" import cdsStatus %}
 
-{% macro gmrCdsStatus(customsDeclaration) %}
+{% macro gmrSearchResultCdsStatus(customsDeclaration) %}
   {% if customsDeclaration.isKnownMrn %}
     {% set cdsStatusClass = cdsStatus(customsDeclaration.finalState) %}
   {% else %}

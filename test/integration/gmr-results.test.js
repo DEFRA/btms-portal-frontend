@@ -68,7 +68,7 @@ test('shows GMR result', async () => {
 
   const { payload, headers } = await server.inject({
     method: 'get',
-    url: `${paths.GMR_RESULTS}?${queryStringParams.SEARCH_TERM}=GMRA00000AB1`,
+    url: `${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=GMRA00000AB1`,
     auth: {
       strategy: 'session',
       credentials
@@ -92,14 +92,14 @@ test('shows GMR result', async () => {
 
   const vehicleRegistrationNumber = getByText(document.body, 'ABC 111')
   expect(vehicleRegistrationNumber).toBeInTheDocument()
-  expect(vehicleRegistrationNumber.className).toEqual('gmr-number-plate gmr-number-plate__front')
+  expect(vehicleRegistrationNumber.className).toEqual('vehicle-number-plate vehicle-number-plate--front')
 
   const trailerRegistrationNumber1 = getByText(document.body, 'ABC 222')
   expect(trailerRegistrationNumber1).toBeInTheDocument()
-  expect(trailerRegistrationNumber1.className).toEqual('gmr-number-plate gmr-number-plate__rear')
+  expect(trailerRegistrationNumber1.className).toEqual('vehicle-number-plate vehicle-number-plate--rear')
   const trailerRegistrationNumber2 = getByText(document.body, 'ABC 333')
   expect(trailerRegistrationNumber2).toBeInTheDocument()
-  expect(trailerRegistrationNumber2.className).toEqual('gmr-number-plate gmr-number-plate__rear')
+  expect(trailerRegistrationNumber2.className).toEqual('vehicle-number-plate vehicle-number-plate--rear')
 
   expect(
     getByRole(document.body, 'link', {
@@ -109,7 +109,7 @@ test('shows GMR result', async () => {
 
   const unknownMrn = getByText(document.body, '25GB00000000000002')
   expect(unknownMrn).toBeInTheDocument()
-  expect(unknownMrn.className).toEqual('tooltiplink gmr-mrn__unknown')
+  expect(unknownMrn.className).toEqual('tooltiplink mrn--unknown')
 
   const knownMrnCdsStatus = getByText(document.body, 'In progress')
   expect(knownMrnCdsStatus).toBeInTheDocument()
@@ -140,7 +140,7 @@ test('redirects to search page if no results', async () => {
 
   const { statusCode, headers } = await server.inject({
     method: 'get',
-    url: `${paths.GMR_RESULTS}?${queryStringParams.SEARCH_TERM}=GMRA00000AB1`,
+    url: `${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=GMRA00000AB1`,
     auth: {
       strategy: 'session',
       credentials
@@ -161,7 +161,7 @@ test('redirects to search page for missing search', async () => {
 
   const { statusCode, headers } = await server.inject({
     method: 'get',
-    url: `${paths.GMR_RESULTS}?${queryStringParams.SEARCH_TERM}=`,
+    url: `${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=`,
     auth: {
       strategy: 'session',
       credentials
@@ -182,7 +182,7 @@ test('redirects to search page for incorrect search', async () => {
 
   const { statusCode, headers } = await server.inject({
     method: 'get',
-    url: `${paths.GMR_RESULTS}?${queryStringParams.SEARCH_TERM}=NOT_SEARCHABLE`,
+    url: `${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=NOT_SEARCHABLE`,
     auth: {
       strategy: 'session',
       credentials
@@ -202,7 +202,7 @@ test('redirect non authorised requests', async () => {
 
   const { statusCode } = await server.inject({
     method: 'get',
-    url: `${paths.GMR_RESULTS}?${queryStringParams.SEARCH_TERM}=GMRA00000AB1`
+    url: `${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=GMRA00000AB1`
   })
 
   expect(statusCode).toBe(302)
@@ -219,7 +219,7 @@ test('handles upstream errors', async () => {
 
   const { statusCode, payload } = await server.inject({
     method: 'get',
-    url: `${paths.GMR_RESULTS}?${queryStringParams.SEARCH_TERM}=GMRA00000AB1`,
+    url: `${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=GMRA00000AB1`,
     auth: {
       strategy: 'session',
       credentials
@@ -247,7 +247,7 @@ test('redirects to search page if not GMR search term', async () => {
 
   const { statusCode, headers } = await server.inject({
     method: 'get',
-    url: `${paths.GMR_RESULTS}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73Y`,
+    url: `${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73Y`,
     auth: {
       strategy: 'session',
       credentials

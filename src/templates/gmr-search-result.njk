@@ -1,20 +1,20 @@
 {% extends 'layout.njk' %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
-{% from "macros/vehicle-registration-number.njk" import vehicleRegistrationNumber %}
-{% from "macros/trailer-registration-numbers.njk" import trailerRegistrationNumbers %}
-{% from "macros/gmr-results-mrn.njk" import gmrMrn %}
-{% from "macros/gmr-results-cds-status.njk" import gmrCdsStatus %}
+{% from "macros/vehicle-number-plate.njk" import vehicleNumberPlate %}
+{% from "macros/trailer-number-plates.njk" import trailerNumberPlates %}
+{% from "macros/gmr-search-result-mrn.njk" import gmrSearchResultMrn %}
+{% from "macros/gmr-search-result-cds-status.njk" import gmrSearchResultCdsStatus %}
 
 {% set pageTitle = "Showing result for " ~ searchTerm %}
 
 {% set customsDeclarationsRows = [] %}
-{% for linkedCustomsDeclaration in linkedCustomsDeclarations %}
-  {% set customsDeclarationsRows = (customsDeclarationsRows.push([{ html: gmrMrn(linkedCustomsDeclaration) }, { html: gmrCdsStatus(linkedCustomsDeclaration) }, { text: linkedCustomsDeclaration.btmsDecision }]), customsDeclarationsRows) %}
+{% for linkedCustomsDeclaration in goodsVehicleMovement.linkedCustomsDeclarations %}
+  {% set customsDeclarationsRows = (customsDeclarationsRows.push([{ html: gmrSearchResultMrn(linkedCustomsDeclaration) }, { html: gmrSearchResultCdsStatus(linkedCustomsDeclaration) }, { text: linkedCustomsDeclaration.btmsDecision }]), customsDeclarationsRows) %}
 {% endfor %}
 
 {% block content %}
-  <div class="govuk-grid-row gmr">
+  <div class="govuk-grid-row btms-gmr-search-result">
     <div class="govuk-grid-column-full">
       <h1 class="govuk-heading-l">
         <span class="govuk-caption-l">Showing result for</span>{{ searchTerm }}
@@ -27,11 +27,11 @@
               rows: [
                 {
                   key: { text: 'Vehicle Registration Number (VRN)' },
-                  value: { html: vehicleRegistrationNumber(vehicleDetails.vehicleRegistrationNumber) }
+                  value: { html: vehicleNumberPlate(goodsVehicleMovement.vehicleRegistrationNumber) }
                 },
                 {
                   key: { text: 'Trailer Registration Number (TRN)' },
-                  value: { html: trailerRegistrationNumbers(vehicleDetails.trailerRegistrationNumbers) }
+                  value: { html: trailerNumberPlates(goodsVehicleMovement.trailerRegistrationNumbers) }
                 }
               ]
             })
@@ -39,7 +39,7 @@
         </div>
       </div>
 
-      <h3 class="govuk-heading-m govuk-!-margin-top-3">Linked customs declarations</h3>
+      <h3 class="govuk-heading-m">Linked customs declarations</h3>
       {{
         govukTable({
           caption: 'MRNs linked to this GMR and their CDS status',

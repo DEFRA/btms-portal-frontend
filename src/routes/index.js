@@ -14,7 +14,7 @@ import { signOut } from './sign-out.js'
 import { signedOut } from './signed-out.js'
 import { search } from './search.js'
 import { searchResult } from './search-result.js'
-import { gmrResults } from './gmr-results.js'
+import { gmrSearchResult } from './gmr-search-result.js'
 import { chromeDevtools } from './chrome-devtools.js'
 import { cookiesGet, cookiesPost } from './cookies.js'
 
@@ -37,6 +37,6 @@ export default [
   signOut,
   search,
   searchResult,
-  gmrResults,
+  gmrSearchResult,
   ...staticAssetRoutes
 ]

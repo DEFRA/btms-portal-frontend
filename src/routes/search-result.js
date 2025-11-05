@@ -1,16 +1,21 @@
-import { paths } from './route-constants.js'
+import { paths, queryStringParams } from './route-constants.js'
 import { getRelatedImportDeclarations } from '../services/related-import-declarations.js'
 import { mapCustomsDeclarations } from '../models/customs-declarations.js'
 import { mapPreNotifications } from '../models/pre-notifications.js'
-import { results } from './results.js'
+import { createRouteConfig } from './search-result-common.js'
+import { searchKeys } from '../services/search-patterns.js'
 
-export const searchResult = results(false, paths.SEARCH_RESULT, async (request, h) => {
-  const searchTerm = request.query.searchTerm.trim()
-  const data = await getRelatedImportDeclarations(request)
+const searchTermValidator = (key, pattern, value) => {
+  return key !== searchKeys.GMR_ID && pattern.test(value)
+}
+
+export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_RESULT, async (request, h) => {
+  const searchTerm = request.query[queryStringParams.SEARCH_TERM].trim()
+  const searchResults = await getRelatedImportDeclarations(request)
 
   if (
-    data.customsDeclarations.length === 0 &&
-    data.importPreNotifications.length === 0
+    searchResults.customsDeclarations.length === 0 &&
+    searchResults.importPreNotifications.length === 0
   ) {
     request.yar.flash('searchError', {
       searchTerm,
@@ -21,8 +26,8 @@ export const searchResult = results(false, paths.SEARCH_RESULT, async (request, 
     return h.redirect(paths.SEARCH).takeover()
   }
 
-  const customsDeclarations = mapCustomsDeclarations(data)
-  const preNotifications = mapPreNotifications(data)
+  const customsDeclarations = mapCustomsDeclarations(searchResults)
+  const preNotifications = mapPreNotifications(searchResults)
 
   const viewModel = {
     resultsPage: true,
