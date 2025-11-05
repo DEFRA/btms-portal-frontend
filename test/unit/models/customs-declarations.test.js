@@ -94,8 +94,10 @@ test('MRN, open, finalised, using netMass, matched', () => {
               decisionDetail: 'Inspection complete',
               decisionReason: null,
               checkCode: 'H223',
-              departmentCode: 'FNAO',
-              departmentCodeDetail: ''
+              authority: {
+                text: 'FNAO',
+                value: 'FNAO'
+              }
             },
             {
               id: expect.any(String),
@@ -105,8 +107,10 @@ test('MRN, open, finalised, using netMass, matched', () => {
               decision: 'Release',
               decisionDetail: 'IUU inspection complete',
               decisionReason: 'IUU Compliant',
-              departmentCode: 'IUU',
-              departmentCodeDetail: ''
+              authority: {
+                text: 'IUU',
+                value: 'IUU'
+              }
             }
           ],
           documents: [
@@ -228,8 +232,10 @@ test('a split consignment with a matching document', () => {
               decision: 'Release',
               decisionDetail: 'Inspection complete',
               decisionReason: 'reasons',
-              departmentCode: 'APHA',
-              departmentCodeDetail: ''
+              authority: {
+                text: 'APHA',
+                value: 'APHA'
+              }
             }
           ],
           documents: [
@@ -353,8 +359,10 @@ test('a split consignment without a matching document', () => {
               decision: '',
               decisionDetail: 'No match - CHED cannot be found',
               decisionReason: 'CHED mismatch',
-              departmentCode: 'APHA',
-              departmentCodeDetail: ''
+              authority: {
+                text: 'APHA',
+                value: 'APHA'
+              }
             }
           ],
           documents: [
@@ -442,8 +450,10 @@ test('an MRN, with no CHED, with no documents', () => {
               decision: '',
               decisionDetail: 'No match - CHED cannot be found',
               decisionReason: 'reasons',
-              departmentCode: 'HMI',
-              departmentCodeDetail: ' - GMS'
+              authority: {
+                text: 'HMI - GMS',
+                value: 'HMI'
+              }
             }
           ],
           checks: [{ checkCode: 'H220' }],
@@ -611,8 +621,10 @@ test('matches malformed references', () => {
               decision: 'Release',
               decisionDetail: 'Inspection complete',
               decisionReason: 'LGTM',
-              departmentCode: 'FNAO',
-              departmentCodeDetail: ''
+              authority: {
+                text: 'FNAO',
+                value: 'FNAO'
+              }
             }
           ],
           checks: [{ checkCode: 'H223' }],
@@ -775,8 +787,10 @@ test.each([
                 decisionDetail,
                 decisionReason: null,
                 checkCode: 'H219',
-                departmentCode: 'PHSI',
-                departmentCodeDetail: '',
+                authority: {
+                  text: 'PHSI',
+                  value: 'PHSI'
+                },
                 documentReference: documentReference || 'GBCHD2025.9710001',
                 id: expect.any(String),
                 match: false
@@ -1211,8 +1225,10 @@ test.each([
                 decision: options.chedDecision,
                 decisionDetail: options.chedDecisionDetail,
                 decisionReason: 'LGTM',
-                departmentCode: 'POAO',
-                departmentCodeDetail: ''
+                authority: {
+                  text: 'POAO',
+                  value: 'POAO'
+                }
               },
               {
                 id: expect.any(String),
@@ -1222,8 +1238,10 @@ test.each([
                 decision: options.iuuDecision,
                 decisionDetail: options.iuuDecisionDetail,
                 decisionReason: 'LGTM',
-                departmentCode: 'IUU',
-                departmentCodeDetail: ''
+                authority: {
+                  text: 'IUU',
+                  value: 'IUU'
+                }
               }
             ],
             documents: [
@@ -1561,8 +1579,10 @@ test('an MRN, with HMI authorities', () => {
               decision: '',
               decisionDetail: 'No match - CHED cannot be found',
               decisionReason: 'reasons',
-              departmentCode: 'HMI',
-              departmentCodeDetail: ' - SMS'
+              authority: {
+                text: 'HMI - SMS',
+                value: 'HMI'
+              }
             }
           ],
           checks: [{ checkCode: 'H218' }],
@@ -1582,8 +1602,10 @@ test('an MRN, with HMI authorities', () => {
               decision: '',
               decisionDetail: 'No match - CHED cannot be found',
               decisionReason: 'reasons',
-              departmentCode: 'HMI',
-              departmentCodeDetail: ' - GMS'
+              authority: {
+                text: 'HMI - GMS',
+                value: 'HMI'
+              }
             }
           ],
           checks: [{ checkCode: 'H220' }],
