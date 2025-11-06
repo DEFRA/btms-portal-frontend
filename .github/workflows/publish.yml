@@ -29,8 +29,13 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Test Coverage Reports
-        run: |
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: |
           npm ci
+          npm run build
           npm test
 
       - name: SonarCloud Scan
