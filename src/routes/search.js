@@ -31,7 +31,7 @@ export const search = {
             }
 
             if (match.key === searchKeys.GMR_ID) {
-              return h.redirect(`${paths.GMR_RESULTS}?${queryStringParams.SEARCH_TERM}=${value}`).takeover()
+              return h.redirect(`${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${value}`).takeover()
             }
 
             return h.redirect(`${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${value}`).takeover()

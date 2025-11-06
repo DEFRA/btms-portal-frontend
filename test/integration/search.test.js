@@ -192,7 +192,7 @@ test('redirects to GMR results page if valid GMR search term', async () => {
   })
 
   expect(statusCode).toBe(302)
-  expect(headers.location).toBe(`${paths.GMR_RESULTS}?${queryStringParams.SEARCH_TERM}=GMRA00000AB1`)
+  expect(headers.location).toBe(`${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=GMRA00000AB1`)
 })
 
 test.each([
