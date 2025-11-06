@@ -4,13 +4,19 @@
   padding: govuk-spacing(7);
   background-color: govuk-colour("light-grey");
 
+  .govuk-hint {
+    margin-bottom: 15px;
+  }
+
   .govuk-input__suffix {
     position: relative;
     padding: govuk-spacing(0);
   }
 
   .govuk-input {
+    font-size: 1rem;
     height: 50px;
+    padding: 0 10px;
   }
 
   .govuk-hint .govuk-body-s {
@@ -19,6 +25,10 @@
 
   .govuk-error-message {
     margin-bottom: 5px;
+  }
+
+  .govuk-form-group {
+    margin-bottom: 0;
   }
 }
 

@@ -1,4 +1,5 @@
 import { accessibility } from './accessibility.js'
+import { adminView } from './admin-view.js'
 import { health } from './health.js'
 import { staticAssetRoutes } from './static-assets.js'
 import { home } from './home.js'
@@ -19,6 +20,7 @@ import { cookiesGet, cookiesPost } from './cookies.js'
 
 export default [
   accessibility,
+  adminView,
   cookiesGet,
   cookiesPost,
   chromeDevtools,
