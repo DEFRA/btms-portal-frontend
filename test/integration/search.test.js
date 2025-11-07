@@ -178,6 +178,31 @@ test('redirect non authorised requests', async () => {
   expect(statusCode).toBe(302)
 })
 
+test.each([
+  {
+    searchTerm: '',
+    expectedSearchError: 'Enter an MRN, CHED or DUCR'
+  },
+  {
+    searchTerm: 'TERM_NOT_MATCHING_ANY_ID_FORMAT',
+    expectedSearchError: 'Enter an MRN, CHED or DUCR reference in the correct format'
+  }
+])('returns search page if search term is not valid', async (options) => {
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { result } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH}?${queryStringParams.SEARCH_TERM}=${options.searchTerm}`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(result).toContain(`<span class="govuk-visually-hidden">Error:</span> ${options.expectedSearchError}`)
+})
+
 test('redirects to GMR results page if valid GMR search term', async () => {
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
