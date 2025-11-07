@@ -165,3 +165,15 @@ export const ORDERED_CLEARANCE_DECISIONS = [
   { type: 'item', code: 'C07', description: `Release - ${decisionCodeDescriptions.C07}` },
   { type: 'item', code: 'C08', description: `Release - ${decisionCodeDescriptions.C08}` }
 ]
+
+export const metricName = {
+  MRN: 'search.mrn',
+  CHED_ID: 'search.chedId',
+  DUCR: 'search.ducr',
+  GMR_ID: 'search.gmrId',
+  SIGNIN_ENTRA_ID: 'signIn.entraId',
+  SIGNIN_DEFRA_ID: 'signIn.defraId',
+  GMR_NOT_FOUND: 'gmr.search.not.found',
+  GMR_KNOWN_MRNS: 'gmr.known.mrns',
+  GMR_UNKNOWN_MRNS: 'gmr.unknown.mrns'
+}

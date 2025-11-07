@@ -42,7 +42,7 @@ export const createRouteConfig = (searchTermValidator, requestPath, requestHandl
               return h.redirect(paths.SEARCH).takeover()
             }
 
-            metricsCounter(`search.${match.key}`)
+            metricsCounter(match.metricName)
             return { [match.key]: value }
           },
           assign: 'searchQuery'

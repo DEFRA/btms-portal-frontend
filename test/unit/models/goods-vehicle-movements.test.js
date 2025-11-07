@@ -1,4 +1,11 @@
 import { mapGoodsVehicleMovements } from '../../../src/models/goods-vehicle-movements'
+import { metricName } from '../../../src/models/model-constants.js'
+
+const mockMetricCounter = jest.fn()
+
+jest.mock('../../../src/utils/metrics.js', () => ({
+  metricsCounter: (...args) => mockMetricCounter(...args)
+}))
 
 test('GMR Vehicle details mapped', () => {
   const relatedImportDeclarationsPayload = {
@@ -538,4 +545,144 @@ test.each([
       }
     ]
   })
+})
+
+test.each([
+  {
+    transits: [
+      {
+        id: "25GB00000000000003"
+      }
+    ],
+    customs: [
+      {
+        id: "25GB00000000000001"
+      }
+    ],
+    expectedKnownMrnsCount: 1,
+    expectedUnknownMrnsCount: 0
+  },
+  {
+    transits: [
+      {
+        id: "25GB00000000000002"
+      }
+    ],
+    customs: [
+      {
+        id: "25GB00000000000001"
+      }
+    ],
+    expectedKnownMrnsCount: 2,
+    expectedUnknownMrnsCount: 0
+  },
+  {
+    transits: [],
+    customs: [
+      {
+        id: "25GB00000000000001"
+      },
+      {
+        id: "25GB00000000000003"
+      }
+    ],
+    expectedKnownMrnsCount: 1,
+    expectedUnknownMrnsCount: 1
+  },
+  {
+    transits: [],
+    customs: [
+      {
+        id: "25GB00000000000003"
+      }
+    ],
+    expectedKnownMrnsCount: 0,
+    expectedUnknownMrnsCount: 1
+  },
+  {
+    transits: [
+      {
+        id: "25GB00000000000004"
+      }
+    ],
+    customs: [
+      {
+        id: "25GB00000000000003"
+      }
+    ],
+    expectedKnownMrnsCount: 0,
+    expectedUnknownMrnsCount: 1
+  }
+])('Emits metrics when counts greater than zero and excludes unknown Transit MRNs', (options) => {
+  const relatedImportDeclarationsPayload = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: "25GB00000000000001",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  checkCode: 'H224',
+                  decisionCode: 'E03'
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              checkCode: 'H224',
+              internalDecisionCode: 'E03'
+            }
+          ]
+        },
+        finalisation: null
+      },
+      {
+        movementReferenceNumber: "25GB00000000000002",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  checkCode: 'H224',
+                  decisionCode: 'E03'
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              checkCode: 'H224',
+              internalDecisionCode: 'E03'
+            }
+          ]
+        },
+        finalisation: null
+      }
+    ],
+    goodsVehicleMovements: [
+      {
+        gmr: {
+          id: "GMRA00000AB1",
+          vehicleRegistrationNumber: "ABC 111",
+          trailerRegistrationNums: [ "ABC 222" ],
+          declarations: {
+            transits: options.transits,
+            customs: options.customs
+          }
+        }
+      }
+    ]
+  }
+
+  mapGoodsVehicleMovements(relatedImportDeclarationsPayload)
+
+  options.expectedKnownMrnsCount > 0
+    ? expect(mockMetricCounter).toHaveBeenCalledWith(metricName.GMR_KNOWN_MRNS, options.expectedKnownMrnsCount)
+    : expect(mockMetricCounter).not.toHaveBeenCalledWith(metricName.GMR_KNOWN_MRNS, 0)
+
+  options.expectedUnknownMrnsCount > 0
+    ? expect(mockMetricCounter).toHaveBeenCalledWith(metricName.GMR_UNKNOWN_MRNS, options.expectedUnknownMrnsCount)
+    : expect(mockMetricCounter).not.toHaveBeenCalledWith(metricName.GMR_UNKNOWN_MRNS, 0)
 })

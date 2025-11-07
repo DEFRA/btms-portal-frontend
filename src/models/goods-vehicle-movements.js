@@ -1,7 +1,8 @@
 import boom from '@hapi/boom'
 import { getCustomsDeclarationStatus } from './customs-declarations.js'
-import { ORDERED_CLEARANCE_DECISIONS } from './model-constants.js'
+import { metricName, ORDERED_CLEARANCE_DECISIONS } from './model-constants.js'
 import { paths, queryStringParams } from '../routes/route-constants.js'
+import { metricsCounter } from '../utils/metrics.js'
 
 const getBtmsDecision = (clearanceDecision) => {
   return ORDERED_CLEARANCE_DECISIONS.find(decisionCheck => {
@@ -10,11 +11,7 @@ const getBtmsDecision = (clearanceDecision) => {
       return true
     }
 
-    if (decisionCheck.type === 'result' && clearanceDecision.results.some(result => result.internalDecisionCode === decisionCheck.code)) {
-      return true
-    }
-
-    return false
+    return decisionCheck.type === 'result' && clearanceDecision.results.some(result => result.internalDecisionCode === decisionCheck.code)
   })?.description
 }
 
@@ -41,13 +38,38 @@ const mapCustomsDeclarations = (
 ) => {
   const gmrCustoms = goodsVehicleMovement?.declarations?.customs?.map((custom) => {
     return mapGmrDeclaration(customsDeclarations, custom)
-  })
+  }) || []
 
   const gmrTransits = goodsVehicleMovement?.declarations?.transits?.map((transit) => {
     return mapGmrDeclaration(customsDeclarations, transit)
-  })
+  }) || []
 
-  return (gmrCustoms || []).concat(gmrTransits || [])
+  emitMetrics(gmrCustoms, gmrTransits)
+
+  return (gmrCustoms).concat(gmrTransits)
+}
+
+const mrnCounter = (counter, custom, shouldBeCounted) => {
+  if (custom.isKnownMrn === shouldBeCounted) {
+    ++counter
+  }
+
+  return counter
+}
+
+const emitMetrics = (gmrCustoms, gmrTransits) => {
+  const knownMrns = gmrCustoms.reduce((knownMrnsCount, custom) => mrnCounter(knownMrnsCount, custom, true), 0)
+    + gmrTransits.reduce((knownMrnsCount, custom) => mrnCounter(knownMrnsCount, custom, true), 0)
+
+  const unknownCustomsMrns = gmrCustoms.reduce((unknownMrnsCount, custom) => mrnCounter(unknownMrnsCount, custom, false), 0)
+
+  if (knownMrns > 0) {
+    metricsCounter(metricName.GMR_KNOWN_MRNS, knownMrns)
+  }
+
+  if (unknownCustomsMrns > 0) {
+    metricsCounter(metricName.GMR_UNKNOWN_MRNS, unknownCustomsMrns)
+  }
 }
 
 export const mapGoodsVehicleMovements = ({
