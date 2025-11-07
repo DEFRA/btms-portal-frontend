@@ -1,0 +1,5 @@
+{% macro vehicleNumberPlate(vehicleRegistrationNumber) %}
+  {% if vehicleRegistrationNumber %}
+    <span class="vehicle-number-plate vehicle-number-plate--front" aria-label="Vehicle registration number {{vehicleRegistrationNumber}}">{{vehicleRegistrationNumber}}</span>
+  {% endif %}
+{% endmacro %}
