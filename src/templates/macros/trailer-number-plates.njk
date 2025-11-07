@@ -1,0 +1,7 @@
+{% macro trailerNumberPlates(trailerRegistrationNumbers) %}
+  {% if trailerRegistrationNumbers %}
+    {% for regNumber in trailerRegistrationNumbers %}
+      <span class="vehicle-number-plate vehicle-number-plate--rear" aria-label="Trailer registration number {{regNumber}}">{{regNumber}}</span>
+    {% endfor %}
+  {% endif %}
+{% endmacro %}
