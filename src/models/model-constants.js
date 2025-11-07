@@ -139,3 +139,36 @@ export const internalDecisionCodeDescriptions = {
   E88: 'Hold - Awaiting IPAFFS update',
   E99: 'No match - Unknown error'
 }
+
+// Order of these checks matter. It returns the 'worst' case of all the item decisions first.
+export const ORDERED_CLEARANCE_DECISIONS = [
+  { type: 'item', code: 'E03', description: `Data Error - ${decisionCodeDescriptions.E03}` },
+  { type: 'item', code: 'N01', description: `Refuse - ${decisionCodeDescriptions.N01}` },
+  { type: 'item', code: 'N02', description: `Refuse - ${decisionCodeDescriptions.N02}` },
+  { type: 'item', code: 'N03', description: `Refuse - ${decisionCodeDescriptions.N03}` },
+  { type: 'item', code: 'N04', description: `Refuse - ${decisionCodeDescriptions.N04}` },
+  { type: 'item', code: 'N05', description: `Refuse - ${decisionCodeDescriptions.N05}` },
+  { type: 'item', code: 'N06', description: `Refuse - ${decisionCodeDescriptions.N06}` },
+  { type: 'item', code: 'N07', description: `Refuse - ${decisionCodeDescriptions.N07}` },
+  { type: 'item', code: 'X00', checkCode: 'H224', description: `Refuse - ${iuuDecisionDisplay.IUUNotCompliant}` },
+  { type: 'result', code: 'E70', description: internalDecisionCodeDescriptions.E70 },
+  { type: 'result', code: 'E71', description: internalDecisionCodeDescriptions.E71 },
+  { type: 'result', code: 'E72', description: internalDecisionCodeDescriptions.E72 },
+  { type: 'result', code: 'E73', description: internalDecisionCodeDescriptions.E73 },
+  { type: 'result', code: 'E75', description: internalDecisionCodeDescriptions.E75 },
+  { type: 'result', code: 'E87', description: internalDecisionCodeDescriptions.E87 },
+  { type: 'result', code: 'E84', description: internalDecisionCodeDescriptions.E84 },
+  { type: 'result', code: 'E99', description: internalDecisionCodeDescriptions.E99 },
+  { type: 'item', code: 'H01', description: `Hold - ${DECISION_NOT_GIVEN}` },
+  { type: 'item', code: 'H02', description: `Hold - ${decisionCodeDescriptions.H02}` },
+  { type: 'result', code: 'E88', description: internalDecisionCodeDescriptions.E88 },
+  { type: 'result', code: 'E74', description: internalDecisionCodeDescriptions.E74 },
+  { type: 'result', code: 'E85', description: internalDecisionCodeDescriptions.E85 },
+  { type: 'result', code: 'E86', description: internalDecisionCodeDescriptions.E86 },
+  { type: 'item', code: 'C02', description: `Release - ${decisionCodeDescriptions.C02}` },
+  { type: 'item', code: 'C03', description: `Release - ${decisionCodeDescriptions.C03}` },
+  { type: 'item', code: 'C05', description: `Release - ${decisionCodeDescriptions.C05}` },
+  { type: 'item', code: 'C06', description: `Release - ${decisionCodeDescriptions.C06}` },
+  { type: 'item', code: 'C07', description: `Release - ${decisionCodeDescriptions.C07}` },
+  { type: 'item', code: 'C08', description: `Release - ${decisionCodeDescriptions.C08}` }
+]

@@ -1,0 +1,96 @@
+@use "govuk-frontend" as *;
+@use "variables" as *;
+
+.btms-gmr-search-result {
+  .govuk-summary-list__key,
+  .govuk-summary-list__value {
+    @include govuk-font-size($size: 16);
+    line-height: 1.3158;
+  }
+
+  .vehicle-number-plate {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid govuk-colour("black");
+    border-radius: 4px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.2;
+    white-space: nowrap;
+    width: 100px;
+    text-align: center;
+  }
+
+  .vehicle-number-plate--rear {
+    background: #ffdf00;
+    color: govuk-colour("black");
+    display: block;
+  }
+
+  .vehicle-number-plate--front {
+    background: govuk-colour("white");
+    color: govuk-colour("black");
+  }
+
+  .govuk-summary-list__value .vehicle-number-plate {
+    margin-top: 0.1rem;
+  }
+
+  h3 {
+    margin-top: govuk-spacing(3)
+  }
+
+  .govuk-table__header,
+  .govuk-table__cell,
+  .govuk-table__caption {
+    @include govuk-font-size($size: 16);
+    line-height: 1.5;
+  }
+
+  .govuk-tag {
+    font-weight: 700;
+    max-width: none;
+    @include govuk-font-size($size: 16);
+    display: inline;
+    white-space: nowrap;
+  }
+
+  [aria-describedby] {
+    cursor: help;
+    position: relative;
+
+    [role="tooltip"] {
+      display: none;
+    }
+
+    &:hover,
+    &:focus {
+      [role="tooltip"] {
+        display: block;
+        position: absolute;
+        left: 0;
+        width: 300px;
+        padding: govuk-spacing(2);
+        color: $govuk-text-colour;
+        background-color: govuk-colour("light-grey");
+        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+        text-decoration: none;
+        z-index: 10000;
+      }
+    }
+  }
+
+  .mrn__tooltip {
+    @include govuk-font-size($size: 14);
+  }
+
+  .mrn--unknown {
+    color: $govuk-error-colour;
+    text-decoration: underline dashed $govuk-error-colour;
+    text-underline-offset: 4px;
+  }
+}

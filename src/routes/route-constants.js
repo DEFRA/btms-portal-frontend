@@ -15,6 +15,7 @@ const paths = {
   SIGNIN_ENTRA_ID_CALLBACK: '/signin-entra-id',
   SEARCH: '/search',
   SEARCH_RESULT: '/search-result',
+  GMR_SEARCH_RESULT: '/gmr-search-result',
   CHROME_DEVTOOLS: '/.well-known/appspecific/com.chrome.devtools.json'
 }
 
