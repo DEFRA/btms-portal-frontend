@@ -4,6 +4,6 @@
   {% if customsDeclaration.isKnownMrn %}
     <a href="{{customsDeclaration.knownMrnLink}}">{{customsDeclaration.mrn}}</a>
   {% else %}
-    <div class="tooltiplink mrn--unknown" aria-describedby="{{customsDeclaration.mrn}}">{{customsDeclaration.mrn}}<div class="mrn__tooltip" role="tooltip" id="{{customsDeclaration.mrn}}">{{unknownMrnTooltipText}}</div></div>
+    <div class="tooltiplink mrn--unknown" aria-describedby="{{customsDeclaration.mrn}}" tabindex="0">{{customsDeclaration.mrn}}<div class="mrn__tooltip" role="tooltip" id="{{customsDeclaration.mrn}}">{{unknownMrnTooltipText}}</div></div>
   {% endif %}
 {% endmacro %}
