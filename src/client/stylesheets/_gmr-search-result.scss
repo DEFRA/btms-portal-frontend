@@ -29,6 +29,10 @@
     background: #ffdf00;
     color: govuk-colour("black");
     display: block;
+
+    &:not(:last-child) {
+      margin-bottom: govuk-spacing(3);
+    }
   }
 
   .vehicle-number-plate--front {
