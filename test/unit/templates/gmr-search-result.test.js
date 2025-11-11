@@ -45,7 +45,7 @@ describe('GMR search result', () => {
     expect($renderedTemplate.html()).toContain('<span class="govuk-!-font-weight-bold govuk-tag govuk-tag--yellow">In progress - Awaiting trader</span>')
     expect($renderedTemplate.html()).toContain('<td class="govuk-table__cell">Hold - Decision not given</td>')
 
-    expect($renderedTemplate.html()).toContain('<div class="tooltiplink mrn--unknown" aria-describedby="25GB00000000000002">25GB00000000000002<div class="mrn__tooltip" role="tooltip" id="25GB00000000000002">This MRN cannot be found in BTMS. The MRN may not have SPS goods associated with it or HMRC have not sent details of this MRN to BTMS.</div></div>')
+    expect($renderedTemplate.html()).toContain('<div class="tooltiplink mrn--unknown" aria-describedby="25GB00000000000002" tabindex="0">25GB00000000000002<div class="mrn__tooltip" role="tooltip" id="25GB00000000000002">This MRN cannot be found in BTMS. The MRN may not have SPS goods associated with it or HMRC have not sent details of this MRN to BTMS.</div></div>')
     expect($renderedTemplate.html()).toContain('<span class="govuk-!-font-weight-bold govuk-tag govuk-tag--grey">Unknown</span>')
     expect($renderedTemplate.html()).toContain('<td class="govuk-table__cell">Unknown</td>')
   })
