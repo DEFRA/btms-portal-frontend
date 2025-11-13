@@ -1,5 +1,5 @@
 {% macro documentReference(decision) %}
-  {% if decision.decisionReason %}
+  {% if decision.documentReference and decision.decisionReason %}
     {% set id = 'tooltip-' + decision.id %}
     <td class="govuk-table__cell btms-no-match" tabindex="0" aria-describedby="{{ id }}">
       {{ decision.documentReference }}
