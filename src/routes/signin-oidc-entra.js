@@ -1,6 +1,6 @@
 import { paths } from './route-constants.js'
 import { setUserSession } from '../auth/user-session.js'
-import { metricsCounter } from '../utils/metrics.js'
+import { METRIC_NAMES, metricsCounter } from '../utils/metrics.js'
 
 export const signinOidcEntra = {
   method: ['get', 'post'],
@@ -13,7 +13,7 @@ export const signinOidcEntra = {
     await setUserSession(request, sessionId)
     request.cookieAuth.set({ sessionId })
 
-    metricsCounter('signIn.entraId')
+    metricsCounter(METRIC_NAMES.SIGNIN_ENTRA_ID)
     return h.redirect(paths.SEARCH)
   }
 }
