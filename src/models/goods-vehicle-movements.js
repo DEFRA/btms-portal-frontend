@@ -1,6 +1,6 @@
 import boom from '@hapi/boom'
 import { getCustomsDeclarationStatus } from './customs-declarations.js'
-import { ORDERED_CLEARANCE_DECISIONS } from './model-constants.js'
+import { cdsStatusOrderPriority, ORDERED_CLEARANCE_DECISIONS } from './model-constants.js'
 import { paths, queryStringParams } from '../routes/route-constants.js'
 
 const getBtmsDecision = (clearanceDecision) => {
@@ -35,6 +35,13 @@ const mapGmrDeclaration = (customsDeclarations, gvmDeclaration) => {
   }
 }
 
+const statusRank = cdsStatusOrderPriority.reduce((acc, status, index) => {
+  acc[status] = index
+  return acc
+}, {})
+
+const getStatusRank = (status) => statusRank[status] ?? Number.MAX_SAFE_INTEGER
+
 const mapCustomsDeclarations = (
   customsDeclarations,
   goodsVehicleMovement
@@ -47,7 +54,7 @@ const mapCustomsDeclarations = (
     return mapGmrDeclaration(customsDeclarations, transit)
   })
 
-  return (gmrCustoms || []).concat(gmrTransits || [])
+  return (gmrCustoms || []).concat(gmrTransits || []).sort((a, b) => getStatusRank(a.cdsStatus) - getStatusRank(b.cdsStatus))
 }
 
 export const mapGoodsVehicleMovements = ({
