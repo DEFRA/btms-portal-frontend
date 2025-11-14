@@ -31,8 +31,8 @@ test('GMR Vehicle details mapped', () => {
     ],
     linkedCustomsDeclarations: [],
     mrnCounts: {
-      knownMrns: 0,
-      unknownMrns: 0
+      known: 0,
+      unknown: 0
     }
   }
 
@@ -109,8 +109,8 @@ test('Maps GMR Customs Declaration', () => {
       }
     ],
     mrnCounts: {
-      knownMrns: 1,
-      unknownMrns: 1
+      known: 1,
+      unknown: 1
     }
   })
 })
@@ -553,8 +553,8 @@ test.each([
       }
     ],
     mrnCounts: {
-      knownMrns: 1,
-      unknownMrns: 0
+      known: 1,
+      unknown: 0
     }
   })
 })

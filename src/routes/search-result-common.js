@@ -44,7 +44,7 @@ export const createRouteConfig = (searchTermValidator, requestPath, requestHandl
 
             const metricName = getMetricNameBySearchType(match.key)
             if (metricName) {
-              metricsCounter(getMetricNameBySearchType(match.key))
+              metricsCounter(metricName)
             }
 
             return { [match.key]: value }

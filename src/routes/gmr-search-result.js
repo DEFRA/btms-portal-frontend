@@ -28,12 +28,12 @@ export const gmrSearchResult = createRouteConfig(searchTermValidator, paths.GMR_
 
   const goodsVehicleMovement = mapGoodsVehicleMovements(data)
 
-  if (goodsVehicleMovement.mrnCounts.knownMrns > 0) {
-    metricsCounter(METRIC_NAMES.GVM_KNOWN_MRNS, goodsVehicleMovement.mrnCounts.knownMrns)
+  if (goodsVehicleMovement.mrnCounts.known > 0) {
+    metricsCounter(METRIC_NAMES.GVM_KNOWN_MRNS, goodsVehicleMovement.mrnCounts.known)
   }
 
-  if (goodsVehicleMovement.mrnCounts.unknownMrns > 0) {
-    metricsCounter(METRIC_NAMES.GVM_UNKNOWN_MRNS, goodsVehicleMovement.mrnCounts.unknownMrns)
+  if (goodsVehicleMovement.mrnCounts.unknown > 0) {
+    metricsCounter(METRIC_NAMES.GVM_UNKNOWN_MRNS, goodsVehicleMovement.mrnCounts.unknown)
   }
 
   const viewModel = {

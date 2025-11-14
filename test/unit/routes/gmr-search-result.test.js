@@ -127,8 +127,8 @@ test.each([
 
   mockMapGoodsVehicleMovements.mockReturnValue({
     mrnCounts: {
-      knownMrns: options.knownMrnsCount,
-      unknownMrns: options.unknownMrnsCount
+      known: options.knownMrnsCount,
+      unknown: options.unknownMrnsCount
     }
   })
 

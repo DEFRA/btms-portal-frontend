@@ -53,8 +53,8 @@ const mapCustomsDeclarations = (
 
   return {
     mrnCounts: {
-      knownMrns: gmrCustoms.reduce((knownMrnsCount, custom) => incrementCounter(knownMrnsCount, custom, true), 0),
-      unknownMrns: gmrCustoms.reduce((unknownMrnsCount, custom) => incrementCounter(unknownMrnsCount, custom, false), 0)
+      known: gmrCustoms.reduce((knownMrnsCount, custom) => incrementCounter(knownMrnsCount, custom, true), 0),
+      unknown: gmrCustoms.reduce((unknownMrnsCount, custom) => incrementCounter(unknownMrnsCount, custom, false), 0)
     },
     customsDeclarations: (gmrCustoms).concat(gmrTransits)
   }
