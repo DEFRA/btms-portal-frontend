@@ -558,3 +558,242 @@ test.each([
     }
   })
 })
+
+test('Linked Customs Declarations are ordered by CDS Status Priority', () => {
+  const relatedImportDeclarationsPayload = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: "25GB00000000000001",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H224",
+                  decisionCode: "X00"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H224",
+              internalDecisionCode: "X00"
+            }
+          ]
+        },
+        finalisation: null
+      },
+      {
+        movementReferenceNumber: "25GB00000000000002",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H222",
+                  decisionCode: "X00"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H222",
+              internalDecisionCode: "X00"
+            }
+          ]
+        },
+        finalisation: {
+          isManualRelease: true
+        }
+      },
+      {
+        movementReferenceNumber: "25GB00000000000003",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H222",
+                  decisionCode: "X00"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H222",
+              internalDecisionCode: "X00"
+            }
+          ]
+        },
+        finalisation: {
+          isManualRelease: false,
+          finalState: 0
+        }
+      },
+      {
+        movementReferenceNumber: "25GB00000000000005",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H222",
+                  decisionCode: "H01"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H222",
+              internalDecisionCode: "H01"
+            }
+          ]
+        },
+        finalisation: null
+      },
+      {
+        movementReferenceNumber: "25GB00000000000006",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H222",
+                  decisionCode: "C01"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H222",
+              internalDecisionCode: "C01"
+            }
+          ]
+        },
+        finalisation: null
+      },
+      {
+        movementReferenceNumber: "25GB00000000000007",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H222",
+                  decisionCode: "X00"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H222",
+              internalDecisionCode: "X00"
+            }
+          ]
+        },
+        finalisation: null
+      },
+      {
+        movementReferenceNumber: "25GB00000000000008",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H222",
+                  decisionCode: "X00"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H222",
+              internalDecisionCode: "X00"
+            }
+          ]
+        },
+        finalisation: {
+          isManualRelease: true
+        }
+      }
+    ],
+    goodsVehicleMovements: [
+      {
+        gmr: {
+          id: "GMRA00000AB1",
+          vehicleRegistrationNumber: "ABC 111",
+          trailerRegistrationNums: [
+            "ABC 222",
+            "ABC 333"
+          ],
+          declarations: {
+            transits: [
+              {
+                id: "25GB00000000000009" // Unknown
+              }
+            ],
+            customs: [
+              {
+                id: "25GB00000000000001" // In progress
+              },
+              {
+                id: "25GB00000000000002" // Finalised - Manually released
+              },
+              {
+                id: "25GB00000000000003" // Finalised - Released
+              },
+              {
+                id: "25GB00000000000004" // Unknown
+              },
+              {
+                id: "25GB00000000000005" // In progress - Awaiting IPAFFS
+              },
+              {
+                id: "25GB00000000000006" // In progress - Awaiting CDS
+              },
+              {
+                id: "25GB00000000000007" // In progress - Awaiting trader
+              },
+              {
+                id: "25GB00000000000008" // Finalised - Manually released
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+
+  const actual = mapGoodsVehicleMovements(relatedImportDeclarationsPayload)
+
+  expect(actual.linkedCustomsDeclarations[0].cdsStatus).toBe('In progress - Awaiting trader')
+  expect(actual.linkedCustomsDeclarations[1].cdsStatus).toBe('In progress - Awaiting IPAFFS')
+  expect(actual.linkedCustomsDeclarations[2].cdsStatus).toBe('In progress - Awaiting CDS')
+  expect(actual.linkedCustomsDeclarations[3].cdsStatus).toBe('In progress')
+  expect(actual.linkedCustomsDeclarations[4].cdsStatus).toBe('Finalised - Manually released')
+  expect(actual.linkedCustomsDeclarations[5].cdsStatus).toBe('Finalised - Manually released')
+  expect(actual.linkedCustomsDeclarations[6].cdsStatus).toBe('Finalised - Released')
+  expect(actual.linkedCustomsDeclarations[7].cdsStatus).toBe('Unknown')
+  expect(actual.linkedCustomsDeclarations[8].cdsStatus).toBe('Unknown')
+})
