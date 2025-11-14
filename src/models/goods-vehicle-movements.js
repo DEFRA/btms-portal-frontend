@@ -1,8 +1,7 @@
 import boom from '@hapi/boom'
 import { getCustomsDeclarationStatus } from './customs-declarations.js'
-import { metricName, ORDERED_CLEARANCE_DECISIONS } from './model-constants.js'
+import { ORDERED_CLEARANCE_DECISIONS } from './model-constants.js'
 import { paths, queryStringParams } from '../routes/route-constants.js'
-import { metricsCounter } from '../utils/metrics.js'
 
 const getBtmsDecision = (clearanceDecision) => {
   return ORDERED_CLEARANCE_DECISIONS.find(decisionCheck => {
@@ -32,6 +31,14 @@ const mapGmrDeclaration = (customsDeclarations, gvmDeclaration) => {
   }
 }
 
+const incrementCounter = (counter, gmrDeclaration, shouldBeCounted) => {
+  if (gmrDeclaration.isKnownMrn === shouldBeCounted) {
+    ++counter
+  }
+
+  return counter
+}
+
 const mapCustomsDeclarations = (
   customsDeclarations,
   goodsVehicleMovement
@@ -44,31 +51,12 @@ const mapCustomsDeclarations = (
     return mapGmrDeclaration(customsDeclarations, transit)
   }) || []
 
-  emitMetrics(gmrCustoms, gmrTransits)
-
-  return (gmrCustoms).concat(gmrTransits)
-}
-
-const mrnCounter = (counter, custom, shouldBeCounted) => {
-  if (custom.isKnownMrn === shouldBeCounted) {
-    ++counter
-  }
-
-  return counter
-}
-
-const emitMetrics = (gmrCustoms, gmrTransits) => {
-  const knownMrns = gmrCustoms.reduce((knownMrnsCount, custom) => mrnCounter(knownMrnsCount, custom, true), 0)
-    + gmrTransits.reduce((knownMrnsCount, custom) => mrnCounter(knownMrnsCount, custom, true), 0)
-
-  const unknownCustomsMrns = gmrCustoms.reduce((unknownMrnsCount, custom) => mrnCounter(unknownMrnsCount, custom, false), 0)
-
-  if (knownMrns > 0) {
-    metricsCounter(metricName.GMR_KNOWN_MRNS, knownMrns)
-  }
-
-  if (unknownCustomsMrns > 0) {
-    metricsCounter(metricName.GMR_UNKNOWN_MRNS, unknownCustomsMrns)
+  return {
+    mrnCounts: {
+      knownMrns: gmrCustoms.reduce((knownMrnsCount, custom) => incrementCounter(knownMrnsCount, custom, true), 0),
+      unknownMrns: gmrCustoms.reduce((unknownMrnsCount, custom) => incrementCounter(unknownMrnsCount, custom, false), 0)
+    },
+    customsDeclarations: (gmrCustoms).concat(gmrTransits)
   }
 }
 
@@ -87,6 +75,7 @@ export const mapGoodsVehicleMovements = ({
   return {
     vehicleRegistrationNumber: vehicleGoodsMovement.vehicleRegistrationNumber,
     trailerRegistrationNumbers: vehicleGoodsMovement.trailerRegistrationNums,
-    linkedCustomsDeclarations
+    linkedCustomsDeclarations: linkedCustomsDeclarations.customsDeclarations,
+    mrnCounts: linkedCustomsDeclarations.mrnCounts
   }
 }

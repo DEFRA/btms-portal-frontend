@@ -3,8 +3,7 @@ import { createRouteConfig } from './search-result-common.js'
 import { getRelatedImportDeclarations } from '../services/related-import-declarations.js'
 import { mapGoodsVehicleMovements } from '../models/goods-vehicle-movements.js'
 import { searchKeys } from '../services/search-patterns.js'
-import { metricsCounter } from '../utils/metrics.js'
-import { metricName } from '../models/model-constants.js'
+import { METRIC_NAMES, metricsCounter } from '../utils/metrics.js'
 
 const searchTermValidator = (key, pattern, value) => {
   return key === searchKeys.GMR_ID && pattern.test(value)
@@ -21,12 +20,21 @@ export const gmrSearchResult = createRouteConfig(searchTermValidator, paths.GMR_
       errorCode: 'SEARCH_TERM_NOT_FOUND'
     })
 
-    metricsCounter(metricName.GMR_NOT_FOUND)
+    metricsCounter(METRIC_NAMES.GMR_NOT_FOUND)
+    request.logger.info(`No search result for ${searchTerm}`)
 
     return h.redirect(paths.SEARCH).takeover()
   }
 
   const goodsVehicleMovement = mapGoodsVehicleMovements(data)
+
+  if (goodsVehicleMovement.mrnCounts.knownMrns > 0) {
+    metricsCounter(METRIC_NAMES.GVM_KNOWN_MRNS, goodsVehicleMovement.mrnCounts.knownMrns)
+  }
+
+  if (goodsVehicleMovement.mrnCounts.unknownMrns > 0) {
+    metricsCounter(METRIC_NAMES.GVM_UNKNOWN_MRNS, goodsVehicleMovement.mrnCounts.unknownMrns)
+  }
 
   const viewModel = {
     searchTerm,

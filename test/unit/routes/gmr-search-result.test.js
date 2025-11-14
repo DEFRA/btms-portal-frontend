@@ -1,15 +1,22 @@
 import { gmrSearchResult } from '../../../src/routes/gmr-search-result.js'
-import { metricName } from '../../../src/models/model-constants.js'
+import { METRIC_NAMES } from '../../../src/utils/metrics.js'
 
 const mockMetricCounter = jest.fn()
 const mockGetRelatedImportDeclarations = jest.fn()
+const mockMapGoodsVehicleMovements = jest.fn()
 
 jest.mock('../../../src/utils/metrics.js', () => ({
-  metricsCounter: (...args) => mockMetricCounter(...args)
+  metricsCounter: (...args) => mockMetricCounter(...args),
+  METRIC_NAMES: jest.requireActual('../../../src/utils/metrics.js').METRIC_NAMES,
+  getMetricNameBySearchType: jest.requireActual('../../../src/utils/metrics.js').getMetricNameBySearchType
 }))
 
 jest.mock('../../../src/services/related-import-declarations.js', () => ({
   getRelatedImportDeclarations: (...args) => mockGetRelatedImportDeclarations(...args)
+}))
+
+jest.mock('../../../src/models/goods-vehicle-movements.js', () => ({
+  mapGoodsVehicleMovements: (...args) => mockMapGoodsVehicleMovements(...args)
 }))
 
 const mockRequest = {
@@ -18,6 +25,9 @@ const mockRequest = {
   },
   yar: {
     flash: () => jest.fn()
+  },
+  logger: {
+    info: jest.fn()
   }
 }
 
@@ -26,7 +36,8 @@ const mockHandler = {
     return {
       takeover: jest.fn()
     }
-  }
+  },
+  view: jest.fn()
 }
 
 test('Should emit GMR search not found metric when no records found', async () => {
@@ -36,7 +47,7 @@ test('Should emit GMR search not found metric when no records found', async () =
 
   await gmrSearchResult.options.handler(mockRequest, mockHandler)
 
-  expect(mockMetricCounter).toHaveBeenCalledWith(metricName.GMR_NOT_FOUND)
+  expect(mockMetricCounter).toHaveBeenCalledWith(METRIC_NAMES.GMR_NOT_FOUND)
 })
 
 test('Should emit GMR search metric', async () => {
@@ -46,5 +57,88 @@ test('Should emit GMR search metric', async () => {
 
   await gmrSearchResult.options.pre[0].method(mockRequest, mockHandler)
 
-  expect(mockMetricCounter).toHaveBeenCalledWith(metricName.GMR_ID)
+  expect(mockMetricCounter).toHaveBeenCalledWith(METRIC_NAMES.GMR_ID)
+})
+
+test.each([
+  {
+    knownMrnsCount: 1,
+    unknownMrnsCount: 0
+  },
+  {
+    knownMrnsCount: 1,
+    unknownMrnsCount: 1
+  },
+  {
+    knownMrnsCount: 0,
+    unknownMrnsCount: 1
+  },
+  {
+    knownMrnsCount: 0,
+    unknownMrnsCount: 0
+  }
+])('Emits metrics when counts greater than zero', async (options) => {
+  const relatedImportDeclarationsPayload = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: "25GB00000000000001",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  checkCode: "H222",
+                  decisionCode: "X00"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              checkCode: "H222",
+              internalDecisionCode: "X00"
+            }
+          ]
+        },
+        finalisation: null
+      }
+    ],
+    goodsVehicleMovements: [
+      {
+        gmr: {
+          id: "GMRA00000AB1",
+          vehicleRegistrationNumber: "ABC 111",
+          trailerRegistrationNums: ["ABC 222"],
+          declarations: {
+            customs: [
+              {
+                id: "25GB00000000000001"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+
+  mockGetRelatedImportDeclarations.mockReturnValue({
+    goodsVehicleMovements: [ relatedImportDeclarationsPayload ]
+  })
+
+  mockMapGoodsVehicleMovements.mockReturnValue({
+    mrnCounts: {
+      knownMrns: options.knownMrnsCount,
+      unknownMrns: options.unknownMrnsCount
+    }
+  })
+
+  await gmrSearchResult.options.handler(mockRequest, mockHandler)
+
+  options.knownMrnsCount > 0
+    ? expect(mockMetricCounter).toHaveBeenCalledWith(METRIC_NAMES.GVM_KNOWN_MRNS, options.knownMrnsCount)
+    : expect(mockMetricCounter).not.toHaveBeenCalledWith(METRIC_NAMES.GVM_KNOWN_MRNS, 0)
+
+  options.unknownMrnsCount > 0
+    ? expect(mockMetricCounter).toHaveBeenCalledWith(METRIC_NAMES.GVM_UNKNOWN_MRNS, options.unknownMrnsCount)
+    : expect(mockMetricCounter).not.toHaveBeenCalledWith(METRIC_NAMES.GVM_UNKNOWN_MRNS, 0)
 })
