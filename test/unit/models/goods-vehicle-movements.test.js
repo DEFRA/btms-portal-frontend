@@ -39,6 +39,17 @@ test('GMR Vehicle details mapped', () => {
   expect(actual).toEqual(expected)
 })
 
+test('Throws exception if GMR data is not returned', () => {
+  const relatedImportDeclarationsPayload = {
+    goodsVehicleMovements: [
+      {
+      }
+    ]
+  }
+
+  expect(() => { mapGoodsVehicleMovements(relatedImportDeclarationsPayload) }).toThrow('Invalid GMR returned')
+})
+
 test('Maps GMR Customs Declaration', () => {
   const relatedImportDeclarationsPayload = {
     customsDeclarations: [
