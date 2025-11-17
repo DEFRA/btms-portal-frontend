@@ -10,11 +10,7 @@ const getBtmsDecision = (clearanceDecision) => {
       return true
     }
 
-    if (decisionCheck.type === 'result' && clearanceDecision.results.some(result => result.internalDecisionCode === decisionCheck.code)) {
-      return true
-    }
-
-    return false
+    return decisionCheck.type === 'result' && clearanceDecision.results.some(result => result.internalDecisionCode === decisionCheck.code)
   })?.description
 }
 
@@ -35,19 +31,33 @@ const mapGmrDeclaration = (customsDeclarations, gvmDeclaration) => {
   }
 }
 
+const incrementCounter = (counter, gmrDeclaration, shouldBeCounted) => {
+  if (gmrDeclaration.isKnownMrn === shouldBeCounted) {
+    ++counter
+  }
+
+  return counter
+}
+
 const mapCustomsDeclarations = (
   customsDeclarations,
   goodsVehicleMovement
 ) => {
   const gmrCustoms = goodsVehicleMovement?.declarations?.customs?.map((custom) => {
     return mapGmrDeclaration(customsDeclarations, custom)
-  })
+  }) || []
 
   const gmrTransits = goodsVehicleMovement?.declarations?.transits?.map((transit) => {
     return mapGmrDeclaration(customsDeclarations, transit)
-  })
+  }) || []
 
-  return (gmrCustoms || []).concat(gmrTransits || [])
+  return {
+    mrnCounts: {
+      known: gmrCustoms.reduce((knownMrnsCount, custom) => incrementCounter(knownMrnsCount, custom, true), 0),
+      unknown: gmrCustoms.reduce((unknownMrnsCount, custom) => incrementCounter(unknownMrnsCount, custom, false), 0)
+    },
+    customsDeclarations: (gmrCustoms).concat(gmrTransits)
+  }
 }
 
 export const mapGoodsVehicleMovements = ({
@@ -65,6 +75,7 @@ export const mapGoodsVehicleMovements = ({
   return {
     vehicleRegistrationNumber: vehicleGoodsMovement.vehicleRegistrationNumber,
     trailerRegistrationNumbers: vehicleGoodsMovement.trailerRegistrationNums,
-    linkedCustomsDeclarations
+    linkedCustomsDeclarations: linkedCustomsDeclarations.customsDeclarations,
+    mrnCounts: linkedCustomsDeclarations.mrnCounts
   }
 }

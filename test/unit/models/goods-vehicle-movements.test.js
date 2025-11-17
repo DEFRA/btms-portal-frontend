@@ -1,5 +1,12 @@
 import { mapGoodsVehicleMovements } from '../../../src/models/goods-vehicle-movements'
 
+const mockMetricCounter = jest.fn()
+
+jest.mock('../../../src/utils/metrics.js', () => ({
+  metricsCounter: (...args) => mockMetricCounter(...args),
+  METRIC_NAMES: jest.requireActual('../../../src/utils/metrics.js').METRIC_NAMES
+}))
+
 test('GMR Vehicle details mapped', () => {
   const relatedImportDeclarationsPayload = {
     goodsVehicleMovements: [
@@ -22,7 +29,11 @@ test('GMR Vehicle details mapped', () => {
       "ABC 222",
       "ABC 333"
     ],
-    linkedCustomsDeclarations: []
+    linkedCustomsDeclarations: [],
+    mrnCounts: {
+      known: 0,
+      unknown: 0
+    }
   }
 
   expect(actual).toEqual(expected)
@@ -96,7 +107,11 @@ test('Maps GMR Customs Declaration', () => {
         btmsDecision: "Unknown",
         finalState: undefined
       }
-    ]
+    ],
+    mrnCounts: {
+      known: 1,
+      unknown: 1
+    }
   })
 })
 
@@ -536,6 +551,10 @@ test.each([
         btmsDecision: options.expectedBtmsDecision,
         finalState: undefined
       }
-    ]
+    ],
+    mrnCounts: {
+      known: 1,
+      unknown: 0
+    }
   })
 })

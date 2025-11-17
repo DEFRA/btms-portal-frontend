@@ -1,7 +1,7 @@
 import joi from 'joi'
 import { CACHE_CONTROL_NO_STORE, paths, queryStringParams } from './route-constants.js'
 import { searchPatterns } from '../services/search-patterns.js'
-import { metricsCounter } from '../utils/metrics.js'
+import { getMetricNameBySearchType, metricsCounter } from '../utils/metrics.js'
 
 export const createRouteConfig = (searchTermValidator, requestPath, requestHandler) => {
   return {
@@ -42,7 +42,11 @@ export const createRouteConfig = (searchTermValidator, requestPath, requestHandl
               return h.redirect(paths.SEARCH).takeover()
             }
 
-            metricsCounter(`search.${match.key}`)
+            const metricName = getMetricNameBySearchType(match.key)
+            if (metricName) {
+              metricsCounter(metricName)
+            }
+
             return { [match.key]: value }
           },
           assign: 'searchQuery'
