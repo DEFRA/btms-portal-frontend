@@ -747,6 +747,33 @@ test('Linked Customs Declarations are ordered by CDS Status Priority', () => {
         finalisation: {
           isManualRelease: true
         }
+      },
+      {
+        movementReferenceNumber: "25GB00000000000010",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H222",
+                  decisionCode: "X00"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H222",
+              internalDecisionCode: "X00"
+            }
+          ]
+        },
+        finalisation: {
+          isManualRelease: false,
+          finalState: 1
+        }
       }
     ],
     goodsVehicleMovements: [
@@ -788,6 +815,9 @@ test('Linked Customs Declarations are ordered by CDS Status Priority', () => {
               },
               {
                 id: "25GB00000000000008" // Finalised - Manually released
+              },
+              {
+                id: "25GB00000000000010" // Finalised - Cancelled after arrival
               }
             ]
           }
@@ -807,4 +837,5 @@ test('Linked Customs Declarations are ordered by CDS Status Priority', () => {
   expect(actual.linkedCustomsDeclarations[6].cdsStatus).toBe('Finalised - Released')
   expect(actual.linkedCustomsDeclarations[7].cdsStatus).toBe('Unknown')
   expect(actual.linkedCustomsDeclarations[8].cdsStatus).toBe('Unknown')
+  expect(actual.linkedCustomsDeclarations[9].cdsStatus).toBe('Finalised - Cancelled after arrival')
 })
