@@ -13,7 +13,7 @@ export const signinOidcEntra = {
     await setUserSession(request, sessionId)
     request.cookieAuth.set({ sessionId })
 
-    metricsCounter(METRIC_NAMES.SIGNIN_ENTRA_ID)
+    await metricsCounter(METRIC_NAMES.SIGNIN_ENTRA_ID)
     return h.redirect(paths.SEARCH)
   }
 }
