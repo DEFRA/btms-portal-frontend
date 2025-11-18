@@ -28,7 +28,7 @@ export const createRouteConfig = (searchTermValidator, requestPath, requestHandl
       },
       pre: [
         {
-          method: (request, h) => {
+          method: async (request, h) => {
             const value = request.query[queryStringParams.SEARCH_TERM].trim().toUpperCase()
             const match = searchPatterns.find(({ key, pattern }) => searchTermValidator(key, pattern, value))
 
@@ -44,7 +44,7 @@ export const createRouteConfig = (searchTermValidator, requestPath, requestHandl
 
             const metricName = getMetricNameBySearchType(match.key)
             if (metricName) {
-              metricsCounter(metricName)
+              await metricsCounter(metricName)
             }
 
             return { [match.key]: value }

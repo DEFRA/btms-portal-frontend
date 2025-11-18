@@ -20,7 +20,7 @@ export const gmrSearchResult = createRouteConfig(searchTermValidator, paths.GMR_
       errorCode: 'SEARCH_TERM_NOT_FOUND'
     })
 
-    metricsCounter(METRIC_NAMES.GMR_NOT_FOUND)
+    await metricsCounter(METRIC_NAMES.GMR_NOT_FOUND)
     request.logger.info(`No search result for ${searchTerm}`)
 
     return h.redirect(paths.SEARCH).takeover()
@@ -29,11 +29,11 @@ export const gmrSearchResult = createRouteConfig(searchTermValidator, paths.GMR_
   const goodsVehicleMovement = mapGoodsVehicleMovements(data)
 
   if (goodsVehicleMovement.mrnCounts.known > 0) {
-    metricsCounter(METRIC_NAMES.GVM_KNOWN_MRNS, goodsVehicleMovement.mrnCounts.known)
+    await metricsCounter(METRIC_NAMES.GVM_KNOWN_MRNS, goodsVehicleMovement.mrnCounts.known)
   }
 
   if (goodsVehicleMovement.mrnCounts.unknown > 0) {
-    metricsCounter(METRIC_NAMES.GVM_UNKNOWN_MRNS, goodsVehicleMovement.mrnCounts.unknown)
+    await metricsCounter(METRIC_NAMES.GVM_UNKNOWN_MRNS, goodsVehicleMovement.mrnCounts.unknown)
   }
 
   const viewModel = {
