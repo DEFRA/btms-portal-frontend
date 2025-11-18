@@ -13,7 +13,7 @@ export const signinOidc = {
     await setUserSession(request, sessionId)
     request.cookieAuth.set({ sessionId })
 
-    metricsCounter(METRIC_NAMES.SIGNIN_DEFRA_ID)
+    await metricsCounter(METRIC_NAMES.SIGNIN_DEFRA_ID)
     return h.redirect(paths.SEARCH)
   }
 }
