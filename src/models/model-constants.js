@@ -173,7 +173,7 @@ export const ORDERED_CLEARANCE_DECISIONS = [
   { type: 'item', code: 'C08', description: `Release - ${decisionCodeDescriptions.C08}` }
 ]
 
-export const cdsStatusOrderPriority = [
+export const ORDERED_CDS_STATUSES = [
   'In progress - Awaiting trader',
   'In progress - Awaiting IPAFFS',
   'In progress - Awaiting CDS',
