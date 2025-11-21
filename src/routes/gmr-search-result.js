@@ -1,6 +1,6 @@
 import { paths, queryStringParams } from './route-constants.js'
 import { createRouteConfig } from './search-result-common.js'
-import { getRelatedImportDeclarations } from '../services/related-import-declarations.js'
+import { getRelatedImportDeclarations } from '../services/imports-data-api-client.js'
 import { mapGoodsVehicleMovements } from '../models/goods-vehicle-movements.js'
 import { searchKeys } from '../services/search-patterns.js'
 import { METRIC_NAMES, metricsCounter } from '../utils/metrics.js'
@@ -11,7 +11,7 @@ const searchTermValidator = (key, pattern, value) => {
 
 export const gmrSearchResult = createRouteConfig(searchTermValidator, paths.GMR_SEARCH_RESULT, async (request, h) => {
   const searchTerm = request.query[queryStringParams.SEARCH_TERM].trim().toUpperCase()
-  const data = await getRelatedImportDeclarations(request)
+  const data = await getRelatedImportDeclarations(request.pre.searchQuery)
 
   if (data.goodsVehicleMovements.length === 0) {
     request.yar.flash('searchError', {
