@@ -12,7 +12,8 @@ import {
   internalDecisionCodeDescriptions,
   IUUDocumentCodes,
   DATE_FORMAT,
-  NO_MATCH_DECISION_CODE
+  NO_MATCH_DECISION_CODE,
+  CDS_STATUSES
 } from './model-constants.js'
 
 const documentReferenceRegex = /\d{7}[VR]?$/
@@ -129,14 +130,14 @@ export const getDecisionDetail = (
 
 export const getCustomsDeclarationStatus = (finalisation, clearanceDecision) => {
   if (finalisation === null) {
-    return `In progress${getInProgressDetail(clearanceDecision)}`
+    return getInProgressDetail(clearanceDecision)
   }
 
   if (finalisation.isManualRelease === true) {
-    return 'Finalised - Manually released'
+    return CDS_STATUSES.FINALISED_MANUALLY_RELEASED
   }
 
-  return `Finalised - ${finalStateMappings[finalisation.finalState]}`
+  return finalStateMappings[finalisation.finalState]
 }
 
 const getDocumentReference = (decision) =>
@@ -146,18 +147,18 @@ const getDocumentReference = (decision) =>
 
 const getInProgressDetail = (clearanceDecision) => {
   if (clearanceDecision.items?.some(item => item.checks?.some(check => check.decisionCode === NO_MATCH_DECISION_CODE && check.checkCode !== 'H224'))) {
-    return ' - Awaiting trader'
+    return CDS_STATUSES.IN_PROGRESS_AWAITING_TRADER
   }
 
   if (clearanceDecision.items?.some(item => item.checks?.some(check => isHoldDecisionCode(check.decisionCode)))) {
-    return ' - Awaiting IPAFFS'
+    return CDS_STATUSES.IN_PROGRESS_AWAITING_IPAFFS
   }
 
   if (clearanceDecision.items?.every(item => item.checks?.every(check => isReleaseDecisionCode(check.decisionCode) || isRefusalDecisionCode(check.decisionCode)))) {
-    return ' - Awaiting CDS'
+    return CDS_STATUSES.IN_PROGRESS_AWAITING_CDS
   }
 
-  return ''
+  return CDS_STATUSES.IN_PROGRESS
 }
 
 export const getCustomsDeclarationOpenState = (finalisation) =>
