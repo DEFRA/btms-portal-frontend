@@ -102,6 +102,9 @@ Ask a member of the team to provide you with values.
 | BTMS_REPORTING_API_BASE_URL          | Reporting section use this API for reporting data        |
 | BTMS_REPORTING_API_USERNAME          | Username for calls to reporting API                      |
 | BTMS_REPORTING_API_PASSWORD          | Password for calls to reporting API                      |
+| BTMS_IMPORTS_PROCESSOR_BASE_URL      | Specify the base URL to retrieve raw IPAFFS/CDS messages |
+| BTMS_IMPORTS_PROCESSOR_USERNAME      | Auth username for the imports processor endpoint(s)      |
+| BTMS_IMPORTS_PROCESSOR_PASSWORD      | Auth password for the imports processor endpoint(s)      |
 | AUTH_DEFRA_ID_OIDC_CONFIGURATION_URL | Configuration URL for DefraId                            |
 | AUTH_DEFRA_ID_CLIENT_SECRET          | Secret for DefraId                                       |
 | AUTH_DEFRA_ID_ORGANISATIONS          | List of DefraId organisations with access to the service |

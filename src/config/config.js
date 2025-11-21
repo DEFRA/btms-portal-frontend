@@ -270,6 +270,26 @@ const config = convict({
       env: 'BTMS_REPORTING_API_PASSWORD'
     }
   },
+  btmsImportsProcessor: {
+    baseUrl: {
+      doc: 'Trade Imports Processor base URL.',
+      format: String,
+      default: 'http://localhost:9080/processor',
+      env: 'BTMS_IMPORTS_PROCESSOR_BASE_URL'
+    },
+    username: {
+      doc: 'Trade Imports Processor username for authentication.',
+      format: String,
+      default: '',
+      env: 'BTMS_IMPORTS_PROCESSOR_USERNAME'
+    },
+    password: {
+      doc: 'Trade Imports Processor password for authentication.',
+      format: String,
+      default: '',
+      env: 'BTMS_IMPORTS_PROCESSOR_PASSWORD'
+    }
+  },
   auth: {
     defraId: {
       oidcConfigurationUrl: {

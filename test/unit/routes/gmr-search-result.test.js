@@ -11,7 +11,7 @@ jest.mock('../../../src/utils/metrics.js', () => ({
   getMetricNameBySearchType: jest.requireActual('../../../src/utils/metrics.js').getMetricNameBySearchType
 }))
 
-jest.mock('../../../src/services/related-import-declarations.js', () => ({
+jest.mock('../../../src/services/imports-data-api-client.js', () => ({
   getRelatedImportDeclarations: (...args) => mockGetRelatedImportDeclarations(...args)
 }))
 
@@ -22,6 +22,9 @@ jest.mock('../../../src/models/goods-vehicle-movements.js', () => ({
 const mockRequest = {
   query: {
     searchTerm: 'GMRA00000000'
+  },
+  pre: {
+    searchQuery: { "gmrId": 'GMRA00000000'}
   },
   yar: {
     flash: () => jest.fn()

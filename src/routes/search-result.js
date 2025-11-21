@@ -1,5 +1,5 @@
 import { paths, queryStringParams } from './route-constants.js'
-import { getRelatedImportDeclarations } from '../services/related-import-declarations.js'
+import { getRelatedImportDeclarations } from '../services/imports-data-api-client.js'
 import { mapCustomsDeclarations } from '../models/customs-declarations.js'
 import { mapPreNotifications } from '../models/pre-notifications.js'
 import { createRouteConfig } from './search-result-common.js'
@@ -11,7 +11,7 @@ const searchTermValidator = (key, pattern, value) => {
 
 export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_RESULT, async (request, h) => {
   const searchTerm = request.query[queryStringParams.SEARCH_TERM].trim().toUpperCase()
-  const searchResults = await getRelatedImportDeclarations(request)
+  const searchResults = await getRelatedImportDeclarations(request.pre.searchQuery)
 
   if (
     searchResults.customsDeclarations.length === 0 &&
