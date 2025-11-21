@@ -1,0 +1,51 @@
+@use "govuk-frontend" as *;
+
+.btms-admin-search-table-container {
+  overflow-x: auto;
+}
+
+.btms-admin-search-table {
+  display: block;
+  @include govuk-font-size($size: 14);
+  font-family: monospace;
+  position: relative;
+  width: max-content;
+
+  .token.property {
+    color:  govuk-colour("blue");
+  }
+
+  .token.number {
+    color: govuk-colour("light-blue");
+  }
+
+  .token.boolean {
+    color: govuk-colour("orange");
+  }
+
+  .token.string {
+    color: govuk-colour("green");
+  }
+
+  .token.keyword {
+    color: govuk-colour("black");
+  }
+
+  .row {
+    content-visibility: auto;
+    contain-intrinsic-size: 19px;
+    display: grid;
+    grid-template-columns: 4ch 1fr;
+  }
+
+  .line-number {
+    background-color: #ffffff;
+    color:  govuk-colour("dark-grey");
+    position: sticky;
+    left: 0;
+  }
+
+  .code {
+    white-space: pre;
+  }
+}

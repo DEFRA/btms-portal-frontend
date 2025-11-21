@@ -1,0 +1,73 @@
+{% extends 'layout.njk' %}
+
+{% from "govuk/components/input/macro.njk" import govukInput %}
+
+{% set errors = {
+  "SEARCH_TERM_REQUIRED": "Enter an MRN or CHED",
+  "SEARCH_TERM_INVALID": "Enter an MRN or CHED in the correct format",
+  "SEARCH_TERM_NOT_FOUND": searchTerm ~ " cannot be found"
+} %}
+{% set pageTitle = "Search for an MRN or CHED" %}
+{% set searchButton %}
+  {% include "./includes/button-search.njk" %}
+{% endset %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <form id="search" class="btms-search-wrapper" action="/admin/search">
+        <h1 class="govuk-label-wrapper">
+          <label class="govuk-label govuk-label--l" for="search-term">
+            Search for an MRN or CHED
+          </label>
+        </h1>
+        {{
+          govukInput({
+            errorMessage: {
+              text: errors[errorCode],
+              id: 'searchError'
+            } if isValid == false,
+            id: "search-term",
+            name: "searchTerm",
+            spellcheck: false,
+            formGroup: {
+              afterInput: {
+                html: searchButton
+              }
+            },
+            value: searchTerm
+          })
+        }}
+        <input type="hidden" name="searchType" value="information" />
+      </form>
+
+      {% if results %}
+      <div class="govuk-tabs govuk-!-margin-top-6">
+        <ul class="govuk-tabs__list" role="tablist">
+          <li class="govuk-tabs__list-item govuk-tabs__list-item{% if searchType == searchTypes.INFORMATION %}--selected{% endif %}" role="presentation">
+            <a class="govuk-tabs__tab" href="{{ links.information }}">{{ resourceType }} Information</a>
+          </li>
+          <li class="govuk-tabs__list-item govuk-tabs__list-item{% if searchType == searchTypes.ALL_EVENTS %}--selected{% endif %}" role="presentation">
+            <a class="govuk-tabs__tab" href="{{ links.allEvents }}">All events</a>
+          </li>
+          <li class="govuk-tabs__list-item govuk-tabs__list-item{% if searchType == searchTypes.ALL_MESSAGES %}--selected{% endif %}" role="presentation">
+            <a class="govuk-tabs__tab" href="{{ links.allMessages }}">All messages</a>
+          </li>
+        </ul>
+        <section class="govuk-tabs__panel" role="tabpanel">
+          <div class="btms-admin-search-table-container">
+            <div class="btms-admin-search-table" role="table">
+              {% for line in results %}
+                <div class="row" role="row">
+                  <div class="line-number" role="cell">{{ loop.index }}</div>
+                  <div class="code" role="cell">{{ line | safe }}</div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </section>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
