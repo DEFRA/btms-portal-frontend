@@ -154,6 +154,30 @@ test('Should render the admin view page with no search term or type supplied', a
   expect(statusCode).toBe(200)
 })
 
+test('Should show an error when no search term is supplied', async () => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.ADMIN_SEARCH}?${queryStringParams.SEARCH_TERM}=&${queryStringParams.SEARCH_TYPE}=information`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(
+    getByText(document.body, 'Enter an MRN or CHED')
+  ).toBeInTheDocument()
+})
+
 test('Should show an error with an invalid search term', async () => {
   wreck.get
     .mockResolvedValueOnce({ payload: provider })
