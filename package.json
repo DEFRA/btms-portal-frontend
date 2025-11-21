@@ -33,7 +33,7 @@
   "license": "OGL-UK-3.0",
   "dependencies": {
     "@babel/runtime": "^7.28.4",
-    "@defra/hapi-tracing": "^1.28.0",
+    "@defra/hapi-tracing": "^1.29.0",
     "@elastic/ecs-pino-format": "^1.5.0",
     "@hapi/bell": "^13.1.0",
     "@hapi/catbox-memory": "^6.0.2",
@@ -95,7 +95,7 @@
     "stylelint": "^16.25.0",
     "stylelint-config-gds": "^2.0.0",
     "terser-webpack-plugin": "^5.3.10",
-    "webpack": "^5.102.1",
+    "webpack": "^5.103.0",
     "webpack-assets-manifest": "^5.2.1",
     "webpack-cli": "^6.0.1"
   }
