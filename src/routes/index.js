@@ -1,4 +1,5 @@
 import { accessibility } from './accessibility.js'
+import { adminSearch } from './admin-search.js'
 import { health } from './health.js'
 import { staticAssetRoutes } from './static-assets.js'
 import { home } from './home.js'
@@ -20,9 +21,11 @@ import { cookiesGet, cookiesPost } from './cookies.js'
 
 export default [
   accessibility,
+  adminSearch,
   cookiesGet,
   cookiesPost,
   chromeDevtools,
+  gmrSearchResult,
   health,
   home,
   latestActivity,
@@ -37,6 +40,5 @@ export default [
   signOut,
   search,
   searchResult,
-  gmrSearchResult,
   ...staticAssetRoutes
 ]

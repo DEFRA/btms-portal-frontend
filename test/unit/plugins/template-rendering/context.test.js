@@ -42,6 +42,11 @@ test('logged in', async () => {
         href: '/latest-activity',
         text: 'Latest activity',
         active: false
+      },
+      {
+        href: '/admin/search',
+        text: 'Admin',
+        active: false
       }
     ],
     accountNavigation: [
@@ -90,6 +95,11 @@ test('not logged in', async () => {
       {
         href: '/latest-activity',
         text: 'Latest activity',
+        active: false
+      },
+      {
+        href: '/admin/search',
+        text: 'Admin',
         active: false
       }
     ],
