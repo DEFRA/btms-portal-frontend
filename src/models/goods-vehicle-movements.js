@@ -1,6 +1,6 @@
 import boom from '@hapi/boom'
 import { getCustomsDeclarationStatus } from './customs-declarations.js'
-import { ORDERED_CLEARANCE_DECISIONS } from './model-constants.js'
+import { ORDERED_CDS_STATUSES,ORDERED_CLEARANCE_DECISIONS } from './model-constants.js'
 import { paths, queryStringParams } from '../routes/route-constants.js'
 
 const getBtmsDecision = (clearanceDecision) => {
@@ -39,6 +39,11 @@ const incrementCounter = (counter, gmrDeclaration, shouldBeCounted) => {
   return counter
 }
 
+const getStatusRank = (status) => {
+  const displayOrder = ORDERED_CDS_STATUSES.indexOf(status)
+  return displayOrder > -1 ? displayOrder :  Number.MAX_SAFE_INTEGER
+}
+
 const mapCustomsDeclarations = (
   customsDeclarations,
   goodsVehicleMovement
@@ -56,7 +61,7 @@ const mapCustomsDeclarations = (
       known: gmrCustoms.reduce((knownMrnsCount, custom) => incrementCounter(knownMrnsCount, custom, true), 0),
       unknown: gmrCustoms.reduce((unknownMrnsCount, custom) => incrementCounter(unknownMrnsCount, custom, false), 0)
     },
-    customsDeclarations: (gmrCustoms).concat(gmrTransits)
+    customsDeclarations: (gmrCustoms).concat(gmrTransits).sort((a, b) => getStatusRank(a.cdsStatus) - getStatusRank(b.cdsStatus))
   }
 }
 

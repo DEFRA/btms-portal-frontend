@@ -39,6 +39,17 @@ test('GMR Vehicle details mapped', () => {
   expect(actual).toEqual(expected)
 })
 
+test('Throws exception if GMR data is not returned', () => {
+  const relatedImportDeclarationsPayload = {
+    goodsVehicleMovements: [
+      {
+      }
+    ]
+  }
+
+  expect(() => { mapGoodsVehicleMovements(relatedImportDeclarationsPayload) }).toThrow('Invalid GMR returned')
+})
+
 test('Maps GMR Customs Declaration', () => {
   const relatedImportDeclarationsPayload = {
     customsDeclarations: [
@@ -557,4 +568,430 @@ test.each([
       unknown: 0
     }
   })
+})
+
+test('Linked Customs Declarations are ordered by CDS Status Priority', () => {
+  const relatedImportDeclarationsPayload = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: "25GB00000000000001",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H224",
+                  decisionCode: "X00"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H224",
+              internalDecisionCode: "X00"
+            }
+          ]
+        },
+        finalisation: null
+      },
+      {
+        movementReferenceNumber: "25GB00000000000002",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H222",
+                  decisionCode: "X00"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H222",
+              internalDecisionCode: "X00"
+            }
+          ]
+        },
+        finalisation: {
+          isManualRelease: true
+        }
+      },
+      {
+        movementReferenceNumber: "25GB00000000000003",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H222",
+                  decisionCode: "X00"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H222",
+              internalDecisionCode: "X00"
+            }
+          ]
+        },
+        finalisation: {
+          isManualRelease: false,
+          finalState: 0
+        }
+      },
+      {
+        movementReferenceNumber: "25GB00000000000005",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H222",
+                  decisionCode: "H01"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H222",
+              internalDecisionCode: "H01"
+            }
+          ]
+        },
+        finalisation: null
+      },
+      {
+        movementReferenceNumber: "25GB00000000000006",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H222",
+                  decisionCode: "C01"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H222",
+              internalDecisionCode: "C01"
+            }
+          ]
+        },
+        finalisation: null
+      },
+      {
+        movementReferenceNumber: "25GB00000000000007",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H222",
+                  decisionCode: "X00"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H222",
+              internalDecisionCode: "X00"
+            }
+          ]
+        },
+        finalisation: null
+      },
+      {
+        movementReferenceNumber: "25GB00000000000008",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H222",
+                  decisionCode: "X00"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H222",
+              internalDecisionCode: "X00"
+            }
+          ]
+        },
+        finalisation: {
+          isManualRelease: true
+        }
+      },
+      {
+        movementReferenceNumber: "25GB00000000000010",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H222",
+                  decisionCode: "X00"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H222",
+              internalDecisionCode: "X00"
+            }
+          ]
+        },
+        finalisation: {
+          isManualRelease: false,
+          finalState: 1
+        }
+      },
+      {
+        movementReferenceNumber: "25GB00000000000011",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H222",
+                  decisionCode: "X00"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H222",
+              internalDecisionCode: "X00"
+            }
+          ]
+        },
+        finalisation: {
+          isManualRelease: false,
+          finalState: 3
+        }
+      },
+      {
+        movementReferenceNumber: "25GB00000000000012",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H222",
+                  decisionCode: "X00"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H222",
+              internalDecisionCode: "X00"
+            }
+          ]
+        },
+        finalisation: {
+          isManualRelease: false,
+          finalState: 5
+        }
+      },
+      {
+        movementReferenceNumber: "25GB00000000000013",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H222",
+                  decisionCode: "X00"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H222",
+              internalDecisionCode: "X00"
+            }
+          ]
+        },
+        finalisation: {
+          isManualRelease: false,
+          finalState: 2
+        }
+      },
+      {
+        movementReferenceNumber: "25GB00000000000014",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H222",
+                  decisionCode: "X00"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H222",
+              internalDecisionCode: "X00"
+            }
+          ]
+        },
+        finalisation: {
+          isManualRelease: false,
+          finalState: 6
+        }
+      },
+      {
+        movementReferenceNumber: "25GB00000000000015",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  itemNumber: 1,
+                  checkCode: "H222",
+                  decisionCode: "X00"
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: "H222",
+              internalDecisionCode: "X00"
+            }
+          ]
+        },
+        finalisation: {
+          isManualRelease: false,
+          finalState: 4
+        }
+      }
+    ],
+    goodsVehicleMovements: [
+      {
+        gmr: {
+          id: "GMRA00000AB1",
+          vehicleRegistrationNumber: "ABC 111",
+          trailerRegistrationNums: [
+            "ABC 222",
+            "ABC 333"
+          ],
+          declarations: {
+            transits: [
+              {
+                id: "25GB00000000000009" // Unknown
+              }
+            ],
+            customs: [
+              {
+                id: "25GB00000000000001" // In progress
+              },
+              {
+                id: "25GB00000000000002" // Finalised - Manually released
+              },
+              {
+                id: "25GB00000000000003" // Finalised - Released
+              },
+              {
+                id: "25GB00000000000004" // Unknown
+              },
+              {
+                id: "25GB00000000000005" // In progress - Awaiting IPAFFS
+              },
+              {
+                id: "25GB00000000000006" // In progress - Awaiting CDS
+              },
+              {
+                id: "25GB00000000000007" // In progress - Awaiting trader
+              },
+              {
+                id: "25GB00000000000008" // Finalised - Manually released
+              },
+              {
+                id: "25GB00000000000010" // Finalised - Cancelled after arrival
+              },
+              {
+                id: "25GB00000000000011" // Finalised - Destroyed
+              },
+              {
+                id: "25GB00000000000012" // Finalised - Released to King’s warehouse
+              },
+              {
+                id: "25GB00000000000013" // Finalised - Cancelled while pre-lodged
+              },
+              {
+                id: "25GB00000000000014" // Finalised - Transferred to MSS
+              },
+              {
+                id: "25GB00000000000015" // Finalised - Seized
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+
+  const actual = mapGoodsVehicleMovements(relatedImportDeclarationsPayload)
+
+  expect(actual.linkedCustomsDeclarations[0].cdsStatus).toBe('In progress - Awaiting trader')
+  expect(actual.linkedCustomsDeclarations[1].cdsStatus).toBe('In progress - Awaiting IPAFFS')
+  expect(actual.linkedCustomsDeclarations[2].cdsStatus).toBe('In progress - Awaiting CDS')
+  expect(actual.linkedCustomsDeclarations[3].cdsStatus).toBe('In progress')
+  expect(actual.linkedCustomsDeclarations[4].cdsStatus).toBe('Finalised - Manually released')
+  expect(actual.linkedCustomsDeclarations[5].cdsStatus).toBe('Finalised - Manually released')
+  expect(actual.linkedCustomsDeclarations[6].cdsStatus).toBe('Finalised - Released')
+  expect(actual.linkedCustomsDeclarations[7].cdsStatus).toBe('Finalised - Cancelled after arrival')
+  expect(actual.linkedCustomsDeclarations[8].cdsStatus).toBe('Finalised - Cancelled while pre-lodged')
+  expect(actual.linkedCustomsDeclarations[9].cdsStatus).toBe('Finalised - Destroyed')
+  expect(actual.linkedCustomsDeclarations[10].cdsStatus).toBe('Finalised - Seized')
+  expect(actual.linkedCustomsDeclarations[11].cdsStatus).toBe('Finalised - Released to King’s warehouse')
+  expect(actual.linkedCustomsDeclarations[12].cdsStatus).toBe('Finalised - Transferred to MSS')
+  expect(actual.linkedCustomsDeclarations[13].cdsStatus).toBe('Unknown')
+  expect(actual.linkedCustomsDeclarations[14].cdsStatus).toBe('Unknown')
+
 })
