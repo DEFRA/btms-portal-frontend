@@ -94,14 +94,30 @@ export const chedStatusDescriptions = {
 
 export const closedChedStatuses = ['CANCELLED', 'REPLACED']
 
+export const CDS_STATUSES = {
+  IN_PROGRESS_AWAITING_TRADER: 'In progress - Awaiting trader',
+  IN_PROGRESS_AWAITING_IPAFFS: 'In progress - Awaiting IPAFFS',
+  IN_PROGRESS_AWAITING_CDS: 'In progress - Awaiting CDS',
+  IN_PROGRESS: 'In progress',
+  FINALISED_MANUALLY_RELEASED: 'Finalised - Manually released',
+  FINALISED_RELEASED: 'Finalised - Released',
+  FINALISED_CANCELLED_AFTER_ARRIVAL: 'Finalised - Cancelled after arrival',
+  FINALISED_CANCELLED_WHILE_PRE_LODGED: 'Finalised - Cancelled while pre-lodged',
+  FINALISED_DESTROYED: 'Finalised - Destroyed',
+  FINALISED_SEIZED: 'Finalised - Seized',
+  FINALISED_RELEASED_TO_KINGS_WAREHOUSE: 'Finalised - Released to King’s warehouse',
+  FINALISED_TRANSFERRED_TO_MSS: 'Finalised - Transferred to MSS',
+  UNKNOWN: 'Unknown'
+}
+
 export const finalStateMappings = {
-  0: 'Released',
-  1: 'Cancelled after arrival',
-  2: 'Cancelled while pre-lodged',
-  3: 'Destroyed',
-  4: 'Seized',
-  5: 'Released to King’s warehouse',
-  6: 'Transferred to MSS'
+  0: CDS_STATUSES.FINALISED_RELEASED,
+  1: CDS_STATUSES.FINALISED_CANCELLED_AFTER_ARRIVAL,
+  2: CDS_STATUSES.FINALISED_CANCELLED_WHILE_PRE_LODGED,
+  3: CDS_STATUSES.FINALISED_DESTROYED,
+  4: CDS_STATUSES.FINALISED_SEIZED,
+  5: CDS_STATUSES.FINALISED_RELEASED_TO_KINGS_WAREHOUSE,
+  6: CDS_STATUSES.FINALISED_TRANSFERRED_TO_MSS
 }
 
 export const iuuDecisionDisplay = {
@@ -171,4 +187,20 @@ export const ORDERED_CLEARANCE_DECISIONS = [
   { type: 'item', code: 'C06', description: `Release - ${decisionCodeDescriptions.C06}` },
   { type: 'item', code: 'C07', description: `Release - ${decisionCodeDescriptions.C07}` },
   { type: 'item', code: 'C08', description: `Release - ${decisionCodeDescriptions.C08}` }
+]
+
+export const ORDERED_CDS_STATUSES = [
+  CDS_STATUSES.IN_PROGRESS_AWAITING_TRADER,
+  CDS_STATUSES.IN_PROGRESS_AWAITING_IPAFFS,
+  CDS_STATUSES.IN_PROGRESS_AWAITING_CDS,
+  CDS_STATUSES.IN_PROGRESS,
+  CDS_STATUSES.FINALISED_MANUALLY_RELEASED,
+  CDS_STATUSES.FINALISED_RELEASED,
+  CDS_STATUSES.FINALISED_CANCELLED_AFTER_ARRIVAL,
+  CDS_STATUSES.FINALISED_CANCELLED_WHILE_PRE_LODGED,
+  CDS_STATUSES.FINALISED_DESTROYED,
+  CDS_STATUSES.FINALISED_SEIZED,
+  CDS_STATUSES.FINALISED_RELEASED_TO_KINGS_WAREHOUSE,
+  CDS_STATUSES.FINALISED_TRANSFERRED_TO_MSS,
+  CDS_STATUSES.UNKNOWN
 ]
