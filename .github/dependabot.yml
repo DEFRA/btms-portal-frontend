@@ -1,30 +1,54 @@
 version: 2
 
 updates:
-  # Update npm packages
-  - package-ecosystem: npm
-    directory: /
-    open-pull-requests-limit: 10
+  # ===========================
+  # NPM - PRODUCTION DEPENDENCIES
+  # ===========================
+  - package-ecosystem: "npm"
+    directory: "/"
     schedule:
-      interval: daily
-      time: '12:00'
-      timezone: 'Europe/London'
-    # Single PR for patch and minor
-    # Major will be one update per PR
-    groups:
-      patch:
-        update-types:
-          - 'patch'
-      minor:
-        update-types:
-          - 'minor'
+      interval: "daily"
+      time: "00:00"
     allow:
-      - dependency-type: direct
+      - dependency-type: "production"
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"             # all prod deps
+        update-types:
+          - "minor"
+          - "patch"
+      security:
+        applies-to: "security-updates"
+        patterns:
+          - "*"
+
+  # ===========================
+  # NPM - DEVELOPMENT DEPENDENCIES
+  # ===========================
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "00:00"
+    allow:
+      - dependency-type: "development"
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"             # all dev deps
+        update-types:
+          - "minor"
+          - "patch"
+      security:
+        applies-to: "security-updates"
+        patterns:
+          - "*"
 
   # Update GitHub Actions
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: daily
-      time: '12:00'
+      time: '00:00'
       timezone: 'Europe/London'
