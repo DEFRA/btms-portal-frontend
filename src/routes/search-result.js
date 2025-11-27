@@ -26,8 +26,8 @@ export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_
     return h.redirect(paths.SEARCH).takeover()
   }
 
-  const customsDeclarations = mapCustomsDeclarations(searchResults)
-  const preNotifications = mapPreNotifications(searchResults)
+  const customsDeclarations = mapCustomsDeclarations(searchResults, searchTerm)
+  const preNotifications = mapPreNotifications(searchResults, searchTerm)
 
   const viewModel = {
     resultsPage: true,
