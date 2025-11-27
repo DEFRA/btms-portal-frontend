@@ -11,6 +11,8 @@ updates:
       time: "00:00"
     allow:
       - dependency-type: "production"
+    reviewers:
+      - DEFRA/trade-data-matching
     groups:
       minor-and-patch:
         patterns:
@@ -22,8 +24,6 @@ updates:
         applies-to: "security-updates"
         patterns:
           - "*"
-    reviewers:
-      - DEFRA/trade-data-matching
 
   # ===========================
   # NPM - DEVELOPMENT DEPENDENCIES
@@ -46,8 +46,6 @@ updates:
         applies-to: "security-updates"
         patterns:
           - "*"
-    reviewers:
-      - DEFRA/trade-data-matching
 
   # Update GitHub Actions
   - package-ecosystem: github-actions
