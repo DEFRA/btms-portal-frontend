@@ -10,7 +10,7 @@ updates:
 
     schedule:
       interval: daily
-      time: "0012:00"
+      time: "00:00"
       timezone: "Europe/London"
 
     allow:
