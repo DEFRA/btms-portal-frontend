@@ -203,13 +203,16 @@ test.each([
   expect(result).toContain(`<span class="govuk-visually-hidden">Error:</span> ${options.expectedSearchError}`)
 })
 
-test('redirects to GMR results page if valid GMR search term', async () => {
+test.each([
+  'GMRA00000AB1',
+  'gmra00000ab1'
+])('redirects to GMR results page if valid GMR search term', async (searchTerm) => {
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
 
   const { statusCode, headers } = await server.inject({
     method: 'get',
-    url: `${paths.SEARCH}?${queryStringParams.SEARCH_TERM}=GMRA00000AB1`,
+    url: `${paths.SEARCH}?${queryStringParams.SEARCH_TERM}=${searchTerm}`,
     auth: {
       strategy: 'session',
       credentials
@@ -217,14 +220,18 @@ test('redirects to GMR results page if valid GMR search term', async () => {
   })
 
   expect(statusCode).toBe(302)
-  expect(headers.location).toBe(`${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=GMRA00000AB1`)
+  expect(headers.location).toBe(`${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${searchTerm.toUpperCase()}`)
 })
 
 test.each([
   '24GB6T3HFCIZV1HAR9',
+  '24gb6t3hfcizv1har9',
   'CHEDP.GB.2025.4433124',
+  'chedp.gb.2025.4433124',
   'GBCHD2025.4433124',
-  '4GB335031931000-WB2408-27WWL62745'
+  'gbchd2025.4433124',
+  '4GB335031931000-WB2408-27WWL62745',
+  '4gb335031931000-wb2408-27wwl62745'
 ])('redirects to search results page if valid non GMR search term', async (searchTerm) => {
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
@@ -239,5 +246,5 @@ test.each([
   })
 
   expect(statusCode).toBe(302)
-  expect(headers.location).toBe(`${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${searchTerm}`)
+  expect(headers.location).toBe(`${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${searchTerm.toUpperCase()}`)
 })
