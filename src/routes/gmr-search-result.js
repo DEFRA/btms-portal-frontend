@@ -10,7 +10,7 @@ const searchTermValidator = (key, pattern, value) => {
 }
 
 export const gmrSearchResult = createRouteConfig(searchTermValidator, paths.GMR_SEARCH_RESULT, async (request, h) => {
-  const searchTerm = request.query[queryStringParams.SEARCH_TERM].trim()
+  const searchTerm = request.query[queryStringParams.SEARCH_TERM].trim().toUpperCase()
   const data = await getRelatedImportDeclarations(request)
 
   if (data.goodsVehicleMovements.length === 0) {
