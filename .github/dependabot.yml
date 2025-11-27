@@ -22,6 +22,8 @@ updates:
         applies-to: "security-updates"
         patterns:
           - "*"
+    reviewers:
+      - DEFRA/trade-data-matching
 
   # ===========================
   # NPM - DEVELOPMENT DEPENDENCIES
@@ -44,6 +46,8 @@ updates:
         applies-to: "security-updates"
         patterns:
           - "*"
+    reviewers:
+      - DEFRA/trade-data-matching
 
   # Update GitHub Actions
   - package-ecosystem: github-actions
@@ -52,3 +56,5 @@ updates:
       interval: daily
       time: '00:00'
       timezone: 'Europe/London'
+    reviewers:
+      - DEFRA/trade-data-matching
