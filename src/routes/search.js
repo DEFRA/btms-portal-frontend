@@ -14,7 +14,7 @@ export const search = {
     pre: [
       {
         method: (request, h) => {
-          const value = request.query[queryStringParams.SEARCH_TERM]?.trim()
+          const value = request.query[queryStringParams.SEARCH_TERM]?.trim().toUpperCase()
           if (value !== undefined) {
             const match = searchPatterns.find(({ pattern }) =>
               pattern.test(value)

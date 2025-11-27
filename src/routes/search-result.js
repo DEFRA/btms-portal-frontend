@@ -10,7 +10,7 @@ const searchTermValidator = (key, pattern, value) => {
 }
 
 export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_RESULT, async (request, h) => {
-  const searchTerm = request.query[queryStringParams.SEARCH_TERM].trim()
+  const searchTerm = request.query[queryStringParams.SEARCH_TERM].trim().toUpperCase()
   const searchResults = await getRelatedImportDeclarations(request)
 
   if (
