@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Test code and Create Test Coverage Reports
         uses: actions/setup-node@v6
@@ -29,13 +29,13 @@ jobs:
           npm run build
           npm run lint
           npm test
-
       - name: Test Docker Image Build
         run: |
           set +e
-          docker build --no-cache --tag cdp-node-frontend-template .
+          docker build --no-cache --tag btms-portal-frontend .
           exit $?
-
+      - name: Check with Trivy
+        run: docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image btms-portal-frontend:latest --ignore-unfixed
       - name: SonarCloud Scan
         if: github.actor != 'dependabot[bot]'
         uses: SonarSource/sonarqube-scan-action@master
