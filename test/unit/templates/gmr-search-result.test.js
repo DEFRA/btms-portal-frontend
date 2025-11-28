@@ -49,4 +49,29 @@ describe('GMR search result', () => {
     expect($renderedTemplate.html()).toContain('<span class="govuk-!-font-weight-bold govuk-tag govuk-tag--grey">Unknown</span>')
     expect($renderedTemplate.html()).toContain('<td class="govuk-table__cell">Unknown</td>')
   })
+
+  test.each([
+    ['ABC 111', null, ['Not available']],
+    ['ABC 111', [], ['Not available']],
+    ['ABC 111', ['ABC 111'], ['Same as VRN']],
+    ['ABC 111', ['ABC 222'], ['<span class="vehicle-number-plate vehicle-number-plate--rear" aria-label="Trailer registration number ABC 222">ABC 222</span>']],
+    ['ABC 111', ['ABC 111', 'ABC 222'], ['<span class="vehicle-number-plate vehicle-number-plate--front" aria-label="Vehicle registration number ABC 111">ABC 111</span>', '<span class="vehicle-number-plate vehicle-number-plate--rear" aria-label="Trailer registration number ABC 222">ABC 222</span>']],
+    [null, ['ABC 111'], ['<span class="vehicle-number-plate vehicle-number-plate--rear" aria-label="Trailer registration number ABC 111">ABC 111</span>']],
+    ['', ['ABC 111'], ['<span class="vehicle-number-plate vehicle-number-plate--rear" aria-label="Trailer registration number ABC 111">ABC 111</span>']]
+  ])('Should render Trailer Registration Number', (vehicleRegNumber, trailRegNumbers, expectedContent) => {
+    const viewContext = {
+      searchTerm: 'GMRA00000AB1',
+      goodsVehicleMovement: {
+        vehicleRegistrationNumber: vehicleRegNumber,
+        trailerRegistrationNumbers: trailRegNumbers,
+        linkedCustomsDeclarations: []
+      }
+    }
+
+    $renderedTemplate = renderTemplate('gmr-search-result.njk', viewContext)
+
+    for (const content in expectedContent) {
+      expect($renderedTemplate.html()).toContain(content)
+    }
+  })
 })

@@ -1,7 +1,13 @@
-{% macro trailerNumberPlates(trailerRegistrationNumbers) %}
-  {% if trailerRegistrationNumbers %}
-    {% for regNumber in trailerRegistrationNumbers %}
-      <span class="vehicle-number-plate vehicle-number-plate--rear" aria-label="Trailer registration number {{regNumber}}">{{regNumber}}</span>
-    {% endfor %}
+{% macro trailerNumberPlates(trailerRegistrationNumbers, vehicleRegistationNumber) %}
+  {% if trailerRegistrationNumbers|length %}
+    {% if trailerRegistrationNumbers.length === 1 and trailerRegistrationNumbers|first|upper === vehicleRegistationNumber|upper %}
+      Same as VRN
+    {% else %}
+      {% for regNumber in trailerRegistrationNumbers %}
+        <span class="vehicle-number-plate vehicle-number-plate--rear" aria-label="Trailer registration number {{regNumber}}">{{regNumber}}</span>
+      {% endfor %}
+    {% endif %}
+  {% else %}
+    Not available
   {% endif %}
 {% endmacro %}
