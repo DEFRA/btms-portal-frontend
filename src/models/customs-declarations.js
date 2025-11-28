@@ -15,6 +15,7 @@ import {
   NO_MATCH_DECISION_CODE,
   CDS_STATUSES
 } from './model-constants.js'
+import { sortDescendingAndSearchTermMatchAlwaysFirst } from '../utils/sort.js'
 
 const documentReferenceRegex = /\d{7}[VR]?$/
 
@@ -253,10 +254,14 @@ const mapCustomsDeclaration = (declaration, notificationStatuses) => {
   }
 }
 
+const searchTermMatcher = (searchTerm, customsDeclaration) =>
+  customsDeclaration.movementReferenceNumber === searchTerm ||
+  customsDeclaration.declarationUcr === searchTerm
+
 export const mapCustomsDeclarations = ({
   customsDeclarations,
   importPreNotifications
-}) => {
+}, searchTerm) => {
   const notificationStatuses = importPreNotifications.reduce(
     (statuses, { importPreNotification }) => {
       const ref = importPreNotification.referenceNumber.split('.').pop()
@@ -268,5 +273,5 @@ export const mapCustomsDeclarations = ({
 
   return customsDeclarations.map((declaration) =>
     mapCustomsDeclaration(declaration, notificationStatuses)
-  )
+  ).sort(sortDescendingAndSearchTermMatchAlwaysFirst(searchTerm, searchTermMatcher))
 }
