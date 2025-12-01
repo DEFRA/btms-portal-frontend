@@ -3,12 +3,12 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set errors = {
-  "SEARCH_TERM_REQUIRED": "Enter an MRN, CHED or DUCR",
-  "SEARCH_TERM_INVALID": "Enter an MRN, CHED or DUCR reference in the correct format",
+  "SEARCH_TERM_REQUIRED": "Enter an MRN, CHED, GMR or DUCR",
+  "SEARCH_TERM_INVALID": "Enter an MRN, CHED, GMR or DUCR reference in the correct format",
   "SEARCH_TERM_NOT_FOUND": searchTerm ~ " cannot be found"
 } %}
 
-{% set pageTitle = "Search by MRN, CHED or DUCR" %}
+{% set pageTitle = "Search for an MRN, CHED, GMR or DUCR" %}
 
 {% set searchHint %}
   {% include "./includes/search-hint.njk" %}
@@ -23,7 +23,7 @@
       <form id="search" class="btms-search-wrapper" action="/search">
         <h1 class="govuk-label-wrapper">
           <label class="govuk-label govuk-label--l" for="search-term">
-            Search by MRN, CHED or DUCR
+            Search for an MRN, CHED, GMR or DUCR
           </label>
         </h1>
         <div id="search-term-hint" class="govuk-hint govuk-body-s">
@@ -31,6 +31,7 @@
           <ul class="govuk-list govuk-body-s">
             <li>MRN, 24GB6T3HFCIZV1HAR9</li>
             <li>CHED, CHEDP.GB.2025.4433124 or GBCHD2025.4433124</li>
+            <li>GMR, GMRA00002KW2</li>
             <li>DUCR, 4GB335031931000-WB2408-27WWL62745</li>
           </ul>
         </div>
