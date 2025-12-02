@@ -35,7 +35,10 @@ export const adminSearch = {
   method: ['get', 'post'],
   path: paths.ADMIN_SEARCH,
   options: {
-    auth: 'session',
+    auth: {
+      scope: 'admin',
+      strategy: 'session'
+    },
     cache: CACHE_CONTROL_NO_STORE,
     validate: {
       query: async (value) => {
@@ -91,6 +94,7 @@ export const adminSearch = {
         )
       }
       request.logger.setBindings({ error })
+      request.logger.error(error)
       throw error
     }
   }

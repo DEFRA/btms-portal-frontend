@@ -373,6 +373,13 @@ const config = convict({
         sensitive: true,
         env: 'AUTH_ENTRA_ID_SCOPES',
         default: ['openid', 'offline_access']
+      },
+      adminGroupId: {
+        doc: 'ENTRA ID - admin security group identifier',
+        format: String,
+        sensitive: true,
+        env: 'AUTH_ENTRA_ID_ADMIN_GROUP_ID',
+        default: ''
       }
     },
     origins: {

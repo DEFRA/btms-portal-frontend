@@ -3,7 +3,7 @@ import wreck from '@hapi/wreck'
 import { getByRole, getByText } from '@testing-library/dom'
 import { paths, queryStringParams } from '../../src/routes/route-constants.js'
 import { initialiseServer } from '../utils/initialise-server.js'
-import { setupAuthedUserSession } from '../unit/utils/session-helper.js'
+import { setupAuthedAdminUserSession, setupAuthedUserSession } from '../unit/utils/session-helper.js'
 
 const provider = {
   authorization_endpoint: 'https://auth.endpoint',
@@ -54,7 +54,7 @@ test.each([
       .mockResolvedValueOnce({ payload: { hello: 'world' } })
 
     const server = await initialiseServer()
-    const credentials = await setupAuthedUserSession(server)
+    const credentials = await setupAuthedAdminUserSession(server)
 
     const { payload } = await server.inject({
       method: 'get',
@@ -97,7 +97,7 @@ test('Should deserialise nested JSON', async () => {
     })
 
   const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
+  const credentials = await setupAuthedAdminUserSession(server)
 
   const { payload } = await server.inject({
     method: 'get',
@@ -140,7 +140,7 @@ test('Should render the admin view page with no search term or type supplied', a
     .mockResolvedValueOnce({ payload: provider })
 
   const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
+  const credentials = await setupAuthedAdminUserSession(server)
 
   const { statusCode } = await server.inject({
     method: 'get',
@@ -160,7 +160,7 @@ test('Should show an error when no search term is supplied', async () => {
     .mockResolvedValueOnce({ payload: provider })
 
   const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
+  const credentials = await setupAuthedAdminUserSession(server)
 
   const { payload } = await server.inject({
     method: 'get',
@@ -184,7 +184,7 @@ test('Should show an error with an invalid search term', async () => {
     .mockResolvedValueOnce({ payload: provider })
 
   const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
+  const credentials = await setupAuthedAdminUserSession(server)
 
   const { payload } = await server.inject({
     method: 'get',
@@ -209,7 +209,7 @@ test('Should show a not found error with a search term that could not be found',
     .mockRejectedValue({ output: { statusCode: 404 } })
 
   const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
+  const credentials = await setupAuthedAdminUserSession(server)
 
   const { payload } = await server.inject({
     method: 'get',
@@ -224,5 +224,29 @@ test('Should show a not found error with a search term that could not be found',
 
   expect(
     getByText(document.body, '24GBBGBKCDMS895999 cannot be found')
+  ).toBeInTheDocument()
+})
+
+test('Should show the forbidden page when the user is not in the admin security group', async () => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.ADMIN_SEARCH}?${queryStringParams.SEARCH_TERM}=24GBBGBKCDMS895999&${queryStringParams.SEARCH_TYPE}=information`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(
+    getByText(document.body, 'You do not have the correct permissions to access this service')
   ).toBeInTheDocument()
 })
