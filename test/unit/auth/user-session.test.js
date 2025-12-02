@@ -38,35 +38,34 @@ describe('#userSession', () => {
     })
 
     test('Should set session in cache', async () => {
+      const sessionId = crypto.randomUUID()
       const request = {
         server,
         auth: {
           isAuthenticated: true,
           credentials: {
-            ...authedUser,
-            profile: {
-              ...authedUser
-            }
-          }
+            ...authedUser
+          },
+          strategy: 'defraId'
         }
       }
 
-      await setUserSession(request, authedUser.sessionId)
+      await setUserSession(request, sessionId)
 
-      const cachedSession = await server.app.cache.get(authedUser.sessionId)
+      const cachedSession = await server.app.cache.get(sessionId)
 
       expect(cachedSession).not.toBeNull()
-      expect(cachedSession.isAuthenticated).toBeTruthy()
+      expect(cachedSession.strategy).toBe('defraId')
+      expect(cachedSession.expiresIn).toBeGreaterThan(1000)
     })
   })
 
   describe('When removing user session', () => {
-    let server, authedUser
+    let server
 
     beforeEach(async () => {
       jest.clearAllMocks()
       server = await startServer()
-      authedUser = createAuthedUser()
     })
 
     afterEach(async () => {
@@ -78,7 +77,7 @@ describe('#userSession', () => {
         server,
         state: {
           userSession: {
-            sessionId: authedUser.sessionId
+            sessionId: crypto.randomUUID()
           }
         },
         cookieAuth: {
@@ -93,12 +92,13 @@ describe('#userSession', () => {
   })
 
   describe('When updating user session', () => {
-    let server, originalCachedSession
+    let server, originalCachedSession, sessionId
 
     beforeEach(async () => {
       jest.clearAllMocks()
       server = await startServer()
-      originalCachedSession = await setupAuthedUserSession(server)
+      sessionId = crypto.randomUUID()
+      originalCachedSession = await setupAuthedUserSession(server, sessionId)
     })
 
     afterEach(async () => {
@@ -112,7 +112,7 @@ describe('#userSession', () => {
         server,
         state: {
           userSession: {
-            sessionId: originalCachedSession.sessionId
+            sessionId
           }
         }
       }
@@ -126,9 +126,7 @@ describe('#userSession', () => {
 
       await updateUserSession(request, refeshedSession)
 
-      const newCachedSession = await server.app.cache.get(
-        originalCachedSession.sessionId
-      )
+      const newCachedSession = await server.app.cache.get(sessionId)
 
       expect(newCachedSession).not.toBeNull()
       expect(newCachedSession.expiresAt).not.toEqual(
@@ -138,11 +136,12 @@ describe('#userSession', () => {
   })
 
   describe('When validating user session', () => {
-    let server, userSession
+    let server, userSession, sessionId
 
     beforeEach(async () => {
       jest.clearAllMocks()
       server = await startServer()
+      sessionId = crypto.randomUUID()
     })
 
     afterEach(async () => {
@@ -162,20 +161,16 @@ describe('#userSession', () => {
     })
 
     test('Should return valid if active session exists', async () => {
-      userSession = await setupAuthedUserSession(server)
+      userSession = await setupAuthedUserSession(server, sessionId)
 
       const request = {
         server,
         state: {
-          userSession: {
-            sessionId: userSession.sessionId
-          }
+          userSession: { sessionId }
         }
       }
 
-      const session = {
-        sessionId: userSession.sessionId
-      }
+      const session = { sessionId }
 
       const result = await validateUserSession(server, request, session)
 
@@ -189,6 +184,7 @@ describe('#userSession', () => {
       })
       userSession = await setupAuthedUserSession(
         server,
+        sessionId,
         new Date().toISOString()
       )
 
@@ -196,7 +192,7 @@ describe('#userSession', () => {
         server,
         state: {
           userSession: {
-            sessionId: userSession.sessionId
+            sessionId
           }
         },
         cookieAuth: {
@@ -205,7 +201,7 @@ describe('#userSession', () => {
       }
 
       const session = {
-        sessionId: userSession.sessionId
+        sessionId
       }
 
       const result = await validateUserSession(server, request, session)
@@ -222,13 +218,13 @@ describe('#userSession', () => {
         output: 'output'
       })
       const expiresAt = new Date().toISOString()
-      userSession = await setupAuthedUserSession(server, expiresAt)
+      userSession = await setupAuthedUserSession(server, sessionId, expiresAt)
 
       const request = {
         server,
         state: {
           userSession: {
-            sessionId: userSession.sessionId
+            sessionId
           }
         },
         logger: {
@@ -237,7 +233,7 @@ describe('#userSession', () => {
       }
 
       const session = {
-        sessionId: userSession.sessionId
+        sessionId
       }
 
       await validateUserSession(server, request, session)
@@ -246,7 +242,7 @@ describe('#userSession', () => {
         [
           JSON.stringify({
             message: 'refreshing token',
-            sessionId: userSession.sessionId,
+            sessionId,
             expiresAt,
             payload: 'payload',
             output: 'output'
@@ -259,6 +255,7 @@ describe('#userSession', () => {
       refreshAccessToken.mockRejectedValue({ message: 'boom' })
       userSession = await setupAuthedUserSession(
         server,
+        sessionId,
         new Date().toISOString()
       )
 
@@ -266,7 +263,7 @@ describe('#userSession', () => {
         server,
         state: {
           userSession: {
-            sessionId: userSession.sessionId
+            sessionId
           }
         },
         logger: {
@@ -275,7 +272,7 @@ describe('#userSession', () => {
       }
 
       const session = {
-        sessionId: userSession.sessionId
+        sessionId
       }
 
       await validateUserSession(server, request, session)
@@ -297,6 +294,7 @@ describe('#userSession', () => {
       })
       userSession = await setupAuthedUserSession(
         server,
+        sessionId,
         new Date().toISOString()
       )
 
@@ -304,13 +302,13 @@ describe('#userSession', () => {
         server,
         state: {
           userSession: {
-            sessionId: userSession.sessionId
+            sessionId
           }
         }
       }
 
       const session = {
-        sessionId: userSession.sessionId
+        sessionId
       }
 
       const result = await validateUserSession(server, request, session)
@@ -323,12 +321,13 @@ describe('#userSession', () => {
   })
 
   describe('When getting user session', () => {
-    let server, userSession
+    let server, userSession, sessionId
 
     describe('When a session exists', () => {
       beforeEach(async () => {
         server = await startServer()
-        userSession = await setupAuthedUserSession(server)
+        sessionId = crypto.randomUUID()
+        userSession = await setupAuthedUserSession(server, sessionId)
       })
 
       afterEach(async () => {
@@ -336,14 +335,14 @@ describe('#userSession', () => {
       })
 
       test('Should return the cached session', async () => {
-        const cachedSession = await server.app.cache.get(userSession.sessionId)
+        const cachedSession = await server.app.cache.get(sessionId)
         expect(cachedSession).toEqual(userSession)
 
         const request = {
           server,
           state: {
             userSession: {
-              sessionId: userSession.sessionId
+              sessionId
             }
           }
         }
@@ -357,7 +356,6 @@ describe('#userSession', () => {
     describe('When request state is not present', () => {
       beforeEach(async () => {
         server = await startServer()
-        userSession = await setupAuthedUserSession(server)
       })
 
       afterEach(async () => {
@@ -365,9 +363,6 @@ describe('#userSession', () => {
       })
 
       test('Should return empty session', async () => {
-        const cachedSession = await server.app.cache.get(userSession.sessionId)
-        expect(cachedSession).toEqual(userSession)
-
         const request = {
           server
         }
@@ -381,7 +376,6 @@ describe('#userSession', () => {
     describe('When a user session is not present', () => {
       beforeEach(async () => {
         server = await startServer()
-        userSession = await setupAuthedUserSession(server)
       })
 
       afterEach(async () => {
@@ -389,12 +383,13 @@ describe('#userSession', () => {
       })
 
       test('Should return empty session', async () => {
-        const cachedSession = await server.app.cache.get(userSession.sessionId)
-        expect(cachedSession).toEqual(userSession)
-
         const request = {
           server,
-          state: {}
+          state: {
+            userSession: {
+              sessionId: crypto.randomUUID()
+            }
+          }
         }
 
         const retrievedSession = await getUserSession(request)
@@ -430,12 +425,12 @@ describe('#userSession', () => {
   })
 
   describe('When dropping user session', () => {
-    let server, userSession
-
+    let server, userSession, sessionId
     describe('When a session exists in cache', () => {
       beforeEach(async () => {
         server = await startServer()
-        userSession = await setupAuthedUserSession(server)
+        sessionId = crypto.randomUUID()
+        userSession = await setupAuthedUserSession(server, sessionId)
       })
 
       afterEach(async () => {
@@ -445,21 +440,21 @@ describe('#userSession', () => {
       test('Should remove the session from cache', async () => {
         let cachedSession
 
-        cachedSession = await server.app.cache.get(userSession.sessionId)
+        cachedSession = await server.app.cache.get(sessionId)
         expect(cachedSession).toEqual(userSession)
 
         const request = {
           server,
           state: {
             userSession: {
-              sessionId: userSession.sessionId
+              sessionId
             }
           }
         }
 
         dropUserSession(request)
 
-        cachedSession = await server.app.cache.get(userSession.sessionId)
+        cachedSession = await server.app.cache.get(sessionId)
         expect(cachedSession).toBeNull()
       })
     })
