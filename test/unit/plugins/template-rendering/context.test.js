@@ -18,7 +18,53 @@ jest.mock('node:fs', () => ({
 test('logged in', async () => {
   mockGetUserSession.mockReturnValue({
     strategy: 'defraId',
-    isAuthenticated: true
+  })
+
+  const expected = {
+    assetPath: '/public/assets',
+    defaultHeaderOptions: {
+      homepageUrl: 'https://www.gov.uk',
+      serviceName: 'Border Trade Matching Service'
+    },
+    navigation: [
+      {
+        href: '/search',
+        text: 'Search',
+        active: true
+      },
+      {
+        href: '/reporting',
+        text: 'Reporting',
+        active: false
+      },
+      {
+        href: '/latest-activity',
+        text: 'Latest activity',
+        active: false
+      }
+    ],
+    accountNavigation: [
+      {
+        href: '#',
+        text: 'Manage account'
+      },
+      {
+        href: '/sign-out',
+        text: 'Sign out'
+      }
+    ],
+    getAssetPath: expect.any(Function)
+  }
+
+  const result = await context({ auth: { isAuthenticated: true }, url: { pathname: '/search' } })
+
+  expect(result).toEqual(expected)
+})
+
+test('logged in as admin user', async () => {
+  mockGetUserSession.mockReturnValue({
+    strategy: 'defraId',
+    scope: ['admin']
   })
 
   const expected = {
@@ -62,7 +108,7 @@ test('logged in', async () => {
     getAssetPath: expect.any(Function)
   }
 
-  const result = await context({ url: { pathname: '/search' } })
+  const result = await context({ auth: { isAuthenticated: true }, url: { pathname: '/search' } })
 
   expect(result).toEqual(expected)
 })
@@ -95,11 +141,6 @@ test('not logged in', async () => {
       {
         href: '/latest-activity',
         text: 'Latest activity',
-        active: false
-      },
-      {
-        href: '/admin/search',
-        text: 'Admin',
         active: false
       }
     ],

@@ -39,16 +39,10 @@ test('defraId: credentials exist', async () => {
       sub: 'testSub',
       correlationId: 'testCorrelationId',
       sessionId: 'testSessionId',
-      contactId: 'testContactId',
-      serviceId: 'testServiceId',
       firstName: 'Test',
       lastName: 'User',
       email: 'testEmail',
       uniqueReference: 'testUniqueRef',
-      loa: 'testLoa',
-      aal: 'testAal',
-      enrolmentCount: 1,
-      enrolmentRequestCount: 1,
       currentRelationshipId,
       relationships: [`${currentRelationshipId}:${organisationId}`],
       roles: 'testRoles',
@@ -65,32 +59,26 @@ test('defraId: credentials exist', async () => {
     }
   )
 
-  const credentials = { token }
+  const credentials = { provider: 'defraId', token }
 
   await provider.profile(credentials, { id_token: 'test-id-token' }, {})
 
+  expect(credentials.externalSessionId).toEqual('testSessionId')
+  expect(credentials.idToken).toBeUndefined()
+  expect(credentials.logoutUrl).toEqual('http://some-end-session-endpoint/path')
   expect(credentials.profile).toEqual({
     id: 'testSub',
     correlationId: 'testCorrelationId',
-    sessionId: 'testSessionId',
-    contactId: 'testContactId',
-    serviceId: 'testServiceId',
     firstName: 'Test',
     lastName: 'User',
     displayName: 'Test User',
     email: 'testEmail',
     uniqueReference: 'testUniqueRef',
-    loa: 'testLoa',
-    aal: 'testAal',
-    enrolmentCount: 1,
-    enrolmentRequestCount: 1,
     currentRelationshipId,
     relationships: [`${currentRelationshipId}:${organisationId}`],
-    roles: 'testRoles',
-    idToken: 'test-id-token',
-    tokenUrl: 'http://some-token-endpoint/path',
-    logoutUrl: 'http://some-end-session-endpoint/path'
+    roles: 'testRoles'
   })
+  expect(credentials.tokenUrl).toEqual('http://some-token-endpoint/path')
 
   expect(config.get('auth.origins')).toEqual([
     'https://test.it',

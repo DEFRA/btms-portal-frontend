@@ -2,14 +2,23 @@ import { addSeconds } from 'date-fns'
 import iron from '@hapi/iron'
 import jwt from '@hapi/jwt'
 import { config } from '../../../src/config/config.js'
+import crypto from 'node:crypto'
 
-const authConfig = config.get('auth')
 const sessionConfig = config.get('session')
 
-export const setupAuthedUserSession = async (server, expiresAt) => {
+export const setupAuthedUserSession = async (server, sessionId= crypto.randomUUID(), expiresAt = undefined) => {
   const authedUser = createAuthedUser(expiresAt)
 
-  await server.app.cache.set(authedUser.sessionId, authedUser)
+  await server.app.cache.set(sessionId, authedUser)
+
+  return authedUser
+}
+
+export const setupAuthedAdminUserSession = async (server, sessionId= crypto.randomUUID(), expiresAt = undefined) => {
+  const authedUser = createAuthedUser(expiresAt)
+  authedUser.scope = ['admin']
+
+  await server.app.cache.set(sessionId, authedUser)
 
   return authedUser
 }
@@ -60,24 +69,20 @@ function createUserProfile(strategy) {
   const expiresAt = addSeconds(new Date(), expiresInSeconds)
 
   return {
-    id: crypto.randomUUID(),
-    correlationId: crypto.randomUUID(),
-    sessionId: crypto.randomUUID(),
-    contactId: crypto.randomUUID(),
-    serviceId: authConfig.defraId.serviceId,
-    firstName: 'Test',
-    lastName: 'User',
-    displayName: 'Test User',
-    email: 'test.user@btms-portal-frontend-unit-test.com',
-    uniqueReference: crypto.randomUUID(),
-    loa: 1,
-    aal: 1,
-    enrolmentCount: 1,
-    enrolmentRequestCount: 1,
-    currentRelationshipId: 1,
-    relationships: '1:1:Defra:0:undefined:0',
-    roles: '',
-    isAuthenticated: true,
+    profile: {
+      id: crypto.randomUUID(),
+      correlationId: crypto.randomUUID(),
+      firstName: 'Test',
+      lastName: 'User',
+      displayName: 'Test User',
+      email: 'test.user@btms-portal-frontend-unit-test.com',
+      uniqueReference: crypto.randomUUID(),
+      currentRelationshipId: 1,
+      relationships: '1:1:Defra:0:undefined:0',
+      roles: '',
+      sessionId: crypto.randomUUID(),
+    },
+    externalSessionId: crypto.randomUUID(),
     expiresIn: expiresInMilliSeconds,
     expiresAt: expiresAt.toISOString(),
     tokenUrl:

@@ -3,22 +3,20 @@ import { addSeconds, isPast, parseISO, subMinutes } from 'date-fns'
 import { refreshAccessToken } from './refesh-token.js'
 
 async function setUserSession(request, sessionId) {
-  const { profile } = request.auth.credentials
   const expiresInSeconds = request.auth.credentials.expiresIn
   const expiresInMilliSeconds = expiresInSeconds * 1000
   const expiresAt = addSeconds(new Date(), expiresInSeconds)
 
+  const userSession = {
+    ...request.auth.credentials,
+    strategy: request.auth.strategy,
+    expiresAt: expiresAt.toISOString(),
+  }
+  userSession.expiresIn = expiresInMilliSeconds
+
   await request.server.app.cache.set(
     sessionId,
-    {
-      ...profile,
-      strategy: request.auth.strategy,
-      isAuthenticated: request.auth.isAuthenticated,
-      token: request.auth.credentials.token,
-      refreshToken: request.auth.credentials.refreshToken,
-      expiresIn: expiresInMilliSeconds,
-      expiresAt: expiresAt.toISOString()
-    },
+    userSession,
     expiresInMilliSeconds
   )
 }
@@ -41,6 +39,8 @@ async function updateUserSession(request, refreshedSession) {
     .filter((part) => part)
     .join(' ')
 
+  //TODO: update this function to reflect the other changes in this PR
+
   await request.server.app.cache.set(
     request.state.userSession.sessionId,
     {
@@ -48,21 +48,14 @@ async function updateUserSession(request, refreshedSession) {
       id: payload.sub,
       correlationId: payload.correlationId,
       sessionId: payload.sessionId,
-      contactId: payload.contactId,
-      serviceId: payload.serviceId,
       firstName: payload.firstName,
       lastName: payload.lastName,
       displayName,
       email: payload.email,
       uniqueReference: payload.uniqueReference,
-      loa: payload.loa,
-      aal: payload.aal,
-      enrolmentCount: payload.enrolmentCount,
-      enrolmentRequestCount: payload.enrolmentRequestCount,
       currentRelationshipId: payload.currentRelationshipId,
       relationships: payload.relationships,
       roles: payload.roles,
-      isAuthenticated: true,
       idToken: refreshedSession.id_token,
       token: refreshedSession.access_token,
       refreshToken: refreshedSession.refresh_token,
