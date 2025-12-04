@@ -15,7 +15,7 @@ import {
   iuuDecisionDisplay
 } from './model-constants.js'
 import { config } from '../config/config.js'
-import { sortDescendingAndSearchTermMatchAlwaysFirst } from '../utils/sort.js'
+import { sortDescending } from './sort.js'
 
 const ipaffsUrlTemplate = config.get('ipaffs.urlTemplate')
 
@@ -172,14 +172,14 @@ const mapPreNotification = (preNotification) => {
   }
 }
 
-const chedIdentifier = (term) => {
+const getNumericChedIdentifier = (term) => {
   return term.substring(term.lastIndexOf('.')+1)
 }
 
-const searchTermMatcher = (searchTerm, preNotification) =>
-  chedIdentifier(preNotification.referenceNumber) === chedIdentifier(searchTerm)
+const isSearchTermMatch = (searchTerm, preNotification) =>
+  getNumericChedIdentifier(preNotification.referenceNumber) === getNumericChedIdentifier(searchTerm)
 
 export const mapPreNotifications = ({ importPreNotifications }, searchTerm) =>
   importPreNotifications.map(({ importPreNotification }) =>
     mapPreNotification(importPreNotification)
-  ).sort(sortDescendingAndSearchTermMatchAlwaysFirst(searchTerm, searchTermMatcher))
+  ).sort(sortDescending(searchTerm, isSearchTermMatch))
