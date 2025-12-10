@@ -38,7 +38,7 @@ test('reporting data', async () => {
       intervals: [
         {
           interval: '2025-09-07T23:00:00Z',
-          summary: { match: 100, noMatch: 10, total: 110 }
+          summary: { match: 100, noMatch: 990, total: 1090 }
         },
         {
           interval: '2025-09-08T05:00:00Z',
@@ -170,14 +170,14 @@ test('reporting data', async () => {
 
   expect(match.textContent.trim()).toBe('Matches')
   expect(matchTotal.textContent.trim()).toBe('180')
-  expect(matchPercentage.textContent.trim()).toBe('(90%)')
+  expect(matchPercentage.textContent.trim()).toBe('(15.25%)')
 
   expect(noMatch.textContent.trim()).toBe('No matches')
-  expect(noMatchTotal.textContent.trim()).toBe('20')
-  expect(noMatchPercentage.textContent.trim()).toBe('(10%)')
+  expect(noMatchTotal.textContent.trim()).toBe('1,000')
+  expect(noMatchPercentage.textContent.trim()).toBe('(84.75%)')
 
   expect(matches.textContent.trim()).toBe('Total')
-  expect(matchesTotal.textContent.trim()).toBe('200')
+  expect(matchesTotal.textContent.trim()).toBe('1,180')
 
   const [releasesSummaryRegion] = getAllByRole(document.body, 'region', {
     name: 'Releases'

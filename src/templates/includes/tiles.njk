@@ -8,7 +8,7 @@
           <dd class="btms-percentage">({{ tile.percentage }}%)</dd>
         {% endif %}
       </dl>
-      {% if downloadUrls[tile.type] and tile.total > 0 %}
+      {% if downloadUrls[tile.type] and tile.total | int > 0 %}
         <a href="{{ downloadUrls[tile.type] }}">Download CSV</a>
       {% endif %}
     </div>
