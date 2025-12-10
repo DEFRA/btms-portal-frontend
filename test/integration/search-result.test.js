@@ -12,11 +12,11 @@ const provider = {
   token_endpoint: 'https://token.endpoint'
 }
 
-const customsDeclarations = [
-  {
-    movementReferenceNumber: '24GB0Z8WEJ9ZBTL73B',
+const createCustomsDeclaration = (mrn, ducr, updated) => {
+  return {
+    movementReferenceNumber: mrn,
     clearanceRequest: {
-      declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+      declarationUcr: ducr,
       commodities: [
         {
           itemNumber: 1,
@@ -94,63 +94,46 @@ const customsDeclarations = [
       finalState: '0',
       isManualRelease: false
     },
-    updated: '2025-05-06T13:11:59.257Z'
+    updated
   }
-]
+}
 
-const importPreNotifications = [
-  {
+const createImportPreNotification = (chedRef, chedType, status, updated, complementId, commodityId, complementName, data) => {
+  return {
     importPreNotification: {
-      referenceNumber: 'CHEDP.GB.2025.0000002',
-      importNotificationType: 'CVEDP',
-      status: 'VALIDATED',
-      updatedSource: '2025-04-22T16:55:17.330Z',
+      referenceNumber: chedRef,
+      importNotificationType: chedType,
+      status,
+      updatedSource: updated,
       partOne: {
         commodities: {
           commodityComplements: [
             {
-              complementId: '2',
-              commodityId: '0202',
-              complementName: 'Dog Chew'
+              complementId,
+              commodityId,
+              complementName
             }
           ],
           complementParameterSets: [
             {
               uniqueComplementId: 'bbdb5c23-0f7c-4c8f-ac1d-8d81aacdc0d9',
-              complementId: '2',
-              keyDataPair: [{ key: 'netweight', data: '4618.35' }]
-            }
-          ]
-        }
-      }
-    }
-  },
-  {
-    importPreNotification: {
-      referenceNumber: 'CHEDA.GB.2025.0000001',
-      importNotificationType: 'CVEDA',
-      status: 'CANCELLED',
-      updatedSource: '2025-04-22T16:53:17.330Z',
-      partOne: {
-        commodities: {
-          commodityComplements: [
-            {
-              complementId: '1',
-              commodityId: '0101',
-              speciesName: 'Equus asinus'
-            }
-          ],
-          complementParameterSets: [
-            {
-              uniqueComplementId: '9604ce16-8352-4ead-ae8b-4828b3e022cb',
-              complementId: '1',
-              keyDataPair: [{ key: 'number_animal', data: '2' }]
+              complementId,
+              keyDataPair: [{ key: 'netweight', data }]
             }
           ]
         }
       }
     }
   }
+}
+
+const customsDeclarations = [
+  createCustomsDeclaration('24GB0Z8WEJ9ZBTL73B', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z')
+]
+
+const importPreNotifications = [
+  createImportPreNotification('CHEDP.GB.2025.0000002', 'CVEDP', 'VALIDATED', '2025-04-22T16:55:17.330Z', '2', '0202', 'Dog Chew', '4618.35'),
+  createImportPreNotification('CHEDA.GB.2025.0000001', 'CVEDA', 'CANCELLED', '2025-04-22T16:55:17.330Z', '1', '0101', 'Equus asinus', '2')
 ]
 
 const relatedImportDeclarations = {
@@ -529,4 +512,64 @@ test('redirects to search page if GMR search term', async () => {
 
   expect(statusCode).toBe(302)
   expect(headers.location).toBe(paths.SEARCH)
+})
+
+test.each([
+  { searchTerm: '24GB0Z8WEJ9ZBTL73A', expectedFirstMrn: '24GB0Z8WEJ9ZBTL73A', expectedSecondMrn: '24GB0Z8WEJ9ZBTL73C', expectedThirdMrn: '24GB0Z8WEJ9ZBTL73B', expectedFirstChed: 'CHEDP.GB.2025.0000003', expectedSecondChed: 'CHEDP.GB.2025.0000002', expectedThirdChed: 'CHEDP.GB.2025.0000001' },
+  { searchTerm: '24GB0Z8WEJ9ZBTL73B', expectedFirstMrn: '24GB0Z8WEJ9ZBTL73B', expectedSecondMrn: '24GB0Z8WEJ9ZBTL73C', expectedThirdMrn: '24GB0Z8WEJ9ZBTL73A', expectedFirstChed: 'CHEDP.GB.2025.0000003', expectedSecondChed: 'CHEDP.GB.2025.0000002', expectedThirdChed: 'CHEDP.GB.2025.0000001' },
+  { searchTerm: '24GB0Z8WEJ9ZBTL73C', expectedFirstMrn: '24GB0Z8WEJ9ZBTL73C', expectedSecondMrn: '24GB0Z8WEJ9ZBTL73B', expectedThirdMrn: '24GB0Z8WEJ9ZBTL73A', expectedFirstChed: 'CHEDP.GB.2025.0000003', expectedSecondChed: 'CHEDP.GB.2025.0000002', expectedThirdChed: 'CHEDP.GB.2025.0000001' },
+  { searchTerm: '1GB126344356000-ABC35932Y1BHA', expectedFirstMrn: '24GB0Z8WEJ9ZBTL73A', expectedSecondMrn: '24GB0Z8WEJ9ZBTL73C', expectedThirdMrn: '24GB0Z8WEJ9ZBTL73B', expectedFirstChed: 'CHEDP.GB.2025.0000003', expectedSecondChed: 'CHEDP.GB.2025.0000002', expectedThirdChed: 'CHEDP.GB.2025.0000001' },
+  { searchTerm: '1GB126344356000-ABC35932Y1BHB', expectedFirstMrn: '24GB0Z8WEJ9ZBTL73B', expectedSecondMrn: '24GB0Z8WEJ9ZBTL73C', expectedThirdMrn: '24GB0Z8WEJ9ZBTL73A', expectedFirstChed: 'CHEDP.GB.2025.0000003', expectedSecondChed: 'CHEDP.GB.2025.0000002', expectedThirdChed: 'CHEDP.GB.2025.0000001' },
+  { searchTerm: '1GB126344356000-ABC35932Y1BHC', expectedFirstMrn: '24GB0Z8WEJ9ZBTL73C', expectedSecondMrn: '24GB0Z8WEJ9ZBTL73B', expectedThirdMrn: '24GB0Z8WEJ9ZBTL73A', expectedFirstChed: 'CHEDP.GB.2025.0000003', expectedSecondChed: 'CHEDP.GB.2025.0000002', expectedThirdChed: 'CHEDP.GB.2025.0000001' },
+  { searchTerm: 'CHEDP.GB.2025.0000001', expectedFirstMrn: '24GB0Z8WEJ9ZBTL73C', expectedSecondMrn: '24GB0Z8WEJ9ZBTL73B', expectedThirdMrn: '24GB0Z8WEJ9ZBTL73A', expectedFirstChed: 'CHEDP.GB.2025.0000001', expectedSecondChed: 'CHEDP.GB.2025.0000003', expectedThirdChed: 'CHEDP.GB.2025.0000002' },
+  { searchTerm: 'CHEDP.GB.2025.0000002', expectedFirstMrn: '24GB0Z8WEJ9ZBTL73C', expectedSecondMrn: '24GB0Z8WEJ9ZBTL73B', expectedThirdMrn: '24GB0Z8WEJ9ZBTL73A', expectedFirstChed: 'CHEDP.GB.2025.0000002', expectedSecondChed: 'CHEDP.GB.2025.0000003', expectedThirdChed: 'CHEDP.GB.2025.0000001' },
+  { searchTerm: 'CHEDP.GB.2025.0000003', expectedFirstMrn: '24GB0Z8WEJ9ZBTL73C', expectedSecondMrn: '24GB0Z8WEJ9ZBTL73B', expectedThirdMrn: '24GB0Z8WEJ9ZBTL73A', expectedFirstChed: 'CHEDP.GB.2025.0000003', expectedSecondChed: 'CHEDP.GB.2025.0000002', expectedThirdChed: 'CHEDP.GB.2025.0000001' },
+])('Search results ordered with matching Customs Declaration or Import Pre Notification first, and the remaining Customs Declarations and related Import Pre Notifications ordered descending by updated date', async (options) => {
+  const dataApiResults = {
+    customsDeclarations: [
+      createCustomsDeclaration('24GB0Z8WEJ9ZBTL73A', '1GB126344356000-ABC35932Y1BHA', '2025-01-01T09:00:00.000Z'),
+      createCustomsDeclaration('24GB0Z8WEJ9ZBTL73B', '1GB126344356000-ABC35932Y1BHB', '2025-02-02T09:00:00.000Z'),
+      createCustomsDeclaration('24GB0Z8WEJ9ZBTL73C', '1GB126344356000-ABC35932Y1BHC', '2025-02-02T10:00:00.000Z')
+    ],
+    importPreNotifications: [
+      createImportPreNotification('CHEDP.GB.2025.0000001', 'CVEDP', 'VALIDATED', '2025-01-01T09:00:00.000Z', '1', '0101', 'Dog Chew', '100'),
+      createImportPreNotification('CHEDP.GB.2025.0000002', 'CVEDP', 'VALIDATED', '2025-02-02T09:00:00.000Z', '1', '0101', 'Dog Chew', '100'),
+      createImportPreNotification('CHEDP.GB.2025.0000003', 'CVEDP', 'VALIDATED', '2025-02-02T10:00:00.000Z', '1', '0101', 'Dog Chew', '100'),
+    ]
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: dataApiResults })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${options.searchTerm}`,
+    auth: {
+      strategy: 'session',
+      credentials
+    },
+    headers: {
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
+    }
+  })
+
+  expect(headers['cache-control']).toBe('no-store')
+
+  globalJsdom(payload)
+  initFilters()
+
+  const summarySections = document.body.querySelectorAll('.govuk-details.btms-details')
+
+  expect(summarySections[0].getAttribute('aria-label')).toBe(options.expectedFirstMrn)
+  expect(summarySections[1].getAttribute('aria-label')).toBe(options.expectedSecondMrn)
+  expect(summarySections[2].getAttribute('aria-label')).toBe(options.expectedThirdMrn)
+  expect(summarySections[3].getAttribute('aria-label')).toBe(options.expectedFirstChed)
+  expect(summarySections[4].getAttribute('aria-label')).toBe(options.expectedSecondChed)
+  expect(summarySections[5].getAttribute('aria-label')).toBe(options.expectedThirdChed)
 })
