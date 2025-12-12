@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs'
 import { config } from '../../config/config.js'
 import { getUserSession } from '../../auth/user-session.js'
 import { paths } from '../../routes/route-constants.js'
+import { APP_SCOPES, AUTH_PROVIDERS } from '../../auth/auth-constants.js'
 
 let webpackManifest
 // once we move to Eslint 9.19+ we can use import with { type: json }
@@ -65,10 +66,10 @@ export async function context(request) {
 
   const authedUser = await getUserSession(request)
   const accountNavigation = [
-    authedUser?.strategy === 'defraId' && manageAccountLink,
+    authedUser?.provider === AUTH_PROVIDERS.DEFRA_ID && manageAccountLink,
     request.auth?.isAuthenticated && signOutLink
   ].filter(Boolean)
-  const isAdminUser = authedUser?.scope?.includes('admin')
+  const isAdminUser = authedUser?.scope?.includes(APP_SCOPES.ADMIN)
 
   const navigation = getNavigation(request.url.pathname, isAdminUser)
 

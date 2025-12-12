@@ -1,5 +1,6 @@
 import { context } from '../../../../src/plugins/template-renderer/context'
 import { config } from '../../../../src/config/config.js'
+import { AUTH_PROVIDERS } from '../../../../src/auth/auth-constants.js'
 
 const mockGetUserSession = jest.fn()
 
@@ -17,7 +18,7 @@ jest.mock('node:fs', () => ({
 
 test('logged in', async () => {
   mockGetUserSession.mockReturnValue({
-    strategy: 'defraId',
+    provider: AUTH_PROVIDERS.DEFRA_ID,
   })
 
   const expected = {
@@ -63,7 +64,7 @@ test('logged in', async () => {
 
 test('logged in as admin user', async () => {
   mockGetUserSession.mockReturnValue({
-    strategy: 'defraId',
+    provider: AUTH_PROVIDERS.ENTRA_ID,
     scope: ['admin']
   })
 
@@ -96,10 +97,6 @@ test('logged in as admin user', async () => {
       }
     ],
     accountNavigation: [
-      {
-        href: '#',
-        text: 'Manage account'
-      },
       {
         href: '/sign-out',
         text: 'Sign out'

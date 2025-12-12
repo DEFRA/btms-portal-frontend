@@ -26,7 +26,7 @@ test('active user session', async () => {
     credentials.idToken
   }&post_logout_redirect_uri=${config.get('appBaseUrl')}${
     paths.SIGNED_OUT
-  }?provider=${credentials.strategy}`
+  }?provider=${credentials.provider}`
 
   expect(statusCode).toBe(302)
   expect(headers.location).toBe(expectedLocation)

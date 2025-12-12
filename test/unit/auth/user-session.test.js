@@ -45,8 +45,7 @@ describe('#userSession', () => {
           isAuthenticated: true,
           credentials: {
             ...authedUser
-          },
-          strategy: 'defraId'
+          }
         }
       }
 
@@ -55,7 +54,6 @@ describe('#userSession', () => {
       const cachedSession = await server.app.cache.get(sessionId)
 
       expect(cachedSession).not.toBeNull()
-      expect(cachedSession.strategy).toBe('defraId')
       expect(cachedSession.expiresIn).toBeGreaterThan(1000)
     })
   })

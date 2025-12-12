@@ -2,24 +2,25 @@ import { config } from '../config/config.js'
 import { getUserSession } from './user-session.js'
 import { getOpenIdRefreshToken } from './open-id-client.js'
 import { paths } from '../routes/route-constants.js'
+import { AUTH_PROVIDERS } from './auth-constants.js'
 
 async function refreshAccessToken(request) {
   const authedUser = await getUserSession(request)
 
-  const authConfig = config.get('auth')[authedUser.strategy]
+  const authConfig = config.get('auth')[authedUser.provider]
   const refreshToken = authedUser.refreshToken
   const clientId = authConfig.clientId
   const clientSecret = authConfig.clientSecret
   const scopes = authConfig.scopes.join(' ')
   const callbackPath =
-    authedUser.strategy === 'defraId'
+    authedUser.provider === AUTH_PROVIDERS.DEFRA_ID
       ? paths.SIGNIN_DEFRA_ID_CALLBACK
       : paths.SIGNIN_ENTRA_ID_CALLBACK
   const redirectUri = config.get('appBaseUrl') + callbackPath
 
   if (!authedUser.refreshToken) {
     request.logger.error(
-      `missing ${authedUser.strategy} refresh token scopes: ${scopes}`
+      `missing ${authedUser.provider} refresh token scopes: ${scopes}`
     )
 
     return {}

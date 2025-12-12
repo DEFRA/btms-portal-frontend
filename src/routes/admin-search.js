@@ -3,6 +3,7 @@ import { paths, queryStringParams, CACHE_CONTROL_NO_STORE } from './route-consta
 import { searchPatterns } from '../services/search-patterns.js'
 import { ADMIN_SEARCH_TYPES, isValidAdminSearchType, search } from '../services/admin.js'
 import { mapAdminSearchResults } from '../models/admin-search-results.js'
+import { APP_SCOPES } from '../auth/auth-constants.js'
 
 const ADMIN_SEARCH_TEMPLATE = 'admin-search'
 
@@ -36,7 +37,7 @@ export const adminSearch = {
   path: paths.ADMIN_SEARCH,
   options: {
     auth: {
-      scope: 'admin',
+      scope: APP_SCOPES.ADMIN,
       strategy: 'session'
     },
     cache: CACHE_CONTROL_NO_STORE,

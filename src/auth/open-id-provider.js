@@ -3,6 +3,7 @@ import { getOpenIdConfig } from './open-id-client.js'
 import { checkOrganisation } from './check-organisation.js'
 import { checkGroups } from './check-groups.js'
 import { config } from '../config/config.js'
+import { APP_SCOPES, AUTH_PROVIDERS } from './auth-constants.js'
 
 const entraAdminSecurityGroupId = config.get('auth.entraId.adminGroupId')
 
@@ -50,7 +51,7 @@ export const openIdProvider = async (name, authConfig) => {
       credentials.logoutUrl = oidcConf.end_session_endpoint
       credentials.tokenUrl = oidcConf.token_endpoint
 
-      if (credentials.provider === 'defraId') {
+      if (credentials.provider === AUTH_PROVIDERS.DEFRA_ID) {
         checkOrganisation(payload.currentRelationshipId, payload.relationships)
 
         const displayName = [payload.firstName, payload.lastName]
@@ -69,7 +70,7 @@ export const openIdProvider = async (name, authConfig) => {
           relationships: payload.relationships,
           roles: payload.roles
         }
-      } else if (credentials.provider === 'entraId') {
+      } else if (credentials.provider === AUTH_PROVIDERS.ENTRA_ID) {
         const { groups = [] } = jwt.token.decode(params.id_token).decoded
           .payload
         checkGroups(groups)
@@ -81,9 +82,8 @@ export const openIdProvider = async (name, authConfig) => {
           email: payload.email,
           id: payload.sub
         }
-        credentials.refreshToken = params.refresh_token
         if (groups.includes(entraAdminSecurityGroupId)) {
-          credentials.scope = ['admin']
+          credentials.scope = [APP_SCOPES.ADMIN]
         }
       } else {
         throw new Error(`Unexpected auth provider encountered: ${credentials.provider}`)

@@ -89,7 +89,7 @@ function createUserProfile(strategy) {
       strategy === 'entraId' ? 'https://entraid.foo' : 'https://defraid.foo',
     logoutUrl:
       strategy === 'entraId' ? 'https://entraid.bar' : 'https://defraid.bar',
-    strategy: strategy === 'entraId' ? 'entraId' : 'defraId'
+    provider: strategy === 'entraId' ? 'entraId' : 'defraId'
   }
 }
 
