@@ -1,6 +1,7 @@
 import { paths } from '../../routes/route-constants.js'
 import { config } from '../../config/config.js'
 import { openIdProvider } from '../../auth/open-id-provider.js'
+import { AUTH_PROVIDERS } from '../../auth/auth-constants.js'
 
 const { defraId, entraId } = config.get('auth')
 const baseUrl = config.get('appBaseUrl')
@@ -10,8 +11,8 @@ const openId = {
   plugin: {
     name: 'open-id',
     register: async (server) => {
-      const defra = await openIdProvider('defraId', defraId)
-      server.auth.strategy('defraId', 'bell', {
+      const defra = await openIdProvider( AUTH_PROVIDERS.DEFRA_ID, defraId)
+      server.auth.strategy(AUTH_PROVIDERS.DEFRA_ID, 'bell', {
         location: () => `${baseUrl}${paths.SIGNIN_DEFRA_ID_CALLBACK}`,
         provider: defra,
         password: cookie.password,
@@ -23,8 +24,8 @@ const openId = {
         }
       })
 
-      const entra = await openIdProvider('entraId', entraId)
-      server.auth.strategy('entraId', 'bell', {
+      const entra = await openIdProvider(AUTH_PROVIDERS.ENTRA_ID, entraId)
+      server.auth.strategy(AUTH_PROVIDERS.ENTRA_ID, 'bell', {
         location: () => `${baseUrl}${paths.SIGNIN_ENTRA_ID_CALLBACK}`,
         provider: entra,
         password: cookie.password,

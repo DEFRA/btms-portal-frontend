@@ -1,6 +1,7 @@
 import jwt from '@hapi/jwt'
 import { config } from '../../../src/config/config.js'
 import { openIdProvider } from '../../../src/auth/open-id-provider.js'
+import { AUTH_PROVIDERS } from '../../../src/auth/auth-constants.js'
 
 jest.mock('../../../src/auth/open-id-client.js', () => ({
   getOpenIdConfig: jest.fn().mockReturnValue({
@@ -15,7 +16,7 @@ test.each([
   { credentials: {} },
   { credentials: { token: null } }
 ])('credentials do not exist', async (credentials) => {
-  const provider = await openIdProvider('defraId', {
+  const provider = await openIdProvider(AUTH_PROVIDERS.DEFRA_ID, {
     oidcConfigurationUrl: 'https://test.it/path'
   })
 
@@ -25,7 +26,7 @@ test.each([
 })
 
 test('defraId: credentials exist', async () => {
-  const provider = await openIdProvider('defraId', {
+const provider = await openIdProvider(AUTH_PROVIDERS.DEFRA_ID, {
     oidcConfigurationUrl: 'https://test.it/path'
   })
 
@@ -39,16 +40,10 @@ test('defraId: credentials exist', async () => {
       sub: 'testSub',
       correlationId: 'testCorrelationId',
       sessionId: 'testSessionId',
-      contactId: 'testContactId',
-      serviceId: 'testServiceId',
       firstName: 'Test',
       lastName: 'User',
       email: 'testEmail',
       uniqueReference: 'testUniqueRef',
-      loa: 'testLoa',
-      aal: 'testAal',
-      enrolmentCount: 1,
-      enrolmentRequestCount: 1,
       currentRelationshipId,
       relationships: [`${currentRelationshipId}:${organisationId}`],
       roles: 'testRoles',
@@ -65,32 +60,26 @@ test('defraId: credentials exist', async () => {
     }
   )
 
-  const credentials = { token }
+  const credentials = { provider: 'defraId', token }
 
   await provider.profile(credentials, { id_token: 'test-id-token' }, {})
 
+  expect(credentials.externalSessionId).toEqual('testSessionId')
+  expect(credentials.idToken).toBeUndefined()
+  expect(credentials.logoutUrl).toEqual('http://some-end-session-endpoint/path')
   expect(credentials.profile).toEqual({
     id: 'testSub',
     correlationId: 'testCorrelationId',
-    sessionId: 'testSessionId',
-    contactId: 'testContactId',
-    serviceId: 'testServiceId',
     firstName: 'Test',
     lastName: 'User',
     displayName: 'Test User',
     email: 'testEmail',
     uniqueReference: 'testUniqueRef',
-    loa: 'testLoa',
-    aal: 'testAal',
-    enrolmentCount: 1,
-    enrolmentRequestCount: 1,
     currentRelationshipId,
     relationships: [`${currentRelationshipId}:${organisationId}`],
-    roles: 'testRoles',
-    idToken: 'test-id-token',
-    tokenUrl: 'http://some-token-endpoint/path',
-    logoutUrl: 'http://some-end-session-endpoint/path'
+    roles: 'testRoles'
   })
+  expect(credentials.tokenUrl).toEqual('http://some-token-endpoint/path')
 
   expect(config.get('auth.origins')).toEqual([
     'https://test.it',
@@ -101,7 +90,7 @@ test('defraId: credentials exist', async () => {
 })
 
 test('defraId: organisation not allowed', async () => {
-  const provider = await openIdProvider('defraId', {
+  const provider = await openIdProvider(AUTH_PROVIDERS.DEFRA_ID, {
     oidcConfigurationUrl: 'https://test.it/path'
   })
 
@@ -128,12 +117,75 @@ test('defraId: organisation not allowed', async () => {
   )
 })
 
-test('entraId: group not allowed', async () => {
-  const provider = await openIdProvider('entraId', {
+test('entraId: credentials exist', async () => {
+  const provider = await openIdProvider(AUTH_PROVIDERS.ENTRA_ID, {
     oidcConfigurationUrl: 'https://test.it/path'
   })
+  const adminGroupId = 'test-admin-group-id'
+  const anotherGroupId = 'test-group-id'
+  config.set('auth.entraId.adminGroupId', adminGroupId)
+  config.set('auth.entraId.groups', [adminGroupId, anotherGroupId])
 
-  config.set('auth.entraId.groups', ['allowed-group'])
+  const token = jwt.token.generate(
+    {
+      sub: 'testSub',
+      sid: 'testSessionId',
+      name: 'Entra Test User',
+      email: 'testEmail',
+      aud: 'test',
+      iss: 'test',
+    },
+    {
+      key: 'test',
+      algorithm: 'HS256'
+    },
+    {
+      ttlSec: 1
+    }
+  )
+
+  const idToken = jwt.token.generate(
+    {
+      aud: 'test',
+      iss: "https://login.microsoftonline.com/test/v2.0",
+      iat: 1765543445,
+      nbf: 1765543445,
+      exp: 1765547345,
+      groups: [
+        adminGroupId,
+        anotherGroupId
+      ],
+      sub: 'testSub',
+      ver: "2.0"
+    },
+    {
+      key: 'test',
+      algorithm: 'HS256'
+    },
+    {
+      ttlSec: 1
+    }
+  )
+
+  const credentials = { provider: AUTH_PROVIDERS.ENTRA_ID, token }
+
+  await provider.profile(credentials, { id_token: idToken }, {})
+
+  expect(credentials.externalSessionId).toEqual('testSessionId')
+  expect(credentials.logoutUrl).toEqual('http://some-end-session-endpoint/path')
+  expect(credentials.profile).toEqual({
+    id: 'testSub',
+    displayName: 'Entra Test User',
+    email: 'testEmail'
+  })
+  expect(credentials.scope).toEqual(['admin'])
+  expect(credentials.tokenUrl).toEqual('http://some-token-endpoint/path')
+})
+
+test('entraId: group not allowed', async () => {
+const provider = await openIdProvider(AUTH_PROVIDERS.ENTRA_ID, {
+    oidcConfigurationUrl: 'https://test.it/path'
+  })
 
   const token = jwt.token.generate(
     {},
@@ -144,7 +196,7 @@ test('entraId: group not allowed', async () => {
   )
   const idToken = jwt.token.generate(
     {
-      groups: ['not-allowed-group']
+      groups: ['disallowed-group']
     },
     {
       key: 'test',

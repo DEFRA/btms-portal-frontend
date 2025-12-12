@@ -1,12 +1,13 @@
 import { paths } from './route-constants.js'
 import { setUserSession } from '../auth/user-session.js'
 import { METRIC_NAMES, metricsCounter } from '../utils/metrics.js'
+import { AUTH_PROVIDERS } from '../auth/auth-constants.js'
 
 export const signinOidc = {
   method: ['get', 'post'],
   path: paths.SIGNIN_DEFRA_ID_CALLBACK,
   options: {
-    auth: 'defraId'
+    auth: AUTH_PROVIDERS.DEFRA_ID
   },
   handler: async (request, h) => {
     const sessionId = crypto.randomUUID()

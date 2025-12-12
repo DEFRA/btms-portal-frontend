@@ -3,6 +3,9 @@ import { getOpenIdConfig } from './open-id-client.js'
 import { checkOrganisation } from './check-organisation.js'
 import { checkGroups } from './check-groups.js'
 import { config } from '../config/config.js'
+import { APP_SCOPES, AUTH_PROVIDERS } from './auth-constants.js'
+
+const entraAdminSecurityGroupId = config.get('auth.entraId.adminGroupId')
 
 const setOrigins = (providerEndpoints) => {
   const { origins } = config.get('auth')
@@ -45,43 +48,45 @@ export const openIdProvider = async (name, authConfig) => {
 
       const payload = jwt.token.decode(credentials.token).decoded.payload
 
-      const { currentRelationshipId, relationships } = payload
+      credentials.logoutUrl = oidcConf.end_session_endpoint
+      credentials.tokenUrl = oidcConf.token_endpoint
 
-      if (credentials.provider === 'defraId') {
-        checkOrganisation(currentRelationshipId, relationships)
-      }
+      if (credentials.provider === AUTH_PROVIDERS.DEFRA_ID) {
+        checkOrganisation(payload.currentRelationshipId, payload.relationships)
 
-      if (credentials.provider === 'entraId') {
+        const displayName = [payload.firstName, payload.lastName]
+          .filter((part) => part)
+          .join(' ')
+        credentials.externalSessionId = payload.sessionId
+        credentials.profile = {
+          id: payload.sub,
+          correlationId: payload.correlationId,
+          firstName: payload.firstName,
+          lastName: payload.lastName,
+          displayName,
+          email: payload.email,
+          uniqueReference: payload.uniqueReference,
+          currentRelationshipId: payload.currentRelationshipId,
+          relationships: payload.relationships,
+          roles: payload.roles
+        }
+      } else if (credentials.provider === AUTH_PROVIDERS.ENTRA_ID) {
         const { groups = [] } = jwt.token.decode(params.id_token).decoded
           .payload
         checkGroups(groups)
-      }
 
-      const displayName = [payload.firstName, payload.lastName]
-        .filter((part) => part)
-        .join(' ')
-
-      credentials.profile = {
-        id: payload.sub,
-        correlationId: payload.correlationId,
-        sessionId: payload.sessionId,
-        contactId: payload.contactId,
-        serviceId: payload.serviceId,
-        firstName: payload.firstName,
-        lastName: payload.lastName,
-        displayName,
-        email: payload.email,
-        uniqueReference: payload.uniqueReference,
-        loa: payload.loa,
-        aal: payload.aal,
-        enrolmentCount: payload.enrolmentCount,
-        enrolmentRequestCount: payload.enrolmentRequestCount,
-        currentRelationshipId: payload.currentRelationshipId,
-        relationships: payload.relationships,
-        roles: payload.roles,
-        idToken: params.id_token,
-        tokenUrl: oidcConf.token_endpoint,
-        logoutUrl: oidcConf.end_session_endpoint
+        credentials.externalSessionId = payload.sid
+        credentials.idToken = params.id_token
+        credentials.profile = {
+          displayName: payload.name,
+          email: payload.email,
+          id: payload.sub
+        }
+        if (groups.includes(entraAdminSecurityGroupId)) {
+          credentials.scope = [APP_SCOPES.ADMIN]
+        }
+      } else {
+        throw new Error(`Unexpected auth provider encountered: ${credentials.provider}`)
       }
     }
   }

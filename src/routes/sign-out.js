@@ -13,7 +13,7 @@ export const signOut = {
     }
 
     const referrer = `${config.get('appBaseUrl')}${paths.SIGNED_OUT}?provider=${
-      authedUser.strategy
+      authedUser.provider
     }`
     const idTokenHint = authedUser.idToken
 

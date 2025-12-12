@@ -6,3 +6,5 @@ process.env.BTMS_API_USERNAME = 'usr-name-for-unit-tests'
 process.env.BTMS_API_PASSWORD = 'pwd-for-unit-tests'
 process.env.BTMS_API_BASE_URL = 'https://btms-api-base-url-for-unit-tests/api'
 process.env.IPAFFS_URL = 'https://ipaffs/CHED_REFERENCE/ched'
+process.env.AUTH_ENTRA_ID_ADMIN_GROUP_ID = 'test-admin-group-id'
+process.env.AUTH_ENTRA_ID_SECURITY_GROUPS = ['test-admin-group-id', 'test-group-id']
