@@ -1,11 +1,12 @@
 import { constants } from 'node:http2'
 import { paths, queryStringParams, CACHE_CONTROL_NO_STORE } from './route-constants.js'
-import { searchPatterns } from '../services/search-patterns.js'
+import { searchKeys, searchPatterns } from '../services/search-patterns.js'
 import { ADMIN_SEARCH_TYPES, isValidAdminSearchType, search } from '../services/admin.js'
 import { mapAdminSearchResults } from '../models/admin-search-results.js'
 import { APP_SCOPES } from '../auth/auth-constants.js'
 
 const ADMIN_SEARCH_TEMPLATE = 'admin-search'
+const UNSUPPORTED_SEARCH_PATTERNS = [ searchKeys.DUCR, searchKeys.GMR_ID ]
 
 const createResultsModel = (searchTerm, searchType, resourceType, results) => {
   const baseLink = `${paths.ADMIN_SEARCH}?${queryStringParams.SEARCH_TERM}=${searchTerm}`
@@ -56,7 +57,9 @@ export const adminSearch = {
         const matchingSearchPattern = searchPatterns.find(({ pattern }) =>
           pattern.test(searchTerm)
         )
-        if (matchingSearchPattern && isValidAdminSearchType(searchType)) {
+        if (matchingSearchPattern
+          && !UNSUPPORTED_SEARCH_PATTERNS.includes(matchingSearchPattern.key)
+          && isValidAdminSearchType(searchType)) {
           return { resourceType: matchingSearchPattern, ...value }
         }
 

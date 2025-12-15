@@ -178,7 +178,9 @@ test('Should show an error when no search term is supplied', async () => {
   ).toBeInTheDocument()
 })
 
-test('Should show an error with an invalid search term', async () => {
+test.each([
+  'abcd123s', 'GMRA00S11AB1', '5GB412342342000-LU123AB123456L123'
+])('Should show an error with an invalid search term', async (testSearchTerm) => {
   wreck.get
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
@@ -188,7 +190,7 @@ test('Should show an error with an invalid search term', async () => {
 
   const { payload } = await server.inject({
     method: 'get',
-    url: `${paths.ADMIN_SEARCH}?${queryStringParams.SEARCH_TERM}=abcd&${queryStringParams.SEARCH_TYPE}=information`,
+    url: `${paths.ADMIN_SEARCH}?${queryStringParams.SEARCH_TERM}=${testSearchTerm}&${queryStringParams.SEARCH_TYPE}=information`,
     auth: {
       strategy: 'session',
       credentials
