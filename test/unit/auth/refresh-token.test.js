@@ -73,7 +73,7 @@ test('logs missing if refresh token missing', async () => {
   const expected = await refreshAccessToken(request)
 
   expect(request.logger.error.mock.calls).toEqual([
-    ['missing defraId refresh token scopes: openid offline_access']
+    ['missing defraId refresh token']
   ])
   expect(expected).toEqual({})
 })

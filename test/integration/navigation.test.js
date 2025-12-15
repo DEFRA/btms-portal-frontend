@@ -9,8 +9,9 @@ import { paths } from '../../src/routes/route-constants.js'
 
 test('authenticated', async () => {
   const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-  const cookie = await getSessionCookie(credentials.sessionId)
+  const sessionId = crypto.randomUUID()
+  const credentials = await setupAuthedUserSession(server, sessionId)
+  const cookie = await getSessionCookie(sessionId)
 
   const { payload } = await server.inject({
     method: 'get',

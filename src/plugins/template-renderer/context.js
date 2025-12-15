@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs'
 import { config } from '../../config/config.js'
 import { getUserSession } from '../../auth/user-session.js'
 import { paths } from '../../routes/route-constants.js'
+import { APP_SCOPES, AUTH_PROVIDERS } from '../../auth/auth-constants.js'
 
 let webpackManifest
 // once we move to Eslint 9.19+ we can use import with { type: json }
@@ -27,23 +28,33 @@ const signOutLink = {
   href: paths.SIGN_OUT
 }
 
-const getNavigation = (pathname) => [
-  {
-    href: paths.SEARCH,
-    text: 'Search',
-    active: pathname === paths.SEARCH
-  },
-  {
-    href: paths.REPORTING,
-    text: 'Reporting',
-    active: pathname === paths.REPORTING
-  },
-  {
-    href: paths.LATEST_ACTIVITY,
-    text: 'Latest activity',
-    active: pathname === paths.LATEST_ACTIVITY
-  }
-]
+const getNavigation = (pathname, isAdminUser) => {
+  const commonNavigationItems = [
+    {
+      href: paths.SEARCH,
+      text: 'Search',
+      active: pathname === paths.SEARCH
+    },
+    {
+      href: paths.REPORTING,
+      text: 'Reporting',
+      active: pathname === paths.REPORTING
+    },
+    {
+      href: paths.LATEST_ACTIVITY,
+      text: 'Latest activity',
+      active: pathname === paths.LATEST_ACTIVITY
+    }
+  ]
+
+  return isAdminUser
+    ? commonNavigationItems.concat({
+      href: paths.ADMIN_SEARCH,
+      text: 'Admin',
+      active: pathname === paths.ADMIN_SEARCH
+    })
+    : commonNavigationItems
+}
 
 /**
  * @param {Request} request
@@ -55,11 +66,12 @@ export async function context(request) {
 
   const authedUser = await getUserSession(request)
   const accountNavigation = [
-    authedUser?.strategy === 'defraId' && manageAccountLink,
-    authedUser?.isAuthenticated && signOutLink
+    authedUser?.provider === AUTH_PROVIDERS.DEFRA_ID && manageAccountLink,
+    request.auth?.isAuthenticated && signOutLink
   ].filter(Boolean)
+  const isAdminUser = authedUser?.scope?.includes(APP_SCOPES.ADMIN)
 
-  const navigation = getNavigation(request.url.pathname)
+  const navigation = getNavigation(request.url.pathname, isAdminUser)
 
   return {
     assetPath: `${assetPath}/assets`,
@@ -72,7 +84,7 @@ export async function context(request) {
     /**
      * @param {string} asset
      */
-    getAssetPath(asset) {
+    getAssetPath: (asset) => {
       const hashed = manifest[asset]
       if (!hashed) {
         request.logger.error(`Asset ${asset} not found in manifest`)

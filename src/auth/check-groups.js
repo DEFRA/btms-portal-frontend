@@ -1,10 +1,8 @@
 import { config } from '../config/config.js'
 import boom from '@hapi/boom'
-
+const entraIdSecurityGroups = config.get('auth.entraId.groups')
 export const checkGroups = (groups) => {
-  const { entraId } = config.get('auth')
-
-  const isInEntraGroup = groups.some((group) => entraId.groups.includes(group))
+  const isInEntraGroup = groups.some((group) => entraIdSecurityGroups.includes(group))
 
   if (!isInEntraGroup) {
     throw boom.forbidden('group not allowed')
