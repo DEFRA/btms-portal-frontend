@@ -20,7 +20,7 @@ async function refreshAccessToken(request) {
 
   if (!authedUser.refreshToken) {
     request.logger.error(
-      `missing ${authedUser.provider} refresh token scopes: ${scopes}`
+      `missing ${authedUser.provider} refresh token`
     )
 
     return {}
