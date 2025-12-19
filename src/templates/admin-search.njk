@@ -56,14 +56,27 @@
         </ul>
         <section class="govuk-tabs__panel" role="tabpanel">
           <div class="btms-admin-search-table-container">
-            <div class="btms-admin-search-table" role="table">
-              {% for line in results %}
+            {% if searchType == searchTypes.ALL_MESSAGES or searchType == searchTypes.ALL_EVENTS %}
+              {% for result in results %}
+              <div class="btms-admin-search-table" role="table">
+                {% for line in result %}
                 <div class="row" role="row">
                   <div class="line-number" role="cell">{{ loop.index }}</div>
                   <div class="code" role="cell">{{ line | safe }}</div>
                 </div>
+                {% endfor %}
+              </div>
               {% endfor %}
-            </div>
+            {% else %}
+              <div class="btms-admin-search-table" role="table">
+                {% for line in results %}
+                  <div class="row" role="row">
+                    <div class="line-number" role="cell">{{ loop.index }}</div>
+                    <div class="code" role="cell">{{ line | safe }}</div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
           </div>
         </section>
       </div>

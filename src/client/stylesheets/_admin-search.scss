@@ -1,7 +1,12 @@
 @use "govuk-frontend" as *;
 
 .btms-admin-search-table-container {
-  overflow-x: auto;
+  overflow-x: scroll;
+  background-color: govuk-colour("light-grey");
+}
+
+.btms-admin-search-table-container > :last-child {
+  border-bottom: none;
 }
 
 .btms-admin-search-table {
@@ -9,7 +14,10 @@
   @include govuk-font-size($size: 14);
   font-family: monospace;
   position: relative;
+  background-color: govuk-colour("light-grey");
+  border-bottom: govuk-colour("white") solid govuk-spacing(4);
   width: max-content;
+  min-width: 100%;
 
   .token.property {
     color:  govuk-colour("blue");
@@ -39,7 +47,6 @@
   }
 
   .line-number {
-    background-color: #ffffff;
     color:  govuk-colour("dark-grey");
     position: sticky;
     left: 0;
