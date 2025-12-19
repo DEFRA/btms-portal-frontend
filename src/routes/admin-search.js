@@ -82,7 +82,7 @@ export const adminSearch = {
       }
 
       const rawSearchResults = await search(resourceType.key, searchTerm, searchType)
-      const formattedSearchResults = mapAdminSearchResults(rawSearchResults)
+      const formattedSearchResults = mapAdminSearchResults(rawSearchResults, searchType)
 
       return h.view(ADMIN_SEARCH_TEMPLATE, createResultsModel(
         searchTerm,
