@@ -4,12 +4,11 @@ import { ADMIN_SEARCH_TYPES } from '../services/admin.js'
 const prettyPrintJson = (json) => JSON.stringify(json, null, 2)
 
 const toHtml = (serialisedObj) => {
-  const test = Prism.highlight(
+  return Prism.highlight(
     serialisedObj,
     Prism.languages.javascript,
     'javascript'
-  )
-    return test.split('\n')
+  ).split('\n')
 }
 
 export const mapAdminSearchResults = (rawSearchResults, searchType) => {
