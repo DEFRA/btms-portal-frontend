@@ -1,7 +1,8 @@
 import { addSeconds, isPast, parseISO, subMinutes } from 'date-fns'
 import { refreshAccessToken } from './refesh-token.js'
+import { config } from '../config/config.js'
 
-const fourHoursMs = 14400000
+const sessionCacheTtl = config.get('session.cache.ttl')
 
 async function setUserSession(request, sessionId) {
   const expiresInSeconds = request.auth.credentials.expiresIn
@@ -17,7 +18,7 @@ async function setUserSession(request, sessionId) {
   await request.server.app.cache.set(
     sessionId,
     userSession,
-    fourHoursMs
+    sessionCacheTtl
   )
 }
 
@@ -43,7 +44,7 @@ async function updateUserSession(request, refreshedSession) {
       expiresIn: expiresInMilliSeconds,
       expiresAt: expiresAt.toISOString()
     },
-    fourHoursMs
+    sessionCacheTtl
   )
 
   return getUserSession(request)
