@@ -1,6 +1,8 @@
 import { addSeconds, isPast, parseISO, subMinutes } from 'date-fns'
 import { refreshAccessToken } from './refesh-token.js'
 
+const fourHoursMs = 14400000
+
 async function setUserSession(request, sessionId) {
   const expiresInSeconds = request.auth.credentials.expiresIn
   const expiresInMilliSeconds = expiresInSeconds * 1000
@@ -15,7 +17,7 @@ async function setUserSession(request, sessionId) {
   await request.server.app.cache.set(
     sessionId,
     userSession,
-    expiresInMilliSeconds
+    fourHoursMs
   )
 }
 
@@ -41,7 +43,7 @@ async function updateUserSession(request, refreshedSession) {
       expiresIn: expiresInMilliSeconds,
       expiresAt: expiresAt.toISOString()
     },
-    expiresInMilliSeconds
+    fourHoursMs
   )
 
   return getUserSession(request)
