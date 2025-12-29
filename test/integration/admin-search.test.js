@@ -17,11 +17,11 @@ const ALL_EVENTS_SEARCH_RESULTS = [
     etag: "12345a972b123474b8059c81",
     created: "2025-12-15T14:26:31.834Z",
     updated: "2025-12-15T14:26:31.878Z",
-    resourceId: "25GBAB123ZKAZZYAR1",
+    resourceId: "24GBBGBKCDMS895001",
     resourceType: "CustomsDeclaration",
     subResourceType: "ClearanceRequest",
     operation: "Created",
-    message: "{\"resourceId\":\"25GBAB123ZKAZZYAR1\",\"resourceType\":\"CustomsDeclaration\",\"subResourceType\":\"ClearanceRequest\",\"operation\":\"Created\",\"resource\":{\"id\":\"25GBAB123ZKAZZYAR1\",\"etag\":\"12345a972b123474b8059c81\",\"created\":\"2025-12-15T14:26:31.8306635Z\",\"updated\":\"2025-12-15T14:26:31.8306635Z\",\"clearanceRequest\":{\"externalCorrelationId\":\"1232133\",\"messageSentAt\":\"2025-12-15T14:26:31Z\",\"externalVersion\":1,\"previousExternalVersion\":null,\"declarationUcr\":\"5GB123407564000-JI123427\",\"declarationPartNumber\":null,\"declarationType\":\"S\",\"arrivesAt\":null,\"submitterTurn\":\"GB123468571234\",\"declarantId\":\"GB123407512345\",\"declarantName\":\"GB123407512345\",\"dispatchCountryCode\":\"DE\",\"goodsLocationCode\":\"DEUDEUDEUGVM\",\"masterUcr\":null,\"commodities\":[{\"itemNumber\":1,\"customsProcedureCode\":\"4000000\",\"taricCommodityCode\":\"1901909990\",\"goodsDescription\":\"Dairy based product\",\"consigneeId\":\"GB123486241234\",\"consigneeName\":\"GB123486241234\",\"netMass\":6123.8,\"supplementaryUnits\":0,\"thirdQuantity\":null,\"originCountryCode\":\"DE\",\"documents\":[{\"documentCode\":\"N853\",\"documentReference\":\"GBCHD2025.1234567\",\"documentStatus\":\"AE\",\"documentControl\":\"P\",\"documentQuantity\":null}],\"checks\":[{\"checkCode\":\"H222\",\"departmentCode\":\"PHA\"}]},{\"itemNumber\":2,\"customsProcedureCode\":\"4000000\",\"taricCommodityCode\":\"0403909100\",\"goodsDescription\":\"Dairy based product\",\"consigneeId\":\"GB12346241234\",\"consigneeName\":\"GB12346241234\",\"netMass\":10123.4,\"supplementaryUnits\":0,\"thirdQuantity\":null,\"originCountryCode\":\"DE\",\"documents\":[{\"documentCode\":\"N853\",\"documentReference\":\"GBCHD2025.1234147\",\"documentStatus\":\"AE\",\"documentControl\":\"P\",\"documentQuantity\":null}],\"checks\":[{\"checkCode\":\"H222\",\"departmentCode\":\"PHA\"}]}]},\"clearanceDecision\":null,\"finalisation\":null,\"externalErrors\":null},\"etag\":\"12345a972b123474b8059c7a\",\"timestamp\":\"2025-12-15T14:26:31.8345945Z\",\"changeSet\":[]}",
+    message: "{\"resourceId\":\"24GBBGBKCDMS895001\",\"resourceType\":\"CustomsDeclaration\",\"subResourceType\":\"ClearanceRequest\",\"operation\":\"Created\",\"resource\":{\"id\":\"24GBBGBKCDMS895001\",\"etag\":\"12345a972b123474b8059c81\",\"created\":\"2025-12-15T14:26:31.8306635Z\",\"updated\":\"2025-12-15T14:26:31.8306635Z\",\"clearanceRequest\":{\"externalCorrelationId\":\"1232133\",\"messageSentAt\":\"2025-12-15T14:26:31Z\",\"externalVersion\":1,\"previousExternalVersion\":null,\"declarationUcr\":\"5GB123407564000-JI123427\",\"declarationPartNumber\":null,\"declarationType\":\"S\",\"arrivesAt\":null,\"submitterTurn\":\"GB123468571234\",\"declarantId\":\"GB123407512345\",\"declarantName\":\"GB123407512345\",\"dispatchCountryCode\":\"DE\",\"goodsLocationCode\":\"DEUDEUDEUGVM\",\"masterUcr\":null,\"commodities\":[{\"itemNumber\":1,\"customsProcedureCode\":\"4000000\",\"taricCommodityCode\":\"1901909990\",\"goodsDescription\":\"Dairy based product\",\"consigneeId\":\"GB123486241234\",\"consigneeName\":\"GB123486241234\",\"netMass\":6123.8,\"supplementaryUnits\":0,\"thirdQuantity\":null,\"originCountryCode\":\"DE\",\"documents\":[{\"documentCode\":\"N853\",\"documentReference\":\"GBCHD2025.1234567\",\"documentStatus\":\"AE\",\"documentControl\":\"P\",\"documentQuantity\":null}],\"checks\":[{\"checkCode\":\"H222\",\"departmentCode\":\"PHA\"}]},{\"itemNumber\":2,\"customsProcedureCode\":\"4000000\",\"taricCommodityCode\":\"0403909100\",\"goodsDescription\":\"Dairy based product\",\"consigneeId\":\"GB12346241234\",\"consigneeName\":\"GB12346241234\",\"netMass\":10123.4,\"supplementaryUnits\":0,\"thirdQuantity\":null,\"originCountryCode\":\"DE\",\"documents\":[{\"documentCode\":\"N853\",\"documentReference\":\"GBCHD2025.1234147\",\"documentStatus\":\"AE\",\"documentControl\":\"P\",\"documentQuantity\":null}],\"checks\":[{\"checkCode\":\"H222\",\"departmentCode\":\"PHA\"}]}]},\"clearanceDecision\":null,\"finalisation\":null,\"externalErrors\":null},\"etag\":\"12345a972b123474b8059c7a\",\"timestamp\":\"2025-12-15T14:26:31.8345945Z\",\"changeSet\":[]}",
     published: "2025-12-15T14:26:31.878Z",
     expiresAt: "2026-06-13T14:26:31.834Z"
   }
@@ -33,15 +33,15 @@ const ALL_MESSAGES_SEARCH_RESULTS = [
     etag: "12345a972b123474b8059c81",
     created: "2025-12-15T14:26:31.799Z",
     updated: "2025-12-15T14:26:31.799Z",
-    resourceId: "25GBAB123ZKAZZYAR1",
+    resourceId: "24GBBGBKCDMS895001",
     resourceType: "ClearanceRequest",
     headers: {
       CorrelationId: "1234133",
       InboundHmrcMessageType: "ClearanceRequest",
-      ResourceId: "25GBAB123ZKAZZYAR1",
+      ResourceId: "24GBBGBKCDMS895001",
     },
     messageId: "dab4e123-8724-467b-adf7-3e5ef3803456",
-    message: "{\n  \"serviceHeader\": {\n    \"sourceSystem\": \"CDS\",\n    \"destinationSystem\": \"ALVS\",\n    \"correlationId\": \"1234133\",\n    \"serviceCallTimestamp\": \"2025-12-15T14:26:31Z\"\n  },\n  \"header\": {\n    \"entryReference\": \"25GBAB123ZKAZZYAR1\",\n    \"entryVersionNumber\": 1,\n    \"declarationUCR\": \"5GB123407564000-JI123427\",\n    \"declarationType\": \"S\",\n    \"submitterTURN\": \"GB123458571234\",\n    \"declarantId\": \"GB123407561234\",\n    \"declarantName\": \"GB123407561234\",\n    \"dispatchCountryCode\": \"DE\",\n    \"goodsLocationCode\": \"DEUDEUDEUGVM\"\n  },\n  \"items\": [\n    {\n      \"itemNumber\": 1,\n      \"customsProcedureCode\": \"4000000\",\n      \"taricCommodityCode\": \"1901909990\",\n      \"goodsDescription\": \"Dairy based product\",\n      \"consigneeId\": \"GB123456241234\",\n      \"consigneeName\": \"GB123456241234\",\n      \"itemNetMass\": 6123.8,\n      \"itemSupplementaryUnits\": 0,\n      \"itemOriginCountryCode\": \"DE\",\n      \"documents\": [\n        {\n          \"documentCode\": \"N853\",\n          \"documentReference\": \"GBCHD2025.7123456\",\n          \"documentStatus\": \"AE\",\n          \"documentControl\": \"P\"\n        }\n      ],\n      \"checks\": [\n        {\n          \"checkCode\": \"H222\",\n          \"departmentCode\": \"PHA\"\n        }\n      ]\n    },\n    {\n      \"itemNumber\": 2,\n      \"customsProcedureCode\": \"4000000\",\n      \"taricCommodityCode\": \"0403909100\",\n      \"goodsDescription\": \"Dairy based product\",\n      \"consigneeId\": \"GB123456241234\",\n      \"consigneeName\": \"GB123456241234\",\n      \"itemNetMass\": 10123.4,\n      \"itemSupplementaryUnits\": 0,\n      \"itemOriginCountryCode\": \"DE\",\n      \"documents\": [\n        {\n          \"documentCode\": \"N853\",\n          \"documentReference\": \"GBCHD2025.7123456\",\n          \"documentStatus\": \"AE\",\n          \"documentControl\": \"P\"\n        }\n      ],\n      \"checks\": [\n        {\n          \"checkCode\": \"H222\",\n          \"departmentCode\": \"PHA\"\n        }\n      ]\n    }\n  ]\n}",
+    message: "{\n  \"serviceHeader\": {\n    \"sourceSystem\": \"CDS\",\n    \"destinationSystem\": \"ALVS\",\n    \"correlationId\": \"1234133\",\n    \"serviceCallTimestamp\": \"2025-12-15T14:26:31Z\"\n  },\n  \"header\": {\n    \"entryReference\": \"24GBBGBKCDMS895001\",\n    \"entryVersionNumber\": 1,\n    \"declarationUCR\": \"5GB123407564000-JI123427\",\n    \"declarationType\": \"S\",\n    \"submitterTURN\": \"GB123458571234\",\n    \"declarantId\": \"GB123407561234\",\n    \"declarantName\": \"GB123407561234\",\n    \"dispatchCountryCode\": \"DE\",\n    \"goodsLocationCode\": \"DEUDEUDEUGVM\"\n  },\n  \"items\": [\n    {\n      \"itemNumber\": 1,\n      \"customsProcedureCode\": \"4000000\",\n      \"taricCommodityCode\": \"1901909990\",\n      \"goodsDescription\": \"Dairy based product\",\n      \"consigneeId\": \"GB123456241234\",\n      \"consigneeName\": \"GB123456241234\",\n      \"itemNetMass\": 6123.8,\n      \"itemSupplementaryUnits\": 0,\n      \"itemOriginCountryCode\": \"DE\",\n      \"documents\": [\n        {\n          \"documentCode\": \"N853\",\n          \"documentReference\": \"GBCHD2025.7123456\",\n          \"documentStatus\": \"AE\",\n          \"documentControl\": \"P\"\n        }\n      ],\n      \"checks\": [\n        {\n          \"checkCode\": \"H222\",\n          \"departmentCode\": \"PHA\"\n        }\n      ]\n    },\n    {\n      \"itemNumber\": 2,\n      \"customsProcedureCode\": \"4000000\",\n      \"taricCommodityCode\": \"0403909100\",\n      \"goodsDescription\": \"Dairy based product\",\n      \"consigneeId\": \"GB123456241234\",\n      \"consigneeName\": \"GB123456241234\",\n      \"itemNetMass\": 10123.4,\n      \"itemSupplementaryUnits\": 0,\n      \"itemOriginCountryCode\": \"DE\",\n      \"documents\": [\n        {\n          \"documentCode\": \"N853\",\n          \"documentReference\": \"GBCHD2025.7123456\",\n          \"documentStatus\": \"AE\",\n          \"documentControl\": \"P\"\n        }\n      ],\n      \"checks\": [\n        {\n          \"checkCode\": \"H222\",\n          \"departmentCode\": \"PHA\"\n        }\n      ]\n    }\n  ]\n}",
     expiresAt: "2026-01-14T14:26:31.799Z"
   }
 ]
@@ -69,7 +69,7 @@ test.each([
 ])(
   'Should show the admin search page',
   async ({ resourceType, searchTerm, type }) => {
-    let adminSearchResults = { mrn: '25GBAB1Y2OQH2HABC6' }
+    let adminSearchResults = { mrn: searchTerm }
     switch (type) {
       case ADMIN_SEARCH_TYPES.ALL_EVENTS:
         adminSearchResults = ALL_EVENTS_SEARCH_RESULTS
@@ -97,26 +97,22 @@ test.each([
 
     globalJsdom(payload)
 
-    const table = getByRole(document.body, 'table')
-    expect(getByRole(table, 'row', { name: '1 {' })).toBeInTheDocument()
+    const searchResult = document.querySelector('.btms-admin-search-result > pre > code')
     switch (type) {
       case ADMIN_SEARCH_TYPES.ALL_EVENTS:
       case ADMIN_SEARCH_TYPES.ALL_MESSAGES: {
-        expect(getByRole(table, 'row', { name: '6 "resourceId": "25GBAB123ZKAZZYAR1",' })).toBeInTheDocument()
+        expect(getByText(searchResult, /resourceId": "24GBBGBKCDMS895001"/)).toBeInTheDocument()
         break
       }
       case ADMIN_SEARCH_TYPES.INFORMATION: {
-        expect(
-          getByRole(table, 'row', { name: '2 "mrn": "25GBAB1Y2OQH2HABC6"' })
-        ).toBeInTheDocument()
-        expect(getByRole(table, 'row', { name: '3 }' })).toBeInTheDocument()
-        expect(
-          getByRole(document.body, 'link', {
-            name: `${resourceType} Information`
-          })).toBeInTheDocument()
+        expect(getByText(searchResult, /mrn": "24GBBGBKCDMS895001"/)).toBeInTheDocument()
         break
       }
     }
+    expect(
+      getByRole(document.body, 'link', {
+        name: `${resourceType} Information`
+      })).toBeInTheDocument()
   }
 )
 
