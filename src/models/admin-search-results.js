@@ -1,8 +1,8 @@
 import { ADMIN_SEARCH_TYPES } from '../services/admin.js'
-const searchTypesNeedingMsgSerialisation = [
+const searchTypesNeedingMsgSerialisation = new Set([
   ADMIN_SEARCH_TYPES.ALL_MESSAGES,
   ADMIN_SEARCH_TYPES.ALL_EVENTS
-]
+])
 
 const prettyPrint = (obj, adminSearchType) => {
   const serialisedObj = JSON.stringify(
@@ -13,7 +13,7 @@ const prettyPrint = (obj, adminSearchType) => {
         // exclude the changeSet field
         return undefined
       }
-      if (searchTypesNeedingMsgSerialisation.includes(adminSearchType)
+      if (searchTypesNeedingMsgSerialisation.has(adminSearchType)
         && key === 'message') {
         // deserialise the message field
         return JSON.parse(value)
