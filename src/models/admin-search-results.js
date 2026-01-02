@@ -1,8 +1,4 @@
 import { ADMIN_SEARCH_TYPES } from '../services/admin.js'
-const searchTypesNeedingMsgSerialisation = new Set([
-  ADMIN_SEARCH_TYPES.ALL_MESSAGES,
-  ADMIN_SEARCH_TYPES.ALL_EVENTS
-])
 
 const prettyPrint = (obj) => {
   // A 'replacer' function has intentionally not
