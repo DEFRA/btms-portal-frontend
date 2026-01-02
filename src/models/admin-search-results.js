@@ -1,35 +1,30 @@
-import Prism from 'prismjs'
 import { ADMIN_SEARCH_TYPES } from '../services/admin.js'
 
-const prettyPrintJson = (json) => JSON.stringify(json, null, 2)
-
-const toHtml = (serialisedObj) => {
-  return Prism.highlight(
-    serialisedObj,
-    Prism.languages.javascript,
-    'javascript'
-  ).split('\n')
+const prettyPrint = (obj) => {
+  // A 'replacer' function has intentionally not
+  // been provided to JSON.stringify here
+  // as it isn't straightforward to determine the context for
+  // the "message" and "changeSet" fields in order to replace their values
+  return JSON.stringify(obj, null, 2)
 }
 
 export const mapAdminSearchResults = (rawSearchResults, searchType) => {
   switch (searchType) {
     case ADMIN_SEARCH_TYPES.ALL_MESSAGES:
       return rawSearchResults
-        .map(r => {
-          r.message = JSON.parse(r.message)
-          return prettyPrintJson(r)
+        .map(rawMsg => {
+          rawMsg.message = JSON.parse(rawMsg.message)
+          return prettyPrint(rawMsg)
         })
-        .map(json => toHtml(json))
     case ADMIN_SEARCH_TYPES.ALL_EVENTS:
       return rawSearchResults
-        .map(r => {
-          r.message = r.message.replace(/,\s*"changeSet":\[.*]/, '')
-          r.message = JSON.parse(r.message)
-          return prettyPrintJson(r)
+        .map(resourceEvent => {
+          resourceEvent.message = resourceEvent.message.replace(/,\s*"changeSet":\[.*]/, '')
+          resourceEvent.message = JSON.parse(resourceEvent.message)
+          return prettyPrint(resourceEvent)
         })
-        .map(json => toHtml(json))
     case ADMIN_SEARCH_TYPES.INFORMATION:
-      return toHtml(prettyPrintJson(rawSearchResults))
+      return prettyPrint(rawSearchResults)
     default:
       throw new Error(`Unsupported admin search type: ${searchType}`)
   }
