@@ -1,58 +1,19 @@
 @use "govuk-frontend" as *;
 
-.btms-admin-search-table-container {
+.btms-admin-search-results-container {
   overflow-x: auto;
   background-color: govuk-colour("light-grey");
 }
 
-.btms-admin-search-table-container > :last-child {
+.btms-admin-search-results-container > :last-child {
   border-bottom: none;
 }
 
-.btms-admin-search-table {
+.btms-admin-search-result {
   display: block;
-  @include govuk-font-size($size: 14);
-  font-family: monospace;
+  @include govuk-font-size($size: 16);
   position: relative;
-  background-color: govuk-colour("light-grey");
-  border-bottom: govuk-colour("white") solid govuk-spacing(4);
+  border-bottom: govuk-colour("dark-grey") solid govuk-spacing(1);
   width: max-content;
   min-width: 100%;
-
-  .token.property {
-    color:  govuk-colour("blue");
-  }
-
-  .token.number {
-    color: govuk-colour("light-blue");
-  }
-
-  .token.boolean {
-    color: govuk-colour("orange");
-  }
-
-  .token.string {
-    color: govuk-colour("green");
-  }
-
-  .token.keyword {
-    color: govuk-colour("black");
-  }
-
-  .row {
-    content-visibility: auto;
-    contain-intrinsic-size: 19px;
-    display: grid;
-    grid-template-columns: 4ch 1fr;
-  }
-
-  .line-number {
-    color:  govuk-colour("dark-grey");
-    position: sticky;
-    left: 0;
-  }
-
-  .code {
-    white-space: pre;
-  }
 }

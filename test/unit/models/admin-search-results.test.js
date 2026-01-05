@@ -12,15 +12,10 @@ test('Should map search results for all-messages search type', () => {
     { resourceId: 1, message: JSON.stringify({ id: 1, content: 'Test message' }) }
   ]
   const result = mapAdminSearchResults(rawSearchResults, 'all-messages')
-  expect(result.length).toBe(1)
-  expect(result[0][0]).toContain('{')
-  expect(result[0][1]).toContain('"resourceId"')
-  expect(result[0][1]).toContain(':')
-  expect(result[0][1]).toContain('1')
-  expect(result[0][6]).toContain('}')
+  expect(result).toStrictEqual(["{\n  \"resourceId\": 1,\n  \"message\": {\n    \"id\": 1,\n    \"content\": \"Test message\"\n  }\n}"])
 })
 
-test('Should map search results for all-events search type', () => {
+test('Should map search resultexpect(result.length).toBe(1)s for all-events search type', () => {
   const rawSearchResults = [
     {
       id: '12241a972b123474b8059c7f',
@@ -36,16 +31,10 @@ test('Should map search results for all-events search type', () => {
     }
   ]
   const result = mapAdminSearchResults(rawSearchResults, 'all-events')
-  expect(result.length).toBe(1)
-  expect(result[0][0]).toContain('{')
-  expect(result[0][1]).toContain('"id"')
-  expect(result[0][2]).toContain('"created"')
-  expect(result[0][3]).toContain('"updated"')
-  expect(result[0][4]).toContain('"resourceId"')
-  expect(result[0][5]).toContain('"resourceType"')
-  expect(result[0][6]).toContain('"subResourceType"')
-  expect(result[0][10]).toContain('}')
-  expect(result[0].find(line => line.includes('"changeSet"'))).toBeUndefined()
+  expect(result).toStrictEqual([
+    "{\n  \"id\": \"12241a972b123474b8059c7f\",\n  \"created\": \"2025-12-15T14:26:31.834Z\",\n  \"updated\": \"2025-12-15T14:26:31.878Z\",\n  \"resourceId\": \"25GBAB123ZABCNXYR7\",\n  \"resourceType\": \"resourceType\",\n  \"subResourceType\": \"subResourceType\",\n  \"message\": {\n    \"id\": 2\n  }\n}"
+  ])
+  expect(result[0].includes('"changeSet"')).toBeFalsy()
 })
 
 test('Should map search results for information search type', () => {
@@ -54,9 +43,5 @@ test('Should map search results for information search type', () => {
     description: 'test description'
   }
   const result = mapAdminSearchResults(rawSearchResults, 'information')
-  expect(result.length).toEqual(4)
-  expect(result[0]).toContain('{')
-  expect(result[1]).toContain('"id"')
-  expect(result[2]).toContain('"test description"')
-  expect(result[3]).toContain('}')
+  expect(result).toStrictEqual('{\n  "id": 1,\n  "description": "test description"\n}')
 })
