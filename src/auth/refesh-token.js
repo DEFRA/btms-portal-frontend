@@ -4,6 +4,14 @@ import { paths } from '../routes/route-constants.js'
 import { AUTH_PROVIDERS } from './auth-constants.js'
 
 async function refreshAccessToken(request, authedUser) {
+  if (!authedUser.refreshToken) {
+    request.logger.error(
+      `missing ${authedUser.provider} refresh token`
+    )
+
+    return {}
+  }
+
   const authConfig = config.get('auth')[authedUser.provider]
   const refreshToken = authedUser.refreshToken
   const clientId = authConfig.clientId
@@ -14,14 +22,6 @@ async function refreshAccessToken(request, authedUser) {
       ? paths.SIGNIN_DEFRA_ID_CALLBACK
       : paths.SIGNIN_ENTRA_ID_CALLBACK
   const redirectUri = config.get('appBaseUrl') + callbackPath
-
-  if (!authedUser.refreshToken) {
-    request.logger.error(
-      `missing ${authedUser.provider} refresh token`
-    )
-
-    return {}
-  }
 
   const params = {
     client_id: clientId,
