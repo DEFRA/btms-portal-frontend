@@ -64,7 +64,7 @@ async function validateUserSession(server, request, session) {
 
   if (tokenIsExpiring) {
     try {
-      const response = await refreshAccessToken(request)
+      const response = await refreshAccessToken(request, authedUser)
 
       if (!response.ok) {
         removeUserSession(request)

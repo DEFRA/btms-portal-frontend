@@ -1,12 +1,9 @@
 import { config } from '../config/config.js'
-import { getUserSession } from './user-session.js'
 import { getOpenIdRefreshToken } from './open-id-client.js'
 import { paths } from '../routes/route-constants.js'
 import { AUTH_PROVIDERS } from './auth-constants.js'
 
-async function refreshAccessToken(request) {
-  const authedUser = await getUserSession(request)
-
+async function refreshAccessToken(request, authedUser) {
   const authConfig = config.get('auth')[authedUser.provider]
   const refreshToken = authedUser.refreshToken
   const clientId = authConfig.clientId
