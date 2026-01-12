@@ -15,6 +15,13 @@ const provider = {
 }
 
 test('latest activity', async () => {
+  const lastCreatedData = {
+    decision: {
+      timestamp: '2025-10-13T11:43:56.487Z',
+      reference: '25GBV2WICDPV7YZXXX'
+    }
+  }
+
   const lastSentData = {
     decision: {
       timestamp: '2025-10-13T11:44:56.487Z',
@@ -31,7 +38,7 @@ test('latest activity', async () => {
       reference: '25GBV2WICDPV7YZXXX'
     },
     preNotification: {
-      timestamp: '2025-10-13T11:44:56.296Z',
+      timestamp: '2025-10-13T11:44:57.296Z',
       reference: 'CHEDA.GB.1558.9999999'
     }
   }
@@ -39,6 +46,7 @@ test('latest activity', async () => {
   wreck.get
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: lastCreatedData })
     .mockResolvedValueOnce({ payload: lastSentData })
     .mockResolvedValueOnce({ payload: lastReceivedData })
 
@@ -64,10 +72,13 @@ test('latest activity', async () => {
     name: 'Latest activity for BTMS'
   })
   expect(
-    getByRole(btmsTable, 'columnheader', { name: 'Last sent' })
+    getByRole(btmsTable, 'columnheader', { name: 'Last updated' })
   ).toBeInTheDocument()
   expect(
-    getByRole(btmsTable, 'row', { name: 'Decision 13 October 2025, 11:44' })
+    getByRole(btmsTable, 'row', { name: 'Decision created BTMS 13 October 2025, 11:43:56' })
+  ).toBeInTheDocument()
+  expect(
+    getByRole(btmsTable, 'row', { name: 'Decision sent BTMS to CDS 13 October 2025, 11:44:56' })
   ).toBeInTheDocument()
 
   const cdsTable = getByRole(document.body, 'table', {
@@ -78,11 +89,11 @@ test('latest activity', async () => {
   ).toBeInTheDocument()
   expect(
     getByRole(cdsTable, 'row', {
-      name: 'Clearance request 13 October 2025, 11:44'
+      name: 'Clearance request 13 October 2025, 11:44:56'
     })
   ).toBeInTheDocument()
   expect(
-    getByRole(cdsTable, 'row', { name: 'Finalisation 13 October 2025, 11:44' })
+    getByRole(cdsTable, 'row', { name: 'Finalisation 13 October 2025, 11:44:18' })
   ).toBeInTheDocument()
 
   const ipaffsTable = getByRole(document.body, 'table', {
@@ -93,7 +104,7 @@ test('latest activity', async () => {
   ).toBeInTheDocument()
   expect(
     getByRole(ipaffsTable, 'row', {
-      name: 'Notification 13 October 2025, 11:44'
+      name: 'Notification 13 October 2025, 11:44:57'
     })
   ).toBeInTheDocument()
 })

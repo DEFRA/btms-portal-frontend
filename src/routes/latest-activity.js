@@ -10,10 +10,10 @@ export const latestActivity = {
     cache: CACHE_CONTROL_NO_STORE
   },
   handler: async (request, h) => {
-    const { lastSent, lastReceived } = await getLatestActivity(request)
+    const { lastCreated, lastSent, lastReceived } = await getLatestActivity(request)
 
     return h.view('latest-activity', {
-      latestActivity: mapLatestActivity(lastSent, lastReceived)
+      latestActivity: mapLatestActivity(lastCreated, lastSent, lastReceived)
     })
   }
 }

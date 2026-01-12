@@ -27,7 +27,11 @@ export const getReports = async (request, from, to, intervals) => {
 
 export const getLatestActivity = async (request) => {
   try {
-    const [lastSent, lastReceived] = await Promise.all([
+    const [lastCreated, lastSent, lastReceived] = await Promise.all([
+      wreck.get(`${baseUrl}/last-created`, {
+        headers: { authorization },
+        json: 'strict'
+      }),
       wreck.get(`${baseUrl}/last-sent`, {
         headers: { authorization },
         json: 'strict'
@@ -39,6 +43,7 @@ export const getLatestActivity = async (request) => {
     ])
 
     return {
+      lastCreated: lastCreated.payload,
       lastSent: lastSent.payload,
       lastReceived: lastReceived.payload
     }

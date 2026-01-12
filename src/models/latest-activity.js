@@ -1,16 +1,20 @@
 import { format } from 'date-fns'
 
-const latestActivityMessage = (type, timestamp) => ({
+const latestActivityMessage = (type, subtype, timestamp) => ({
   type,
-  timestamp: format(new Date(timestamp), 'dd MMMM yyyy, HH:mm')
+  subtype,
+  timestamp: timestamp ? format(new Date(timestamp), 'dd MMMM yyyy, HH:mm:ss') : 'No Data Available'
 })
 
-export const mapLatestActivity = (lastSent, lastReceived) => ({
+export const mapLatestActivity = (lastCreated, lastSent, lastReceived) => ({
   services: [
     {
       name: 'BTMS',
-      direction: 'sent',
-      messages: [latestActivityMessage('Decision', lastSent.decision.timestamp)]
+      direction: 'updated',
+      messages: [
+        latestActivityMessage('Decision created', 'BTMS', lastCreated.decision?.timestamp),
+        latestActivityMessage('Decision sent', 'BTMS to CDS', lastSent.decision?.timestamp)
+      ]
     },
     {
       name: 'CDS',
@@ -18,11 +22,13 @@ export const mapLatestActivity = (lastSent, lastReceived) => ({
       messages: [
         latestActivityMessage(
           'Clearance request',
-          lastReceived.clearanceRequest.timestamp
+          null,
+          lastReceived.clearanceRequest?.timestamp
         ),
         latestActivityMessage(
           'Finalisation',
-          lastReceived.finalisation.timestamp
+          null,
+          lastReceived.finalisation?.timestamp
         )
       ]
     },
@@ -32,7 +38,8 @@ export const mapLatestActivity = (lastSent, lastReceived) => ({
       messages: [
         latestActivityMessage(
           'Notification',
-          lastReceived.preNotification.timestamp
+          null,
+          lastReceived.preNotification?.timestamp
         )
       ]
     }
