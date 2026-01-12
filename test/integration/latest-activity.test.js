@@ -153,3 +153,83 @@ test('redirect non authorised requests', async () => {
   expect(statusCode).toBe(302)
   expect(headers.location).toBe('/sign-in-choose')
 })
+
+test('handles no latest activity data', async () => {
+  const lastCreatedData = {
+    decision: null
+  }
+
+  const lastSentData = {
+    decision: null
+  }
+  const lastReceivedData = {
+    finalisation: null,
+    clearanceRequest: null,
+    preNotification: null
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: lastCreatedData })
+  .mockResolvedValueOnce({ payload: lastSentData })
+  .mockResolvedValueOnce({ payload: lastReceivedData })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.LATEST_ACTIVITY}`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(
+    getByRole(document.body, 'heading', { name: 'BTMS' })
+  ).toBeInTheDocument()
+
+  const btmsTable = getByRole(document.body, 'table', {
+    name: 'Latest activity for BTMS'
+  })
+  expect(
+    getByRole(btmsTable, 'columnheader', { name: 'Last updated' })
+  ).toBeInTheDocument()
+  expect(
+    getByRole(btmsTable, 'row', { name: 'Decision created BTMS No Data Available' })
+  ).toBeInTheDocument()
+  expect(
+    getByRole(btmsTable, 'row', { name: 'Decision sent BTMS to CDS No Data Available' })
+  ).toBeInTheDocument()
+
+  const cdsTable = getByRole(document.body, 'table', {
+    name: 'Latest activity for CDS'
+  })
+  expect(
+    getByRole(cdsTable, 'columnheader', { name: 'Last received' })
+  ).toBeInTheDocument()
+  expect(
+    getByRole(cdsTable, 'row', {
+      name: 'Clearance request No Data Available'
+    })
+  ).toBeInTheDocument()
+  expect(
+    getByRole(cdsTable, 'row', { name: 'Finalisation No Data Available' })
+  ).toBeInTheDocument()
+
+  const ipaffsTable = getByRole(document.body, 'table', {
+    name: 'Latest activity for IPAFFS'
+  })
+  expect(
+    getByRole(ipaffsTable, 'columnheader', { name: 'Last received' })
+  ).toBeInTheDocument()
+  expect(
+    getByRole(ipaffsTable, 'row', {
+      name: 'Notification No Data Available'
+    })
+  ).toBeInTheDocument()
+})
