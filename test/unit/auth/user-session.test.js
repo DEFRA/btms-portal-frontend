@@ -54,7 +54,7 @@ describe('#userSession', () => {
       const cachedSession = await server.app.cache.get(sessionId)
 
       expect(cachedSession).not.toBeNull()
-      expect(cachedSession.expiresIn).toBeGreaterThan(1000)
+      expect(cachedSession.expiresIn).toBe(sessionConfig.cache.ttl)
     })
   })
 
@@ -130,6 +130,7 @@ describe('#userSession', () => {
       expect(newCachedSession.expiresAt).not.toEqual(
         originalCachedSession.expiresAt
       )
+      expect(newCachedSession.expiresIn).toBe(sessionConfig.cache.ttl + 1000)
     })
   })
 

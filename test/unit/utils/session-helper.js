@@ -65,7 +65,6 @@ function createDummyToken(authedUserProfile, ttl) {
 
 function createUserProfile(strategy) {
   const expiresInSeconds = sessionConfig.cache.ttl / 1000
-  const expiresInMilliSeconds = sessionConfig.cache.ttl
   const expiresAt = addSeconds(new Date(), expiresInSeconds)
 
   return {
@@ -83,7 +82,7 @@ function createUserProfile(strategy) {
       sessionId: crypto.randomUUID(),
     },
     externalSessionId: crypto.randomUUID(),
-    expiresIn: expiresInMilliSeconds,
+    expiresIn: expiresInSeconds,
     expiresAt: expiresAt.toISOString(),
     tokenUrl:
       strategy === 'entraId' ? 'https://entraid.foo' : 'https://defraid.foo',
