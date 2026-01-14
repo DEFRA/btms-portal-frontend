@@ -7,7 +7,7 @@
       name: "startDate",
       label: { text: 'Start date' },
       value: startDate,
-      minDate: '02/09/2025',
+      minDate: earliestReportingDate,
       maxDate: todaysDate,
       errorMessage: {
         text: errors.startDate
@@ -19,7 +19,7 @@
       name: "endDate",
       label: { text: "End date" },
       value: endDate,
-      minDate: '02/09/2025',
+      minDate: earliestReportingDate,
       maxDate: todaysDate,
       errorMessage: {
         text: errors.endDate
