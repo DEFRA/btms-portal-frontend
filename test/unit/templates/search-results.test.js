@@ -21,10 +21,15 @@ function createViewContext(
             itemNumber: 12074014,
             commodityCode: '0909',
             commodityDesc: preNotificationCommodityDesc,
-            weightOrQuantity: 16120
+            weightOrQuantity: 16120,
+            checks: [
+              {
+                authority: 'HMI',
+                decision: 'Decision not given'
+              }
+            ]
           }
-        ],
-        decision: 'Acceptable for internal market'
+        ]
       }
     ],
     customsDeclarations: [
