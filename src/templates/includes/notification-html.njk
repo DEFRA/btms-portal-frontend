@@ -17,10 +17,10 @@
     <tbody>
       {% for check in commodity.checks %}
         <tr data-ched-authority="{{ check.authority }}">
-          <td class="govuk-table__cell">{% if loop.first %}{{ commodity.complementId }}{% endif %}</td>
-          <td class="govuk-table__cell">{% if loop.first %}{{ commodity.commodityId }}{% endif %}</td>
-          <td class="govuk-table__cell">{% if loop.first %}{{ commodityDescription(commodity.commodityDesc, commodity.id, maxLength) }}{% endif %}</td>
-          <td class="govuk-table__cell">{% if loop.first %}{{ commodity.weightOrQuantity }}{% endif %}</td>
+          <td class="govuk-table__cell">{{ commodity.complementId }}</td>
+          <td class="govuk-table__cell">{{ commodity.commodityId }}</td>
+          <td class="govuk-table__cell">{{ commodityDescription(commodity.commodityDesc, commodity.id, maxLength) }}</td>
+          <td class="govuk-table__cell">{{ commodity.weightOrQuantity }}</td>
           <td class="govuk-table__cell">
               {{ check.authority }}
           </td>
