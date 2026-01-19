@@ -1,11 +1,16 @@
 import { config } from '../config/config.js'
-import { getUserSession } from './user-session.js'
 import { getOpenIdRefreshToken } from './open-id-client.js'
 import { paths } from '../routes/route-constants.js'
 import { AUTH_PROVIDERS } from './auth-constants.js'
 
-async function refreshAccessToken(request) {
-  const authedUser = await getUserSession(request)
+async function refreshAccessToken(request, authedUser) {
+  if (!authedUser.refreshToken) {
+    request.logger.error(
+      `missing ${authedUser.provider} refresh token`
+    )
+
+    return {}
+  }
 
   const authConfig = config.get('auth')[authedUser.provider]
   const refreshToken = authedUser.refreshToken
@@ -17,14 +22,6 @@ async function refreshAccessToken(request) {
       ? paths.SIGNIN_DEFRA_ID_CALLBACK
       : paths.SIGNIN_ENTRA_ID_CALLBACK
   const redirectUri = config.get('appBaseUrl') + callbackPath
-
-  if (!authedUser.refreshToken) {
-    request.logger.error(
-      `missing ${authedUser.provider} refresh token`
-    )
-
-    return {}
-  }
 
   const params = {
     client_id: clientId,
