@@ -198,26 +198,7 @@
     border: none;
   }
 
-  .btms-notification
-    tbody
-    > tr:not([hidden])
-    ~ tr:not(:first-child)
-    > td:nth-child(-n + 4) {
-    visibility: hidden;
-  }
-
-  .btms-notification
-    tbody
-    tr:not(:last-of-type):not(:has(+ tr[data-ched-authority="IUU"]))
-    > td:nth-last-child(-n + 2) {
-    border-bottom: 1px dashed $btms-light-to-mid-grey;
-  }
-
-  .btms-notification tbody:last-of-type tr:last-of-type > td {
-    border-bottom: none;
-  }
-
-  .btms-notification tbody > tr:not(:last-of-type) > td {
+  .btms-notification tbody tr:last-child td {
     border: none;
   }
 

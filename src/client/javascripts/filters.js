@@ -83,9 +83,16 @@ const setRow = {
     )
   },
   notification: (state, row) => {
-    row.hidden = filterTypes.notification.some(
-      (key) => state[key] && row.dataset[key] !== state[key]
-    )
+    const authorityList = row.querySelector('ul')
+    const listItems = [...row.querySelectorAll('li')]
+
+    listItems.forEach((li) => {
+      li.hidden = filterTypes.notification.some(
+        (key) => state[key] && li.dataset[key] !== state[key]
+      )
+    })
+
+    row.hidden = authorityList.querySelectorAll('li:not([hidden])').length === 0
   }
 }
 
