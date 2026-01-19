@@ -29,7 +29,7 @@ test('renders search page', async () => {
   initSearch()
 
   const searchBox = getByRole(document.body, 'textbox', {
-    name: 'Search for an MRN, CHED, GMR or DUCR'
+    name: 'Search for an MRN, CHED or GMR'
   })
   expect(searchBox).not.toHaveClass('govuk-input--error')
 
@@ -45,7 +45,7 @@ test('renders search page', async () => {
 
   expect(document.querySelectorAll('script[nonce]').length).toBe(2)
   expect(document.title).toBe(
-    'Search for an MRN, CHED, GMR or DUCR - Border Trade Matching Service'
+    'Search for an MRN, CHED or GMR - Border Trade Matching Service'
   )
 })
 
@@ -75,13 +75,13 @@ test('renders search page with error: no search term', async () => {
   initSearch()
 
   const searchBox = getByRole(document.body, 'textbox', {
-    name: 'Search for an MRN, CHED, GMR or DUCR'
+    name: 'Search for an MRN, CHED or GMR'
   })
   expect(searchBox).toHaveClass('govuk-input--error')
   expect(searchBox).toHaveValue('')
 
   expect(
-    getByText(document.body, 'Enter an MRN, CHED, GMR or DUCR', {
+    getByText(document.body, 'Enter an MRN, CHED or GMR', {
       exact: false
     })
   ).toBeInTheDocument()
@@ -113,7 +113,7 @@ test('renders search page with error: invalid search term', async () => {
   initSearch()
 
   const searchBox = getByRole(document.body, 'textbox', {
-    name: 'Search for an MRN, CHED, GMR or DUCR'
+    name: 'Search for an MRN, CHED or GMR'
   })
   expect(searchBox).toHaveClass('govuk-input--error')
   expect(searchBox).toHaveValue('test search')
@@ -121,7 +121,7 @@ test('renders search page with error: invalid search term', async () => {
   expect(
     getByText(
       document.body,
-      'Enter an MRN, CHED, GMR or DUCR reference in the correct format',
+      'Enter an MRN, CHED or GMR reference in the correct format',
       {
         exact: false
       }
@@ -155,7 +155,7 @@ test('renders search page with error: search term not found', async () => {
   initSearch()
 
   const searchBox = getByRole(document.body, 'textbox', {
-    name: 'Search for an MRN, CHED, GMR or DUCR'
+    name: 'Search for an MRN, CHED or GMR'
   })
   expect(searchBox).toHaveClass('govuk-input--error')
   expect(searchBox).toHaveValue('24GB6T3HFCIZV1HAR9')
@@ -181,11 +181,11 @@ test('redirect non authorised requests', async () => {
 test.each([
   {
     searchTerm: '',
-    expectedSearchError: 'Enter an MRN, CHED, GMR or DUCR'
+    expectedSearchError: 'Enter an MRN, CHED or GMR'
   },
   {
     searchTerm: 'TERM_NOT_MATCHING_ANY_ID_FORMAT',
-    expectedSearchError: 'Enter an MRN, CHED, GMR or DUCR reference in the correct format'
+    expectedSearchError: 'Enter an MRN, CHED or GMR reference in the correct format'
   }
 ])('returns search page if search term is not valid', async (options) => {
   const server = await initialiseServer()
