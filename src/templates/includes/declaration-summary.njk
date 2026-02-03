@@ -2,29 +2,38 @@
 {% from "../macros/cds-status.njk" import cdsStatus %}
 
 {% set cdsStatusClass = cdsStatus(customsDeclaration.finalState) %}
+{% set summaryRows = [
+  {
+    key: { text: "MRN" },
+    value: { text: customsDeclaration.movementReferenceNumber }
+  }
+] %}
+
+{% if customsDeclaration.gmr %}
+{% set summaryRows = (summaryRows.push(
+  {
+    key: { text: "GMR" },
+    value: { html: '<a href="' ~ customsDeclaration.gmrLink ~ '">' ~ customsDeclaration.gmr ~ '</a>' }
+  }
+), summaryRows) %}
+{% endif %}
+
+{% set summaryRows = (summaryRows.push(
+  {
+    key: { text: "CDS status" },
+    value: {
+      html: '<span class="' ~ cdsStatusClass ~ '">' ~ customsDeclaration.status ~ '</span>'
+    }
+  },
+  {
+    key: { text: "Last updated" },
+    value: { text: customsDeclaration.updated }
+  }
+), summaryRows) %}
 
 {{
   govukSummaryList({
     classes: "btms-customs-declaration-summary",
-    rows: [
-      {
-        key: { text: "MRN" },
-        value: { text: customsDeclaration.movementReferenceNumber }
-      },
-      {
-        key: { text: "DUCR" },
-        value: { text: customsDeclaration.declarationUcr }
-      },
-      {
-        key: { text: "CDS status" },
-        value: {
-          html: '<span class="' ~ cdsStatusClass ~ '">' ~ customsDeclaration.status ~ '</span>'
-        }
-      },
-      {
-        key: { text: "Last updated" },
-        value: { text: customsDeclaration.updated }
-      }
-    ]
+    rows: summaryRows
   })
 }}
