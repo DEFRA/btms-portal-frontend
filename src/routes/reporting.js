@@ -28,6 +28,7 @@ const dateFormat = 'd/M/yyyy'
 const getDateProps = (tab) => {
   const daysToLastWeek = 6
   const daysToLastMonth = 29
+  const maxReportingDays = 123
 
   const todaysDate = formatToday()
   const today = getQueryString(todaysDate, todaysDate, tab)
@@ -37,13 +38,15 @@ const getDateProps = (tab) => {
   const lastWeek = getQueryString(lastWeekDate, todaysDate, tab)
   const lastMonthDate = formatDayInPast(daysToLastMonth)
   const lastMonth = getQueryString(lastMonthDate, todaysDate, tab)
+  const earliestReportingDate =formatDayInPast(maxReportingDays)
 
   return {
     todaysDate,
     today,
     yesterday,
     lastWeek,
-    lastMonth
+    lastMonth,
+    earliestReportingDate
   }
 }
 

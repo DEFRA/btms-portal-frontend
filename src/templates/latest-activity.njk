@@ -23,7 +23,11 @@
           <tbody class="govuk-table__body">
             {% for message in service.messages %}
               <tr class="govuk-table__row">
-                <td class="govuk-table__cell">{{ message.type }}</td>
+                <td class="govuk-table__cell">{{ message.type }}
+                {% if message.subtype %}
+                <br>
+                <span class="govuk-body-s govuk-!-font-weight-regular govuk-!-colour-secondary btms-latest-activity--message-sub-type">{{ message.subtype }}</span>
+                {% endif %}</td>
                 <td class="govuk-table__cell govuk-table__cell--numeric">{{ message.timestamp }}</td>
               </tr>
             {% endfor %}

@@ -4,6 +4,7 @@ import { initialiseServer } from '../utils/initialise-server.js'
 import { setupAuthedUserSession } from '../unit/utils/session-helper.js'
 import { paths } from '../../src/routes/route-constants.js'
 import { getByRole, getAllByRole } from '@testing-library/dom'
+import { format, subDays } from 'date-fns'
 
 const provider = {
   authorization_endpoint: 'https://auth.endpoint',
@@ -153,6 +154,16 @@ test('reporting data', async () => {
       level: 2
     })
   ).toBeInTheDocument()
+
+  const datePickers = document.body.querySelectorAll(
+    '[data-module="moj-date-picker"]'
+  )
+  expect(datePickers.length).toBe(2)
+  const minDate = format(subDays(new Date(), 123), 'dd/MM/yyyy')
+  const startDateMin = datePickers[0].getAttribute('data-min-date')
+  const endDateMin = datePickers[1].getAttribute('data-min-date')
+  expect(startDateMin).toBe(minDate)
+  expect(endDateMin).toBe(minDate)
 
   const [matchesSummaryRegion] = getAllByRole(document.body, 'region', {
     name: 'Matches'
