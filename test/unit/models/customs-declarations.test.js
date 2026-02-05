@@ -1802,3 +1802,420 @@ test('gmr with no customs or transits', () => {
   expect(result[0].gmr).toBeUndefined()
   expect(result[0].gmrLink).toBeUndefined()
 })
+
+test('CHED ordering: decisions are sorted by CHED reference then authority when all references start with CHED', () => {
+  const data = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: 'GB251234567890ABCD',
+        clearanceRequest: {
+          declarationUcr: '5GB123456789000-BDOV123456',
+          commodities: [
+            {
+              itemNumber: 1,
+              netMass: '9999',
+              documents: [],
+              checks: [
+                { checkCode: 'H221' },
+                { checkCode: 'H219' },
+                { checkCode: 'H223' }
+              ]
+            }
+          ]
+        },
+        clearanceDecision: {
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: 'H221',
+              documentReference: 'CHEDP.GB.2025.1234569',
+              decisionCode: 'C03',
+              decisionReason: null,
+              internalDecisionCode: 'E00'
+            },
+            {
+              itemNumber: 1,
+              checkCode: 'H219',
+              documentReference: 'CHEDPP.GB.2025.1234567',
+              decisionCode: 'C03',
+              decisionReason: null,
+              internalDecisionCode: 'E00'
+            },
+            {
+              itemNumber: 1,
+              checkCode: 'H223',
+              documentReference: 'CHEDP.GB.2025.1234568',
+              decisionCode: 'C03',
+              decisionReason: null,
+              internalDecisionCode: 'E00'
+            }
+          ]
+        },
+        finalisation: null,
+        updated: '2025-05-12T11:13:17.330Z'
+      }
+    ],
+    importPreNotifications: []
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  // Decisions should be sorted by documentReference
+  expect(result[0].commodities[0].decisions[0].documentReference).toBe('CHEDP.GB.2025.1234568')
+  expect(result[0].commodities[0].decisions[1].documentReference).toBe('CHEDP.GB.2025.1234569')
+  expect(result[0].commodities[0].decisions[2].documentReference).toBe('CHEDPP.GB.2025.1234567')
+})
+
+test('CHED ordering: decisions with same CHED reference are sorted by authority', () => {
+  const data = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: 'GB251234567890ABCD',
+        clearanceRequest: {
+          declarationUcr: '5GB123456789000-BDOV123456',
+          commodities: [
+            {
+              itemNumber: 1,
+              netMass: '9999',
+              documents: [],
+              checks: [
+                { checkCode: 'H219' },
+                { checkCode: 'H221' }
+              ]
+            }
+          ]
+        },
+        clearanceDecision: {
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: 'H219',
+              documentReference: 'CHEDP.GB.2025.1234567',
+              decisionCode: 'C03',
+              decisionReason: null,
+              internalDecisionCode: 'E00'
+            },
+            {
+              itemNumber: 1,
+              checkCode: 'H221',
+              documentReference: 'CHEDP.GB.2025.1234567',
+              decisionCode: 'C03',
+              decisionReason: null,
+              internalDecisionCode: 'E00'
+            }
+          ]
+        },
+        finalisation: null,
+        updated: '2025-05-12T11:13:17.330Z'
+      }
+    ],
+    importPreNotifications: []
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  // Same CHED reference, sorted by authority (APHA before PHSI)
+  expect(result[0].commodities[0].decisions[0].authority.text).toBe('APHA')
+  expect(result[0].commodities[0].decisions[1].authority.text).toBe('PHSI')
+})
+
+test('CHED ordering: not applied when IUU decision present (null documentReference)', () => {
+  const data = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: 'GB251234567890ABCD',
+        clearanceRequest: {
+          declarationUcr: '5GB123456789000-BDOV123456',
+          commodities: [
+            {
+              itemNumber: 1,
+              netMass: '9999',
+              documents: [],
+              checks: [
+                { checkCode: 'H223' },
+                { checkCode: 'H224' }
+              ]
+            }
+          ]
+        },
+        clearanceDecision: {
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: 'H223',
+              documentReference: 'CHEDP.GB.2025.1234567',
+              decisionCode: 'C03',
+              decisionReason: null,
+              internalDecisionCode: 'E00'
+            },
+            {
+              itemNumber: 1,
+              checkCode: 'H224',
+              documentReference: 'CHEDP.GB.2025.1234567',
+              decisionCode: 'C07',
+              decisionReason: null,
+              internalDecisionCode: 'E00'
+            }
+          ]
+        },
+        finalisation: null,
+        updated: '2025-05-12T11:13:17.330Z'
+      }
+    ],
+    importPreNotifications: []
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  // H224 is IUU, so documentReference becomes null, which means CHED ordering should NOT apply
+  // Original order should be maintained (H223/FNAO first, then H224/IUU)
+  expect(result[0].commodities[0].decisions[0].authority.text).toBe('FNAO')
+  expect(result[0].commodities[0].decisions[1].authority.text).toBe('IUU')
+})
+
+test('CHED ordering: not applied when "Requires CHED" present', () => {
+  const data = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: 'GB251234567890ABCD',
+        clearanceRequest: {
+          declarationUcr: '5GB123456789000-BDOV123456',
+          commodities: [
+            {
+              itemNumber: 1,
+              netMass: '9999',
+              documents: [],
+              checks: [
+                { checkCode: 'H223' },
+                { checkCode: 'H220' }
+              ]
+            }
+          ]
+        },
+        clearanceDecision: {
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: 'H223',
+              documentReference: 'CHEDP.GB.2025.1234567',
+              decisionCode: 'C03',
+              decisionReason: null,
+              internalDecisionCode: 'E00'
+            },
+            {
+              itemNumber: 1,
+              checkCode: 'H220',
+              documentReference: 'CHEDP.GB.2025.1234568',
+              decisionCode: 'X00',
+              decisionReason: null,
+              internalDecisionCode: 'E82'
+            }
+          ]
+        },
+        finalisation: null,
+        updated: '2025-05-12T11:13:17.330Z'
+      }
+    ],
+    importPreNotifications: []
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  // E82 internal decision code results in "Requires CHED" which doesn't start with "CHED"
+  // So CHED ordering should NOT apply, original order maintained
+  expect(result[0].commodities[0].decisions[0].authority.text).toBe('FNAO')
+  expect(result[0].commodities[0].decisions[1].authority.text).toBe('HMI - GMS')
+  expect(result[0].commodities[0].decisions[1].documentReference).toBe('Requires CHED')
+})
+
+test('CHED ordering: decisions are sorted when references start with GBCHD', () => {
+  const data = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: 'GB251234567890ABCD',
+        clearanceRequest: {
+          declarationUcr: '5GB123456789000-BDOV123456',
+          commodities: [
+            {
+              itemNumber: 1,
+              netMass: '9999',
+              documents: [],
+              checks: [
+                { checkCode: 'H221' },
+                { checkCode: 'H219' }
+              ]
+            }
+          ]
+        },
+        clearanceDecision: {
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: 'H221',
+              documentReference: 'GBCHD2025.1234568',
+              decisionCode: 'C03',
+              decisionReason: null,
+              internalDecisionCode: 'E00'
+            },
+            {
+              itemNumber: 1,
+              checkCode: 'H219',
+              documentReference: 'GBCHD2025.1234567',
+              decisionCode: 'C03',
+              decisionReason: null,
+              internalDecisionCode: 'E00'
+            }
+          ]
+        },
+        finalisation: null,
+        updated: '2025-05-12T11:13:17.330Z'
+      }
+    ],
+    importPreNotifications: []
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  // Decisions should be sorted by documentReference (GBCHD2025.1234567 before GBCHD2025.1234568)
+  expect(result[0].commodities[0].decisions[0].documentReference).toBe('GBCHD2025.1234567')
+  expect(result[0].commodities[0].decisions[1].documentReference).toBe('GBCHD2025.1234568')
+})
+
+test('CHED ordering: applied per-commodity - commodity with IUU unsorted, commodity without IUU sorted', () => {
+  const data = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: 'GB251234567890ABCD',
+        clearanceRequest: {
+          declarationUcr: '5GB123456789000-BDOV123456',
+          commodities: [
+            {
+              itemNumber: 1,
+              netMass: '9999',
+              documents: [],
+              checks: [
+                { checkCode: 'H222' },
+                { checkCode: 'H224' }
+              ]
+            },
+            {
+              itemNumber: 2,
+              netMass: '9999',
+              documents: [],
+              checks: [
+                { checkCode: 'H219' },
+                { checkCode: 'H221' }
+              ]
+            }
+          ]
+        },
+        clearanceDecision: {
+          results: [
+            // Item 1: Has IUU (H224), should NOT be sorted
+            {
+              itemNumber: 1,
+              checkCode: 'H222',
+              documentReference: 'CHEDP.GB.2025.1234567',
+              decisionCode: 'C03',
+              decisionReason: null,
+              internalDecisionCode: 'E00'
+            },
+            {
+              itemNumber: 1,
+              checkCode: 'H224',
+              documentReference: 'CHEDP.GB.2025.1234567',
+              decisionCode: 'C07',
+              decisionReason: null,
+              internalDecisionCode: 'E00'
+            },
+            // Item 2: No IUU, should be sorted (PHSI before APHA alphabetically, but input is PHSI, APHA)
+            {
+              itemNumber: 2,
+              checkCode: 'H219',
+              documentReference: 'CHEDP.GB.2025.1234568',
+              decisionCode: 'C03',
+              decisionReason: null,
+              internalDecisionCode: 'E00'
+            },
+            {
+              itemNumber: 2,
+              checkCode: 'H221',
+              documentReference: 'CHEDP.GB.2025.1234568',
+              decisionCode: 'C03',
+              decisionReason: null,
+              internalDecisionCode: 'E00'
+            }
+          ]
+        },
+        finalisation: null,
+        updated: '2025-05-12T11:13:17.330Z'
+      }
+    ],
+    importPreNotifications: []
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  // Item 1 (commodity 0): Has IUU, should NOT be sorted - original order maintained
+  expect(result[0].commodities[0].decisions[0].authority.text).toBe('POAO')
+  expect(result[0].commodities[0].decisions[1].authority.text).toBe('IUU')
+
+  // Item 2 (commodity 1): No IUU, SHOULD be sorted by authority (APHA before PHSI)
+  expect(result[0].commodities[1].decisions[0].authority.text).toBe('APHA')
+  expect(result[0].commodities[1].decisions[1].authority.text).toBe('PHSI')
+})
+
+test('CHED ordering: handles decisions with unknown check codes (undefined authority.text)', () => {
+  const data = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: 'GB251234567890ABCD',
+        clearanceRequest: {
+          declarationUcr: '5GB123456789000-BDOV123456',
+          commodities: [
+            {
+              itemNumber: 1,
+              netMass: '9999',
+              documents: [],
+              checks: [
+                { checkCode: 'H999' },
+                { checkCode: 'H998' }
+              ]
+            }
+          ]
+        },
+        clearanceDecision: {
+          results: [
+            {
+              itemNumber: 1,
+              checkCode: 'H999',
+              documentReference: 'CHEDP.GB.2025.1234567',
+              decisionCode: 'C03',
+              decisionReason: null,
+              internalDecisionCode: 'E00'
+            },
+            {
+              itemNumber: 1,
+              checkCode: 'H998',
+              documentReference: 'CHEDP.GB.2025.1234567',
+              decisionCode: 'C03',
+              decisionReason: null,
+              internalDecisionCode: 'E00'
+            }
+          ]
+        },
+        finalisation: null,
+        updated: '2025-05-12T11:13:17.330Z'
+      }
+    ],
+    importPreNotifications: []
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  // Both decisions have same documentReference and unknown check codes (undefined authority.text)
+  // Sorting should handle undefined authority.text gracefully
+  expect(result[0].commodities[0].decisions).toHaveLength(2)
+  expect(result[0].commodities[0].decisions[0].authority.text).toBeUndefined()
+  expect(result[0].commodities[0].decisions[1].authority.text).toBeUndefined()
+})
