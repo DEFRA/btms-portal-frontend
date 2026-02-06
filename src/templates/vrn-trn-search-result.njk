@@ -1,0 +1,42 @@
+{% extends 'layout.njk' %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% set pageTitle = "Showing result for " ~ searchTerm %}
+
+{% set linkedGmrRows = [] %}
+{% for linkedGmr in linkedGmrs %}
+  {% set linkedGmrRows = (linkedGmrRows.push([{ html: '<a href="' ~ linkedGmr.gmrLink ~ '">' ~ linkedGmr.gmrId ~ '</a>' }, { text: linkedGmr.linkedDeclarations }, { text: linkedGmr.arrivalDate }]), linkedGmrRows) %}
+{% endfor %}
+
+{% block content %}
+  <div class="govuk-grid-row btms-vrn-trn-search-result">
+    <div class="govuk-grid-column-full">
+      <div class="btms-heading-container">
+        <h1 class="govuk-heading-l">
+          <span class="govuk-caption-l">Showing result for</span>{{ searchTerm }}
+        </h1>
+      </div>
+      <h2 class="govuk-heading-m">Linked GMRs</h2>
+
+      {{
+        govukTable({
+          caption: 'Linked GMRs',
+          captionClasses: 'govuk-visually-hidden',
+          head: [
+            {
+              text: 'GMR'
+            },
+            {
+              text: 'Linked declarations'
+            },
+            {
+              text: 'Arrival date'
+            }
+          ],
+          rows: linkedGmrRows
+        })
+      }}
+
+    </div>
+  </div>
+{% endblock %}

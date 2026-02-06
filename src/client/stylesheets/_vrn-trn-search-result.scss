@@ -1,0 +1,11 @@
+@use "govuk-frontend" as *;
+@use "variables" as *;
+
+.btms-vrn-trn-search-result {
+  .govuk-table__header,
+  .govuk-table__cell,
+  .govuk-table__caption {
+    @include govuk-font-size($size: 16);
+    line-height: 1.5;
+  }
+}

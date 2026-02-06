@@ -182,10 +182,6 @@ test.each([
   {
     searchTerm: '',
     expectedSearchError: 'Enter an MRN, CHED or GMR'
-  },
-  {
-    searchTerm: 'TERM_NOT_MATCHING_ANY_ID_FORMAT',
-    expectedSearchError: 'Enter an MRN, CHED or GMR reference in the correct format'
   }
 ])('returns search page if search term is not valid', async (options) => {
   const server = await initialiseServer()
@@ -201,6 +197,23 @@ test.each([
   })
 
   expect(result).toContain(`<span class="govuk-visually-hidden">Error:</span> ${options.expectedSearchError}`)
+})
+
+test('redirects to VRN TRN results page if search term is not a valid MRN, CHED, GMR or DUCR format', async () => {
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { statusCode, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH}?${queryStringParams.SEARCH_TERM}=FOO`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(302)
+  expect(headers.location).toBe(`${paths.VRN_TRN_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=FOO`)
 })
 
 test.each([
