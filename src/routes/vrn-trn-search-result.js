@@ -1,9 +1,9 @@
 import { CACHE_CONTROL_NO_STORE, paths, queryStringParams } from './route-constants.js'
-import joi from 'joi'
 import { searchKeys } from '../services/search-patterns.js'
 import { getMetricNameBySearchType, METRIC_NAMES, metricsCounter } from '../utils/metrics.js'
 import { getRelatedImportDeclarations } from '../services/imports-data-api-client.js'
 import { mapVrnTrnGoodsVehicleMovements } from '../models/goods-vehicle-movements.js'
+import { searchValidation } from './search-result-common.js'
 
 export const vrnTrnSearchResult = {
   method: 'get',
@@ -11,22 +11,7 @@ export const vrnTrnSearchResult = {
   options: {
     auth: 'session',
     cache: CACHE_CONTROL_NO_STORE,
-    validate: {
-      query: joi
-      .object({
-        searchTerm: joi.string().required()
-      })
-      .unknown(),
-      failAction: async (request, h, error) => {
-        request.logger.setBindings({ error })
-        request.yar.flash('searchError', {
-          searchTerm: '',
-          isValid: false,
-          errorCode: 'SEARCH_TERM_REQUIRED'
-        })
-        return h.redirect(paths.SEARCH).takeover()
-      }
-    },
+    validate: searchValidation,
     pre: [
       {
         method: async (request) => {
