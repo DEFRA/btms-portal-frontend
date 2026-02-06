@@ -29,7 +29,7 @@ export const vrnTrnSearchResult = {
     },
     pre: [
       {
-        method: async (request, h) => {
+        method: async (request) => {
           const value = request.query[queryStringParams.SEARCH_TERM].trim().toUpperCase()
 
           const metricName = getMetricNameBySearchType(searchKeys.VRN_TRN)

@@ -4,6 +4,8 @@ import { ORDERED_CDS_STATUSES,ORDERED_CLEARANCE_DECISIONS } from './model-consta
 import { paths, queryStringParams } from '../routes/route-constants.js'
 import { format } from 'date-fns'
 
+const MAX_VRN_TRN_SEARCH_RESULTS = 5
+
 const getBtmsDecision = (clearanceDecision) => {
   return ORDERED_CLEARANCE_DECISIONS.find(decisionCheck => {
     if (decisionCheck.type === 'item' && clearanceDecision.items.some(item => item.checks.some(itemCheck =>
@@ -115,5 +117,5 @@ export const mapVrnTrnGoodsVehicleMovements = ({
       }
     })
 
-  return linkedGmrs.slice(0, 5)
+  return linkedGmrs.slice(0, MAX_VRN_TRN_SEARCH_RESULTS)
 }
