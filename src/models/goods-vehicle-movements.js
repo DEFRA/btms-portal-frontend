@@ -107,7 +107,7 @@ export const mapVrnTrnGoodsVehicleMovements = ({
     .map(gvm => {
       const transits = gvm.gmr.declarations.transits.map(transit => transit.id)
       const customs = gvm.gmr.declarations.customs.map(custom => custom.id)
-      const linkedDeclarations = [...new Set([...transits, ...customs])].length
+      const linkedDeclarations = new Set([...transits, ...customs]).size
 
       return {
         gmrId: gvm.gmr.id,
