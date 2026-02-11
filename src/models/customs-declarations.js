@@ -16,6 +16,7 @@ import {
   CDS_STATUSES
 } from './model-constants.js'
 import { sortDescending } from './sort.js'
+import { paths, queryStringParams } from '../routes/route-constants.js'
 
 const documentReferenceRegex = /\d{7}[VR]?$/
 
@@ -233,7 +234,7 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
   }
 }
 
-const mapCustomsDeclaration = (declaration, notificationStatuses) => {
+const mapCustomsDeclaration = (declaration, notificationStatuses, goodsVehicleMovements) => {
   const { clearanceRequest, clearanceDecision, finalisation } = declaration
   const updated = format(declaration.updated, DATE_FORMAT)
   const commodities = clearanceRequest.commodities.map((commodity) =>
@@ -243,9 +244,16 @@ const mapCustomsDeclaration = (declaration, notificationStatuses) => {
   const status = getCustomsDeclarationStatus(finalisation, clearanceDecision)
   const open = getCustomsDeclarationOpenState(finalisation)
 
+  const relatedGoodsVehicleMovement = goodsVehicleMovements?.find(gvm =>
+    gvm.gmr.declarations.customs.some(customs => customs.id.toLowerCase() === declaration.movementReferenceNumber.toLowerCase())
+    || gvm.gmr.declarations.transits.some(transit => transit.id.toLowerCase() === declaration.movementReferenceNumber.toLowerCase()))
+  const gmrLink = relatedGoodsVehicleMovement ? `${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${relatedGoodsVehicleMovement.gmr?.id}` : undefined
+
   return {
     movementReferenceNumber: declaration.movementReferenceNumber,
     declarationUcr: clearanceRequest.declarationUcr,
+    gmr: relatedGoodsVehicleMovement?.gmr?.id,
+    gmrLink,
     status,
     updated,
     open,
@@ -260,7 +268,8 @@ const isSearchTermMatch = (searchTerm, customsDeclaration) =>
 
 export const mapCustomsDeclarations = ({
   customsDeclarations,
-  importPreNotifications
+  importPreNotifications,
+  goodsVehicleMovements
 }, searchTerm) => {
   const notificationStatuses = importPreNotifications.reduce(
     (statuses, { importPreNotification }) => {
@@ -272,6 +281,6 @@ export const mapCustomsDeclarations = ({
   )
 
   return customsDeclarations.map((declaration) =>
-    mapCustomsDeclaration(declaration, notificationStatuses)
+    mapCustomsDeclaration(declaration, notificationStatuses, goodsVehicleMovements)
   ).sort(sortDescending(searchTerm, isSearchTermMatch))
 }

@@ -1626,3 +1626,101 @@ test('an MRN, with HMI authorities', () => {
 
   expect(result).toEqual(expected)
 })
+
+test.each([
+  {
+    mrnSearch: 'GB251234567890AAAA',
+    expectedGmr: 'GMRA00000AB1',
+    expectedGmrLink: '/gmr-search-result?searchTerm=GMRA00000AB1'
+  },
+  {
+    mrnSearch: 'GB251234567890BBBB',
+    expectedGmr: 'GMRA00000AB1',
+    expectedGmrLink: '/gmr-search-result?searchTerm=GMRA00000AB1'
+  },
+  {
+    mrnSearch: 'GB251234567890CCCC',
+    expectedGmr: undefined,
+    expectedGmrLink: undefined
+  }
+])('declaration contains related GMR', (options) => {
+  const data = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: options.mrnSearch,
+        clearanceRequest: {
+          declarationUcr: '5GB123456789000-BDOV123456',
+          commodities: [
+            {
+              itemNumber: 1,
+              netMass: '9999',
+              documents: [
+                {
+                  documentCode: 'N853',
+                  documentReference: 'GBCHD2025.1234567'
+                }
+              ],
+              checks: [
+                {
+                  checkCode: 'H222'
+                }
+              ]
+            }
+          ]
+        },
+        clearanceDecision: {
+          items: [
+            {
+              itemNumber: 1,
+              checks: [
+                {
+                  checkCode: 'H222',
+                  decisionCode: 'X00'
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              decisionCode: 'X00',
+              documentReference: 'GBCHD2025.1234567',
+              decisionReason: 'LGTM',
+              checkCode: 'H222'
+            }
+          ]
+        },
+        finalisation: null,
+        updated: '2025-05-12T11:13:17.330Z'
+      }
+    ],
+    importPreNotifications: [
+      {
+        importPreNotification: {
+          referenceNumber: 'CHEDP.GB.2025.1234567',
+          status: 'VALIDATED'
+        }
+      }
+    ],
+    goodsVehicleMovements: [
+      {
+        gmr: {
+          id: "GMRA00000AB1",
+          declarations: {
+            customs: [
+              { "id": "GB251234567890AAAA" }
+            ],
+            transits: [
+              { "id": "GB251234567890BBBB" }
+            ]
+          }
+        }
+      }
+    ]
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  expect(result[0].gmr).toEqual(options.expectedGmr)
+  expect(result[0].gmrLink).toEqual(options.expectedGmrLink)
+})
