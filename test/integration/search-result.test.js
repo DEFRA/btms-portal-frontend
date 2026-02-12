@@ -1,6 +1,6 @@
 import globalJsdom from 'global-jsdom'
 import wreck from '@hapi/wreck'
-import { getAllByRole, getByRole } from '@testing-library/dom'
+import { getAllByRole, getByRole, queryByRole } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { paths, queryStringParams } from '../../src/routes/route-constants.js'
 import { initialiseServer } from '../utils/initialise-server.js'
@@ -122,6 +122,20 @@ const createImportPreNotification = (chedRef, chedType, status, updated, complem
             }
           ]
         }
+      }
+    }
+  }
+}
+
+const createGmr = (gmrId, linkedCustomsDeclaration) => {
+  return {
+    gmr: {
+      id: gmrId,
+      declarations: {
+        customs: [
+          { "id": linkedCustomsDeclaration }
+        ],
+        transits: []
       }
     }
   }
@@ -572,4 +586,55 @@ test.each([
   expect(summarySections[3].getAttribute('aria-label')).toBe(options.expectedFirstChed)
   expect(summarySections[4].getAttribute('aria-label')).toBe(options.expectedSecondChed)
   expect(summarySections[5].getAttribute('aria-label')).toBe(options.expectedThirdChed)
+})
+
+test.each([
+  {
+    expectGmrLink: true,
+    goodsVehicleMovements: [
+      createGmr('GMRA00000AB1', '24GB0Z8WEJ9ZBTL73A')
+    ]
+  },
+  {
+    expectGmrLink: false,
+    goodsVehicleMovements: []
+  }
+])('Links to GMR if related', async (options) => {
+  const dataApiResults = {
+    customsDeclarations: [ createCustomsDeclaration('24GB0Z8WEJ9ZBTL73A', '1GB126344356000-ABC35932Y1BHA', '2025-01-01T09:00:00.000Z') ],
+    importPreNotifications: [],
+    goodsVehicleMovements: options.goodsVehicleMovements
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: dataApiResults })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73A`,
+    auth: {
+      strategy: 'session',
+      credentials
+    },
+    headers: {
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
+    }
+  })
+
+  expect(headers['cache-control']).toBe('no-store')
+
+  globalJsdom(payload)
+  initFilters()
+
+  if (options.expectGmrLink) {
+    expect(getByRole(document.body, 'link', { name: 'GMRA00000AB1' })).toHaveAttribute('href', '/gmr-search-result?searchTerm=GMRA00000AB1')
+  } else {
+    expect(queryByRole(document.body, 'link', { name: 'GMRA00000AB1' })).not.toBeInTheDocument()
+  }
 })
