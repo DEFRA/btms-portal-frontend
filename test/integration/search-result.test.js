@@ -155,6 +155,168 @@ const relatedImportDeclarations = {
   importPreNotifications
 }
 
+const emptyResourceEvents = []
+
+const invalidResourceEvents = [
+  {
+    resourceType: 'CustomsDeclaration',
+    subResourceType: 'ClearanceRequest',
+    message: 'invalid json'
+  }
+]
+
+// Note - not full resource event samples, just enough to mock the usage in the implementation
+const declarationResourceEvents = [
+  {
+    resourceType: 'CustomsDeclaration',
+    subResourceType: 'ClearanceRequest',
+    message: '{\n'
+      + '    "resource": {\n'
+      + '      "clearanceRequest": {\n'
+      + '        "externalVersion": 1,\n'
+      + '        "messageSentAt": "2025-01-01T09:00:00.000Z",\n'
+      + '        "commodities": [\n'
+      + '          {\n'
+      + '            "itemNumber": 1,\n'
+      + '            "goodsDescription": "Horse Re-entry",\n'
+      + '            "taricCommodityCode": "1601009105",\n'
+      + '            "documents": [\n'
+      + '              {\n'
+      + '                "documentCode": "C640",\n'
+      + '                "documentReference": "CHEDA.GB.2025.0000001"\n'
+      + '              }\n'
+      + '            ],\n'
+      + '            "checks": [{\n'
+      + '              "checkCode": "H221"\n'
+      + '            }]\n'
+      + '          }\n'
+      + '        ]\n'
+      + '      }\n'
+      + '    }\n'
+      + '  }',
+  },
+  {
+    resourceType: 'CustomsDeclaration',
+    subResourceType: 'ClearanceDecision',
+    message: '{\n'
+      + '    "resource": {\n'
+      + '      "clearanceRequest": {\n'
+      + '        "commodities": [\n'
+      + '          {\n'
+      + '            "itemNumber": 1,\n'
+      + '            "goodsDescription": "Horse Re-entry",\n'
+      + '            "taricCommodityCode": "1601009105"\n'
+      + '          }\n'
+      + '        ]\n'
+      + '      },\n'
+      + '      "clearanceDecision": {\n'
+      + '        "decisionNumber": 1,\n'
+      + '        "items": [\n'
+      + '          {\n'
+      + '            "itemNumber": 1\n'
+      + '          }\n'
+      + '        ],\n'
+      + '        "results": [\n'
+      + '          {\n'
+      + '            "itemNumber": 1,\n'
+      + '            "documentReference": "CHEDA.GB.2025.0000001",\n'
+      + '            "checkCode": "H221",\n'
+      + '            "decisionCode": "X00",\n'
+      + '            "internalDecisionCode": "E70"\n'
+      + '          }\n'
+      + '        ],\n'
+      + '        "created": "2025-01-01T09:00:00.000Z"\n'
+      + '      },\n'
+      + '      "finalisation": {\n'
+      + '        "isManualRelease": true\n'
+      + '      }\n'
+      + '    }\n'
+      + '  }'
+  },
+  {
+    resourceType: 'CustomsDeclaration',
+    subResourceType: 'Finalisation',
+    message: '{\n'
+      + '    "resource": {\n'
+      + '      "finalisation": {\n'
+      + '        "isManualRelease": true,\n'
+      + '        "externalVersion": 1,\n'
+      + '        "messageSentAt": "2025-01-01T09:00:00.000Z"\n'
+      + '      }\n'
+      + '    }\n'
+      + '  }'
+  },
+  {
+    resourceType: 'CustomsDeclaration',
+    subResourceType: 'ExternalError',
+    message: '{\n'
+      + '    "resource": {\n'
+      + '      "externalErrors": [\n'
+      + '        {\n'
+      + '          "messageSentAt": "2025-01-01T09:00:00.000Z",\n'
+      + '          "errors": [\n'
+      + '            {\n'
+      + '              "code": "HMRCVAL101",\n'
+      + '              "message": "An error notification sent by CDS into BTMS"\n'
+      + '            }\n'
+      + '          ]\n'
+      + '        }\n'
+      + '      ]\n'
+      + '    }\n'
+      + '  }'
+  },
+  {
+    resourceType: 'ProcessingError',
+    message: '{\n'
+      + '    "resource": {\n'
+      + '      "processingErrors": [\n'
+      + '        {\n'
+      + '          "errors": [\n'
+      + '            {\n'
+      + '              "code": "ALVSVAL303",\n'
+      + '              "message": "An error detected in the Imports Processor"\n'
+      + '            }\n'
+      + '          ],\n'
+      + '          "externalVersion": 1,\n'
+      + '          "created": "2025-01-01T09:00:00.000Z"\n'
+      + '        },\n'
+      + '        {\n'
+      + '          "errors": [\n'
+      + '            {\n'
+      + '              "code": "ALVSVAL303",\n'
+      + '              "message": "An error detected in the Imports Processor"\n'
+      + '            }\n'
+      + '          ],\n'
+      + '          "externalVersion": 1,\n'
+      + '          "created": "2025-01-02T09:00:00.000Z"\n'
+      + '        }\n'
+      + '      ]\n'
+      + '    }\n'
+      + '  }'
+  }
+]
+
+const importPreNotificationResourceEvents = [
+  {
+    resourceType: 'ImportPreNotification',
+    message: '{\n'
+      + '    "resource": {\n'
+      + '      "importPreNotification": {\n'
+      + '        "referenceNumber": "CHEDA.GB.2025.0000001",\n'
+      + '        "status": "VALIDATED",\n'
+      + '        "decisionDate": "2025-01-01T09:00:00.000Z",\n'
+      + '        "updatedSource": "2025-01-01T09:00:00.000Z",\n'
+      + '        "partTwo": {\n'
+      + '          "decision": {\n'
+      + '            "decision": "Horse Re-entry"\n'
+      + '          }\n'
+      + '        }\n'
+      + '      }\n'
+      + '    }\n'
+      + '  }'
+  }
+]
+
 jest.mock('@hapi/wreck', () => ({
   get: jest.fn()
 }))
@@ -164,6 +326,10 @@ test('shows search results', async () => {
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: relatedImportDeclarations })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
@@ -244,6 +410,10 @@ test('results can be filtered', async () => {
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: relatedImportDeclarations })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
@@ -364,6 +534,7 @@ test('handles H220 1% check', async () => {
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: h220Declaration })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
@@ -556,6 +727,18 @@ test.each([
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: dataApiResults })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
@@ -610,6 +793,10 @@ test.each([
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: dataApiResults })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
@@ -637,4 +824,245 @@ test.each([
   } else {
     expect(queryByRole(document.body, 'link', { name: 'GMRA00000AB1' })).not.toBeInTheDocument()
   }
+})
+
+test('shows latest search results and timeline tabs', async () => {
+  const customsDeclarations = [
+    createCustomsDeclaration('24GB0Z8WEJ9ZBTL73A', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z'),
+    createCustomsDeclaration('24GB0Z8WEJ9ZBTL73B', '1GB126344356000-ABC35932Y1BHY', '2025-05-06T13:11:59.257Z')
+  ]
+
+  const importPreNotifications = [
+    createImportPreNotification('CHEDA.GB.2025.0000001', 'CVEDA', 'CANCELLED', '2025-04-22T16:55:17.330Z', '1', '0101', 'Equus asinus', '2')
+  ]
+
+  const relatedImportDeclarations = {
+    customsDeclarations,
+    importPreNotifications
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: relatedImportDeclarations })
+  .mockResolvedValueOnce({ payload: declarationResourceEvents })
+  .mockResolvedValueOnce({ payload: importPreNotificationResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
+    auth: {
+      strategy: 'session',
+      credentials
+    },
+    headers: {
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
+    }
+  })
+
+  expect(headers['cache-control']).toBe('no-store')
+
+  globalJsdom(payload)
+  initFilters()
+
+  const summarySections = document.body.querySelectorAll('.govuk-tabs__panel .govuk-details.btms-details')
+  expect(summarySections.length).toBeGreaterThan(0)
+
+  const mrnTimelines = document.body.querySelectorAll('.govuk-tabs__panel .mrn-timeline')
+  expect(mrnTimelines.length).toBe(2)
+  expect(mrnTimelines[0].hasAttribute('hidden')).toBeFalsy()
+  expect(mrnTimelines[1].hasAttribute('hidden')).toBeTruthy()
+
+  const timelineMrnFilter = document.getElementById('timelineMrn')
+  expect(timelineMrnFilter).toBeInTheDocument()
+  expect(timelineMrnFilter.options.length).toBe(2)
+  expect(timelineMrnFilter.options[0].text).toBe('24GB0Z8WEJ9ZBTL73B')
+  expect(timelineMrnFilter.options[1].text).toBe('24GB0Z8WEJ9ZBTL73A')
+
+  const eventTitles = Array.from(document.body.querySelectorAll('.moj-timeline__item .moj-timeline__header .moj-timeline__title span:nth-child(1)')).map(title => title.innerHTML)
+  expect(eventTitles.length).toBe(6)
+  expect(eventTitles).toContain('CHEDA.GB.2025.0000001')
+  expect(eventTitles).toContain('CDS decision request')
+  expect(eventTitles).toContain('CDS finalisation')
+  expect(eventTitles).toContain('BTMS decision')
+  expect(eventTitles).toContain('BTMS processing error')
+  expect(eventTitles).toContain('CDS processing error')
+})
+
+test('handles resource event that cannot be parsed and mapped', async () => {
+  const customsDeclarations = [
+    createCustomsDeclaration('24GB0Z8WEJ9ZBTL73A', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z')
+  ]
+
+  const importPreNotifications = [
+    createImportPreNotification('CHEDA.GB.2025.0000001', 'CVEDA', 'CANCELLED', '2025-04-22T16:55:17.330Z', '1', '0101', 'Equus asinus', '2')
+  ]
+
+  const relatedImportDeclarations = {
+    customsDeclarations,
+    importPreNotifications
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: relatedImportDeclarations })
+  .mockResolvedValueOnce({ payload: declarationResourceEvents })
+  .mockResolvedValueOnce({ payload: invalidResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73A`,
+    auth: {
+      strategy: 'session',
+      credentials
+    },
+    headers: {
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
+    }
+  })
+
+  expect(headers['cache-control']).toBe('no-store')
+
+  globalJsdom(payload)
+  initFilters()
+
+  const eventTitles = Array.from(document.body.querySelectorAll('.moj-timeline__item .moj-timeline__header .moj-timeline__title span:nth-child(1)')).map(title => title.innerHTML)
+  expect(eventTitles.length).toBe(5)
+  expect(eventTitles).toContain('CDS decision request')
+  expect(eventTitles).toContain('CDS finalisation')
+  expect(eventTitles).toContain('BTMS decision')
+  expect(eventTitles).toContain('BTMS processing error')
+  expect(eventTitles).toContain('CDS processing error')
+})
+
+test('handles upstream errors when retrieving resource events', async () => {
+  const customsDeclarations = [
+    createCustomsDeclaration('24GB0Z8WEJ9ZBTL73A', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z')
+  ]
+
+  const importPreNotifications = [
+    createImportPreNotification('CHEDA.GB.2025.0000001', 'CVEDA', 'CANCELLED', '2025-04-22T16:55:17.330Z', '1', '0101', 'Equus asinus', '2')
+  ]
+
+  const relatedImportDeclarations = {
+    customsDeclarations,
+    importPreNotifications
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: relatedImportDeclarations })
+  .mockResolvedValueOnce({ payload: declarationResourceEvents })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73A`,
+    auth: {
+      strategy: 'session',
+      credentials
+    },
+    headers: {
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
+    }
+  })
+
+  expect(headers['cache-control']).toBe('no-store')
+
+  globalJsdom(payload)
+  initFilters()
+
+  const eventTitles = Array.from(document.body.querySelectorAll('.moj-timeline__item .moj-timeline__header .moj-timeline__title span:nth-child(1)')).map(title => title.innerHTML)
+  expect(eventTitles.length).toBe(0)
+})
+
+test('timeline can be filtered', async () => {
+  const user = userEvent.setup()
+
+  const customsDeclarations = [
+    createCustomsDeclaration('24GB0Z8WEJ9ZBTL73A', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z'),
+    createCustomsDeclaration('24GB0Z8WEJ9ZBTL73B', '1GB126344356000-ABC35932Y1BHY', '2025-05-06T13:11:59.257Z')
+  ]
+
+  const importPreNotifications = [
+    createImportPreNotification('CHEDA.GB.2025.0000001', 'CVEDA', 'CANCELLED', '2025-04-22T16:55:17.330Z', '1', '0101', 'Equus asinus', '2')
+  ]
+
+  const relatedImportDeclarations = {
+    customsDeclarations,
+    importPreNotifications
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: relatedImportDeclarations })
+  .mockResolvedValueOnce({ payload: declarationResourceEvents })
+  .mockResolvedValueOnce({ payload: importPreNotificationResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const query = {
+    [queryStringParams.SEARCH_TERM]: '24GB0Z8WEJ9ZBTL73B',
+    timelineMrn: '24GB0Z8WEJ9ZBTL73B'
+  }
+  const queryString = new URLSearchParams(query).toString()
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryString}#timeline-view`,
+    auth: { strategy: 'session', credentials },
+    headers: {
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics":false}').toString('base64')
+    }
+  })
+
+  globalJsdom(payload)
+
+  window.history.pushState({}, 'test', `?${queryString}`)
+  initFilters()
+
+  const timelineMrnFilter = document.getElementById('timelineMrn')
+
+  const mrnTimelines = document.body.querySelectorAll('.govuk-tabs__panel .mrn-timeline')
+  expect(mrnTimelines.length).toBe(2)
+  expect(mrnTimelines[0].hasAttribute('hidden')).toBeFalsy()
+  expect(mrnTimelines[1].hasAttribute('hidden')).toBeTruthy()
+
+  await user.selectOptions(timelineMrnFilter, '24GB0Z8WEJ9ZBTL73A')
+  expect(mrnTimelines[0].hasAttribute('hidden')).toBeTruthy()
+  expect(mrnTimelines[1].hasAttribute('hidden')).toBeFalsy()
+
+  await user.selectOptions(timelineMrnFilter, '24GB0Z8WEJ9ZBTL73B')
+  expect(mrnTimelines[0].hasAttribute('hidden')).toBeFalsy()
+  expect(mrnTimelines[1].hasAttribute('hidden')).toBeTruthy()
 })

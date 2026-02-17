@@ -10,7 +10,10 @@ const nunjucksTestEnv = nunjucks.configure(
     path.normalize(
       path.resolve(dirname, '../../../node_modules/govuk-frontend/dist')
     ),
-    path.normalize(path.resolve(dirname, '../../../src/templates'))
+    path.normalize(path.resolve(dirname, '../../../src/templates')),
+    path.normalize(
+      path.resolve(dirname, '../../../node_modules/@ministryofjustice/frontend')
+    )
   ],
   {
     trimBlocks: true,

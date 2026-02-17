@@ -1,6 +1,7 @@
 const filterTypes = {
   declaration: ['decision', 'authority', 'match'],
-  notification: ['chedAuthority']
+  notification: ['chedAuthority'],
+  timeline: ['timelineMrn']
 }
 
 const resultTypes = {
@@ -130,7 +131,34 @@ const setUpFilters = (type) => {
   setRows(initialState, type)
 }
 
+const setTimeline = (selectedTimelineMrn) => {
+  const mrnTimelines = [...document.querySelectorAll('div.mrn-timeline')]
+
+  mrnTimelines.forEach((timeline) => {
+    if (timeline.dataset.timeline_mrn === selectedTimelineMrn.timelineMrn) {
+      timeline.removeAttribute('hidden')
+    } else {
+      timeline.setAttribute('hidden', 'hidden')
+    }
+  })
+}
+
+const setUpTimelineFilters = () => {
+  const filtersWrapper = document.getElementById('timeline-filters-wrapper')
+  if (filtersWrapper) {
+    filtersWrapper.removeAttribute('hidden')
+
+    const filters = document.getElementById('timeline-filters')
+    filters.addEventListener('change', (event) => {
+      setState(event)
+      const state = getState(filterTypes['timeline'])
+      setTimeline(state)
+    })
+  }
+}
+
 export const initFilters = () => {
   setUpFilters('declaration')
   setUpFilters('notification')
+  setUpTimelineFilters()
 }

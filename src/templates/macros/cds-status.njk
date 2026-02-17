@@ -1,4 +1,4 @@
-{%- macro cdsStatus(finalState) -%}
+{%- macro cdsStatus(finalState, timeline) -%}
   {%- set stateMap = {
     "0": "green",
     "1": "red",
@@ -14,6 +14,6 @@
   {%- endif -%}
 
   {%- if cdsStatusColour -%}
-    govuk-!-font-weight-bold govuk-tag govuk-tag--{{ cdsStatusColour }}
+    {% if not timeline %}govuk-!-font-weight-bold{% endif %} govuk-tag govuk-tag--{{ cdsStatusColour }}
   {%- endif -%}
 {%- endmacro %}

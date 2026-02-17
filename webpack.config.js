@@ -28,6 +28,9 @@ export default {
     },
     reporting: {
       import: ['./javascripts/reporting.js']
+    },
+    searchResult: {
+      import: ['./javascripts/search-result.js']
     }
   },
   experiments: {
