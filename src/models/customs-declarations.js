@@ -245,8 +245,8 @@ const mapCustomsDeclaration = (declaration, notificationStatuses, goodsVehicleMo
   const open = getCustomsDeclarationOpenState(finalisation)
 
   const relatedGoodsVehicleMovement = goodsVehicleMovements?.find(gvm =>
-    gvm.gmr.declarations.customs.some(customs => customs.id.toLowerCase() === declaration.movementReferenceNumber.toLowerCase())
-    || gvm.gmr.declarations.transits.some(transit => transit.id.toLowerCase() === declaration.movementReferenceNumber.toLowerCase()))
+    gvm.gmr?.declarations?.customs?.some(customs => customs.id.toLowerCase() === declaration.movementReferenceNumber.toLowerCase())
+    || gvm.gmr?.declarations?.transits?.some(transit => transit.id.toLowerCase() === declaration.movementReferenceNumber.toLowerCase()))
   const gmrLink = relatedGoodsVehicleMovement ? `${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${relatedGoodsVehicleMovement.gmr?.id}` : undefined
 
   return {

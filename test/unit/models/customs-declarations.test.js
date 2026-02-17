@@ -1724,3 +1724,81 @@ test.each([
   expect(result[0].gmr).toEqual(options.expectedGmr)
   expect(result[0].gmrLink).toEqual(options.expectedGmrLink)
 })
+
+test('gmr with no customs or transits', () => {
+  const data = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: 'GB251234567890AAAA',
+        clearanceRequest: {
+          declarationUcr: '5GB123456789000-BDOV123456',
+          commodities: [
+            {
+              itemNumber: 1,
+              netMass: '9999',
+              documents: [
+                {
+                  documentCode: 'N853',
+                  documentReference: 'GBCHD2025.1234567'
+                }
+              ],
+              checks: [
+                {
+                  checkCode: 'H222'
+                }
+              ]
+            }
+          ]
+        },
+        clearanceDecision: {
+          items: [
+            {
+              itemNumber: 1,
+              checks: [
+                {
+                  checkCode: 'H222',
+                  decisionCode: 'X00'
+                }
+              ]
+            }
+          ],
+          results: [
+            {
+              itemNumber: 1,
+              decisionCode: 'X00',
+              documentReference: 'GBCHD2025.1234567',
+              decisionReason: 'LGTM',
+              checkCode: 'H222'
+            }
+          ]
+        },
+        finalisation: null,
+        updated: '2025-05-12T11:13:17.330Z'
+      }
+    ],
+    importPreNotifications: [
+      {
+        importPreNotification: {
+          referenceNumber: 'CHEDP.GB.2025.1234567',
+          status: 'VALIDATED'
+        }
+      }
+    ],
+    goodsVehicleMovements: [
+      {
+        gmr: {
+          id: "GMRA00000AB1",
+          declarations: {
+            customs: null,
+            transits: null
+          }
+        }
+      }
+    ]
+  }
+
+  const result = mapCustomsDeclarations(data)
+
+  expect(result[0].gmr).toBeUndefined()
+  expect(result[0].gmrLink).toBeUndefined()
+})
