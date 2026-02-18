@@ -105,8 +105,8 @@ export const mapVrnTrnGoodsVehicleMovements = ({
     .filter(gvm => gvm.gmr)
     .sort((a, b) => sortArrivesAtDescending(a.gmr.actualCrossing?.arrivesAt, b.gmr.actualCrossing?.arrivesAt))
     .map(gvm => {
-      const transits = gvm.gmr.declarations.transits.map(transit => transit.id)
-      const customs = gvm.gmr.declarations.customs.map(custom => custom.id)
+      const transits = gvm.gmr.declarations.transits?.map(transit => transit.id) || []
+      const customs = gvm.gmr.declarations.customs?.map(custom => custom.id) || []
       const linkedDeclarations = new Set([...transits, ...customs]).size
 
       return {
