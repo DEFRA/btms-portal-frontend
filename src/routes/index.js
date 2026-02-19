@@ -18,6 +18,7 @@ import { searchResult } from './search-result.js'
 import { gmrSearchResult } from './gmr-search-result.js'
 import { chromeDevtools } from './chrome-devtools.js'
 import { cookiesGet, cookiesPost } from './cookies.js'
+import { vrnTrnSearchResult } from './vrn-trn-search-result.js'
 
 export default [
   accessibility,
@@ -40,5 +41,6 @@ export default [
   signOut,
   search,
   searchResult,
+  vrnTrnSearchResult,
   ...staticAssetRoutes
 ]

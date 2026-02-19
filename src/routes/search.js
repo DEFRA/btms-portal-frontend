@@ -16,18 +16,22 @@ export const search = {
         method: (request, h) => {
           const value = request.query[queryStringParams.SEARCH_TERM]?.trim().toUpperCase()
           if (value !== undefined) {
+            if (value === '') {
+              request.yar.flash('searchError', {
+                searchTerm: value,
+                isValid: false,
+                errorCode: 'SEARCH_TERM_REQUIRED'
+              })
+
+              return {}
+            }
+
             const match = searchPatterns.find(({ pattern }) =>
               pattern.test(value)
             )
 
             if (!match) {
-              request.yar.flash('searchError', {
-                searchTerm: value,
-                isValid: false,
-                errorCode: value === '' ? 'SEARCH_TERM_REQUIRED' : 'SEARCH_TERM_INVALID'
-              })
-
-              return {}
+              return h.redirect(`${paths.VRN_TRN_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${value}`).takeover()
             }
 
             if (match.key === searchKeys.GMR_ID) {

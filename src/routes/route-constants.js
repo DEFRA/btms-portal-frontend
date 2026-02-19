@@ -17,7 +17,8 @@ const paths = {
   SIGN_OUT: '/sign-out',
   SIGNED_OUT: '/signed-out',
   SIGNIN_DEFRA_ID_CALLBACK: '/signin-oidc',
-  SIGNIN_ENTRA_ID_CALLBACK: '/signin-entra-id'
+  SIGNIN_ENTRA_ID_CALLBACK: '/signin-entra-id',
+  VRN_TRN_SEARCH_RESULT: '/vrn-trn-search-result'
 }
 
 const queryStringParams = {

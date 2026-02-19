@@ -5,7 +5,8 @@ export const searchKeys = {
   PARTIAL_CHED: 'chedId',
   CHED_LAST_SEVEN_DIGITS: 'chedId',
   DUCR: 'ducr',
-  GMR_ID: 'gmrId'
+  GMR_ID: 'gmrId',
+  VRN_TRN: 'vrnOrTrn'
 }
 
 export const searchPatterns = [
