@@ -11,6 +11,9 @@
 
   .govuk-input {
     height: 50px;
+    border-right: none;
+    @include govuk-font-size($size: 16);
+    padding: 0 10px;
   }
 
   .govuk-hint .govuk-body-s {
@@ -19,6 +22,33 @@
 
   .govuk-error-message {
     margin-bottom: 5px;
+  }
+
+  .govuk-heading-l {
+    border-bottom: 1px solid $govuk-border-colour;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+  }
+
+  .govuk-form-group {
+    margin-bottom: 0;
+  }
+
+  .govuk-details {
+    margin-top: 20px;
+    margin-bottom: 0;
+  }
+
+  .govuk-details__text {
+    @include govuk-font-size($size: 16);
+    background-color: govuk-colour("white");
+    padding: 15px;
+    margin-top: 10px;
+  }
+
+  .govuk-details__text ul {
+    @include govuk-font-size($size: 16);
+    line-height: 1.3158;
   }
 }
 
@@ -77,9 +107,7 @@
     align-items: center;
     width: 50px;
     position: relative;
-    left: -2px;
     background-color: govuk-colour("blue");
-    border: 1px solid govuk-colour("black");
   }
 
   .btms-search-icon {
