@@ -2,6 +2,9 @@ import boom from '@hapi/boom'
 import { getCustomsDeclarationStatus } from './customs-declarations.js'
 import { ORDERED_CDS_STATUSES,ORDERED_CLEARANCE_DECISIONS } from './model-constants.js'
 import { paths, queryStringParams } from '../routes/route-constants.js'
+import { format } from 'date-fns'
+
+const MAX_VRN_TRN_SEARCH_RESULTS = 5
 
 const getBtmsDecision = (clearanceDecision) => {
   return ORDERED_CLEARANCE_DECISIONS.find(decisionCheck => {
@@ -65,6 +68,16 @@ const mapCustomsDeclarations = (
   }
 }
 
+const sortArrivesAtDescending = (a, b) => {
+  if (!a) { return -1 }
+  if (!b) { return 1 }
+
+  const aArrivalTime = new Date(a).getTime()
+  const bArrivalTime = new Date(b).getTime()
+
+  return bArrivalTime - aArrivalTime
+}
+
 export const mapGoodsVehicleMovements = ({
   customsDeclarations,
   goodsVehicleMovements
@@ -83,4 +96,26 @@ export const mapGoodsVehicleMovements = ({
     linkedCustomsDeclarations: linkedCustomsDeclarations.customsDeclarations,
     mrnCounts: linkedCustomsDeclarations.mrnCounts
   }
+}
+
+export const mapVrnTrnGoodsVehicleMovements = ({
+  goodsVehicleMovements
+}) => {
+  const linkedGmrs = goodsVehicleMovements
+    .filter(gvm => gvm.gmr)
+    .sort((a, b) => sortArrivesAtDescending(a.gmr.actualCrossing?.arrivesAt, b.gmr.actualCrossing?.arrivesAt))
+    .map(gvm => {
+      const transits = gvm.gmr.declarations.transits?.map(transit => transit.id) || []
+      const customs = gvm.gmr.declarations.customs?.map(custom => custom.id) || []
+      const linkedDeclarations = new Set([...transits, ...customs]).size
+
+      return {
+        gmrId: gvm.gmr.id,
+        gmrLink: `${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${gvm.gmr.id}`,
+        linkedDeclarations,
+        arrivalDate: gvm.gmr.actualCrossing?.arrivesAt ? format(new Date(gvm.gmr.actualCrossing?.arrivesAt), 'dd MMMM yyyy, HH:mm') : 'Not arrived'
+      }
+    })
+
+  return linkedGmrs.slice(0, MAX_VRN_TRN_SEARCH_RESULTS)
 }

@@ -3,6 +3,23 @@ import { CACHE_CONTROL_NO_STORE, paths, queryStringParams } from './route-consta
 import { searchPatterns } from '../services/search-patterns.js'
 import { getMetricNameBySearchType, metricsCounter } from '../utils/metrics.js'
 
+export const searchValidation = {
+  query: joi
+  .object({
+    searchTerm: joi.string().required()
+  })
+  .unknown(),
+  failAction: async (request, h, error) => {
+    request.logger.setBindings({ error })
+    request.yar.flash('searchError', {
+      searchTerm: '',
+      isValid: false,
+      errorCode: 'SEARCH_TERM_REQUIRED'
+    })
+    return h.redirect(paths.SEARCH).takeover()
+  }
+}
+
 export const createRouteConfig = (searchTermValidator, requestPath, requestHandler) => {
   return {
     method: 'get',
@@ -10,22 +27,7 @@ export const createRouteConfig = (searchTermValidator, requestPath, requestHandl
     options: {
       auth: 'session',
       cache: CACHE_CONTROL_NO_STORE,
-      validate: {
-        query: joi
-        .object({
-          searchTerm: joi.string().required()
-        })
-        .unknown(),
-        failAction: async (request, h, error) => {
-          request.logger.setBindings({ error })
-          request.yar.flash('searchError', {
-            searchTerm: '',
-            isValid: false,
-            errorCode: 'SEARCH_TERM_REQUIRED'
-          })
-          return h.redirect(paths.SEARCH).takeover()
-        }
-      },
+      validate: searchValidation,
       pre: [
         {
           method: async (request, h) => {

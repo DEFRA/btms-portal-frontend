@@ -1,4 +1,11 @@
-import { mapGoodsVehicleMovements } from '../../../src/models/goods-vehicle-movements'
+import {
+  mapGoodsVehicleMovements,
+  mapVrnTrnGoodsVehicleMovements
+} from '../../../src/models/goods-vehicle-movements'
+import {
+  paths,
+  queryStringParams
+} from '../../../src/routes/route-constants.js'
 
 const mockMetricCounter = jest.fn()
 
@@ -994,4 +1001,167 @@ test('Linked Customs Declarations are ordered by CDS Status Priority', () => {
   expect(actual.linkedCustomsDeclarations[13].cdsStatus).toBe('Unknown')
   expect(actual.linkedCustomsDeclarations[14].cdsStatus).toBe('Unknown')
 
+})
+
+test('maps GMRs for VRN TRN search in the correct order and limits results to 5', async () => {
+  const relatedImportDeclarationsPayload = {
+    customsDeclarations: [],
+    goodsVehicleMovements: [
+      {
+        gmr: {
+          id: "GMRA00000AB1",
+          vehicleRegistrationNumber: "ABC 111",
+          trailerRegistrationNums: [],
+          declarations: {
+            transits: [],
+            customs: [
+              {
+                id: "25GB00000000000001"
+              }
+            ]
+          }
+        }
+      },
+      {
+        gmr: {
+          id: "GMRA00000AB2",
+          vehicleRegistrationNumber: "ABC 222",
+          trailerRegistrationNums: [
+            "ABC 111"
+          ],
+          actualCrossing: {
+            arrivesAt: "2025-02-02T02:02:00"
+          },
+          declarations: {
+            transits: [],
+            customs: [
+              {
+                id: "25GB00000000000001"
+              }
+            ]
+          }
+        }
+      },
+      {
+        gmr: {
+          id: "GMRA00000AB3",
+          vehicleRegistrationNumber: "ABC 333",
+          trailerRegistrationNums: [
+            "ABC 111"
+          ],
+          actualCrossing: {
+            arrivesAt: "2025-03-03T03:03:00"
+          },
+          declarations: {
+            transits: [
+              {
+                id: "25GB00000000000001"
+              }
+            ],
+            customs: [
+              {
+                id: "25GB00000000000002"
+              }
+            ]
+          }
+        }
+      },
+      {
+        gmr: {
+          id: "GMRA00000AB4",
+          vehicleRegistrationNumber: "ABC 444",
+          trailerRegistrationNums: [
+            "ABC 111"
+          ],
+          actualCrossing: {
+            arrivesAt: "2025-04-04T04:04:00"
+          },
+          declarations: {
+            transits: [
+              {
+                id: "25GB00000000000001"
+              },
+              {
+                id: "25GB00000000000002"
+              }
+            ],
+            customs: [
+              {
+                id: "25GB00000000000002"
+              }
+            ]
+          }
+        }
+      },
+      {
+        gmr: {
+          id: "GMRA00000AB5",
+          vehicleRegistrationNumber: "ABC 555",
+          trailerRegistrationNums: [
+            "ABC 111"
+          ],
+          actualCrossing: {
+            arrivesAt: "2025-05-05T05:05:00"
+          },
+          declarations: {
+            transits: [
+              {
+                id: "25GB00000000000001"
+              }
+            ],
+            customs: []
+          }
+        }
+      },
+      {
+        gmr: {
+          id: "GMRA00000AB6",
+          vehicleRegistrationNumber: "ABC 666",
+          trailerRegistrationNums: [
+            "ABC 111"
+          ],
+          actualCrossing: {
+            arrivesAt: null
+          },
+          declarations: {
+            transits: [],
+            customs: [
+              {
+                id: "25GB00000000000002"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+
+  const actual = mapVrnTrnGoodsVehicleMovements(relatedImportDeclarationsPayload)
+
+  expect(actual.length).toBe(5)
+
+  expect(actual[0].gmrId).toBe("GMRA00000AB6")
+  expect(actual[0].gmrLink).toBe(`${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=GMRA00000AB6`)
+  expect(actual[0].linkedDeclarations).toBe(1)
+  expect(actual[0].arrivalDate).toBe('Not arrived')
+
+  expect(actual[1].gmrId).toBe("GMRA00000AB1")
+  expect(actual[1].gmrLink).toBe(`${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=GMRA00000AB1`)
+  expect(actual[1].linkedDeclarations).toBe(1)
+  expect(actual[1].arrivalDate).toBe('Not arrived')
+
+  expect(actual[2].gmrId).toBe("GMRA00000AB5")
+  expect(actual[2].gmrLink).toBe(`${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=GMRA00000AB5`)
+  expect(actual[2].linkedDeclarations).toBe(1)
+  expect(actual[2].arrivalDate).toBe('05 May 2025, 05:05')
+
+  expect(actual[3].gmrId).toBe("GMRA00000AB4")
+  expect(actual[3].gmrLink).toBe(`${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=GMRA00000AB4`)
+  expect(actual[3].linkedDeclarations).toBe(2)
+  expect(actual[3].arrivalDate).toBe('04 April 2025, 04:04')
+
+  expect(actual[4].gmrId).toBe("GMRA00000AB3")
+  expect(actual[4].gmrLink).toBe(`${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=GMRA00000AB3`)
+  expect(actual[4].linkedDeclarations).toBe(2)
+  expect(actual[4].arrivalDate).toBe('03 March 2025, 03:03')
 })
