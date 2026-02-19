@@ -1,0 +1,57 @@
+{% from "./cds-status.njk" import cdsStatus %}
+
+{% macro btmsDecisionEvent(timelineEvent) %}
+
+  {% set cdsStatusClass = cdsStatus(timelineEvent.finalState, true) %}
+
+  <div class="timeline-detail-row">
+    <span class="timeline-detail-label">CDS status</span>
+    <span class="govuk-tag {{ cdsStatusClass }}">{{ timelineEvent.status }}</span>
+  </div>
+  <div class="timeline-detail-row">
+    <span class="timeline-detail-label">Version</span>
+    <span>{{ timelineEvent.version }}</span>
+  </div>
+  <div class="timeline-detail-row">
+    <span class="timeline-detail-label">Created</span>
+    <time datetime="{{ timelineEvent.created}}">{{ timelineEvent.created}}</time>
+  </div>
+  <details class="govuk-details">
+    <summary class="govuk-details__summary">
+      <span class="govuk-details__summary-text">
+        More details
+      </span>
+    </summary>
+    <div class="govuk-details__text">
+      {% for commodity in timelineEvent.commodities %}
+
+        <h3 class="govuk-heading-m govuk-!-margin-top-4">Item {{ commodity.itemNumber }} - {{ commodity.description }}</h3>
+        <p class="commodity-code"><strong>Commodity code:</strong> {{ commodity.commodityCode }}</p>
+        <table class="govuk-table">
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">CHED reference</th>
+              <th scope="col" class="govuk-table__header">Check code</th>
+              <th scope="col" class="govuk-table__header">Authority</th>
+              <th scope="col" class="govuk-table__header">Decision code</th>
+              <th scope="col" class="govuk-table__header">Decision </th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            {% for decision in commodity.decisions %}
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell">{{ decision.chedReference }}</td>
+                <td class="govuk-table__cell">{{ decision.checkCode }}</td>
+                <td class="govuk-table__cell">{{ decision.authority }}</td>
+                <td class="govuk-table__cell">{{ decision.decisionCode }}</td>
+                <td class="govuk-table__cell">{{ decision.decision }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+      {% endfor %}
+    </div>
+  </details>
+
+{% endmacro %}

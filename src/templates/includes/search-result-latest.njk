@@ -1,0 +1,46 @@
+<h3 class="govuk-heading-m">Customs declaration details</h3>
+{% include "./declaration-filters.njk" %}
+{% for customsDeclaration in customsDeclarations %}
+  {% set declarationSummaryHTML %}
+  {% include "./declaration-summary.njk" %}
+  {% endset %}
+  {% set declarationHTML %}
+  {% include "./declaration-html.njk" %}
+  {% endset %}
+  {{
+    govukDetails({
+      summaryHtml: declarationSummaryHTML,
+      html: declarationHTML,
+      open: customsDeclaration.open,
+      classes: 'btms-details',
+      attributes: {
+        'aria-label': customsDeclaration.movementReferenceNumber
+      }
+    })
+  }}
+{% else %}
+  <p class="govuk-inset-text">There are no matching Customs declaration details</p>
+{% endfor %}
+<h3 class="govuk-heading-m">IPAFFS notification (CHED) details</h3>
+{% include "./notification-filters.njk" %}
+{% for preNotification in preNotifications %}
+  {% set notificationSummaryHTML %}
+  {% include "./notification-summary.njk" %}
+  {% endset %}
+  {% set notificationHTML %}
+  {% include "./notification-html.njk" %}
+  {% endset %}
+  {{
+    govukDetails({
+      summaryHtml: notificationSummaryHTML,
+      html: notificationHTML,
+      open: preNotification.open,
+      classes: 'btms-details',
+      attributes: {
+        'aria-label': preNotification.referenceNumber
+      }
+    })
+  }}
+{% else %}
+  <p class="govuk-inset-text">There are no matching IPAFFS pre-notification (CHED) details</p>
+{% endfor %}

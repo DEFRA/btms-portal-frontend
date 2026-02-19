@@ -1,0 +1,77 @@
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "moj/components/timeline/macro.njk" import mojTimeline %}
+{% from "../macros/search-result-timeline-btms-decision.njk" import btmsDecisionEvent %}
+{% from "../macros/search-result-timeline-btms-error.njk" import btmsErrorEvent %}
+{% from "../macros/search-result-timeline-cds-decision-request.njk" import cdsDecisionRequestEvent %}
+{% from "../macros/search-result-timeline-cds-error.njk" import cdsErrorEvent %}
+{% from "../macros/search-result-timeline-cds-finalisation.njk" import cdsFinalisationEvent %}
+{% from "../macros/search-result-timeline-ched.njk" import chedEvent %}
+
+<div class="btms-timelines">
+  {% if timelineEvents.length > 1 %}
+    {% set mrnFilterItems = [] %}
+    {% for mrnTimeline in timelineEvents %}
+      {% set mrnFilterItems = (mrnFilterItems.push({ text: mrnTimeline.mrn, value: mrnTimeline.mrn }), mrnFilterItems) %}
+    {% endfor %}
+
+    <div id="timeline-filters-wrapper" hidden>
+      <form id="timeline-filters" class="btms-filters timeline-mrn-filter">
+        {{
+          govukSelect({
+            id: "timelineMrn",
+            name: "timelineMrn",
+            label: { text: "MRN" },
+            items: mrnFilterItems
+          })
+        }}
+      </form>
+    </div>
+  {% endif %}
+
+  {% if timelineEvents %}
+    <div class="govuk-inset-text">
+      The timeline includes events from the past 30 days only.
+    </div>
+  {% endif %}
+
+  {% for mrnTimeline in timelineEvents %}
+    {% set timelineItems = [] %}
+    {% for timelineEvent in mrnTimeline.timelineEvents %}
+
+      {% set title = '<span>' ~ timelineEvent.eventTitle ~ '</span>'%}
+
+      {% if timelineEvent.eventType === 'BtmsDecision' %}
+        {% set eventHtml = btmsDecisionEvent(timelineEvent) %}
+      {% elif timelineEvent.eventType === 'BtmsError' %}
+        {% set eventHtml = btmsErrorEvent(timelineEvent) %}
+        {% set title = '<span class="error-title">' ~ timelineEvent.eventTitle ~ '</span>'%}
+      {% elif timelineEvent.eventType === 'CdsDecisionRequest' %}
+        {% set eventHtml = cdsDecisionRequestEvent(timelineEvent) %}
+      {% elif timelineEvent.eventType === 'CdsError' %}
+        {% set eventHtml = cdsErrorEvent(timelineEvent) %}
+        {% set title = '<span class="error-title">' ~ timelineEvent.eventTitle ~ '</span>'%}
+      {% elif timelineEvent.eventType === 'CdsFinalisation' %}
+        {% set eventHtml = cdsFinalisationEvent(timelineEvent) %}
+      {% elif timelineEvent.eventType === 'Ched' %}
+        {% set eventHtml = chedEvent(timelineEvent) %}
+      {% endif %}
+
+      {% set timelineItems = (timelineItems.push(
+        {
+          label: {
+            html: title ~ '<span class="btms-timeline-event-source">' ~ timelineEvent.source ~ '</span>'
+          },
+          html: eventHtml
+        }
+      ), timelineItems) %}
+    {% endfor %}
+
+    <div class="mrn-timeline" data-timeline_mrn="{{ mrnTimeline.mrn }}" {% if not loop.first %}hidden{% endif %}>
+      {{ mojTimeline({
+        classes: 'btms-search-result-timeline',
+        attributes: timelineAttributes,
+        items: timelineItems
+      }) }}
+    </div>
+  {% endfor %}
+</div>

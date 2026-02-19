@@ -1,0 +1,18 @@
+{% macro chedEvent(timelineEvent) %}
+
+  <div class="timeline-detail-row">
+    <span class="timeline-detail-label">CHED status</span>
+    <span>{{ timelineEvent.status }}</span>
+  </div>
+  {% if timelineEvent.decision %}
+    <div class="timeline-detail-row">
+      <span class="timeline-detail-label">Decision</span>
+      <span>{{ timelineEvent.decision }}</span>
+    </div>
+  {% endif %}
+  <div class="timeline-detail-row">
+    <span class="timeline-detail-label">Created</span>
+    <time datetime="{{ timelineEvent.created}}">{{ timelineEvent.created}}</time>
+  </div>
+
+{% endmacro %}
