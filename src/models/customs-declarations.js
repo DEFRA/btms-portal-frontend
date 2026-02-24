@@ -147,6 +147,22 @@ const getDocumentReference = (decision) =>
     ? 'Requires CHED'
     : decision.documentReference
 
+const shouldApplyDocumentReferenceOrdering = (commodity) => {
+  const references = commodity.decisions.map(decision => decision.documentReference)
+
+  // Do not try and order if IUUs are present
+  // If we try and order decisions where IUUs are present, then the IUUs lose their parent CHED
+  return references.every(ref => ref?.startsWith('CHED') || ref?.startsWith('GBCHD'))
+}
+
+const sortByChedReferenceAndAuthority = (a, b) => {
+  const refCompare = a.documentReference.localeCompare(b.documentReference)
+  if (refCompare !== 0) {
+    return refCompare
+  }
+  return (a.authority?.text || '').localeCompare(b.authority?.text || '')
+}
+
 const getInProgressDetail = (clearanceDecision) => {
   if (clearanceDecision.items?.some(item => item.checks?.some(check => check.decisionCode === NO_MATCH_DECISION_CODE && check.checkCode !== 'H224'))) {
     return CDS_STATUSES.IN_PROGRESS_AWAITING_TRADER
@@ -240,6 +256,12 @@ const mapCustomsDeclaration = (declaration, notificationStatuses, goodsVehicleMo
   const commodities = clearanceRequest.commodities.map((commodity) =>
     mapCommodity(commodity, notificationStatuses, clearanceDecision)
   )
+
+  commodities.forEach(commodity => {
+    if (shouldApplyDocumentReferenceOrdering(commodity)) {
+      commodity.decisions.sort(sortByChedReferenceAndAuthority)
+    }
+  })
 
   const status = getCustomsDeclarationStatus(finalisation, clearanceDecision)
   const open = getCustomsDeclarationOpenState(finalisation)
