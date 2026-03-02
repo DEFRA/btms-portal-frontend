@@ -4,7 +4,7 @@ import { mapCustomsDeclarations } from '../models/customs-declarations.js'
 import { mapPreNotifications } from '../models/pre-notifications.js'
 import { createRouteConfig } from './search-result-common.js'
 import { searchKeys } from '../services/search-patterns.js'
-import { mapResourceEvents } from '../models/resource-events.js'
+import { mapResourceEvents, RESOURCE_TYPE, SUB_RESOURCE_TYPE } from '../models/resource-events.js'
 import { createLogger } from '../utils/logger.js'
 
 const logger = createLogger()
@@ -20,16 +20,28 @@ const sortCreatedDescending = (a, b) => {
   return bCreated - aCreated
 }
 
-const getChedTimelineEvents = async (declaration) => {
+const getChedTimelineEvents = async (mrn, declarationResourceEvents) => {
   let chedTimelineEvents = []
 
-  for (const commodity of declaration.commodities) {
-    if (commodity?.documents) {
-      for (const document of commodity.documents) {
-        const chedResourceEvents = await getResourceEvents(document.documentReference)
-        chedTimelineEvents = chedTimelineEvents.concat(mapResourceEvents(declaration.movementReferenceNumber, chedResourceEvents))
-      }
-    }
+  const clearanceRequestResourceEvents = declarationResourceEvents.filter(resourceEvent =>
+    resourceEvent.resourceType === RESOURCE_TYPE.CUSTOMS_DECLARATION
+    && resourceEvent.subResourceType === SUB_RESOURCE_TYPE.CLEARANCE_REQUEST)
+
+  const resourceEventDocRefs = clearanceRequestResourceEvents.flatMap(clearanceRequestResourceEvent => {
+    const resourceMessage = JSON.parse(clearanceRequestResourceEvent.message)
+
+    return resourceMessage?.resource?.clearanceRequest?.commodities?.flatMap(commodity => {
+      return commodity?.documents.flatMap(document => {
+        return document.documentReference
+      })
+    })
+  }) || []
+
+  const uniqueDocRefs = new Set(resourceEventDocRefs)
+
+  for (const docRef of uniqueDocRefs) {
+    const chedResourceEvents = await getResourceEvents(docRef)
+    chedTimelineEvents = chedTimelineEvents.concat(mapResourceEvents(mrn, chedResourceEvents))
   }
 
   return chedTimelineEvents
@@ -43,7 +55,7 @@ const getAllEvents = async (customsDeclarations) => {
       const declarationResourceEvents = await getResourceEvents(declaration.movementReferenceNumber)
       const declarationTimelineEvents = mapResourceEvents(declaration.movementReferenceNumber, declarationResourceEvents)
 
-      const chedTimelineEvents = await getChedTimelineEvents(declaration)
+      const chedTimelineEvents = await getChedTimelineEvents(declaration.movementReferenceNumber, declarationResourceEvents)
 
       const timelineEvents = declarationTimelineEvents.concat(chedTimelineEvents).sort((a, b) => sortCreatedDescending(a, b))
 

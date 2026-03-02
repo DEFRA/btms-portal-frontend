@@ -12,13 +12,13 @@ import { createLogger } from '../utils/logger.js'
 
 const logger = createLogger()
 
-const RESOURCE_TYPE = {
+export const RESOURCE_TYPE = {
   IMPORT_PRE_NOTIFICATION: 'ImportPreNotification',
   CUSTOMS_DECLARATION: 'CustomsDeclaration',
   PROCESSING_ERROR: 'ProcessingError'
 }
 
-const SUB_RESOURCE_TYPE = {
+export const SUB_RESOURCE_TYPE = {
   CLEARANCE_REQUEST: 'ClearanceRequest',
   CLEARANCE_DECISION: 'ClearanceDecision',
   EXTERNAL_ERROR: 'ExternalError',
@@ -74,32 +74,28 @@ const DECISION = {
 
 const timeFormat = 'dd MMMM yyyy, HH:mm:ss'
 
-const getDocRef = (commodity, check) => {
-  const docCodes = checkCodeToDocumentCodeMapping[check.checkCode]
+const mapChecks = (commodity) => {
+  return commodity.checks?.flatMap(check => {
+    const docCodes = checkCodeToDocumentCodeMapping[check.checkCode]
 
-  let docRef
+    return docCodes.flatMap(docCode => {
+      const documents = commodity.documents?.filter(commodityDocument => commodityDocument.documentCode === docCode) || []
 
-  docCodes?.some(docCode => {
-    const document = commodity.documents?.find(commodityDocument => commodityDocument.documentCode === docCode)
-    docRef = document?.documentReference
-    return true
+      return documents.map(document => {
+        return {
+          chedReference: document.documentReference,
+          checkCode: check.checkCode,
+          authority: checkCodeToAuthorityNameMapping[check.checkCode]
+            || checkCodeToAuthorityMapping[check.checkCode]
+        }
+      })
+    })
   })
-
-  return docRef
 }
 
 const mapClearanceRequestResourceEvent = (resourceMessage) => {
   const commodities = resourceMessage.resource?.clearanceRequest?.commodities?.map(commodity => {
-    const checks = commodity.checks?.map(check => {
-      const docRef = getDocRef(commodity, check)
-
-      return {
-        chedReference: docRef,
-        checkCode: check.checkCode,
-        authority: checkCodeToAuthorityNameMapping[check.checkCode]
-          || checkCodeToAuthorityMapping[check.checkCode]
-      }
-    })
+    const checks = mapChecks(commodity)
 
     return {
       itemNumber: commodity.itemNumber,

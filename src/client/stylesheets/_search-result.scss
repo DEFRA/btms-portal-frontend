@@ -304,4 +304,10 @@
   .btms-error-highlight {
     margin-right: 0;
   }
+
+  .moj-timeline__description .govuk-tag--none {
+    color: govuk-colour("black");
+    background: none;
+    padding: 2px 0 3px;
+  }
 }

@@ -15,5 +15,7 @@
 
   {%- if cdsStatusColour -%}
     {% if not timeline %}govuk-!-font-weight-bold{% endif %} govuk-tag govuk-tag--{{ cdsStatusColour }}
+  {%- else -%}
+    {% if timeline %}govuk-tag--none{% endif %}
   {%- endif -%}
 {%- endmacro %}
