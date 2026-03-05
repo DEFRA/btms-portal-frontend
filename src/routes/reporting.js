@@ -28,7 +28,7 @@ const dateFormat = 'd/M/yyyy'
 const getDateProps = (tab) => {
   const daysToLastWeek = 6
   const daysToLastMonth = 29
-  const maxReportingDays = 123
+  const maxReportingDays = 122
 
   const todaysDate = formatToday()
   const today = getQueryString(todaysDate, todaysDate, tab)
