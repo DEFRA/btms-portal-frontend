@@ -3,12 +3,12 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set errors = {
-  "SEARCH_TERM_REQUIRED": "Enter an MRN, CHED or GMR",
+  "SEARCH_TERM_REQUIRED": "Enter an MRN, CHED, GMR, VRN or TRN reference",
   "SEARCH_TERM_INVALID": "Enter an MRN, CHED or GMR reference in the correct format",
   "SEARCH_TERM_NOT_FOUND": searchTerm ~ " cannot be found"
 } %}
 
-{% set pageTitle = "Search for an MRN, CHED or GMR" %}
+{% set pageTitle = "Search for an MRN, CHED, GMR, VRN or TRN" %}
 
 {% set searchHint %}
   {% include "./includes/search-hint.njk" %}
@@ -21,19 +21,10 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       <form id="search" class="btms-search-wrapper" action="/search">
-        <h1 class="govuk-label-wrapper">
-          <label class="govuk-label govuk-label--l" for="search-term">
-            Search for an MRN, CHED or GMR
-          </label>
+        <h1 class="govuk-heading-l">
+            Search
         </h1>
-        <div id="search-term-hint" class="govuk-hint govuk-body-s">
-          <p class="govuk-body-s">For example:</p>
-          <ul class="govuk-list govuk-body-s">
-            <li>MRN, 24GB6T3HFCIZV1HAR9</li>
-            <li>CHED, CHEDP.GB.2025.4433124 or GBCHD2025.4433124</li>
-            <li>GMR, GMRA00002KW2</li>
-          </ul>
-        </div>
+        <label class="govuk-label" for="search-term">Enter an MRN, CHED, GMR, VRN or TRN</label>
         {{
           govukInput({
             errorMessage: {
@@ -51,6 +42,21 @@
             value: searchTerm
           })
         }}
+        <details class="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+              See search examples
+            </span>
+          </summary>
+          <div class="govuk-details__text">
+            <ul class="govuk-list">
+              <li>MRN, 26GB3FJBV1UEKBDAR0</li>
+              <li>CHED, CHEDP.GB.2026.4433124 or GBCHD2026.4433124</li>
+              <li>GMR, GMRA00002KW2</li>
+              <li>VRN (Vehicle Registration Number) or TRN (Trailer Registration Number), HX66 BVL</li>
+            </ul>
+          </div>
+        </details>
       </form>
     </div>
   </div>
