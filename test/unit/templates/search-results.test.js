@@ -49,7 +49,8 @@ function createViewContext(
           }
         ]
       }
-    ]
+    ],
+    timelineEvents: []
   }
 }
 
