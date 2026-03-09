@@ -159,7 +159,7 @@ test('reporting data', async () => {
     '[data-module="moj-date-picker"]'
   )
   expect(datePickers.length).toBe(2)
-  const minDate = format(subDays(new Date(), 123), 'dd/MM/yyyy')
+  const minDate = format(subDays(new Date(), 122), 'dd/MM/yyyy')
   const startDateMin = datePickers[0].getAttribute('data-min-date')
   const endDateMin = datePickers[1].getAttribute('data-min-date')
   expect(startDateMin).toBe(minDate)
