@@ -30,7 +30,7 @@ test('maps Clearance Request Resource Event', () => {
       + '  }',
   }]
 
-  const result = mapResourceEvents('24GB0Z8WEJ9ZBTL73A', resourceEvents)
+  const result = mapResourceEvents('24GB0Z8WEJ9ZBTL73A', undefined, resourceEvents)
 
   expect(result.length).toBe(1)
   expect(result[0]).toEqual({
@@ -96,7 +96,7 @@ test('maps Decision Notification Resource Event', () => {
       + '  }'
   }]
 
-  const result = mapResourceEvents('24GB0Z8WEJ9ZBTL73A', resourceEvents)
+  const result = mapResourceEvents('24GB0Z8WEJ9ZBTL73A', undefined, resourceEvents)
 
   expect(result.length).toBe(1)
   expect(result[0]).toEqual({
@@ -165,7 +165,7 @@ test('maps Decision Notification Resource Event with unknown internal decision c
       + '  }'
   }]
 
-  const result = mapResourceEvents('24GB0Z8WEJ9ZBTL73A', resourceEvents)
+  const result = mapResourceEvents('24GB0Z8WEJ9ZBTL73A', undefined, resourceEvents)
 
   expect(result.length).toBe(1)
   expect(result[0]).toEqual({
@@ -209,7 +209,7 @@ test('maps Finalisation Resource Event', () => {
       + '  }'
   }]
 
-  const result = mapResourceEvents('24GB0Z8WEJ9ZBTL73A', resourceEvents)
+  const result = mapResourceEvents('24GB0Z8WEJ9ZBTL73A', undefined, resourceEvents)
 
   expect(result.length).toBe(1)
   expect(result[0]).toEqual({
@@ -243,7 +243,7 @@ test('maps CDS Error Resource Event', () => {
       + '  }'
   }]
 
-  const result = mapResourceEvents('24GB0Z8WEJ9ZBTL73A', resourceEvents)
+  const result = mapResourceEvents('24GB0Z8WEJ9ZBTL73A', undefined, resourceEvents)
 
   expect(result.length).toBe(1)
   expect(result[0]).toEqual({
@@ -282,7 +282,7 @@ test('maps Processing Error Resource Event', () => {
       + '  }'
   }]
 
-  const result = mapResourceEvents('24GB0Z8WEJ9ZBTL73A', resourceEvents)
+  const result = mapResourceEvents('24GB0Z8WEJ9ZBTL73A', undefined, resourceEvents)
 
   expect(result.length).toBe(1)
   expect(result[0]).toEqual({
@@ -320,7 +320,7 @@ test('maps Import Pre Notification Resource Event', () => {
       + '  }'
   }]
 
-  const result = mapResourceEvents('24GB0Z8WEJ9ZBTL73A', resourceEvents)
+  const result = mapResourceEvents('24GB0Z8WEJ9ZBTL73A', undefined, resourceEvents)
 
   expect(result.length).toBe(1)
   expect(result[0]).toEqual({
@@ -344,7 +344,7 @@ test.each([
 ])('skips resource event if message not present', (resourceEvent) => {
   const resourceEvents = [resourceEvent]
 
-  const result = mapResourceEvents('24GB0Z8WEJ9ZBTL73A', resourceEvents)
+  const result = mapResourceEvents('24GB0Z8WEJ9ZBTL73A', undefined, resourceEvents)
 
   expect(result.length).toBe(0)
 })
@@ -375,7 +375,7 @@ test('skips resource event if unable to parse and map', () => {
     }
   ]
 
-  const result = mapResourceEvents('24GB0Z8WEJ9ZBTL73A', resourceEvents)
+  const result = mapResourceEvents(undefined, "CHEDA.GB.2025.0000001", resourceEvents)
 
   expect(result.length).toBe(1)
   expect(result[0]).toEqual({

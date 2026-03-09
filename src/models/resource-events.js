@@ -235,7 +235,7 @@ const mapImportPreNotificationResourceEvent = (resourceMessage) => {
   }
 }
 
-export const mapResourceEvents = (mrn, resourceEvents) => {
+export const mapResourceEvents = (mrn, chedRef, resourceEvents) => {
   const mappedResourceEvents = []
 
   resourceEvents.forEach((resourceEvent) => {
@@ -269,7 +269,7 @@ export const mapResourceEvents = (mrn, resourceEvents) => {
         mappedResourceEvents.push(mapImportPreNotificationResourceEvent(resourceMessage))
       }
     } catch (error) {
-      logger.warn(`Unable to parse and map timeline resource event for MNR ${mrn}. ERROR: ${error.message}`)
+      logger.warn(`Unable to parse and map timeline resource event for resource Id ${mrn || chedRef}. ERROR: ${error.message}`)
     }
   })
 
