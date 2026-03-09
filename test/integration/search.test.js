@@ -29,7 +29,7 @@ test('renders search page', async () => {
   initSearch()
 
   const searchBox = getByRole(document.body, 'textbox', {
-    name: 'Search for an MRN, CHED or GMR'
+    name: 'Enter an MRN, CHED, GMR, VRN or TRN'
   })
   expect(searchBox).not.toHaveClass('govuk-input--error')
 
@@ -45,7 +45,7 @@ test('renders search page', async () => {
 
   expect(document.querySelectorAll('script[nonce]').length).toBe(2)
   expect(document.title).toBe(
-    'Search for an MRN, CHED or GMR - Border Trade Matching Service'
+    'Search for an MRN, CHED, GMR, VRN or TRN - Border Trade Matching Service'
   )
 })
 
@@ -75,13 +75,13 @@ test('renders search page with error: no search term', async () => {
   initSearch()
 
   const searchBox = getByRole(document.body, 'textbox', {
-    name: 'Search for an MRN, CHED or GMR'
+    name: 'Enter an MRN, CHED, GMR, VRN or TRN'
   })
   expect(searchBox).toHaveClass('govuk-input--error')
   expect(searchBox).toHaveValue('')
 
   expect(
-    getByText(document.body, 'Enter an MRN, CHED or GMR', {
+    getByText(document.body, 'Enter an MRN, CHED, GMR, VRN or TRN reference', {
       exact: false
     })
   ).toBeInTheDocument()
@@ -113,7 +113,7 @@ test('renders search page with error: invalid search term', async () => {
   initSearch()
 
   const searchBox = getByRole(document.body, 'textbox', {
-    name: 'Search for an MRN, CHED or GMR'
+    name: 'Enter an MRN, CHED, GMR, VRN or TRN'
   })
   expect(searchBox).toHaveClass('govuk-input--error')
   expect(searchBox).toHaveValue('test search')
@@ -155,7 +155,7 @@ test('renders search page with error: search term not found', async () => {
   initSearch()
 
   const searchBox = getByRole(document.body, 'textbox', {
-    name: 'Search for an MRN, CHED or GMR'
+    name: 'Enter an MRN, CHED, GMR, VRN or TRN'
   })
   expect(searchBox).toHaveClass('govuk-input--error')
   expect(searchBox).toHaveValue('24GB6T3HFCIZV1HAR9')
@@ -181,7 +181,7 @@ test('redirect non authorised requests', async () => {
 test.each([
   {
     searchTerm: '',
-    expectedSearchError: 'Enter an MRN, CHED or GMR'
+    expectedSearchError: 'Enter an MRN, CHED, GMR, VRN or TRN reference'
   }
 ])('returns search page if search term is not valid', async (options) => {
   const server = await initialiseServer()
