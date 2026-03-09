@@ -5,6 +5,7 @@ import hapiVision from '@hapi/vision'
 import { config } from '../../config/config.js'
 import { context } from './context.js'
 import * as filters from './filters/filters.js'
+import mojFilters from '@ministryofjustice/frontend/moj/filters/all.js'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const nunjucksEnvironment = nunjucks.configure(
@@ -26,6 +27,10 @@ nunjucksEnvironment.addGlobal('govukRebrand', true)
 Object.entries(filters).forEach(([name, filter]) => {
   nunjucksEnvironment.addFilter(name, filter)
 })
+
+for (const [name, filter] of Object.entries(mojFilters())) {
+  nunjucksEnvironment.addFilter(name, filter)
+}
 
 /**
  * @satisfies {ServerRegisterPluginObject<ServerViewsConfiguration>}

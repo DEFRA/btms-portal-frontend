@@ -1,0 +1,20 @@
+{% from "./cds-status.njk" import cdsStatus %}
+
+{% macro cdsFinalisationEvent(timelineEvent) %}
+
+  {% set cdsStatusClass = cdsStatus(timelineEvent.finalState, true) %}
+
+  <div class="timeline-detail-row">
+    <span class="timeline-detail-label">CDS status</span>
+    <span class="govuk-tag {{ cdsStatusClass }}">{{ timelineEvent.status }}</span>
+  </div>
+  <div class="timeline-detail-row">
+    <span class="timeline-detail-label">Version</span>
+    <span>{{ timelineEvent.version }}</span>
+  </div>
+  <div class="timeline-detail-row">
+    <span class="timeline-detail-label">Created</span>
+    <time datetime="{{ timelineEvent.created}}">{{ timelineEvent.created}}</time>
+  </div>
+
+{% endmacro %}
