@@ -21,7 +21,7 @@ test('signed out', async () => {
     name: 'Defra Single Sign-on'
   })
   const defraRadio = getByRole(document.body, 'radio', {
-    name: 'Government Gateway'
+    name: 'Government Gateway or GOV UK One Login'
   })
   const submitButton = getByRole(document.body, 'button', {
     name: 'Sign in'
