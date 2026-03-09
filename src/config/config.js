@@ -230,6 +230,13 @@ const config = convict({
       env: 'TRACING_HEADER'
     }
   },
+  cdpApiKey: {
+    doc: 'CDP API Key',
+    default: null,
+    format: String,
+    env: 'CDP_API_KEY',
+    nullable: true
+  },
   btmsApi: {
     baseUrl: {
       doc: 'BTMS (backend) API base URL.',
