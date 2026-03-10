@@ -34,9 +34,9 @@
     </div>
   {% endif %}
 
-  {% for mrnTimeline in timelineEvents %}
+  {% for timeline in timelineEvents %}
     {% set timelineItems = [] %}
-    {% for timelineEvent in mrnTimeline.timelineEvents %}
+    {% for timelineEvent in timeline.timelineEvents %}
 
       {% set title = '<span>' ~ timelineEvent.eventTitle ~ '</span>'%}
 
@@ -66,7 +66,7 @@
       ), timelineItems) %}
     {% endfor %}
 
-    <div class="mrn-timeline" data-timeline_mrn="{{ mrnTimeline.mrn }}" {% if not loop.first %}hidden{% endif %}>
+    <div class="mrn-timeline" data-timeline_ref="{% if timeline.mrn %}{{ timeline.mrn}}{% else %}{{ timeline.chedRef }}{% endif %}" {% if not loop.first %}hidden{% endif %}>
       {{ mojTimeline({
         classes: 'btms-search-result-timeline',
         attributes: timelineAttributes,
