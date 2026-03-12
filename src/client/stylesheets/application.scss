@@ -9,7 +9,9 @@
 @use "filters";
 @use "reporting";
 @use "gmr-search-result";
-@use "admin-search";
+@use "admin-messages";
+@use "admin-dlq";
+@use "admin-redrive";
 @use "latest-activity";
 @use "vrn-trn-search-result";
 

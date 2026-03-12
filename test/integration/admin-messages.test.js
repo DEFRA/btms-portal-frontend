@@ -4,7 +4,7 @@ import { getByRole, getByText } from '@testing-library/dom'
 import { paths, queryStringParams } from '../../src/routes/route-constants.js'
 import { initialiseServer } from '../utils/initialise-server.js'
 import { setupAuthedAdminUserSession, setupAuthedUserSession } from '../unit/utils/session-helper.js'
-import { ADMIN_SEARCH_TYPES } from '../../src/services/admin.js'
+import { ADMIN_SEARCH_TYPES } from '../../src/services/admin-messages.js'
 
 const provider = {
   authorization_endpoint: 'https://auth.endpoint',
@@ -88,7 +88,7 @@ test.each([
 
     const { payload } = await server.inject({
       method: 'get',
-      url: `${paths.ADMIN_SEARCH}?${queryStringParams.SEARCH_TERM}=${searchTerm}&${queryStringParams.SEARCH_TYPE}=${type}`,
+      url: `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=${searchTerm}&${queryStringParams.SEARCH_TYPE}=${type}`,
       auth: {
         strategy: 'session',
         credentials
@@ -126,7 +126,7 @@ test('Should render the admin view page with no search term or type supplied', a
 
   const { statusCode } = await server.inject({
     method: 'get',
-    url: paths.ADMIN_SEARCH,
+    url: paths.ADMIN_MESSAGES,
     auth: {
       strategy: 'session',
       credentials
@@ -146,7 +146,7 @@ test('Should show an error when no search term is supplied', async () => {
 
   const { payload } = await server.inject({
     method: 'get',
-    url: `${paths.ADMIN_SEARCH}?${queryStringParams.SEARCH_TERM}=&${queryStringParams.SEARCH_TYPE}=information`,
+    url: `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=&${queryStringParams.SEARCH_TYPE}=information`,
     auth: {
       strategy: 'session',
       credentials
@@ -172,7 +172,7 @@ test.each([
 
   const { payload } = await server.inject({
     method: 'get',
-    url: `${paths.ADMIN_SEARCH}?${queryStringParams.SEARCH_TERM}=${testSearchTerm}&${queryStringParams.SEARCH_TYPE}=information`,
+    url: `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=${testSearchTerm}&${queryStringParams.SEARCH_TYPE}=information`,
     auth: {
       strategy: 'session',
       credentials
@@ -197,7 +197,7 @@ test('Should show a not found error with a search term that could not be found',
 
   const { payload } = await server.inject({
     method: 'get',
-    url: `${paths.ADMIN_SEARCH}?${queryStringParams.SEARCH_TERM}=24GBBGBKCDMS895999&${queryStringParams.SEARCH_TYPE}=information`,
+    url: `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=24GBBGBKCDMS895999&${queryStringParams.SEARCH_TYPE}=information`,
     auth: {
       strategy: 'session',
       credentials
@@ -211,7 +211,10 @@ test('Should show a not found error with a search term that could not be found',
   ).toBeInTheDocument()
 })
 
-test('Should show the forbidden page when the user is not in the admin security group', async () => {
+test.each([
+  `${paths.ADMIN_MESSAGES}`,
+  `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=24GBBGBKCDMS895999&${queryStringParams.SEARCH_TYPE}=information`
+])('Should show the forbidden page when the user is not in the admin security group', async (requestedPage) => {
   wreck.get
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
@@ -221,7 +224,7 @@ test('Should show the forbidden page when the user is not in the admin security 
 
   const { payload } = await server.inject({
     method: 'get',
-    url: `${paths.ADMIN_SEARCH}?${queryStringParams.SEARCH_TERM}=24GBBGBKCDMS895999&${queryStringParams.SEARCH_TYPE}=information`,
+    url: requestedPage,
     auth: {
       strategy: 'session',
       credentials

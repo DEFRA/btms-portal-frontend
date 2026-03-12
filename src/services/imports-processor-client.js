@@ -6,3 +6,6 @@ const processorApiClient = new ApiClient(processorApiConfig)
 
 export const getRawMessages = (resourceId) =>
   processorApiClient.get(`raw-messages?resourceId=${resourceId}`)
+
+export const getDlqCount = async (dlqCountEndpoint) =>
+  processorApiClient.get(dlqCountEndpoint)
