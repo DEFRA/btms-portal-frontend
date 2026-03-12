@@ -1,5 +1,5 @@
 import { accessibility } from './accessibility.js'
-import { adminSearch } from './admin-search.js'
+import { admin } from './admin.js'
 import { health } from './health.js'
 import { staticAssetRoutes } from './static-assets.js'
 import { home } from './home.js'
@@ -22,7 +22,7 @@ import { vrnTrnSearchResult } from './vrn-trn-search-result.js'
 
 export default [
   accessibility,
-  adminSearch,
+  admin,
   cookiesGet,
   cookiesPost,
   chromeDevtools,

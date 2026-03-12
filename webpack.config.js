@@ -31,6 +31,9 @@ export default {
     },
     searchResult: {
       import: ['./javascripts/search-result.js']
+    },
+    admin: {
+      import: ['./javascripts/admin.js']
     }
   },
   experiments: {

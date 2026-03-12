@@ -1,6 +1,6 @@
 import globalJsdom from 'global-jsdom'
 import wreck from '@hapi/wreck'
-import { getByRole, getByText } from '@testing-library/dom'
+import { getByRole, getByText, queryByText } from '@testing-library/dom'
 import { paths, queryStringParams } from '../../src/routes/route-constants.js'
 import { initialiseServer } from '../utils/initialise-server.js'
 import { setupAuthedAdminUserSession, setupAuthedUserSession } from '../unit/utils/session-helper.js'
@@ -46,6 +46,9 @@ const ALL_MESSAGES_SEARCH_RESULTS = [
   }
 ]
 
+const DEAD_LETTER_QUEUE_COUNT_EXISTS_RESULT = { deadLetterQueueCount: 1 }
+const DEAD_LETTER_QUEUE_COUNT_RESULT = { deadLetterQueueCount: 0 }
+
 jest.mock('@hapi/wreck', () => ({
   get: jest.fn()
 }))
@@ -81,6 +84,12 @@ test.each([
     wreck.get
       .mockResolvedValueOnce({ payload: provider })
       .mockResolvedValueOnce({ payload: provider })
+      .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+      .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+      .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+      .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+      .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+      .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
       .mockResolvedValueOnce({ payload: adminSearchResults })
 
     const server = await initialiseServer()
@@ -88,7 +97,7 @@ test.each([
 
     const { payload } = await server.inject({
       method: 'get',
-      url: `${paths.ADMIN_SEARCH}?${queryStringParams.SEARCH_TERM}=${searchTerm}&${queryStringParams.SEARCH_TYPE}=${type}`,
+      url: `${paths.ADMIN}?${queryStringParams.SEARCH_TERM}=${searchTerm}&${queryStringParams.SEARCH_TYPE}=${type}#messages-view`,
       auth: {
         strategy: 'session',
         credentials
@@ -120,20 +129,204 @@ test('Should render the admin view page with no search term or type supplied', a
   wreck.get
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+    .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+    .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+    .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+    .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+    .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedAdminUserSession(server)
 
-  const { statusCode } = await server.inject({
+  const { payload, statusCode } = await server.inject({
     method: 'get',
-    url: paths.ADMIN_SEARCH,
+    url: paths.ADMIN,
     auth: {
       strategy: 'session',
       credentials
     }
   })
 
+  globalJsdom(payload)
+
   expect(statusCode).toBe(200)
+
+  expect(
+    getByText(document.body, 'Dead letter queues')
+  ).toBeInTheDocument()
+
+  expect(
+    getByRole(document.body, 'row', {
+      name: 'BTMS Gatewaytrade_imports_data_upserted_btms-gateway-deadletter 0'
+    })
+  ).toBeInTheDocument()
+
+  expect(
+    getByRole(document.body, 'row', {
+      name: 'Customs Declarations Processortrade_imports_inbound_customs_declarations_processor-deadletter.fifo 0'
+    })
+  ).toBeInTheDocument()
+
+  expect(
+    getByRole(document.body, 'row', {
+      name: 'Upserted Processortrade_imports_data_upserted_processor-deadletter 0'
+    })
+  ).toBeInTheDocument()
+
+  expect(
+    getByRole(document.body, 'row', {
+      name: 'Upserted Reporting APItrade_imports_data_upserted_reporting_api-deadletter 0'
+    })
+  ).toBeInTheDocument()
+
+  expect(
+    getByRole(document.body, 'row', {
+      name: 'Activity Reporting APItrade_imports_btms_activity_reporting_api-deadletter 0'
+    })
+  ).toBeInTheDocument()
+
+  expect(
+    getByRole(document.body, 'row', {
+      name: 'Decision Derivertrade_imports_data_upserted_decision_deriver-deadletter 0'
+    })
+  ).toBeInTheDocument()
+})
+
+test('Should render the admin view page with Take Action links when DLQ count is greater than 0', async () => {
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_EXISTS_RESULT })
+  .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_EXISTS_RESULT })
+  .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_EXISTS_RESULT })
+  .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_EXISTS_RESULT })
+  .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_EXISTS_RESULT })
+  .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_EXISTS_RESULT })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { payload, statusCode } = await server.inject({
+    method: 'get',
+    url: paths.ADMIN,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(statusCode).toBe(200)
+
+  expect(
+    getByText(document.body, 'Dead letter queues')
+  ).toBeInTheDocument()
+
+  expect(
+    getByRole(document.body, 'row', {
+      name: 'BTMS Gatewaytrade_imports_data_upserted_btms-gateway-deadletter 1 Take Action'
+    })
+  ).toBeInTheDocument()
+
+  expect(
+    getByRole(document.body, 'row', {
+      name: 'Customs Declarations Processortrade_imports_inbound_customs_declarations_processor-deadletter.fifo 1 Take Action'
+    })
+  ).toBeInTheDocument()
+
+  expect(
+    getByRole(document.body, 'row', {
+      name: 'Upserted Processortrade_imports_data_upserted_processor-deadletter 1 Take Action'
+    })
+  ).toBeInTheDocument()
+
+  expect(
+    getByRole(document.body, 'row', {
+      name: 'Upserted Reporting APItrade_imports_data_upserted_reporting_api-deadletter 1 Take Action'
+    })
+  ).toBeInTheDocument()
+
+  expect(
+    getByRole(document.body, 'row', {
+      name: 'Activity Reporting APItrade_imports_btms_activity_reporting_api-deadletter 1 Take Action'
+    })
+  ).toBeInTheDocument()
+
+  expect(
+    getByRole(document.body, 'row', {
+      name: 'Decision Derivertrade_imports_data_upserted_decision_deriver-deadletter 1 Take Action'
+    })
+  ).toBeInTheDocument()
+})
+
+test('Accessing Redrive Confirmation page for an unknown DLQ should not show Redrive page', async () => {
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+  .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+  .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+  .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+  .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+  .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { payload, statusCode } = await server.inject({
+    method: 'get',
+    url: `${paths.ADMIN}?redrive=some_unconfigured_deadletter_queue#dlq-view`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(statusCode).toBe(200)
+
+  expect(
+    queryByText(document.body, 'Redrive Messages')
+  ).not.toBeInTheDocument()
+
+  expect(
+    getByText(document.body, 'Dead letter queues')
+  ).toBeInTheDocument()
+})
+
+test('Should show Redrive Confirmation page if valid redrive queue requested', async () => {
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+  .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+  .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+  .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+  .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+  .mockResolvedValueOnce({ payload: DEAD_LETTER_QUEUE_COUNT_RESULT })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { payload, statusCode } = await server.inject({
+    method: 'get',
+    url: `${paths.ADMIN}?redrive=trade_imports_data_upserted_btms-gateway-deadletter#dlq-view`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(statusCode).toBe(200)
+
+  expect(
+    getByText(document.body, 'Redrive Messages')
+  ).toBeInTheDocument()
 })
 
 test('Should show an error when no search term is supplied', async () => {
@@ -146,7 +339,7 @@ test('Should show an error when no search term is supplied', async () => {
 
   const { payload } = await server.inject({
     method: 'get',
-    url: `${paths.ADMIN_SEARCH}?${queryStringParams.SEARCH_TERM}=&${queryStringParams.SEARCH_TYPE}=information`,
+    url: `${paths.ADMIN}?${queryStringParams.SEARCH_TERM}=&${queryStringParams.SEARCH_TYPE}=information#messages-view`,
     auth: {
       strategy: 'session',
       credentials
@@ -172,7 +365,7 @@ test.each([
 
   const { payload } = await server.inject({
     method: 'get',
-    url: `${paths.ADMIN_SEARCH}?${queryStringParams.SEARCH_TERM}=${testSearchTerm}&${queryStringParams.SEARCH_TYPE}=information`,
+    url: `${paths.ADMIN}?${queryStringParams.SEARCH_TERM}=${testSearchTerm}&${queryStringParams.SEARCH_TYPE}=information#messages-view`,
     auth: {
       strategy: 'session',
       credentials
@@ -197,7 +390,7 @@ test('Should show a not found error with a search term that could not be found',
 
   const { payload } = await server.inject({
     method: 'get',
-    url: `${paths.ADMIN_SEARCH}?${queryStringParams.SEARCH_TERM}=24GBBGBKCDMS895999&${queryStringParams.SEARCH_TYPE}=information`,
+    url: `${paths.ADMIN}?${queryStringParams.SEARCH_TERM}=24GBBGBKCDMS895999&${queryStringParams.SEARCH_TYPE}=information#messages-view`,
     auth: {
       strategy: 'session',
       credentials
@@ -211,7 +404,19 @@ test('Should show a not found error with a search term that could not be found',
   ).toBeInTheDocument()
 })
 
-test('Should show the forbidden page when the user is not in the admin security group', async () => {
+test.each([
+  `${paths.ADMIN}`,
+  `${paths.ADMIN}#dlq-view`,
+  `${paths.ADMIN}#messages-view`,
+  `${paths.ADMIN}?${queryStringParams.SEARCH_TERM}=24GBBGBKCDMS895999&${queryStringParams.SEARCH_TYPE}=information#dlq-view`,
+  `${paths.ADMIN}?${queryStringParams.SEARCH_TERM}=24GBBGBKCDMS895999&${queryStringParams.SEARCH_TYPE}=information#messages-view`,
+  `${paths.ADMIN}?redrive=trade_imports_data_upserted_btms-gateway-deadletter#dlq-view`,
+  `${paths.ADMIN}?redrive=trade_imports_inbound_customs_declarations_processor-deadletter.fifo#dlq-view`,
+  `${paths.ADMIN}?redrive=trade_imports_data_upserted_processor-deadletter#dlq-view`,
+  `${paths.ADMIN}?redrive=trade_imports_data_upserted_reporting_api-deadletter#dlq-view`,
+  `${paths.ADMIN}?redrive=trade_imports_btms_activity_reporting_api-deadletter#dlq-view`,
+  `${paths.ADMIN}?redrive=trade_imports_data_upserted_decision_deriver-deadletter#dlq-view`
+])('Should show the forbidden page when the user is not in the admin security group', async (requestedPage) => {
   wreck.get
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
@@ -221,7 +426,7 @@ test('Should show the forbidden page when the user is not in the admin security 
 
   const { payload } = await server.inject({
     method: 'get',
-    url: `${paths.ADMIN_SEARCH}?${queryStringParams.SEARCH_TERM}=24GBBGBKCDMS895999&${queryStringParams.SEARCH_TYPE}=information`,
+    url: requestedPage,
     auth: {
       strategy: 'session',
       credentials

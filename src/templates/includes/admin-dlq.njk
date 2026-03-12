@@ -1,0 +1,44 @@
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% if dlq.redrive %}
+  <h1 class="govuk-heading-l">Redrive Messages</h1>
+  <div class="btms-admin-dlq__redrive">
+    <div class="govuk-inset-text">
+      There are currently {{ dlq.redrive.redriveQueueCount }} dead letter messages in the {{ dlq.redrive.redriveGroup }} queue - {{ dlq.redrive.redriveQueue }}
+    </div>
+    <p>Coming soon...</p>
+
+    {{ govukBackLink({
+      text: "Back",
+      href: "/admin"
+    }) }}
+  </div>
+{% else %}
+  <h1 class="govuk-heading-l">Dead letter queues</h1>
+  <p>
+    Current dead letter queue quantities
+  </p>
+  <div class="btms-admin-dlq__list">
+    {% for dlqGroup in dlq.dlqs %}
+      <h2 class="govuk-heading-m">{{ dlqGroup.groupName }}</h2>
+      <table class="govuk-table govuk-table--small-text-until-tablet btms-dlq" aria-label="DLQ Counts for {{ dlqGroup.groupName }}">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header btms-admin-dlq__queue-name">Queue name</th>
+            <th scope="col" class="govuk-table__header btms-admin-dlq__count">Dead letter count</th>
+            <th scope="col" class="govuk-table__header btms-admin-dlq__action"></th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for queue in dlqGroup.queues %}
+            <tr>
+              <td class="govuk-table__cell">{{ queue.queueName }}<span class="btms-admin-dlq__name">{{ queue.sqsQueueName }}</span></td>
+              <td class="govuk-table__cell btms-admin-dlq__count">{{ queue.queueCount }}</td>
+              <td class="govuk-table__cell btms-admin-dlq__action">{% if queue.queueCount > 0 %}<a href="/admin?redrive={{ queue.sqsQueueName }}#dlq-view">Take Action</a>{% endif %}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endfor %}
+  </div>
+{% endif %}

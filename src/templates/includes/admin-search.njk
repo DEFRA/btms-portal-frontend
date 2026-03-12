@@ -1,0 +1,69 @@
+{% from "govuk/components/input/macro.njk" import govukInput %}
+
+{% set errors = {
+  "SEARCH_TERM_REQUIRED": "Enter an MRN or CHED",
+  "SEARCH_TERM_INVALID": "Enter an MRN or CHED in the correct format",
+  "SEARCH_TERM_NOT_FOUND": searchTerm ~ " cannot be found"
+} %}
+{% set searchButton %}
+  {% include "./button-search.njk" %}
+{% endset %}
+
+<form id="search" class="btms-search-wrapper" action="/admin#messages-view">
+  <h1 class="govuk-label-wrapper">
+    <label class="govuk-label govuk-label--l" for="search-term">
+      Search for an MRN or CHED
+    </label>
+  </h1>
+  {{
+    govukInput({
+      errorMessage: {
+        text: errors[errorCode],
+        id: 'searchError'
+      } if isValid == false,
+      id: "search-term",
+      name: "searchTerm",
+      spellcheck: false,
+      formGroup: {
+        afterInput: {
+          html: searchButton
+        }
+      },
+      value: searchTerm
+    })
+  }}
+  <input type="hidden" name="searchType" value="information" />
+</form>
+
+{% if results %}
+<div class="govuk-tabs govuk-!-margin-top-6">
+  <ul class="govuk-tabs__list" role="tablist">
+    <li class="govuk-tabs__list-item govuk-tabs__list-item{% if searchType == searchTypes.INFORMATION %}--selected{% endif %}" role="presentation">
+      <a class="btms-admin-search__tab" href="{{ links.information }}">{{ resourceType }} Information</a>
+    </li>
+    <li class="govuk-tabs__list-item govuk-tabs__list-item{% if searchType == searchTypes.ALL_EVENTS %}--selected{% endif %}" role="presentation">
+      <a class="btms-admin-search__tab" href="{{ links.allEvents }}">All events</a>
+    </li>
+    <li class="govuk-tabs__list-item govuk-tabs__list-item{% if searchType == searchTypes.ALL_MESSAGES %}--selected{% endif %}" role="presentation">
+      <a class="btms-admin-search__tab" href="{{ links.allMessages }}">All messages</a>
+    </li>
+  </ul>
+  <section class="btms-admin-search-tabs__panel" role="tabpanel">
+    <div class="btms-admin-search-results-container">
+      {% if searchType == searchTypes.ALL_MESSAGES or searchType == searchTypes.ALL_EVENTS %}
+        {% for result in results %}
+        <div class="btms-admin-search-result">
+          <pre><code>{{ result | safe }}</code></pre>
+        </div>
+        {% else %}
+        <p>No results found.</p>
+        {% endfor %}
+      {% else %}
+        <div class="btms-admin-search-result">
+          <pre><code>{{ results | safe }}</code></pre>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endif %}

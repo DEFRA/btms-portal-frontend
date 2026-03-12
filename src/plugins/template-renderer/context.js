@@ -49,9 +49,9 @@ const getNavigation = (pathname, isAdminUser) => {
 
   return isAdminUser
     ? commonNavigationItems.concat({
-      href: paths.ADMIN_SEARCH,
+      href: paths.ADMIN,
       text: 'Admin',
-      active: pathname === paths.ADMIN_SEARCH
+      active: pathname === paths.ADMIN
     })
     : commonNavigationItems
 }
