@@ -1,0 +1,45 @@
+{% extends 'layout.njk' %}
+
+{% set pageTitle = "Admin - Dead letter queues" %}
+
+{% block content %}
+  <div class="govuk-tabs btms-admin-tabs">
+    <ul class="govuk-tabs__list" role="tablist">
+      <li class="govuk-tabs__list-item govuk-tabs__list-item--selected" role="presentation">
+        <a class="btms-admin-dlq__tab" href="#">Dead Letter</a>
+      </li>
+      <li class="govuk-tabs__list-item govuk-tabs__list-item" role="presentation">
+        <a class="btms-admin-dlq__tab" href="/admin/messages">Messages</a>
+      </li>
+    </ul>
+    <section class="btms-admin-dlq-tabs__panel" role="tabpanel">
+      <h1 class="govuk-heading-l govuk-!-margin-top-6">Dead letter queues</h1>
+      <p>
+        Current dead letter queue quantities
+      </p>
+      <div class="btms-admin-dlq__list">
+        {% for dlqGroup in dlqs %}
+          <h2 class="govuk-heading-m">{{ dlqGroup.groupName }}</h2>
+          <table class="govuk-table govuk-table--small-text-until-tablet btms-dlq" aria-label="DLQ Counts for {{ dlqGroup.groupName }}">
+            <thead class="govuk-table__head">
+              <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header btms-admin-dlq__queue-name">Queue name</th>
+                <th scope="col" class="govuk-table__header btms-admin-dlq__count">Dead letter count</th>
+                <th scope="col" class="govuk-table__header btms-admin-dlq__action"></th>
+              </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+              {% for queue in dlqGroup.queues %}
+                <tr>
+                  <td class="govuk-table__cell">{{ queue.queueName }}<span class="btms-admin-dlq__name">{{ queue.sqsQueueName }}</span></td>
+                  <td class="govuk-table__cell btms-admin-dlq__count">{{ queue.queueCount }}</td>
+                  <td class="govuk-table__cell btms-admin-dlq__action">{% if queue.queueCount > 0 %}<a href="/admin/redrive?queue={{ queue.sqsQueueName }}">Take Action</a>{% endif %}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endfor %}
+       </div>
+    </section>
+  </div>
+{% endblock %}

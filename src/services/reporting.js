@@ -1,8 +1,10 @@
 import wreck from '@hapi/wreck'
 import { config } from '../config/config.js'
 import { authorization } from './reporting-auth.js'
+import { ApiClient } from '../utils/api.js'
 
-const { baseUrl } = config.get('btmsReportingApi')
+const reportingApiConfig = config.get('btmsReportingApi')
+const reportingApiClient = new ApiClient(reportingApiConfig)
 
 export const getReports = async (request, from, to, intervals) => {
   const query = new URLSearchParams({ from, to })
@@ -13,7 +15,7 @@ export const getReports = async (request, from, to, intervals) => {
   }
 
   try {
-    const { payload } = await wreck.get(`${baseUrl}/intervals?${query}`, {
+    const { payload } = await wreck.get(`${reportingApiConfig.baseUrl}/intervals?${query}`, {
       headers: { authorization },
       json: 'strict'
     })
@@ -28,15 +30,15 @@ export const getReports = async (request, from, to, intervals) => {
 export const getLatestActivity = async (request) => {
   try {
     const [lastCreated, lastSent, lastReceived] = await Promise.all([
-      wreck.get(`${baseUrl}/last-created`, {
+      wreck.get(`${reportingApiConfig.baseUrl}/last-created`, {
         headers: { authorization },
         json: 'strict'
       }),
-      wreck.get(`${baseUrl}/last-sent`, {
+      wreck.get(`${reportingApiConfig.baseUrl}/last-sent`, {
         headers: { authorization },
         json: 'strict'
       }),
-      wreck.get(`${baseUrl}/last-received`, {
+      wreck.get(`${reportingApiConfig.baseUrl}/last-received`, {
         headers: { authorization },
         json: 'strict'
       })
@@ -52,3 +54,6 @@ export const getLatestActivity = async (request) => {
     throw error
   }
 }
+
+export const getDlqCount = async (dlqCountEndpoint) =>
+  reportingApiClient.get(dlqCountEndpoint)

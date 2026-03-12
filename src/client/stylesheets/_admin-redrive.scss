@@ -1,0 +1,21 @@
+@use "govuk-frontend" as *;
+
+.btms-admin-tabs {
+  .btms-admin-dlq__tab:link,
+  .btms-admin-dlq__tab:visited {
+    color: govuk-colour("black");
+  }
+
+  .govuk-tabs__list-item--selected .btms-admin-dlq__tab {
+    text-decoration: none;
+  }
+
+  .btms-admin-dlq__redrive {
+    width: 90%;
+
+    .govuk-inset-text {
+      margin-top: 0;
+      @include govuk-font-size($size: 16);
+    }
+  }
+}
