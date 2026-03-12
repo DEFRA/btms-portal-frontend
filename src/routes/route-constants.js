@@ -1,6 +1,6 @@
 const paths = {
   ACCESSIBILITY: '/accessibility-statement',
-  ADMIN_SEARCH: '/admin/search',
+  ADMIN: '/admin',
   CHROME_DEVTOOLS: '/.well-known/appspecific/com.chrome.devtools.json',
   COOKIES: '/cookies',
   GMR_SEARCH_RESULT: '/gmr-search-result',
@@ -24,7 +24,8 @@ const paths = {
 const queryStringParams = {
   RESOURCE_TYPE: 'resourceType',
   SEARCH_TERM: 'searchTerm',
-  SEARCH_TYPE: 'searchType'
+  SEARCH_TYPE: 'searchType',
+  REDRIVE: 'redrive'
 }
 
 const CACHE_CONTROL_NO_STORE = {

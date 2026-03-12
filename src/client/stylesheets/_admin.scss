@@ -1,0 +1,78 @@
+@use "govuk-frontend" as *;
+
+.btms-admin-tabs {
+  .btms-admin-search-results-container {
+    overflow-x: auto;
+    background-color: govuk-colour("light-grey");
+  }
+
+  .btms-admin-search-results-container > :last-child {
+    border-bottom: none;
+  }
+
+  .btms-admin-search-result {
+    display: block;
+    @include govuk-font-size($size: 16);
+    position: relative;
+    border-bottom: govuk-colour("dark-grey") solid govuk-spacing(1);
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .govuk-tabs__panel {
+    border: none;
+    padding: 30px 10px;
+  }
+
+  .btms-admin-search-tabs__panel {
+    @include govuk-responsive-margin(0, "bottom");
+    padding: govuk-spacing(6) govuk-spacing(4);
+    border: 1px solid $govuk-border-colour;
+    border-top: 0;
+
+    & > :last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .btms-admin-search__tab:link,
+  .btms-admin-search__tab:visited {
+    color: govuk-colour("black");
+  }
+
+  .govuk-tabs__list-item--selected .btms-admin-search__tab {
+    text-decoration: none;
+  }
+
+  .btms-admin-dlq__redrive,
+  .btms-admin-dlq__list {
+    width: 90%;
+
+    .govuk-inset-text {
+      margin-top: 0;
+      @include govuk-font-size($size: 16);
+    }
+  }
+
+  .btms-dlq {
+    .btms-admin-dlq__queue-name {
+      width: 60%;
+    }
+
+    .btms-admin-dlq__count {
+      width: 25%;
+      text-align: right;
+    }
+
+    .btms-admin-dlq__action {
+      width: 15%;
+      text-align: right;
+      padding-right: govuk-spacing(4);
+    }
+
+    .btms-admin-dlq__name {
+      display: block;
+      @include govuk-font-size($size: 14);
+    }
+  }
+}

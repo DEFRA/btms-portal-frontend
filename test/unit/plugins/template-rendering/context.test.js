@@ -91,7 +91,7 @@ test('logged in as admin user', async () => {
         active: false
       },
       {
-        href: '/admin/search',
+        href: '/admin',
         text: 'Admin',
         active: false
       }
