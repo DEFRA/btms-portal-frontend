@@ -1,5 +1,6 @@
 {% extends 'layout.njk' %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set pageTitle = "Admin - Redrive Messages" %}
 
@@ -19,7 +20,19 @@
         <div class="govuk-inset-text">
           There are currently {{ redrive.redriveQueueCount }} dead letter messages in the {{ redrive.redriveGroup }} queue - {{ redrive.redriveQueue }}
         </div>
-        <p>Coming soon...</p>
+
+        {% if redrive.redriveQueueCount > 0 %}
+          <p>Clicking on the Redrive Messages button will queue the messages for delivery to CDS.</p>
+          <p>There may be a slight delay before the Dead Letter Queue shows as empty, this is to be expected.</p>
+
+          <form id="redrive" method="post" action="/admin/redrive" class="btms-admin-redrive__confirm">
+            {{ govukButton({
+              text: "Redrive Messages",
+              preventDoubleClick: true
+            }) }}
+            <input type="hidden" name="confirmRedriveQueue" value="{{ redrive.redriveQueue }}" />
+          </form>
+        {% endif %}
 
         {{ govukBackLink({
         text: "Back",

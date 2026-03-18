@@ -6,3 +6,6 @@ const gatewayClient = new ApiClient(btmsGatewayConfig)
 
 export const getDlqCount = async (dlqCountEndpoint) =>
   gatewayClient.get(dlqCountEndpoint)
+
+export const postBtmsGatewayRedrive = async (redriveEndpoint) =>
+  gatewayClient.post(redriveEndpoint)

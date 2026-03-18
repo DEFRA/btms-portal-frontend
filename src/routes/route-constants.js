@@ -3,6 +3,7 @@ const paths = {
   ADMIN_MESSAGES: '/admin/messages',
   ADMIN_DLQ: '/admin/dlq',
   ADMIN_REDRIVE: '/admin/redrive',
+  ADMIN_REDRIVE_COMPLETE: '/admin/redrive-complete',
   CHROME_DEVTOOLS: '/.well-known/appspecific/com.chrome.devtools.json',
   COOKIES: '/cookies',
   GMR_SEARCH_RESULT: '/gmr-search-result',

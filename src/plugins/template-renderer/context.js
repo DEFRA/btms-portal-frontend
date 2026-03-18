@@ -51,7 +51,7 @@ const getNavigation = (pathname, isAdminUser) => {
     ? commonNavigationItems.concat({
       href: paths.ADMIN_DLQ,
       text: 'Admin',
-      active: pathname === paths.ADMIN_DLQ || pathname === paths.ADMIN_REDRIVE || pathname === paths.ADMIN_MESSAGES
+      active: pathname === paths.ADMIN_DLQ || pathname === paths.ADMIN_REDRIVE || pathname === paths.ADMIN_REDRIVE_COMPLETE || pathname === paths.ADMIN_MESSAGES
     })
     : commonNavigationItems
 }

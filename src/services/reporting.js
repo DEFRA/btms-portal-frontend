@@ -57,3 +57,6 @@ export const getLatestActivity = async (request) => {
 
 export const getDlqCount = async (dlqCountEndpoint) =>
   reportingApiClient.get(dlqCountEndpoint)
+
+export const postReportingRedrive = async (redriveEndpoint) =>
+  reportingApiClient.post(redriveEndpoint)
