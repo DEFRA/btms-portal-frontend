@@ -9,4 +9,8 @@
       @include govuk-font-size($size: 16);
     }
   }
+
+  .btms-admin-redrive__confirm {
+    margin-top: 70px;
+  }
 }

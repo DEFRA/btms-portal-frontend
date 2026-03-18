@@ -6,3 +6,6 @@ const decisionDeriverClient = new ApiClient(decisionDeriverConfig)
 
 export const getDlqCount = async (dlqCountEndpoint) =>
   decisionDeriverClient.get(dlqCountEndpoint)
+
+export const postDecisionDeriverRedrive = async (redriveEndpoint) =>
+  decisionDeriverClient.post(redriveEndpoint)

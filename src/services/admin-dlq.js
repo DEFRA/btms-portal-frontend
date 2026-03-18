@@ -1,7 +1,7 @@
-import { getDlqCount as getBtmsGatewayDlqCount } from './btms-gateway-client.js'
-import { getDlqCount as getProcessorDlqCount } from './imports-processor-client.js'
-import { getDlqCount as getReportingDlqCount } from './reporting.js'
-import { getDlqCount as getDecisionDeriverDlqCount } from './decision-deriver-client.js'
+import { getDlqCount as getBtmsGatewayDlqCount, postBtmsGatewayRedrive } from './btms-gateway-client.js'
+import { getDlqCount as getProcessorDlqCount, postProcessorRedrive } from './imports-processor-client.js'
+import { getDlqCount as getReportingDlqCount, postReportingRedrive } from './reporting.js'
+import { getDlqCount as getDecisionDeriverDlqCount, postDecisionDeriverRedrive } from './decision-deriver-client.js'
 import { createLogger } from '../utils/logger.js'
 
 const logger = createLogger()
@@ -49,7 +49,25 @@ const getDlqCounts = async (dlqConfigs) => {
   return queueCounts
 }
 
+const postRedriveRequest = async (groupName, redriveEndpoint) => {
+  switch (groupName) {
+    case 'BTMS Gateway':
+      return postBtmsGatewayRedrive(redriveEndpoint)
+    case 'Processor':
+      return postProcessorRedrive(redriveEndpoint)
+    case 'Reporting':
+      return postReportingRedrive(redriveEndpoint)
+    case 'Decision Deriver':
+      return postDecisionDeriverRedrive(redriveEndpoint)
+    default:
+      logger.warn(
+        `Unknown DLQ Group ${groupName}. Redrive not requested.`)
+      return undefined
+  }
+}
+
 export {
   getQueueCount,
-  getDlqCounts
+  getDlqCounts,
+  postRedriveRequest
 }

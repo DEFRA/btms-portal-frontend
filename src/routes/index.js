@@ -1,7 +1,8 @@
 import { accessibility } from './accessibility.js'
 import { adminMessages } from './admin-messages.js'
 import { adminDlq } from './admin-dlq.js'
-import { adminRedrive } from './admin-redrive.js'
+import { adminRedriveGet, adminRedrivePost } from './admin-redrive.js'
+import { adminRedriveComplete } from './admin-redrive-complete.js'
 import { health } from './health.js'
 import { staticAssetRoutes } from './static-assets.js'
 import { home } from './home.js'
@@ -26,7 +27,9 @@ export default [
   accessibility,
   adminMessages,
   adminDlq,
-  adminRedrive,
+  adminRedriveGet,
+  adminRedrivePost,
+  adminRedriveComplete,
   cookiesGet,
   cookiesPost,
   chromeDevtools,

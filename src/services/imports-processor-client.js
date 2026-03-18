@@ -9,3 +9,6 @@ export const getRawMessages = (resourceId) =>
 
 export const getDlqCount = async (dlqCountEndpoint) =>
   processorApiClient.get(dlqCountEndpoint)
+
+export const postProcessorRedrive = async (redriveEndpoint) =>
+  processorApiClient.post(redriveEndpoint)
