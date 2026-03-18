@@ -12,13 +12,13 @@ import { createLogger } from '../utils/logger.js'
 
 const logger = createLogger()
 
-export const RESOURCE_TYPE = {
+const RESOURCE_TYPE = {
   IMPORT_PRE_NOTIFICATION: 'ImportPreNotification',
   CUSTOMS_DECLARATION: 'CustomsDeclaration',
   PROCESSING_ERROR: 'ProcessingError'
 }
 
-export const SUB_RESOURCE_TYPE = {
+const SUB_RESOURCE_TYPE = {
   CLEARANCE_REQUEST: 'ClearanceRequest',
   CLEARANCE_DECISION: 'ClearanceDecision',
   EXTERNAL_ERROR: 'ExternalError',
