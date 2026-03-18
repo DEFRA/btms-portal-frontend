@@ -1036,3 +1036,92 @@ test('timeline can be filtered', async () => {
   expect(mrnTimelines[0].hasAttribute('hidden')).toBeFalsy()
   expect(mrnTimelines[1].hasAttribute('hidden')).toBeTruthy()
 })
+
+test('shows timeline for unmatched CHED', async () => {
+  const customsDeclarations = []
+
+  const importPreNotifications = [
+    createImportPreNotification('CHEDA.GB.2025.0000001', 'CVEDA', 'CANCELLED', '2025-04-22T16:55:17.330Z', '1', '0101', 'Equus asinus', '2')
+  ]
+
+  const relatedImportDeclarations = {
+    customsDeclarations,
+    importPreNotifications
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: relatedImportDeclarations })
+  .mockResolvedValueOnce({ payload: importPreNotificationResourceEvents })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const query = {
+    [queryStringParams.SEARCH_TERM]: '24GB0Z8WEJ9ZBTL73B',
+    timelineMrn: '24GB0Z8WEJ9ZBTL73B'
+  }
+  const queryString = new URLSearchParams(query).toString()
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryString}#timeline-view`,
+    auth: { strategy: 'session', credentials },
+    headers: {
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics":false}').toString('base64')
+    }
+  })
+
+  globalJsdom(payload)
+
+  window.history.pushState({}, 'test', `?${queryString}`)
+  initFilters()
+
+  const mrnTimelines = document.body.querySelectorAll('.govuk-tabs__panel .mrn-timeline')
+  expect(mrnTimelines.length).toBe(1)
+  expect(mrnTimelines[0].hasAttribute('hidden')).toBeFalsy()
+})
+
+test('handles upstream errors when retrieving resource events for unmatched CHED', async () => {
+  const customsDeclarations = []
+
+  const importPreNotifications = [
+    createImportPreNotification('CHEDA.GB.2025.0000001', 'CVEDA', 'CANCELLED', '2025-04-22T16:55:17.330Z', '1', '0101', 'Equus asinus', '2')
+  ]
+
+  const relatedImportDeclarations = {
+    customsDeclarations,
+    importPreNotifications
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: relatedImportDeclarations })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73A`,
+    auth: {
+      strategy: 'session',
+      credentials
+    },
+    headers: {
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
+    }
+  })
+
+  expect(headers['cache-control']).toBe('no-store')
+
+  globalJsdom(payload)
+  initFilters()
+
+  const eventTitles = Array.from(document.body.querySelectorAll('.moj-timeline__item .moj-timeline__header .moj-timeline__title span:nth-child(1)')).map(title => title.innerHTML)
+  expect(eventTitles.length).toBe(0)
+})

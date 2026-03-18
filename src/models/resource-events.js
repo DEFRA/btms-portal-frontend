@@ -12,13 +12,13 @@ import { createLogger } from '../utils/logger.js'
 
 const logger = createLogger()
 
-export const RESOURCE_TYPE = {
+const RESOURCE_TYPE = {
   IMPORT_PRE_NOTIFICATION: 'ImportPreNotification',
   CUSTOMS_DECLARATION: 'CustomsDeclaration',
   PROCESSING_ERROR: 'ProcessingError'
 }
 
-export const SUB_RESOURCE_TYPE = {
+const SUB_RESOURCE_TYPE = {
   CLEARANCE_REQUEST: 'ClearanceRequest',
   CLEARANCE_DECISION: 'ClearanceDecision',
   EXTERNAL_ERROR: 'ExternalError',
@@ -235,7 +235,7 @@ const mapImportPreNotificationResourceEvent = (resourceMessage) => {
   }
 }
 
-export const mapResourceEvents = (mrn, resourceEvents) => {
+export const mapResourceEvents = (mrn, chedRef, resourceEvents) => {
   const mappedResourceEvents = []
 
   resourceEvents.forEach((resourceEvent) => {
@@ -269,7 +269,7 @@ export const mapResourceEvents = (mrn, resourceEvents) => {
         mappedResourceEvents.push(mapImportPreNotificationResourceEvent(resourceMessage))
       }
     } catch (error) {
-      logger.warn(`Unable to parse and map timeline resource event for MNR ${mrn}. ERROR: ${error.message}`)
+      logger.warn(`Unable to parse and map timeline resource event for resource Id ${mrn || chedRef}. ERROR: ${error.message}`)
     }
   })
 
