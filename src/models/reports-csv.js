@@ -25,15 +25,26 @@ export const mapReportsCsv = (res, name, startDate, endDate) => {
     transform({ value }, _, callback) {
       const row =
         [
-          value.reference,
-          `"${format(new Date(value.timestamp), 'dd MMMM yy, HH:mm')}"`
+          `"${format(new Date(value.timestamp), 'dd MMMM yy, HH:mm')}"`,
+          value.mrn,
+          value.itemNumber,
+          value.commodityCode,
+          value.description,
+          value.quantityOrWeight,
+          value.chedReference,
+          value.checkCode,
+          value.match,
+          value.authority,
+          value.decision,
+          value.decisionReasons,
+
         ].join(',') + '\n'
 
       if (firstRow) {
         this.push(`BTMS - ${headings[name]} MRNs\n`)
         this.push(`Date range: ${from} to ${to}\n`)
         this.push('\n')
-        this.push('MRN,Last updated\n')
+        this.push('Last updated,MRN,Item number,Commodity code,Description,Quantity/Weight,CHED reference,Check code,Match,Authority,Decision,Decision reason\n')
         firstRow = false
       }
       this.push(row)
