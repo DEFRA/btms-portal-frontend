@@ -1,6 +1,7 @@
 import convict from 'convict'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { dlqConfigs } from './dlq-configs.js'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -297,6 +298,46 @@ const config = convict({
       env: 'BTMS_IMPORTS_PROCESSOR_PASSWORD'
     }
   },
+  btmsGateway: {
+    baseUrl: {
+      doc: 'BTMS Gateway base URL.',
+      format: String,
+      default: 'http://localhost:8080',
+      env: 'BTMS_GATEWAY_BASE_URL'
+    },
+    username: {
+      doc: 'BTMS Gateway username for authentication.',
+      format: String,
+      default: '',
+      env: 'BTMS_GATEWAY_USERNAME'
+    },
+    password: {
+      doc: 'BTMS Gateway password for authentication.',
+      format: String,
+      default: '',
+      env: 'BTMS_GATEWAY_PASSWORD'
+    }
+  },
+  decisionDeriver: {
+    baseUrl: {
+      doc: 'Decision Deriver base URL.',
+      format: String,
+      default: 'http://localhost:8083',
+      env: 'DECISION_DERIVER_BASE_URL'
+    },
+    username: {
+      doc: 'Decision Deriver username for authentication.',
+      format: String,
+      default: '',
+      env: 'DECISION_DERIVER_USERNAME'
+    },
+    password: {
+      doc: 'Decision Deriver password for authentication.',
+      format: String,
+      default: '',
+      env: 'DECISION_DERIVER_PASSWORD'
+    }
+  },
   auth: {
     defraId: {
       oidcConfigurationUrl: {
@@ -408,7 +449,8 @@ const config = convict({
     format: String,
     default: 'GTM-PSCS57N9',
     env: 'GTM_ID'
-  }
+  },
+  dlq: dlqConfigs
 })
 
 config.validate({ allowed: 'strict' })
