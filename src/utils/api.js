@@ -18,6 +18,16 @@ export class ApiClient {
 
     return payload
   }
+
+  async post (endpoint) {
+    const headers = config.get('cdpApiKey') ? withCdpApiKey(this.headers) : this.headers
+
+    const { res } = await wreck.post(`${this.baseUrl}/${endpoint}`, {
+      headers
+    })
+
+    return res
+  }
 }
 
 const withCdpApiKey = (headers) => ({ ...headers, 'x-api-key': config.get('cdpApiKey') })

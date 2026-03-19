@@ -1,0 +1,38 @@
+@use "govuk-frontend" as *;
+
+.btms-admin-tabs {
+  .btms-admin-dlq__tab:link,
+  .btms-admin-dlq__tab:visited {
+    color: govuk-colour("black");
+  }
+
+  .govuk-tabs__list-item--selected .btms-admin-dlq__tab {
+    text-decoration: none;
+  }
+
+  .btms-admin-dlq__list {
+    width: 90%;
+  }
+
+  .btms-dlq {
+    .btms-admin-dlq__queue-name {
+      width: 60%;
+    }
+
+    .btms-admin-dlq__count {
+      width: 25%;
+      text-align: right;
+    }
+
+    .btms-admin-dlq__action {
+      width: 15%;
+      text-align: right;
+      padding-right: govuk-spacing(4);
+    }
+
+    .btms-admin-dlq__name {
+      display: block;
+      @include govuk-font-size($size: 14);
+    }
+  }
+}
