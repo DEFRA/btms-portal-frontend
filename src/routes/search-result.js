@@ -4,7 +4,7 @@ import { mapCustomsDeclarations } from '../models/customs-declarations.js'
 import { mapPreNotifications } from '../models/pre-notifications.js'
 import { createRouteConfig } from './search-result-common.js'
 import { searchKeys } from '../services/search-patterns.js'
-import { mapResourceEvents, RESOURCE_TYPE, SUB_RESOURCE_TYPE } from '../models/resource-events.js'
+import { mapResourceEvents } from '../models/resource-events.js'
 import { createLogger } from '../utils/logger.js'
 
 const logger = createLogger()
@@ -20,42 +20,26 @@ const sortCreatedDescending = (a, b) => {
   return bCreated - aCreated
 }
 
-const getChedTimelineEvents = async (mrn, declarationResourceEvents) => {
+const getChedTimelineEvents = async (preNotifications) => {
   let chedTimelineEvents = []
 
-  const clearanceRequestResourceEvents = declarationResourceEvents.filter(resourceEvent =>
-    resourceEvent.resourceType === RESOURCE_TYPE.CUSTOMS_DECLARATION
-    && resourceEvent.subResourceType === SUB_RESOURCE_TYPE.CLEARANCE_REQUEST)
-
-  const resourceEventDocRefs = clearanceRequestResourceEvents.flatMap(clearanceRequestResourceEvent => {
-    const resourceMessage = JSON.parse(clearanceRequestResourceEvent.message)
-
-    return resourceMessage?.resource?.clearanceRequest?.commodities?.flatMap(commodity => {
-      return commodity?.documents.flatMap(document => {
-        return document.documentReference
-      })
-    })
-  }) || []
-
-  const uniqueDocRefs = new Set(resourceEventDocRefs)
-
-  for (const docRef of uniqueDocRefs) {
-    const chedResourceEvents = await getResourceEvents(docRef)
-    chedTimelineEvents = chedTimelineEvents.concat(mapResourceEvents(mrn, chedResourceEvents))
+  for (const preNotification of preNotifications) {
+    const preNotificationResourceEvents = await getResourceEvents(preNotification.referenceNumber)
+    chedTimelineEvents = chedTimelineEvents.concat(mapResourceEvents(undefined, preNotification.referenceNumber, preNotificationResourceEvents))
   }
 
   return chedTimelineEvents
 }
 
-const getAllEvents = async (customsDeclarations) => {
+const getEventsFromCustomsDeclarations = async (customsDeclarations, preNotifications) => {
   const mrnEvents = []
 
   for (const declaration of customsDeclarations) {
     try {
       const declarationResourceEvents = await getResourceEvents(declaration.movementReferenceNumber)
-      const declarationTimelineEvents = mapResourceEvents(declaration.movementReferenceNumber, declarationResourceEvents)
+      const declarationTimelineEvents = mapResourceEvents(declaration.movementReferenceNumber, undefined, declarationResourceEvents)
 
-      const chedTimelineEvents = await getChedTimelineEvents(declaration.movementReferenceNumber, declarationResourceEvents)
+      const chedTimelineEvents = await getChedTimelineEvents(preNotifications)
 
       const timelineEvents = declarationTimelineEvents.concat(chedTimelineEvents).sort((a, b) => sortCreatedDescending(a, b))
 
@@ -73,6 +57,38 @@ const getAllEvents = async (customsDeclarations) => {
   }
 
   return mrnEvents
+}
+
+const getEventsFromUnmatchedPreNotifications = async (preNotifications) => {
+  const preNotificationEvents = []
+
+  for (const preNotification of preNotifications) {
+    try {
+      const preNotificationResourceEvents = await getResourceEvents(preNotification.referenceNumber)
+      const timelineEvents = mapResourceEvents(undefined, preNotification.referenceNumber, preNotificationResourceEvents)?.sort((a, b) => sortCreatedDescending(a, b))
+
+      preNotificationEvents.push({
+        chedRef: preNotification.referenceNumber,
+        timelineEvents
+      })
+    } catch (error) {
+      logger.warn(`Unable to retrieve and map timeline resource events for unmatched Pre Notification ${preNotification.referenceNumber}. ERROR: ${error.message}`)
+      preNotificationEvents.push({
+        chedRef: preNotification.referenceNumber,
+        timelineEvents: []
+      })
+    }
+  }
+
+  return preNotificationEvents
+}
+
+const getAllEvents = async (customsDeclarations, preNotifications) => {
+  if (customsDeclarations.length > 0) {
+    return getEventsFromCustomsDeclarations(customsDeclarations, preNotifications)
+  } else {
+    return getEventsFromUnmatchedPreNotifications(preNotifications)
+  }
 }
 
 export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_RESULT, async (request, h) => {
@@ -94,7 +110,7 @@ export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_
 
   const customsDeclarations = mapCustomsDeclarations(searchResults, searchTerm)
   const preNotifications = mapPreNotifications(searchResults, searchTerm)
-  const timelineEvents = await getAllEvents(customsDeclarations)
+  const timelineEvents = await getAllEvents(customsDeclarations, preNotifications)
 
   const viewModel = {
     resultsPage: true,

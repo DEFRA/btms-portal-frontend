@@ -135,7 +135,7 @@ const setTimeline = (selectedTimelineMrn) => {
   const mrnTimelines = [...document.querySelectorAll('div.mrn-timeline')]
 
   mrnTimelines.forEach((timeline) => {
-    if (timeline.dataset.timeline_mrn === selectedTimelineMrn.timelineMrn) {
+    if (timeline.dataset.timeline_ref === selectedTimelineMrn.timelineMrn) {
       timeline.removeAttribute('hidden')
     } else {
       timeline.setAttribute('hidden', 'hidden')
