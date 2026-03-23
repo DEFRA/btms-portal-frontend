@@ -16,15 +16,18 @@
   }
 
   .btms-admin-dlq__redrive {
-    width: 90%;
-
-    .govuk-inset-text {
-      margin-top: 0;
-      @include govuk-font-size($size: 16);
-    }
+    width: 70%;
   }
 
-  .btms-admin-redrive__confirm {
-    margin-top: 70px;
+  .govuk-panel--confirmation {
+    margin-top: 30px;
+  }
+
+  .govuk-panel__body {
+    overflow-wrap: break-word;
+  }
+
+  .govuk-button--secondary {
+    margin-top: 50px;
   }
 }

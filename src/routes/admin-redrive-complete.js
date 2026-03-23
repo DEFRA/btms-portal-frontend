@@ -19,7 +19,8 @@ export const adminRedriveComplete = {
   },
   handler: async (request, h) => {
     const redrivenQueue = request.query[queryStringParams.QUEUE]
+    const adminDlqPath = paths.ADMIN_DLQ
 
-    return h.view(ADMIN_REDRIVE_COMPLETE_TEMPLATE, { redrivenQueue })
+    return h.view(ADMIN_REDRIVE_COMPLETE_TEMPLATE, { redrivenQueue, adminDlqPath })
   }
 }
