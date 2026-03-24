@@ -8,6 +8,9 @@ test('400: bad request', async () => {
   server.route({
     method: 'get',
     path: '/simulate-bad-request-error',
+    options: {
+      auth: false
+    },
     handler: () => boom.badRequest()
   })
 
@@ -49,6 +52,9 @@ test('403: forbidden', async () => {
   server.route({
     method: 'GET',
     path: '/simulate-forbidden-error',
+    options: {
+      auth: false
+    },
     handler: () => boom.forbidden()
   })
 
@@ -89,6 +95,9 @@ test('500: internal server error', async () => {
   server.route({
     method: 'get',
     path: '/simulate-error',
+    options: {
+      auth: false
+    },
     handler: () => boom.badImplementation()
   })
 
@@ -113,6 +122,9 @@ test('502: bad gateway', async () => {
   server.route({
     method: 'get',
     path: '/simulate-upstream-error',
+    options: {
+      auth: false
+    },
     handler: () => boom.badGateway()
   })
 

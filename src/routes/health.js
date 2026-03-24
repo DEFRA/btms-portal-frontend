@@ -4,6 +4,9 @@ import { paths } from './route-constants.js'
 export const health = {
   method: 'GET',
   path: paths.HEALTH,
+  options: {
+    auth: false
+  },
   handler: (_request, h) => {
     return h.response({ message: 'success' }).code(httpConstants.HTTP_STATUS_OK)
   }

@@ -5,6 +5,7 @@ export const signedOut = {
   method: 'get',
   path: paths.SIGNED_OUT,
   options: {
+    auth: false,
     validate: {
       query: joi.object({
         provider: joi.string()
