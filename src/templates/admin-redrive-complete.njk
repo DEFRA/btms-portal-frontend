@@ -1,0 +1,25 @@
+{% extends 'layout.njk' %}
+
+{% set pageTitle = "Admin - Redrive Complete" %}
+
+{% block content %}
+  <div class="govuk-tabs btms-admin-tabs">
+    <ul class="govuk-tabs__list" role="tablist">
+      <li class="govuk-tabs__list-item govuk-tabs__list-item--selected" role="presentation">
+        <a class="btms-admin-dlq__tab" href="#">Dead Letter</a>
+      </li>
+      <li class="govuk-tabs__list-item govuk-tabs__list-item" role="presentation">
+        <a class="btms-admin-dlq__tab" href="/admin/messages">Messages</a>
+      </li>
+    </ul>
+    <section class="btms-admin-dlq-tabs__panel" role="tabpanel">
+      <h1 class="govuk-heading-l govuk-!-margin-top-6">Redrive Request Successful</h1>
+      <div class="btms-admin-dlq__redrive">
+        <p>Content coming soon...</p>
+        <p>
+          <a href="/admin/dlq">Continue</a>
+        </p>
+      </div>
+    </section>
+  </div>
+{% endblock %}

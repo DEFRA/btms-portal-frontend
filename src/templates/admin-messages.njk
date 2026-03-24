@@ -1,5 +1,4 @@
 {% extends 'layout.njk' %}
-
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
 {% set errors = {
@@ -7,15 +6,24 @@
   "SEARCH_TERM_INVALID": "Enter an MRN or CHED in the correct format",
   "SEARCH_TERM_NOT_FOUND": searchTerm ~ " cannot be found"
 } %}
-{% set pageTitle = "Search for an MRN or CHED" %}
 {% set searchButton %}
   {% include "./includes/button-search.njk" %}
 {% endset %}
 
+{% set pageTitle = "Admin - Search for an MRN or CHED" %}
+
 {% block content %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-      <form id="search" class="btms-search-wrapper" action="/admin/search">
+  <div class="govuk-tabs btms-admin-tabs">
+    <ul class="govuk-tabs__list" role="tablist">
+      <li class="govuk-tabs__list-item govuk-tabs__list-item" role="presentation">
+        <a class="btms-admin-search__tab" href="/admin/dlq">Dead Letter</a>
+      </li>
+      <li class="govuk-tabs__list-item govuk-tabs__list-item--selected" role="presentation">
+        <a class="btms-admin-search__tab" href="#">Messages</a>
+      </li>
+    </ul>
+    <section class="btms-admin-search-tabs__panel" role="tabpanel">
+      <form id="search" class="btms-search-wrapper" action="/admin/messages">
         <h1 class="govuk-label-wrapper">
           <label class="govuk-label govuk-label--l" for="search-term">
             Search for an MRN or CHED
@@ -45,16 +53,16 @@
       <div class="govuk-tabs govuk-!-margin-top-6">
         <ul class="govuk-tabs__list" role="tablist">
           <li class="govuk-tabs__list-item govuk-tabs__list-item{% if searchType == searchTypes.INFORMATION %}--selected{% endif %}" role="presentation">
-            <a class="govuk-tabs__tab" href="{{ links.information }}">{{ resourceType }} Information</a>
+            <a class="btms-admin-search__tab" href="{{ links.information }}">{{ resourceType }} Information</a>
           </li>
           <li class="govuk-tabs__list-item govuk-tabs__list-item{% if searchType == searchTypes.ALL_EVENTS %}--selected{% endif %}" role="presentation">
-            <a class="govuk-tabs__tab" href="{{ links.allEvents }}">All events</a>
+            <a class="btms-admin-search__tab" href="{{ links.allEvents }}">All events</a>
           </li>
           <li class="govuk-tabs__list-item govuk-tabs__list-item{% if searchType == searchTypes.ALL_MESSAGES %}--selected{% endif %}" role="presentation">
-            <a class="govuk-tabs__tab" href="{{ links.allMessages }}">All messages</a>
+            <a class="btms-admin-search__tab" href="{{ links.allMessages }}">All messages</a>
           </li>
         </ul>
-        <section class="govuk-tabs__panel" role="tabpanel">
+        <section class="btms-admin-search-results-tabs__panel" role="tabpanel">
           <div class="btms-admin-search-results-container">
             {% if searchType == searchTypes.ALL_MESSAGES or searchType == searchTypes.ALL_EVENTS %}
               {% for result in results %}
@@ -66,13 +74,13 @@
               {% endfor %}
             {% else %}
               <div class="btms-admin-search-result">
-                  <pre><code>{{ results | safe }}</code></pre>
+                <pre><code>{{ results | safe }}</code></pre>
               </div>
             {% endif %}
           </div>
         </section>
       </div>
       {% endif %}
-    </div>
+    </section>
   </div>
 {% endblock %}
