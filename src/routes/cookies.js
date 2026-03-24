@@ -4,6 +4,9 @@ import joi from 'joi'
 export const cookiesGet = {
   method: 'get',
   path: paths.COOKIES,
+  options: {
+    auth: false
+  },
   handler: (request, h) => {
     const [error] = request.yar.flash('cookiesError')
     return h.view('cookies', { error })
@@ -14,6 +17,7 @@ export const cookiesPost = {
   method: 'post',
   path: paths.COOKIES,
   options: {
+    auth: false,
     validate: {
       payload: joi
         .object({

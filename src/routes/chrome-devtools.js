@@ -4,6 +4,9 @@ import { paths } from './route-constants.js'
 export const chromeDevtools = {
   method: 'GET',
   path: paths.CHROME_DEVTOOLS,
+  options: {
+    auth: false
+  },
   handler: (_request, h) => {
     return h
       .response({ message: 'success' })
