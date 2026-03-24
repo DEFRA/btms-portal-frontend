@@ -5,7 +5,9 @@ export const chromeDevtools = {
   method: 'GET',
   path: paths.CHROME_DEVTOOLS,
   options: {
-    auth: false
+    auth: {
+      mode: 'try'
+    }
   },
   handler: (_request, h) => {
     return h

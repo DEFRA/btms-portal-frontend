@@ -4,7 +4,9 @@ export const accessibility = {
   method: 'GET',
   path: paths.ACCESSIBILITY,
   options: {
-    auth: false
+    auth: {
+      mode: 'try'
+    }
   },
   handler: (_, h) => {
     return h.view('accessibility')
