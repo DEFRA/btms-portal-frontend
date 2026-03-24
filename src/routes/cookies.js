@@ -5,7 +5,9 @@ export const cookiesGet = {
   method: 'get',
   path: paths.COOKIES,
   options: {
-    auth: false
+    auth: {
+      mode: 'try'
+    }
   },
   handler: (request, h) => {
     const [error] = request.yar.flash('cookiesError')
@@ -17,7 +19,9 @@ export const cookiesPost = {
   method: 'post',
   path: paths.COOKIES,
   options: {
-    auth: false,
+    auth: {
+      mode: 'try'
+    },
     validate: {
       payload: joi
         .object({
