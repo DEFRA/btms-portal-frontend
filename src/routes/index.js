@@ -1,5 +1,8 @@
 import { accessibility } from './accessibility.js'
-import { adminSearch } from './admin-search.js'
+import { adminMessages } from './admin-messages.js'
+import { adminDlq } from './admin-dlq.js'
+import { adminRedriveGet, adminRedrivePost } from './admin-redrive.js'
+import { adminRedriveComplete } from './admin-redrive-complete.js'
 import { health } from './health.js'
 import { staticAssetRoutes } from './static-assets.js'
 import { home } from './home.js'
@@ -22,7 +25,11 @@ import { vrnTrnSearchResult } from './vrn-trn-search-result.js'
 
 export default [
   accessibility,
-  adminSearch,
+  adminMessages,
+  adminDlq,
+  adminRedriveGet,
+  adminRedrivePost,
+  adminRedriveComplete,
   cookiesGet,
   cookiesPost,
   chromeDevtools,
