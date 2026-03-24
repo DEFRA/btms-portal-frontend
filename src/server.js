@@ -10,7 +10,7 @@ export async function createServer() {
     port: config.get('port'),
     routes: {
       auth: {
-        mode: 'try'
+        mode: 'required'
       },
       validate: {
         options: {
