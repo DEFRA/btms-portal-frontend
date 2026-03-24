@@ -15,7 +15,7 @@ test('authenticated', async () => {
 
   const { payload } = await server.inject({
     method: 'get',
-    url: paths.COOKIES,
+    url: paths.SEARCH,
     auth: {
       strategy: 'session',
       credentials
@@ -38,7 +38,7 @@ test('not authenticated', async () => {
 
   const { payload } = await server.inject({
     method: 'get',
-    url: paths.COOKIES
+    url: paths.SEARCH
   })
 
   globalJsdom(payload)

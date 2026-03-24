@@ -5,6 +5,9 @@ import { dropUserSession, getUserSession } from '../auth/user-session.js'
 export const signOut = {
   method: 'GET',
   path: paths.SIGN_OUT,
+  options: {
+    auth: false
+  },
   handler: async (request, h) => {
     const authedUser = await getUserSession(request)
 

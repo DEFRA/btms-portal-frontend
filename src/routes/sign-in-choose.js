@@ -5,6 +5,9 @@ export const signInChoose = [
   {
     method: 'get',
     path: paths.SIGN_IN_CHOOSE,
+    options: {
+      auth: false
+    },
     handler: async (request, h) => {
       const [error] = request.yar.flash('signInError')
       const LegendIsPageHeading = true
@@ -15,6 +18,7 @@ export const signInChoose = [
     method: 'post',
     path: paths.SIGN_IN_CHOOSE,
     options: {
+      auth: false,
       validate: {
         payload: joi.object({
           authProvider: joi.string().required()
