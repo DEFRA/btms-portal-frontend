@@ -153,9 +153,7 @@ test('Should render the admin dlq page with Take Action links when DLQ count is 
   ).toBeInTheDocument()
 })
 
-test.each([
-  `${paths.ADMIN_DLQ}`
-])('Should show the forbidden page when the user is not in the admin security group', async (requestedPage) => {
+test('Should show the forbidden page when the user is not in the admin security group', async () => {
   wreck.get
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: provider })
@@ -165,7 +163,7 @@ test.each([
 
   const { payload } = await server.inject({
     method: 'get',
-    url: requestedPage,
+    url: paths.ADMIN_DLQ,
     auth: {
       strategy: 'session',
       credentials

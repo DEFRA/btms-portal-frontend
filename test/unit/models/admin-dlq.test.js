@@ -1,6 +1,6 @@
 import { mapDlqs } from '../../../src/models/admin-dlq.js'
 
-const dlqCOnfigs = {
+const dlqConfigs = {
   groups: [
     {
       groupName: 'Service 1 DLQs',
@@ -78,7 +78,7 @@ test('Should map configs and counts to model', () => {
     }
   ]
 
-  const result = mapDlqs(dlqCOnfigs, queueCounts)
+  const result = mapDlqs(dlqConfigs, queueCounts)
 
   expect(result).toEqual(expected)
 })
