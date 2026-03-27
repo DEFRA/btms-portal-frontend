@@ -10,6 +10,7 @@ import { createLogger } from '../logger.js'
  * @property {string} keyPrefix
  * @property {boolean} useSingleInstanceCache
  * @property {boolean} useTLS
+ * @property {boolean} enableReadyCheck
  */
 
 /**
@@ -25,6 +26,7 @@ export function buildRedisClient(redisConfig) {
   const db = 0
   const keyPrefix = redisConfig.keyPrefix
   const host = redisConfig.host
+  const enableReadyCheck = redisConfig.enableReadyCheck
   let redisClient
 
   const credentials =
@@ -42,6 +44,7 @@ export function buildRedisClient(redisConfig) {
       host,
       db,
       keyPrefix,
+      enableReadyCheck,
       ...credentials,
       ...tls
     })
@@ -55,6 +58,7 @@ export function buildRedisClient(redisConfig) {
       ],
       {
         keyPrefix,
+        enableReadyCheck,
         slotsRefreshTimeout: 10000,
         dnsLookup: (address, callback) => callback(null, address),
         redisOptions: {

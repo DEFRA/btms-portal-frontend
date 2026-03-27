@@ -208,6 +208,12 @@ const config = convict({
       format: Boolean,
       default: isProduction,
       env: 'REDIS_TLS'
+    },
+    enableReadyCheck: {
+      doc: 'Determines whether a check for Redis readiness is done during startup',
+      format: Boolean,
+      default: false,
+      env: 'REDIS_ENABLE_READY_CHECK'
     }
   }),
   nunjucks: {
