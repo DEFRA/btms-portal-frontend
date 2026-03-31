@@ -1,0 +1,16 @@
+@use "govuk-frontend" as *;
+
+.btms-admin-tabs {
+  .btms-admin-dlq__redrive {
+    width: 90%;
+
+    .govuk-inset-text {
+      margin-top: 0;
+      @include govuk-font-size($size: 16);
+    }
+  }
+
+  .btms-admin-redrive__confirm {
+    margin-top: 70px;
+  }
+}
