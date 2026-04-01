@@ -1,4 +1,4 @@
-import { ADMIN_SEARCH_TYPES } from '../services/admin.js'
+import { ADMIN_SEARCH_TYPES } from '../services/admin-messages.js'
 
 const prettyPrint = (obj) => {
   // A 'replacer' function has intentionally not

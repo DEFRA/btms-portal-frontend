@@ -1,0 +1,33 @@
+@use "govuk-frontend" as *;
+
+.btms-admin-tabs {
+  .btms-admin-dlq__tab:link,
+  .btms-admin-dlq__tab:visited {
+    color: govuk-colour("black");
+  }
+
+  .govuk-tabs__list-item--selected .btms-admin-dlq__tab {
+    text-decoration: none;
+  }
+
+  .btms-admin-dlq-tabs__panel {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+
+  .btms-admin-dlq__redrive {
+    width: 70%;
+  }
+
+  .govuk-panel--confirmation {
+    margin-top: 30px;
+  }
+
+  .govuk-panel__body {
+    overflow-wrap: break-word;
+  }
+
+  .govuk-button--secondary {
+    margin-top: 50px;
+  }
+}
