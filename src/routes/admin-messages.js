@@ -1,15 +1,15 @@
 import { constants } from 'node:http2'
 import { paths, queryStringParams, CACHE_CONTROL_NO_STORE } from './route-constants.js'
 import { searchKeys, searchPatterns } from '../services/search-patterns.js'
-import { ADMIN_SEARCH_TYPES, isValidAdminSearchType, search } from '../services/admin.js'
+import { ADMIN_SEARCH_TYPES, isValidAdminSearchType, search } from '../services/admin-messages.js'
 import { mapAdminSearchResults } from '../models/admin-search-results.js'
 import { APP_SCOPES } from '../auth/auth-constants.js'
 
-const ADMIN_SEARCH_TEMPLATE = 'admin-search'
-const UNSUPPORTED_SEARCH_PATTERNS = [ searchKeys.DUCR, searchKeys.GMR_ID ]
+const ADMIN_MESSAGES_TEMPLATE = 'admin-messages'
+const UNSUPPORTED_SEARCH_PATTERNS = new Set([ searchKeys.DUCR, searchKeys.GMR_ID ])
 
 const createResultsModel = (searchTerm, searchType, resourceType, results) => {
-  const baseLink = `${paths.ADMIN_SEARCH}?${queryStringParams.SEARCH_TERM}=${searchTerm}`
+  const baseLink = `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=${searchTerm}`
   return {
     isValid: true,
     links: {
@@ -33,9 +33,9 @@ const createErrorModel = (errorCode, searchTerm) => {
   }
 }
 
-export const adminSearch = {
+export const adminMessages = {
   method: ['get', 'post'],
-  path: paths.ADMIN_SEARCH,
+  path: paths.ADMIN_MESSAGES,
   options: {
     auth: {
       scope: APP_SCOPES.ADMIN,
@@ -58,7 +58,7 @@ export const adminSearch = {
           pattern.test(searchTerm)
         )
         if (matchingSearchPattern
-          && !UNSUPPORTED_SEARCH_PATTERNS.includes(matchingSearchPattern.key)
+          && !UNSUPPORTED_SEARCH_PATTERNS.has(matchingSearchPattern.key)
           && isValidAdminSearchType(searchType)) {
           return { resourceType: matchingSearchPattern, ...value }
         }
@@ -67,7 +67,7 @@ export const adminSearch = {
       },
       failAction: async (_, h, error) => {
         return h
-          .view(ADMIN_SEARCH_TEMPLATE, createErrorModel(error.message, ''))
+          .view(ADMIN_MESSAGES_TEMPLATE, createErrorModel(error.message, ''))
           .takeover()
       }
     }
@@ -76,15 +76,16 @@ export const adminSearch = {
     const searchTerm = request.query[queryStringParams.SEARCH_TERM]
     const searchType = request.query[queryStringParams.SEARCH_TYPE]
     const resourceType = request.query[queryStringParams.RESOURCE_TYPE]
+
     try {
       if (!searchTerm?.length || !searchType?.length) {
-        return h.view(ADMIN_SEARCH_TEMPLATE)
+        return h.view(ADMIN_MESSAGES_TEMPLATE)
       }
 
       const rawSearchResults = await search(resourceType.key, searchTerm, searchType)
       const formattedSearchResults = mapAdminSearchResults(rawSearchResults, searchType)
 
-      return h.view(ADMIN_SEARCH_TEMPLATE, createResultsModel(
+      return h.view(ADMIN_MESSAGES_TEMPLATE, createResultsModel(
         searchTerm,
         searchType,
         resourceType.description,
@@ -93,7 +94,7 @@ export const adminSearch = {
     } catch (error) {
       if (error.output?.statusCode === constants.HTTP_STATUS_NOT_FOUND) {
         return h.view(
-          ADMIN_SEARCH_TEMPLATE,
+          ADMIN_MESSAGES_TEMPLATE,
           createErrorModel('SEARCH_TERM_NOT_FOUND', searchTerm)
         )
       }
