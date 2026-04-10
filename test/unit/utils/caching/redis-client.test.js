@@ -20,7 +20,8 @@ describe('#buildRedisClient', () => {
         db: 0,
         host: '127.0.0.1',
         keyPrefix: 'btms-portal-frontend:',
-        port: 6379
+        port: 6379,
+        enableReadyCheck: false
       })
     })
   })
@@ -32,7 +33,8 @@ describe('#buildRedisClient', () => {
         useSingleInstanceCache: false,
         useTLS: true,
         username: 'user',
-        password: 'pass'
+        password: 'pass',
+        enableReadyCheck: false
       })
     })
 
@@ -43,7 +45,8 @@ describe('#buildRedisClient', () => {
           dnsLookup: expect.any(Function),
           keyPrefix: 'btms-portal-frontend:',
           redisOptions: { db: 0, password: 'pass', tls: {}, username: 'user' },
-          slotsRefreshTimeout: 10000
+          slotsRefreshTimeout: 10000,
+          enableReadyCheck: false
         }
       )
     })
