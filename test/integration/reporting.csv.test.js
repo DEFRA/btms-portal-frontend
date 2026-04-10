@@ -19,17 +19,37 @@ jest.mock('@hapi/wreck', () => ({
 test('no matches csv', async () => {
   jest
     .useFakeTimers({ doNotFake: ['nextTick'] })
-    .setSystemTime(new Date('2025-09-23'))
+    .setSystemTime(new Date('2025-10-22'))
 
   const noMatches = {
     data: [
       {
-        timestamp: '2025-09-22T11:47:05.367Z',
-        reference: '25GBO1LJH43YMZO0X5'
+        timestamp: '2025-10-21T08:23:00.000Z',
+        mrn: '25GBBM2H1R3H662AR3',
+        itemNumber: 1,
+        commodityCode: '0804400010',
+        description: 'EDIBLE FRUIT AND NUTS; PEEL OF CITRUS FRUIT OR MELONS DATES, FIGS, PINEAPPLES, AVOCADOS, GUAVAS, MANGOES AND MANGOSTEENS, FRESH OR DRIED AVOCADOS FRESH',
+        quantityOrWeight: 24000,
+        chedReference: 'GBCHD2025',
+        match: 'No',
+        authority: 'PHSI',
+        checkCode: 'H218',
+        decision: 'No match',
+        decisionReasons: 'CHED reference GBCHD2025. cannot be found in IPAFFS. Check that the reference is correct.'
       },
       {
-        timestamp: '2025-09-22T11:47:49.998Z',
-        reference: '25GBO2FGE22YTRF2C4'
+        timestamp: '2025-10-21T08:23:00.000Z',
+        mrn: '25GBBM2H1R3H662AR3',
+        itemNumber: 2,
+        commodityCode: '0804400010',
+        description: 'SOME FRUITS',
+        quantityOrWeight: 100,
+        chedReference: 'GBCHD2025',
+        match: 'No',
+        authority: 'PHSI',
+        checkCode: 'H218',
+        decision: 'No match',
+        decisionReasons: 'CHED reference GBCHD2025. cannot be found in IPAFFS. Check that the reference is correct.'
       }
     ]
   }
@@ -53,16 +73,16 @@ test('no matches csv', async () => {
   })
 
   expect(payload).toBe(`BTMS - No matches MRNs
-Date range: 22 September 2025 at 00:00 to 22 September 2025 at 23:59
+Date range: 21 October 2025 at 00:00 to 21 October 2025 at 23:59
 
-MRN,Last updated
-25GBO1LJH43YMZO0X5,"22 September 25, 11:47"
-25GBO2FGE22YTRF2C4,"22 September 25, 11:47"
+Last updated,MRN,Item number,Commodity code,Description,Quantity/Weight,CHED reference,Check code,Match,Authority,Decision,Decision reason
+"21 October 25, 08:23",25GBBM2H1R3H662AR3,1,0804400010,EDIBLE FRUIT AND NUTS; PEEL OF CITRUS FRUIT OR MELONS DATES, FIGS, PINEAPPLES, AVOCADOS, GUAVAS, MANGOES AND MANGOSTEENS, FRESH OR DRIED AVOCADOS FRESH,24000,GBCHD2025,H218,No,PHSI,No match,CHED reference GBCHD2025. cannot be found in IPAFFS. Check that the reference is correct.
+"21 October 25, 08:23",25GBBM2H1R3H662AR3,2,0804400010,SOME FRUITS,100,GBCHD2025,H218,No,PHSI,No match,CHED reference GBCHD2025. cannot be found in IPAFFS. Check that the reference is correct.
 `)
 
   expect(headers['content-type']).toBe('text/csv; charset=utf-8')
   expect(headers['content-disposition']).toBe(
-    'attachment; filename="no-matches-2025.09.22-2025.09.22.csv"'
+    'attachment; filename="no-matches-2025.10.21-2025.10.21.csv"'
   )
   expect(headers['cache-control']).toBe('no-store')
 
@@ -71,8 +91,8 @@ MRN,Last updated
 
   expect(pathname).toBe('/reporting-api/matches/data')
   expect(Object.fromEntries(searchParams)).toEqual({
-    from: '2025-09-22T00:00:00.000Z',
-    to: '2025-09-23T00:00:00.000Z',
+    from: '2025-10-21T00:00:00.000Z',
+    to: '2025-10-22T00:00:00.000Z',
     match: 'false'
   })
 })
@@ -80,17 +100,37 @@ MRN,Last updated
 test('manual releases csv', async () => {
   jest
     .useFakeTimers({ doNotFake: ['nextTick'] })
-    .setSystemTime(new Date('2025-09-23'))
+    .setSystemTime(new Date('2025-10-22'))
 
   const noMatches = {
     data: [
       {
-        timestamp: '2025-09-22T10:00:00.000Z',
-        reference: '25GBO2YTP65OPRO1Y2'
+        timestamp: '2025-10-21T08:23:00.000Z',
+        mrn: '25GBBM2H1R3H662AR4',
+        itemNumber: 1,
+        commodityCode: '0804400010',
+        description: 'BEANS',
+        quantityOrWeight: 24000,
+        chedReference: 'GBCHD2025',
+        match: 'No',
+        authority: 'PHSI',
+        checkCode: 'H218',
+        decision: 'No match',
+        decisionReasons: 'CHED reference GBCHD2025. cannot be found in IPAFFS. Check that the reference is correct.'
       },
       {
-        timestamp: '2025-09-22T11:00:00.000Z',
-        reference: '25GBO2WER23TUYO4D3'
+        timestamp: '2025-10-21T08:23:00.000Z',
+        mrn: '25GBBM2H1R3H662AR4',
+        itemNumber: 2,
+        commodityCode: '0804400010',
+        description: 'HORSE FOOD',
+        quantityOrWeight: 100,
+        chedReference: 'GBCHD2025',
+        match: 'No',
+        authority: 'PHSI',
+        checkCode: 'H218',
+        decision: 'No match',
+        decisionReasons: 'CHED reference GBCHD2025. cannot be found in IPAFFS. Check that the reference is correct.'
       }
     ]
   }
@@ -114,16 +154,16 @@ test('manual releases csv', async () => {
   })
 
   expect(payload).toBe(`BTMS - Manual releases MRNs
-Date range: 22 September 2025 at 00:00 to 22 September 2025 at 23:59
+Date range: 21 October 2025 at 00:00 to 21 October 2025 at 23:59
 
-MRN,Last updated
-25GBO2YTP65OPRO1Y2,"22 September 25, 10:00"
-25GBO2WER23TUYO4D3,"22 September 25, 11:00"
+Last updated,MRN,Item number,Commodity code,Description,Quantity/Weight,CHED reference,Check code,Match,Authority,Decision,Decision reason
+"21 October 25, 08:23",25GBBM2H1R3H662AR4,1,0804400010,BEANS,24000,GBCHD2025,H218,No,PHSI,No match,CHED reference GBCHD2025. cannot be found in IPAFFS. Check that the reference is correct.
+"21 October 25, 08:23",25GBBM2H1R3H662AR4,2,0804400010,HORSE FOOD,100,GBCHD2025,H218,No,PHSI,No match,CHED reference GBCHD2025. cannot be found in IPAFFS. Check that the reference is correct.
 `)
 
   expect(headers['content-type']).toBe('text/csv; charset=utf-8')
   expect(headers['content-disposition']).toBe(
-    'attachment; filename="manual-releases-2025.09.22-2025.09.22.csv"'
+    'attachment; filename="manual-releases-2025.10.21-2025.10.21.csv"'
   )
 
   const apiURL = wreck.request.mock.calls[0][1]
@@ -131,8 +171,8 @@ MRN,Last updated
 
   expect(pathname).toBe('/reporting-api/releases/data')
   expect(Object.fromEntries(searchParams)).toEqual({
-    from: '2025-09-22T00:00:00.000Z',
-    to: '2025-09-23T00:00:00.000Z',
+    from: '2025-10-21T00:00:00.000Z',
+    to: '2025-10-22T00:00:00.000Z',
     releaseType: 'Manual'
   })
 })
