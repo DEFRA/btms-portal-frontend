@@ -12,7 +12,7 @@
       </div>
       <div class="timeline-detail-row">
         <span class="timeline-detail-label">Created</span>
-        <time datetime="{{ error.created }}">{{ error.created }}</time>
+        <time datetime="{{ error.created }}">{% if error.created %}{{ error.created | date("DD MMMM yyyy, HH:mm:ss") }}{% endif %}</time>
       </div>
     </div>
   {% endfor %}
