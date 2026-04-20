@@ -1,0 +1,26 @@
+vulnerabilities:
+  # brace-expansion and picomatch below are inside npm's own bundled
+  # node_modules (/usr/local/lib/node_modules/npm/). They cannot be
+  # resolved via package.json overrides; a fix requires the base image
+  # to ship a newer npm version.
+
+  - id: CVE-2026-33750
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/brace-expansion/package.json
+    reason: >
+      Vulnerable brace-expansion is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-33671
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/picomatch/package.json
+    reason: >
+      Vulnerable picomatch is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-33672
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/picomatch/package.json
+    reason: >
+      Vulnerable picomatch is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
