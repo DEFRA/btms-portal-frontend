@@ -35,7 +35,14 @@ jobs:
           docker build --no-cache --tag btms-portal-frontend .
           exit $?
       - name: Check with Trivy
-        run: docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.69.3 image btms-portal-frontend:latest --ignore-unfixed
+        run: |
+          docker run -v /var/run/docker.sock:/var/run/docker.sock \
+            -v ${{ github.workspace }}/.trivyignore.yaml:/work/.trivyignore.yaml \
+            aquasec/trivy:0.69.3 image \
+            --ignore-unfixed \
+            --ignorefile /work/.trivyignore.yaml \
+            --exit-code 1 \
+            btms-portal-frontend:latest
       - name: SonarCloud Scan
         if: github.actor != 'dependabot[bot]'
         uses: SonarSource/sonarqube-scan-action@master

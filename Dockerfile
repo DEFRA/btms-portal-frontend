@@ -35,6 +35,7 @@ ENV TZ="Europe/London"
 # CDP PLATFORM HEALTHCHECK REQUIREMENT
 USER root
 RUN apk update \
+    && apk upgrade \
     && apk add curl \
     && apk cache clean
 
