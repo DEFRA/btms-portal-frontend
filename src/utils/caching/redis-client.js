@@ -63,6 +63,7 @@ export function buildRedisClient(redisConfig) {
         dnsLookup: (address, callback) => callback(null, address),
         redisOptions: {
           db,
+          enableReadyCheck,
           ...credentials,
           ...tls
         }
