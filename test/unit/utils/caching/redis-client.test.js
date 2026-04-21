@@ -44,7 +44,7 @@ describe('#buildRedisClient', () => {
         {
           dnsLookup: expect.any(Function),
           keyPrefix: 'btms-portal-frontend:',
-          redisOptions: { db: 0, password: 'pass', tls: {}, username: 'user' },
+          redisOptions: { db: 0, password: 'pass', tls: {}, username: 'user', enableReadyCheck: false },
           slotsRefreshTimeout: 10000,
           enableReadyCheck: false
         }
