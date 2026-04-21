@@ -48,7 +48,7 @@ test('maps Clearance Request Resource Event', () => {
         "itemNumber": 1
       }
     ],
-    "created": "01 January 2025, 09:00:00",
+    "created": "2025-01-01T09:00:00.000Z",
     "eventTitle": "CDS decision request",
     "eventType": "CdsDecisionRequest",
     "source": "CDS to BTMS",
@@ -116,7 +116,7 @@ test('maps Decision Notification Resource Event', () => {
         "itemNumber": 1
       }
     ],
-    "created": "01 January 2025, 09:00:00",
+    "created": "2025-01-01T09:00:00.000Z",
     "eventTitle": "BTMS decision",
     "eventType": "BtmsDecision",
     "source": "BTMS to CDS",
@@ -185,7 +185,7 @@ test('maps Decision Notification Resource Event with unknown internal decision c
         "itemNumber": 1
       }
     ],
-    "created": "01 January 2025, 09:00:00",
+    "created": "2025-01-01T09:00:00.000Z",
     "eventTitle": "BTMS decision",
     "eventType": "BtmsDecision",
     "source": "BTMS to CDS",
@@ -213,7 +213,7 @@ test('maps Finalisation Resource Event', () => {
 
   expect(result.length).toBe(1)
   expect(result[0]).toEqual({
-    "created": "01 January 2025, 09:00:00",
+    "created": "2025-01-01T09:00:00.000Z",
     "eventTitle": "CDS finalisation",
     "eventType": "CdsFinalisation",
     "source": "CDS to BTMS",
@@ -247,10 +247,10 @@ test('maps CDS Error Resource Event', () => {
 
   expect(result.length).toBe(1)
   expect(result[0]).toEqual({
-    "created": "01 January 2025, 09:00:00",
+    "created": "2025-01-01T09:00:00.000Z",
     "errors": [
       {
-        "created": "01 January 2025, 09:00:00",
+        "created": "2025-01-01T09:00:00.000Z",
         "errorCode": "HMRCVAL101",
         "errorMessage": "An error notification sent by CDS into BTMS"
       }
@@ -286,10 +286,10 @@ test('maps Processing Error Resource Event', () => {
 
   expect(result.length).toBe(1)
   expect(result[0]).toEqual({
-    "created": "01 January 2025, 09:00:00",
+    "created": "2025-01-01T09:00:00.000Z",
     "errors": [
       {
-        "created": "01 January 2025, 09:00:00",
+        "created": "2025-01-01T09:00:00.000Z",
         "errorCode": "ALVSVAL303",
         "errorMessage": "An error detected in the Imports Processor"
       }
@@ -324,7 +324,7 @@ test('maps Import Pre Notification Resource Event', () => {
 
   expect(result.length).toBe(1)
   expect(result[0]).toEqual({
-    "created": "01 January 2025, 09:00:00",
+    "created": "2025-01-01T09:00:00.000Z",
     "decision": "Horse Re-entry",
     "eventTitle": "CHEDA.GB.2025.0000001",
     "eventType": "Ched",
@@ -379,7 +379,7 @@ test('skips resource event if unable to parse and map', () => {
 
   expect(result.length).toBe(1)
   expect(result[0]).toEqual({
-    "created": "01 January 2025, 09:00:00",
+    "created": "2025-01-01T09:00:00.000Z",
     "decision": "Horse Re-entry",
     "eventTitle": "CHEDA.GB.2025.0000001",
     "eventType": "Ched",
