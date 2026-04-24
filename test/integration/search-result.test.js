@@ -77,7 +77,8 @@ const createCustomsDeclaration = (mrn, ducr, updated) => {
           itemNumber: 2,
           checkCode: 'H222',
           decisionCode: 'H01',
-          documentReference: 'CHEDP.GB.2025.0000002'
+          documentReference: 'CHEDP.GB.2025.0000002',
+          mode: null
         },
         {
           itemNumber: 3,
@@ -86,7 +87,8 @@ const createCustomsDeclaration = (mrn, ducr, updated) => {
           documentReference: 'CHEDP.BB.2025.NOMATCH',
           decisionReason:
             'This CHED reference cannot be found on the customs declaration. Please check that the reference is correct.',
-          internalDecisionCode: 'E70'
+          internalDecisionCode: 'E70',
+          mode: 'Active'
         }
       ]
     },
@@ -223,6 +225,92 @@ const declarationResourceEvents = [
       + '            "checkCode": "H221",\n'
       + '            "decisionCode": "X00",\n'
       + '            "internalDecisionCode": "E70"\n'
+      + '          }\n'
+      + '        ],\n'
+      + '        "created": "2025-01-01T09:00:00.000Z"\n'
+      + '      },\n'
+      + '      "finalisation": {\n'
+      + '        "isManualRelease": true\n'
+      + '      }\n'
+      + '    }\n'
+      + '  }'
+  },
+  {
+    resourceType: 'CustomsDeclaration',
+    subResourceType: 'ClearanceDecision',
+    message: '{\n'
+      + '    "resource": {\n'
+      + '      "clearanceRequest": {\n'
+      + '        "commodities": [\n'
+      + '          {\n'
+      + '            "itemNumber": 1,\n'
+      + '            "goodsDescription": "Horse Re-entry",\n'
+      + '            "taricCommodityCode": "1601009105"\n'
+      + '          }\n'
+      + '        ]\n'
+      + '      },\n'
+      + '      "clearanceDecision": {\n'
+      + '        "decisionNumber": 2,\n'
+      + '        "items": [\n'
+      + '          {\n'
+      + '            "itemNumber": 1\n'
+      + '          }\n'
+      + '        ],\n'
+      + '        "results": [\n'
+      + '          {\n'
+      + '            "itemNumber": 1,\n'
+      + '            "documentReference": "CHEDA.GB.2025.0000001",\n'
+      + '            "checkCode": "H221",\n'
+      + '            "decisionCode": "X00",\n'
+      + '            "internalDecisionCode": "E70",\n'
+      + '            "mode": null\n'
+      + '          }\n'
+      + '        ],\n'
+      + '        "created": "2025-01-01T09:00:00.000Z"\n'
+      + '      },\n'
+      + '      "finalisation": {\n'
+      + '        "isManualRelease": true\n'
+      + '      }\n'
+      + '    }\n'
+      + '  }'
+  },
+  {
+    resourceType: 'CustomsDeclaration',
+    subResourceType: 'ClearanceDecision',
+    message: '{\n'
+      + '    "resource": {\n'
+      + '      "clearanceRequest": {\n'
+      + '        "commodities": [\n'
+      + '          {\n'
+      + '            "itemNumber": 1,\n'
+      + '            "goodsDescription": "Horse Re-entry",\n'
+      + '            "taricCommodityCode": "1601009105"\n'
+      + '          }\n'
+      + '        ]\n'
+      + '      },\n'
+      + '      "clearanceDecision": {\n'
+      + '        "decisionNumber": 3,\n'
+      + '        "items": [\n'
+      + '          {\n'
+      + '            "itemNumber": 1\n'
+      + '          }\n'
+      + '        ],\n'
+      + '        "results": [\n'
+      + '          {\n'
+      + '            "itemNumber": 1,\n'
+      + '            "documentReference": "CHEDA.GB.2025.0000001",\n'
+      + '            "checkCode": "H221",\n'
+      + '            "decisionCode": "X00",\n'
+      + '            "internalDecisionCode": "E70",\n'
+      + '            "mode": "Active"\n'
+      + '          },\n'
+      + '          {\n'
+      + '            "itemNumber": 1,\n'
+      + '            "documentReference": "CHEDA.GB.2025.0000001",\n'
+      + '            "checkCode": "H221",\n'
+      + '            "decisionCode": "H01",\n'
+      + '            "internalDecisionCode": "H01",\n'
+      + '            "mode": "Passive"\n'
       + '          }\n'
       + '        ],\n'
       + '        "created": "2025-01-01T09:00:00.000Z"\n'
@@ -867,7 +955,7 @@ test('shows latest search results and timeline tabs', async () => {
   expect(timelineMrnFilter.options[1].text).toBe('24GB0Z8WEJ9ZBTL73A')
 
   const eventTitles = Array.from(document.body.querySelectorAll('.moj-timeline__item .moj-timeline__header .moj-timeline__title span:nth-child(1)')).map(title => title.innerHTML)
-  expect(eventTitles.length).toBe(6)
+  expect(eventTitles.length).toBe(8)
   expect(eventTitles).toContain('CHEDA.GB.2025.0000001')
   expect(eventTitles).toContain('CDS decision request')
   expect(eventTitles).toContain('CDS finalisation')
@@ -919,7 +1007,7 @@ test('handles resource event that cannot be parsed and mapped', async () => {
   initFilters()
 
   const eventTitles = Array.from(document.body.querySelectorAll('.moj-timeline__item .moj-timeline__header .moj-timeline__title span:nth-child(1)')).map(title => title.innerHTML)
-  expect(eventTitles.length).toBe(5)
+  expect(eventTitles.length).toBe(7)
   expect(eventTitles).toContain('CDS decision request')
   expect(eventTitles).toContain('CDS finalisation')
   expect(eventTitles).toContain('BTMS decision')
