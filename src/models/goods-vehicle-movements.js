@@ -13,7 +13,8 @@ const getBtmsDecision = (clearanceDecision) => {
       return true
     }
 
-    return decisionCheck.type === 'result' && clearanceDecision.results.some(result => result.internalDecisionCode === decisionCheck.code)
+    return decisionCheck.type === 'result' && clearanceDecision.results.some(result =>
+      result.internalDecisionCode === decisionCheck.code && (result.mode == null || result.mode === 'Active'))
   })?.description
 }
 

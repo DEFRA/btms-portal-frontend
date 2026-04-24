@@ -118,7 +118,8 @@ const mapClearanceRequestResourceEvent = (resourceMessage) => {
 const mapDecisionNotificationResourceEvent = (resourceMessage) => {
   const commodities = resourceMessage.resource?.clearanceDecision?.items?.map(item => {
     const commodity = resourceMessage.resource?.clearanceRequest?.commodities?.find(clearanceRequestCommodity => clearanceRequestCommodity.itemNumber === item.itemNumber)
-    const itemResults = resourceMessage.resource?.clearanceDecision?.results?.filter(result => result.itemNumber === commodity.itemNumber) || []
+    const itemResults = resourceMessage.resource?.clearanceDecision?.results?.filter(result =>
+      result.itemNumber === commodity.itemNumber && (result.mode == null || result.mode === 'Active')) || []
 
     const decisions = itemResults.map(result => {
       let decision = DECISION[result.decisionCode]
