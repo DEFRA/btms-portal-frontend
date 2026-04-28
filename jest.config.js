@@ -24,11 +24,12 @@ export default {
   ],
   coverageDirectory: '<rootDir>/coverage',
   transform: {
-    '^.+\\.js$': 'babel-jest'
+    '^.+\\.m?js$': 'babel-jest'
   },
   transformIgnorePatterns: [
     `node_modules/(?!${[
-      '@defra/hapi-tracing' // Supports ESM only
+      '@defra/hapi-tracing', // Supports ESM only
+      '@csstools' // ESM-only CSS parsing packages, transitive deps via jsdom/cssstyle
     ].join('|')}/)`
   ],
   testTimeout: 7000
