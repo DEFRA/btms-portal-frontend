@@ -174,7 +174,7 @@ const declarationResourceEvents = [
       + '    "resource": {\n'
       + '      "clearanceRequest": {\n'
       + '        "externalVersion": 1,\n'
-      + '        "messageSentAt": "2025-01-01T09:00:00.000Z",\n'
+      + '        "messageSentAt": "2025-01-02T09:00:00.000Z",\n'
       + '        "commodities": [\n'
       + '          {\n'
       + '            "itemNumber": 1,\n'
@@ -225,7 +225,7 @@ const declarationResourceEvents = [
       + '            "internalDecisionCode": "E70"\n'
       + '          }\n'
       + '        ],\n'
-      + '        "created": "2025-01-01T09:00:00.000Z"\n'
+      + '        "created": "2025-01-05T09:00:00.000Z"\n'
       + '      },\n'
       + '      "finalisation": {\n'
       + '        "isManualRelease": true\n'
@@ -241,7 +241,7 @@ const declarationResourceEvents = [
       + '      "finalisation": {\n'
       + '        "isManualRelease": true,\n'
       + '        "externalVersion": 1,\n'
-      + '        "messageSentAt": "2025-01-01T09:00:00.000Z"\n'
+      + '        "messageSentAt": "2025-01-05T09:00:00.0000001Z"\n'
       + '      }\n'
       + '    }\n'
       + '  }'
@@ -253,7 +253,7 @@ const declarationResourceEvents = [
       + '    "resource": {\n'
       + '      "externalErrors": [\n'
       + '        {\n'
-      + '          "messageSentAt": "2025-01-01T09:00:00.000Z",\n'
+      + '          "messageSentAt": "2025-01-04T09:00:00.000Z",\n'
       + '          "errors": [\n'
       + '            {\n'
       + '              "code": "HMRCVAL101",\n'
@@ -278,7 +278,7 @@ const declarationResourceEvents = [
       + '            }\n'
       + '          ],\n'
       + '          "externalVersion": 1,\n'
-      + '          "created": "2025-01-01T09:00:00.000Z"\n'
+      + '          "created": "2025-01-03T09:00:00.000Z"\n'
       + '        },\n'
       + '        {\n'
       + '          "errors": [\n'
@@ -289,6 +289,133 @@ const declarationResourceEvents = [
       + '          ],\n'
       + '          "externalVersion": 1,\n'
       + '          "created": "2025-01-02T09:00:00.000Z"\n'
+      + '        }\n'
+      + '      ]\n'
+      + '    }\n'
+      + '  }'
+  },
+  {
+    resourceType: 'CustomsDeclaration',
+    subResourceType: 'ClearanceRequest',
+    message: '{\n'
+      + '    "resource": {\n'
+      + '      "clearanceRequest": {\n'
+      + '        "externalVersion": 1,\n'
+      + '        "messageSentAt": null,\n'
+      + '        "commodities": [\n'
+      + '          {\n'
+      + '            "itemNumber": 1,\n'
+      + '            "goodsDescription": "Horse Re-entry",\n'
+      + '            "taricCommodityCode": "1601009105",\n'
+      + '            "documents": [\n'
+      + '              {\n'
+      + '                "documentCode": "C640",\n'
+      + '                "documentReference": "CHEDA.GB.2025.0000001"\n'
+      + '              }\n'
+      + '            ],\n'
+      + '            "checks": [{\n'
+      + '              "checkCode": "H221"\n'
+      + '            }]\n'
+      + '          }\n'
+      + '        ]\n'
+      + '      }\n'
+      + '    }\n'
+      + '  }',
+  },
+  {
+    resourceType: 'CustomsDeclaration',
+    subResourceType: 'ClearanceDecision',
+    message: '{\n'
+      + '    "resource": {\n'
+      + '      "clearanceRequest": {\n'
+      + '        "commodities": [\n'
+      + '          {\n'
+      + '            "itemNumber": 1,\n'
+      + '            "goodsDescription": "Horse Re-entry",\n'
+      + '            "taricCommodityCode": "1601009105"\n'
+      + '          }\n'
+      + '        ]\n'
+      + '      },\n'
+      + '      "clearanceDecision": {\n'
+      + '        "decisionNumber": 1,\n'
+      + '        "items": [\n'
+      + '          {\n'
+      + '            "itemNumber": 1\n'
+      + '          }\n'
+      + '        ],\n'
+      + '        "results": [\n'
+      + '          {\n'
+      + '            "itemNumber": 1,\n'
+      + '            "documentReference": "CHEDA.GB.2025.0000001",\n'
+      + '            "checkCode": "H221",\n'
+      + '            "decisionCode": "X00",\n'
+      + '            "internalDecisionCode": "E70"\n'
+      + '          }\n'
+      + '        ],\n'
+      + '        "created": null\n'
+      + '      },\n'
+      + '      "finalisation": {\n'
+      + '        "isManualRelease": true\n'
+      + '      }\n'
+      + '    }\n'
+      + '  }'
+  },
+  {
+    resourceType: 'CustomsDeclaration',
+    subResourceType: 'Finalisation',
+    message: '{\n'
+      + '    "resource": {\n'
+      + '      "finalisation": {\n'
+      + '        "isManualRelease": true,\n'
+      + '        "externalVersion": 1,\n'
+      + '        "messageSentAt": null\n'
+      + '      }\n'
+      + '    }\n'
+      + '  }'
+  },
+  {
+    resourceType: 'CustomsDeclaration',
+    subResourceType: 'ExternalError',
+    message: '{\n'
+      + '    "resource": {\n'
+      + '      "externalErrors": [\n'
+      + '        {\n'
+      + '          "messageSentAt": null,\n'
+      + '          "errors": [\n'
+      + '            {\n'
+      + '              "code": "HMRCVAL101",\n'
+      + '              "message": "An error notification sent by CDS into BTMS"\n'
+      + '            }\n'
+      + '          ]\n'
+      + '        }\n'
+      + '      ]\n'
+      + '    }\n'
+      + '  }'
+  },
+  {
+    resourceType: 'ProcessingError',
+    message: '{\n'
+      + '    "resource": {\n'
+      + '      "processingErrors": [\n'
+      + '        {\n'
+      + '          "errors": [\n'
+      + '            {\n'
+      + '              "code": "ALVSVAL303",\n'
+      + '              "message": "An error detected in the Imports Processor"\n'
+      + '            }\n'
+      + '          ],\n'
+      + '          "externalVersion": 1,\n'
+      + '          "created": null\n'
+      + '        },\n'
+      + '        {\n'
+      + '          "errors": [\n'
+      + '            {\n'
+      + '              "code": "ALVSVAL303",\n'
+      + '              "message": "An error detected in the Imports Processor"\n'
+      + '            }\n'
+      + '          ],\n'
+      + '          "externalVersion": 1,\n'
+      + '          "created": null\n'
       + '        }\n'
       + '      ]\n'
       + '    }\n'
@@ -306,6 +433,24 @@ const importPreNotificationResourceEvents = [
       + '        "status": "VALIDATED",\n'
       + '        "decisionDate": "2025-01-01T09:00:00.000Z",\n'
       + '        "updatedSource": "2025-01-01T09:00:00.000Z",\n'
+      + '        "partTwo": {\n'
+      + '          "decision": {\n'
+      + '            "decision": "Horse Re-entry"\n'
+      + '          }\n'
+      + '        }\n'
+      + '      }\n'
+      + '    }\n'
+      + '  }'
+  },
+  {
+    resourceType: 'ImportPreNotification',
+    message: '{\n'
+      + '    "resource": {\n'
+      + '      "importPreNotification": {\n'
+      + '        "referenceNumber": "CHEDA.GB.2025.0000001",\n'
+      + '        "status": "VALIDATED",\n'
+      + '        "decisionDate": "2025-01-01T09:00:00.000Z",\n'
+      + '        "updatedSource": null,\n'
       + '        "partTwo": {\n'
       + '          "decision": {\n'
       + '            "decision": "Horse Re-entry"\n'
@@ -867,13 +1012,33 @@ test('shows latest search results and timeline tabs', async () => {
   expect(timelineMrnFilter.options[1].text).toBe('24GB0Z8WEJ9ZBTL73A')
 
   const eventTitles = Array.from(document.body.querySelectorAll('.moj-timeline__item .moj-timeline__header .moj-timeline__title span:nth-child(1)')).map(title => title.innerHTML)
-  expect(eventTitles.length).toBe(6)
-  expect(eventTitles).toContain('CHEDA.GB.2025.0000001')
-  expect(eventTitles).toContain('CDS decision request')
-  expect(eventTitles).toContain('CDS finalisation')
-  expect(eventTitles).toContain('BTMS decision')
-  expect(eventTitles).toContain('BTMS processing error')
-  expect(eventTitles).toContain('CDS processing error')
+  expect(eventTitles.length).toBe(12)
+  expect(eventTitles[0]).toBe('CDS finalisation')
+  expect(eventTitles[1]).toBe('BTMS decision')
+  expect(eventTitles[2]).toBe('CDS processing error')
+  expect(eventTitles[3]).toBe('BTMS processing error')
+  expect(eventTitles[4]).toBe('CDS decision request')
+  expect(eventTitles[5]).toBe('CHEDA.GB.2025.0000001')
+  expect(eventTitles[6]).toBe('CDS decision request')
+  expect(eventTitles[7]).toBe('BTMS decision')
+  expect(eventTitles[8]).toBe('CDS finalisation')
+  expect(eventTitles[9]).toBe('CDS processing error')
+  expect(eventTitles[10]).toBe('BTMS processing error')
+  expect(eventTitles[11]).toBe('CHEDA.GB.2025.0000001')
+
+  const createdDisplayText = Array.from(document.body.querySelectorAll('.moj-timeline__item .moj-timeline__description .timeline-detail-row time')).map(time => time.innerHTML)
+  expect(createdDisplayText[0]).toBe("05 January 2025, 09:00:00")
+  expect(createdDisplayText[1]).toBe("05 January 2025, 09:00:00")
+  expect(createdDisplayText[2]).toBe("04 January 2025, 09:00:00")
+  expect(createdDisplayText[3]).toBe("03 January 2025, 09:00:00")
+  expect(createdDisplayText[4]).toBe("02 January 2025, 09:00:00")
+  expect(createdDisplayText[5]).toBe("01 January 2025, 09:00:00")
+  expect(createdDisplayText[6]).toBe("")
+  expect(createdDisplayText[7]).toBe("")
+  expect(createdDisplayText[8]).toBe("")
+  expect(createdDisplayText[9]).toBe("")
+  expect(createdDisplayText[10]).toBe("")
+  expect(createdDisplayText[11]).toBe("")
 })
 
 test('handles resource event that cannot be parsed and mapped', async () => {
@@ -919,12 +1084,17 @@ test('handles resource event that cannot be parsed and mapped', async () => {
   initFilters()
 
   const eventTitles = Array.from(document.body.querySelectorAll('.moj-timeline__item .moj-timeline__header .moj-timeline__title span:nth-child(1)')).map(title => title.innerHTML)
-  expect(eventTitles.length).toBe(5)
-  expect(eventTitles).toContain('CDS decision request')
-  expect(eventTitles).toContain('CDS finalisation')
-  expect(eventTitles).toContain('BTMS decision')
-  expect(eventTitles).toContain('BTMS processing error')
-  expect(eventTitles).toContain('CDS processing error')
+  expect(eventTitles.length).toBe(10)
+  expect(eventTitles[0]).toBe('CDS finalisation')
+  expect(eventTitles[1]).toBe('BTMS decision')
+  expect(eventTitles[2]).toBe('CDS processing error')
+  expect(eventTitles[3]).toBe('BTMS processing error')
+  expect(eventTitles[4]).toBe('CDS decision request')
+  expect(eventTitles[5]).toBe('CDS decision request')
+  expect(eventTitles[6]).toBe('BTMS decision')
+  expect(eventTitles[7]).toBe('CDS finalisation')
+  expect(eventTitles[8]).toBe('CDS processing error')
+  expect(eventTitles[9]).toBe('BTMS processing error')
 })
 
 test('handles upstream errors when retrieving resource events', async () => {
