@@ -11,7 +11,8 @@
       maxDate: todaysDate,
       errorMessage: {
         text: errors.startDate
-      } if errors.startDate
+      } if errors.startDate,
+      attributes: { readonly: '' }
     })
   }}
   {{
@@ -23,7 +24,8 @@
       maxDate: todaysDate,
       errorMessage: {
         text: errors.endDate
-      } if errors.endDate
+      } if errors.endDate,
+      attributes: { readonly: '' }
     })
   }}
   {{
