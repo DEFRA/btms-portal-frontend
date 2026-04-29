@@ -7,17 +7,42 @@ import { searchKeys } from '../services/search-patterns.js'
 import { mapResourceEvents } from '../models/resource-events.js'
 import { createLogger } from '../utils/logger.js'
 
+const NANOSECOND_PRECISION = 7
+
 const logger = createLogger()
 
 const searchTermValidator = (key, pattern, value) => {
   return key !== searchKeys.GMR_ID && pattern.test(value)
 }
 
-const sortCreatedDescending = (a, b) => {
-  const aCreated = new Date(a.created).getTime()
-  const bCreated = new Date(b.created).getTime()
+function getNanosecondsAsNumber(nanosecondDate) {
+  let nanosecondPart = nanosecondDate.split('.')[1].split('Z')[0]
+  nanosecondPart = nanosecondPart.padEnd(NANOSECOND_PRECISION, "0")
+  return Number(nanosecondPart)
+}
 
-  return bCreated - aCreated
+const sortCreatedDescending = (a, b) => {
+  if (a.created === undefined && b.created === undefined)
+    {return 0}
+
+  if (a.created === undefined)
+    {return 1}
+
+  if (b.created === undefined)
+    {return -1}
+
+  const aCreatedTime = new Date(a.created).getTime()
+  const bCreatedTime = new Date(b.created).getTime()
+
+  // getTime is only accurate to milliseconds. If getTime values are the same, try order by just the nanoseconds part as a number
+  if (aCreatedTime === bCreatedTime) {
+    const aCreatedNanoseconds = getNanosecondsAsNumber(a.created)
+    const bCreatedNanoseconds = getNanosecondsAsNumber(b.created)
+
+    return bCreatedNanoseconds - aCreatedNanoseconds
+  }
+
+  return bCreatedTime - aCreatedTime
 }
 
 const getChedTimelineEvents = async (preNotifications) => {

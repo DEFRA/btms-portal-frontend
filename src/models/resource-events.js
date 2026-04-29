@@ -1,4 +1,3 @@
-import { format } from 'date-fns'
 import { getCustomsDeclarationStatus } from './customs-declarations.js'
 import {
   checkCodeToAuthorityMapping,
@@ -72,8 +71,6 @@ const DECISION = {
   E03: `Data Error - ${decisionCodeDescriptions['E03']}`
 }
 
-const timeFormat = 'dd MMMM yyyy, HH:mm:ss'
-
 const mapChecks = (commodity) => {
   return commodity.checks?.flatMap(check => {
     const docCodes = checkCodeToDocumentCodeMapping[check.checkCode]
@@ -110,7 +107,7 @@ const mapClearanceRequestResourceEvent = (resourceMessage) => {
     eventTitle: 'CDS decision request',
     source: EVENT_SOURCE.CLEARANCE_REQUEST,
     version: resourceMessage.resource?.clearanceRequest?.externalVersion,
-    created: resourceMessage.resource?.clearanceRequest?.messageSentAt ? format(new Date(resourceMessage.resource.clearanceRequest.messageSentAt), timeFormat) : undefined,
+    created: resourceMessage.resource?.clearanceRequest?.messageSentAt ?? undefined,
     commodities
   }
 }
@@ -152,7 +149,7 @@ const mapDecisionNotificationResourceEvent = (resourceMessage) => {
     status: getCustomsDeclarationStatus(resourceMessage.resource?.finalisation, resourceMessage.resource?.clearanceDecision),
     finalState: resourceMessage.resource?.finalisation?.finalState,
     version: resourceMessage.resource?.clearanceDecision?.decisionNumber,
-    created: resourceMessage.resource?.clearanceDecision?.created ? format(new Date(resourceMessage.resource.clearanceDecision.created), timeFormat) : undefined,
+    created: resourceMessage.resource?.clearanceDecision?.created ?? undefined,
     commodities
   }
 }
@@ -165,7 +162,7 @@ const mapFinalisationResourceEvent = (resourceMessage) => {
     status: getCustomsDeclarationStatus(resourceMessage.resource?.finalisation, resourceMessage.resource?.clearanceDecision),
     finalState: resourceMessage.resource?.finalisation?.finalState,
     version: resourceMessage.resource?.finalisation?.externalVersion,
-    created: resourceMessage.resource?.finalisation?.messageSentAt ? format(new Date(resourceMessage.resource.finalisation.messageSentAt), timeFormat) : undefined
+    created: resourceMessage.resource?.finalisation?.messageSentAt ?? undefined
   }
 }
 
@@ -176,7 +173,7 @@ const mapCdsErrorResourceEvent = (resourceMessage) => {
     return {
       errorCode: error.code,
       errorMessage: error.message,
-      created: lastInboundError?.messageSentAt ? format(new Date(lastInboundError.messageSentAt), timeFormat) : undefined
+      created: lastInboundError?.messageSentAt ?? undefined
     }
   })
 
@@ -185,7 +182,7 @@ const mapCdsErrorResourceEvent = (resourceMessage) => {
     eventTitle: 'CDS processing error',
     source: EVENT_SOURCE.CDS_ERROR,
     errors,
-    created: lastInboundError?.messageSentAt ? format(new Date(lastInboundError?.messageSentAt), timeFormat) : undefined
+    created: lastInboundError?.messageSentAt ?? undefined
   }
 }
 
@@ -210,7 +207,7 @@ const mapProcessingErrorResourceEvent = (mrn, resourceMessage) => {
       return {
         errorCode: error.code,
         errorMessage,
-        created: latestProcessingError.created ? format(new Date(latestProcessingError.created), timeFormat) : undefined
+        created: latestProcessingError.created ?? undefined
       }
     })
   }
@@ -220,7 +217,7 @@ const mapProcessingErrorResourceEvent = (mrn, resourceMessage) => {
     eventTitle: 'BTMS processing error',
     source: EVENT_SOURCE.PROCESSING_ERROR,
     errors,
-    created: latestProcessingError?.created ? format(new Date(latestProcessingError.created), timeFormat) : undefined
+    created: latestProcessingError?.created ?? undefined
   }
 }
 
@@ -231,7 +228,7 @@ const mapImportPreNotificationResourceEvent = (resourceMessage) => {
     source: EVENT_SOURCE.IMPORT_PRE_NOTIFICATION,
     status: resourceMessage.resource?.importPreNotification?.status,
     decision: resourceMessage.resource?.importPreNotification?.decisionDate ? resourceMessage.resource?.importPreNotification?.partTwo?.decision?.decision : undefined,
-    created: resourceMessage.resource?.importPreNotification?.updatedSource ? format(new Date(resourceMessage.resource.importPreNotification.updatedSource), timeFormat) : undefined
+    created: resourceMessage.resource?.importPreNotification?.updatedSource ?? undefined
   }
 }
 
