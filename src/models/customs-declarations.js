@@ -189,7 +189,7 @@ export const getCustomsDeclarationOpenState = (finalisation) =>
 const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
   const clearanceDecisions =
     clearanceDecision?.results.filter(
-      ({ itemNumber }) => itemNumber === commodity.itemNumber
+      ({ itemNumber, mode }) => itemNumber === commodity.itemNumber && (mode == null || mode === 'Active')
     ) || []
 
   const allDecisionCodesAreNoMatch = clearanceDecisions.every(
