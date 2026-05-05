@@ -124,6 +124,128 @@ test('shows GMR result', async () => {
   expect(unknownMrnBtmsDecision.className).toEqual('govuk-table__cell')
 })
 
+test.each([
+  {
+    internalDecisionCode: "E70"
+  },
+  {
+    internalDecisionCode: "E70",
+    mode: null
+  },
+  {
+    internalDecisionCode: "E70",
+    mode: "Active"
+  }
+])('shows GMR result for BTMS Decision requiring result check', async (result) => {
+  const relatedImportDeclarationsPayload = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: "25GB00000000000001",
+        clearanceDecision: {
+          items: [
+            {
+              checks: [
+                {
+                  decisionCode: "E70"
+                }
+              ]
+            }
+          ],
+          results: [ result ]
+        },
+        finalisation: null
+      }
+    ],
+    goodsVehicleMovements: [
+      {
+        gmr: {
+          id: "GMRA00000AB1",
+          vehicleRegistrationNumber: "ABC 111",
+          trailerRegistrationNums: [
+            "ABC 222",
+            "ABC 333"
+          ],
+          declarations: {
+            customs: [
+              {
+                id: "25GB00000000000001"
+              },
+              {
+                id: "25GB00000000000002"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: relatedImportDeclarationsPayload })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=GMRA00000AB1`,
+    auth: {
+      strategy: 'session',
+      credentials
+    },
+    headers: {
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
+    }
+  })
+
+  expect(headers['cache-control']).toBe('no-store')
+
+  globalJsdom(payload)
+
+  expect(document.title).toBe(
+    'Showing result for GMRA00000AB1 - Border Trade Matching Service'
+  )
+  expect(getByText(document.body, 'GMRA00000AB1')).toBeInTheDocument()
+  expect(getByText(document.body, 'Vehicle details')).toBeInTheDocument()
+  expect(getByText(document.body, 'Linked customs declarations')).toBeInTheDocument()
+
+  const vehicleRegistrationNumber = getByText(document.body, 'ABC 111')
+  expect(vehicleRegistrationNumber).toBeInTheDocument()
+  expect(vehicleRegistrationNumber.className).toEqual('vehicle-number-plate vehicle-number-plate--front')
+
+  const trailerRegistrationNumber1 = getByText(document.body, 'ABC 222')
+  expect(trailerRegistrationNumber1).toBeInTheDocument()
+  expect(trailerRegistrationNumber1.className).toEqual('vehicle-number-plate vehicle-number-plate--rear')
+  const trailerRegistrationNumber2 = getByText(document.body, 'ABC 333')
+  expect(trailerRegistrationNumber2).toBeInTheDocument()
+  expect(trailerRegistrationNumber2.className).toEqual('vehicle-number-plate vehicle-number-plate--rear')
+
+  expect(
+    getByRole(document.body, 'link', {
+      name: '25GB00000000000001'
+    })
+  ).toHaveAttribute('href', '/search-result?searchTerm=25GB00000000000001')
+
+  const unknownMrn = getByText(document.body, '25GB00000000000002')
+  expect(unknownMrn).toBeInTheDocument()
+  expect(unknownMrn.className).toEqual('tooltiplink mrn--unknown')
+
+  const knownMrnCdsStatus = getByText(document.body, 'In progress')
+  expect(knownMrnCdsStatus).toBeInTheDocument()
+  expect(knownMrnCdsStatus.className).toEqual('govuk-!-font-weight-bold govuk-tag govuk-tag--yellow')
+
+  const unknownMrnCdsStatus = getByText(document.body, 'Unknown', { selector: 'span' })
+  expect(unknownMrnCdsStatus).toBeInTheDocument()
+  expect(unknownMrnCdsStatus.className).toEqual('govuk-!-font-weight-bold govuk-tag govuk-tag--grey')
+
+  const unknownMrnBtmsDecision = getByText(document.body, 'Unknown', { selector: 'td' })
+  expect(unknownMrnBtmsDecision).toBeInTheDocument()
+  expect(unknownMrnBtmsDecision.className).toEqual('govuk-table__cell')
+})
+
 test('redirects to search page if no results', async () => {
   const noResults = {
     customsDeclarations: [],
