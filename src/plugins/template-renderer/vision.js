@@ -11,8 +11,8 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
 const nunjucksEnvironment = nunjucks.configure(
   [
     'node_modules/govuk-frontend/dist/',
-    'node_modules/@ministryofjustice/frontend',
-    path.resolve(dirname, '../../templates')
+    path.resolve(dirname, '../../templates'),
+    'node_modules/@ministryofjustice/frontend'
   ],
   {
     autoescape: true,
