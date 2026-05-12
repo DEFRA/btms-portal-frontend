@@ -256,7 +256,12 @@
     font-size: 14px;
   }
 
-  .moj-timeline__description .govuk-details__text p {
+  .commodity-code {
+    text-align: left;
+  }
+
+  .moj-timeline__description .govuk-details__text p,
+  .moj-timeline__description .govuk-details__text .commodity-code{
     margin-top: 0;
     margin-bottom: 8px;
   }
