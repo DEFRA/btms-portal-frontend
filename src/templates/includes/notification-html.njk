@@ -1,6 +1,6 @@
 {% from "../macros/commodity-description.njk" import commodityDescription %}
 
-{% if (preNotification.status == 'Amend') or (preNotification.status == 'Modify') %}
+{% if (preNotification.status === 'Amend') or (preNotification.status === 'Modify') %}
   <div class="govuk-inset-text">The IPAFFS notification is currently in {% if preNotification.status == 'Amend' %}an 'Amend'{% else %}a 'Modify'{% endif%} status, so item information cannot be shown. Once the notification has been updated the item information will be displayed here.</div>
 {% else %}
   {% set maxLength = 50 %}
