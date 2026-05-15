@@ -1699,3 +1699,53 @@ test.each([
     ).not.toBeInTheDocument()
   }
 })
+
+test('handles CHEDs in amend and modify status', async () => {
+  const amendModifyImportPreNotifications = [
+    createImportPreNotification('CHEDP.GB.2025.0000002', 'CVEDP', 'AMEND', '2025-04-22T16:55:17.330Z', '2', '0202', 'Dog Chew', '4618.35'),
+    createImportPreNotification('CHEDA.GB.2025.0000001', 'CVEDA', 'MODIFY', '2025-04-22T16:55:17.330Z', '1', '0101', 'Equus asinus', '2')
+  ]
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: { customsDeclarations, importPreNotifications: amendModifyImportPreNotifications } })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
+    auth: {
+      strategy: 'session',
+      credentials
+    },
+    headers: {
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
+    }
+  })
+
+  expect(headers['cache-control']).toBe('no-store')
+
+  globalJsdom(payload)
+  initFilters()
+
+  const amendNotification = getByRole(document.body, 'group', {
+    name: 'CHEDP.GB.2025.0000002'
+  })
+  expect(amendNotification).toBeInTheDocument()
+  const amendInsetText = amendNotification.querySelector(".govuk-inset-text")
+  expect(amendInsetText).toBeInTheDocument()
+  expect(amendInsetText).toHaveTextContent("The IPAFFS notification is currently in an 'Amend' status, so item information cannot be shown. Once the notification has been updated the item information will be displayed here.")
+
+  const modifyNotification = getByRole(document.body, 'group', {
+    name: 'CHEDA.GB.2025.0000001'
+  })
+  expect(modifyNotification).toBeInTheDocument()
+  const modifyInsetText = modifyNotification.querySelector(".govuk-inset-text")
+  expect(modifyInsetText).toBeInTheDocument()
+  expect(modifyInsetText).toHaveTextContent("The IPAFFS notification is currently in a 'Modify' status, so item information cannot be shown. Once the notification has been updated the item information will be displayed here.")
+})
