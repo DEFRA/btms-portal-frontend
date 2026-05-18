@@ -24,3 +24,10 @@ vulnerabilities:
     reason: >
       Vulnerable picomatch is bundled inside npm itself, not the
       application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-42338
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/ip-address/package.json
+    reason: >
+      Vulnerable ip-address is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
