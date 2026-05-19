@@ -18,12 +18,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 #v6
         with:
           fetch-depth: 0 # Depth 0 is required for branch-based versioning
 
       - name: Test code and Create Test Coverage Reports
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: 22
           cache: npm
@@ -34,12 +34,12 @@ jobs:
           npm test
 
       - name: Publish Hot Fix
-        uses: DEFRA/cdp-build-action/build-hotfix@main
+        uses: DEFRA/cdp-build-action/build-hotfix@dfb7dbaa4129b6e7e6b250c043d06628b32f8167
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@master
+        uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

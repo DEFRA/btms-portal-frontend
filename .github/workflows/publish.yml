@@ -21,15 +21,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 #v6
 
       - name: Build and Publish
-        uses: DEFRA/cdp-build-action/build@main
+        uses: DEFRA/cdp-build-action/build@5f3ba75f66a3ef96855322c137727ff996cc2995
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Test Coverage Reports
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: 22
           cache: npm
@@ -39,7 +39,7 @@ jobs:
           npm test
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@master
+        uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
