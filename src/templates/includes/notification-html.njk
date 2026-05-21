@@ -1,40 +1,44 @@
 {% from "../macros/commodity-description.njk" import commodityDescription %}
 
-{% set maxLength = 50 %}
+{% if (preNotification.status === 'Amend') or (preNotification.status === 'Modify') %}
+  <div class="govuk-inset-text">The IPAFFS notification is currently in {% if preNotification.status === 'Amend' %}an 'Amend'{% else %}a 'Modify'{% endif%} status, so item information cannot be shown. Once the notification has been updated the item information will be displayed here.</div>
+{% else %}
+  {% set maxLength = 50 %}
 
-<table class="govuk-table govuk-table--small-text-until-tablet btms-notification">
-  <thead class="govuk-table__head">
-    <tr class="govuk-table__row">
-      <th scope="col" class="govuk-table__header">Item number</th>
-      <th scope="col" class="govuk-table__header">Commodity code</th>
-      <th scope="col" class="govuk-table__header">Description</th>
-      <th scope="col" class="govuk-table__header">Quantity / Weight</th>
-      <th scope="col" class="govuk-table__header">Authority</th>
-      <th scope="col" class="govuk-table__header">Decision</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for commodity in preNotification.commodities %}
-      <tr>
-        <td class="govuk-table__cell">{{ commodity.complementId }}</td>
-        <td class="govuk-table__cell">{{ commodity.commodityId }}</td>
-        <td class="govuk-table__cell">{{ commodityDescription(commodity.commodityDesc, commodity.id, maxLength) }}</td>
-        <td class="govuk-table__cell">{{ commodity.weightOrQuantity }}</td>
-        <td class="govuk-table__cell">
-          {% for check in commodity.checks %}
-            {% if loop.first %} <ul class="govuk-list"> {% endif %}
-              <li data-ched-authority="{{ check.authority }}">{{ check.authority }}</li>
-            {% if loop.last %} </ul> {% endif %}
-          {% endfor %}
-        </td>
-        <td class="govuk-table__cell">
-          {% for check in commodity.checks %}
-            {% if loop.first %} <ul class="govuk-list"> {% endif %}
-              <li data-ched-authority="{{ check.authority }}">{{ check.decision }}</li>
-            {% if loop.last %} </ul> {% endif %}
-          {% endfor %}
-        </td>
+  <table class="govuk-table govuk-table--small-text-until-tablet btms-notification">
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th scope="col" class="govuk-table__header">Item number</th>
+        <th scope="col" class="govuk-table__header">Commodity code</th>
+        <th scope="col" class="govuk-table__header">Description</th>
+        <th scope="col" class="govuk-table__header">Quantity / Weight</th>
+        <th scope="col" class="govuk-table__header">Authority</th>
+        <th scope="col" class="govuk-table__header">Decision</th>
       </tr>
-    {% endfor %}
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      {% for commodity in preNotification.commodities %}
+        <tr>
+          <td class="govuk-table__cell">{{ commodity.complementId }}</td>
+          <td class="govuk-table__cell">{{ commodity.commodityId }}</td>
+          <td class="govuk-table__cell">{{ commodityDescription(commodity.commodityDesc, commodity.id, maxLength) }}</td>
+          <td class="govuk-table__cell">{{ commodity.weightOrQuantity }}</td>
+          <td class="govuk-table__cell">
+            {% for check in commodity.checks %}
+              {% if loop.first %} <ul class="govuk-list"> {% endif %}
+                <li data-ched-authority="{{ check.authority }}">{{ check.authority }}</li>
+              {% if loop.last %} </ul> {% endif %}
+            {% endfor %}
+          </td>
+          <td class="govuk-table__cell">
+            {% for check in commodity.checks %}
+              {% if loop.first %} <ul class="govuk-list"> {% endif %}
+                <li data-ched-authority="{{ check.authority }}">{{ check.decision }}</li>
+              {% if loop.last %} </ul> {% endif %}
+            {% endfor %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}

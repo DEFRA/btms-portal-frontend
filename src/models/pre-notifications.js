@@ -152,10 +152,13 @@ const mapPreNotification = (preNotification) => {
   const open = !closedChedStatuses.includes(preNotification.status)
   const updated = format(new Date(preNotification.updatedSource), DATE_FORMAT)
 
-  const { commodityComplements } = preNotification.partOne.commodities
-  const commodities = commodityComplements.map((commodityComplement) =>
-    mapCommodity(commodityComplement, preNotification)
-  )
+  let commodities = []
+  if (status !== 'Amend' && status !== 'Modify') {
+    const { commodityComplements } = preNotification.partOne.commodities
+    commodities = commodityComplements.map((commodityComplement) =>
+      mapCommodity(commodityComplement, preNotification)
+    )
+  }
 
   const ipaffsUrl = ipaffsUrlTemplate.replace(
     'CHED_REFERENCE',
