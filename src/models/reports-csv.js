@@ -2,9 +2,12 @@ import { Transform } from 'node:stream'
 import streamJson from 'stream-json'
 import pickFilter from 'stream-json/filters/Pick.js'
 import streamArrayStreamers from 'stream-json/streamers/StreamArray.js'
-import { format } from 'date-fns'
 import { formatReportingDate } from '../utils/dates.js'
-import { NO_MATCH_CSV, MANUAL_RELEASE_CSV } from '../routes/route-constants.js'
+import {
+  NO_MATCH_CSV,
+  MANUAL_RELEASE_CSV,
+  LEVEL_MATCHING_CSV
+} from '../routes/route-constants.js'
 
 const { parser } = streamJson
 const { pick } = pickFilter
@@ -12,10 +15,11 @@ const { streamArray } = streamArrayStreamers
 
 const headings = {
   [NO_MATCH_CSV]: 'No matches',
-  [MANUAL_RELEASE_CSV]: 'Manual releases'
+  [MANUAL_RELEASE_CSV]: 'Manual releases',
+  [LEVEL_MATCHING_CSV]: 'Level No Matches'
 }
 
-export const mapReportsCsv = (res, name, startDate, endDate) => {
+export const mapReportsCsv = (res, name, startDate, endDate, mapRowHandler, reportHeaders) => {
   const from = formatReportingDate(startDate)
   const to = formatReportingDate(endDate)
 
@@ -23,17 +27,13 @@ export const mapReportsCsv = (res, name, startDate, endDate) => {
   const toCsv = new Transform({
     writableObjectMode: true,
     transform({ value }, _, callback) {
-      const row =
-        [
-          value.reference,
-          `"${format(new Date(value.timestamp), 'dd MMMM yy, HH:mm')}"`
-        ].join(',') + '\n'
+      const row = mapRowHandler(value)
 
       if (firstRow) {
         this.push(`BTMS - ${headings[name]} MRNs\n`)
         this.push(`Date range: ${from} to ${to}\n`)
         this.push('\n')
-        this.push('MRN,Last updated\n')
+        this.push(reportHeaders)
         firstRow = false
       }
       this.push(row)

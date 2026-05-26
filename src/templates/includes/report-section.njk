@@ -1,0 +1,11 @@
+<section aria-labelledBy="{{ report.type }}-summary-heading" class="govuk-grid-row govuk-!-margin-bottom-6 btms-report">
+  <div class="govuk-grid-column-full">
+    <heading>
+      <h3 id="{{ report.type }}-summary-heading" class="govuk-heading-m">{{ report.heading }}</h3>
+      {% if descriptions[report.type] %}
+        <p class="govuk-body-s">{{ descriptions[report.type] }}</p>
+      {% endif %}
+    </heading>
+    {% include "./tiles.njk" %}
+  </div>
+</section>

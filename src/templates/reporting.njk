@@ -15,6 +15,39 @@
 {% include "./includes/reporting-charts.njk" %}
 {% endset %}
 
+{% set reportingTabs = [
+  {
+    label: 'Summary view',
+    id: 'summary-view',
+    panel: {
+      html: summaryView
+    }
+  },
+  {
+    label: 'Chart view',
+    id: 'charts-view',
+    panel: {
+      html: chartsView
+    }
+  }
+] %}
+
+{% if showLevelMatchingReports %}
+  {% set levelMatchingView %}
+  {% include "./includes/reporting-level-matching.njk" %}
+  {% endset %}
+
+  {% set reportingTabs = (reportingTabs.push(
+        {
+          label: 'L1, L2 & L3 matching',
+          id: 'level-matching-view',
+          panel: {
+            html: levelMatchingView
+          }
+        }
+      ), reportingTabs) %}
+{% endif %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
@@ -41,22 +74,7 @@
             </h2>
             {{ govukTabs({
               classes: 'btms-tabs',
-              items: [
-                {
-                  label: 'Summary view',
-                  id: 'summary-view',
-                  panel: {
-                    html: summaryView
-                  }
-                },
-                {
-                  label: 'Chart view',
-                  id: 'charts-view',
-                  panel: {
-                    html: chartsView
-                  }
-                }
-              ]
+              items: reportingTabs
             }) }}
           </div>
         {% endif %}

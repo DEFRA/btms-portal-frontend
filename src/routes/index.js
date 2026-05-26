@@ -8,7 +8,7 @@ import { staticAssetRoutes } from './static-assets.js'
 import { home } from './home.js'
 import { latestActivity } from './latest-activity.js'
 import { reporting } from './reporting.js'
-import { reportingCsv } from './reporting.csv.js'
+import { reportingCsv, restrictedReportingCsv } from './reporting.csv.js'
 import { signinOidc } from './signin-oidc.js'
 import { signIn } from './sign-in.js'
 import { signInChoose } from './sign-in-choose.js'
@@ -39,6 +39,7 @@ export default [
   latestActivity,
   reporting,
   reportingCsv,
+  restrictedReportingCsv,
   signIn,
   ...signInChoose,
   signInEntra,

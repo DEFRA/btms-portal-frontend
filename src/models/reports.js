@@ -4,6 +4,10 @@ const calculatePercentage = (part, total) => {
   }
 
   const value = (part / total) * 100
+  return roundValue(value)
+}
+
+const roundValue = (value) => {
   const decimalPlaces = Number.isInteger(value) ? 0 : 2
   return value.toFixed(decimalPlaces)
 }
@@ -66,6 +70,55 @@ const dataSetKeys = {
   matches: ['match', 'noMatch'],
   clearanceRequests: ['unique'],
   notifications: ['chedA', 'chedP', 'chedPp', 'chedD']
+}
+
+const getLevelFigures = (total, matches) => {
+  if (total === 0 || Number.isNaN(Number(matches)))
+    {return {
+      levelMatches: 0,
+      levelMatchesPercentage: 0,
+      levelNoMatches: 0,
+      levelNoMatchesPercentage: 0
+    }}
+
+  const levelMatches = Number(matches)
+  const levelMatchesPercentage = (levelMatches/total) * 100
+  const levelNoMatches = total - levelMatches
+  const levelNoMatchesPercentage = ((total - levelMatches) / total) * 100
+
+  return {
+    levelMatches,
+    levelMatchesPercentage,
+    levelNoMatches,
+    levelNoMatchesPercentage
+  }
+}
+
+const mapLevelReport = (reportType, reportHeading, total, levelFigures) => {
+  return {
+    type: reportType,
+    heading: reportHeading,
+    tiles: [
+      {
+        type: 'match',
+        label: 'Matches',
+        total: levelFigures.levelMatches.toLocaleString('en-GB'),
+        percentage: roundValue(levelFigures.levelMatchesPercentage)
+      },
+      {
+        type: 'nomatch',
+        label: 'No matches',
+        total: levelFigures.levelNoMatches.toLocaleString('en-GB'),
+        percentage: roundValue(levelFigures.levelNoMatchesPercentage)
+      },
+      {
+        type: 'total',
+        label: 'Total',
+        total: total.toLocaleString('en-GB'),
+        percentage: null
+      }
+    ]
+  }
 }
 
 export const mapReports = (reports, tableHeadings) => {
@@ -142,4 +195,20 @@ export const mapReports = (reports, tableHeadings) => {
       }
     })
     .sort((a, b) => order[a.type] - order[b.type])
+}
+
+export const mapMatchingReports = (matchingSummaryLevels) => {
+  const total = Number.isNaN(Number(matchingSummaryLevels.total)) ? 0 : Number(matchingSummaryLevels.total)
+
+  const level1Figures = getLevelFigures(total, matchingSummaryLevels.level1)
+  const level2Figures = getLevelFigures(total, matchingSummaryLevels.level2)
+  const level3Figures = getLevelFigures(total, matchingSummaryLevels.level3)
+
+  const matchingReports = [
+    mapLevelReport('level1', 'Level 1 match rates', total, level1Figures),
+    mapLevelReport('level2', 'Level 2 match rates', total, level2Figures),
+    mapLevelReport('level3', 'Level 3 match rates', total, level3Figures)
+  ]
+
+  return matchingReports
 }

@@ -6,3 +6,7 @@ export const AUTH_PROVIDERS = {
 export const APP_SCOPES = {
   ADMIN: 'admin'
 }
+
+export const AUTH_FEATURES = {
+  LEVEL_MATCHING_REPORTS: 'levelMatchingReports'
+}

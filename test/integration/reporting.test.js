@@ -1,9 +1,18 @@
 import globalJsdom from 'global-jsdom'
 import wreck from '@hapi/wreck'
 import { initialiseServer } from '../utils/initialise-server.js'
-import { setupAuthedUserSession } from '../unit/utils/session-helper.js'
+import {
+  createAuthedUser,
+  setupAuthedAdminUserSession,
+  setupAuthedUserSession
+} from '../unit/utils/session-helper.js'
 import { paths } from '../../src/routes/route-constants.js'
-import { getByRole, getAllByRole } from '@testing-library/dom'
+import {
+  getByRole,
+  getAllByRole,
+  queryByRole,
+  getByText
+} from '@testing-library/dom'
 import { format, subDays } from 'date-fns'
 
 const provider = {
@@ -623,4 +632,329 @@ test('redirect non authorised requests', async () => {
 
   expect(statusCode).toBe(302)
   expect(headers.location).toBe('/sign-in-choose')
+})
+
+test.each([
+    {
+      scope: ['admin'],
+      levelMatchingTabAllowed: true
+    },
+    {
+      scope: [],
+      levelMatchingTabAllowed: false
+    }
+])('Level Matching Tab is only visible for allowed user', async (user) => {
+  const levelMatchingData = {
+    level1: 0,
+    level2: 0,
+    level3: 0,
+    total: 0
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: {} })
+
+  if (user.levelMatchingTabAllowed) {
+    wreck.get.mockResolvedValueOnce({ payload: levelMatchingData })
+  }
+
+  const server = await initialiseServer()
+  const authedUser = createAuthedUser(undefined, 'entraId')
+  authedUser.scope = user.scope
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.REPORTING}#level-matching-view`,
+    auth: {
+      strategy: 'session',
+      credentials: {
+        ...authedUser
+      }
+    }
+  })
+
+  globalJsdom(payload)
+
+  if (user.levelMatchingTabAllowed) {
+    expect(
+      getByRole(document.body, 'link', {
+        name: 'L1, L2 & L3 matching'
+      })).toBeInTheDocument()
+  } else {
+    expect(
+      queryByRole(document.body, 'link', {
+        name: 'L1, L2 & L3 matching'
+      })).not.toBeInTheDocument()
+  }
+})
+
+test('logged in user is redirected if not authorised to get level matching report CSV', async () => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload, statusCode } = await server.inject({
+    method: 'get',
+    url: '/restricted-reporting/level-matching.csv',
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(statusCode).toBe(403)
+  expect(
+    getByText(document.body, 'You do not have the correct permissions to access this service')
+  ).toBeInTheDocument()
+})
+
+test('user with no logged in session is redirected to sign in if attempting to get level matching report CSV', async () => {
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+
+  const { statusCode, headers } = await server.inject({
+    method: 'get',
+    url: '/restricted-reporting/level-matching.csv'
+  })
+
+  expect(statusCode).toBe(302)
+  expect(headers.location).toBe('/sign-in-choose')
+})
+
+test('match rate figures are shown for all levels when viewed by authorized user', async () => {
+  const levelMatchingData = {
+    level1: 9,
+    level2: 6,
+    level3: 3,
+    total: 9
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: {} })
+    .mockResolvedValueOnce({ payload: levelMatchingData })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.REPORTING}#level-matching-view`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(getByRole(document.body, 'button', { name: 'Download as CSV' })).toBeInTheDocument()
+  expect(getByText(document.body, 'This data is only available from 15th May 2026.')).toBeInTheDocument()
+
+  const level1MatchRateSection = document.body.querySelector('[aria-labelledby="level1-summary-heading"]')
+  expect(level1MatchRateSection).toBeInTheDocument()
+  const level1MatchesFigure = level1MatchRateSection.querySelectorAll('dd.govuk-heading-l')
+  expect(level1MatchesFigure.length).toBe(3)
+  expect(level1MatchesFigure[0].textContent).toBe("9")
+  expect(level1MatchesFigure[1].textContent).toBe("0")
+  expect(level1MatchesFigure[2].textContent).toBe("9")
+  const level1Percentages = level1MatchRateSection.querySelectorAll('dd.btms-percentage')
+  expect(level1Percentages.length).toBe(2)
+  expect(level1Percentages[0].textContent).toBe("(100%)")
+  expect(level1Percentages[1].textContent).toBe("(0%)")
+
+  const level2MatchRateSection = document.body.querySelector('[aria-labelledby="level2-summary-heading"]')
+  const level2MatchesFigure = level2MatchRateSection.querySelectorAll('dd.govuk-heading-l')
+  expect(level2MatchesFigure.length).toBe(3)
+  expect(level2MatchesFigure[0].textContent).toBe("6")
+  expect(level2MatchesFigure[1].textContent).toBe("3")
+  expect(level2MatchesFigure[2].textContent).toBe("9")
+  const level2Percentages = level2MatchRateSection.querySelectorAll('dd.btms-percentage')
+  expect(level2Percentages.length).toBe(2)
+  expect(level2Percentages[0].textContent).toBe("(66.67%)")
+  expect(level2Percentages[1].textContent).toBe("(33.33%)")
+
+  const level3MatchRateSection = document.body.querySelector('[aria-labelledby="level3-summary-heading"]')
+  const level3MatchesFigure = level3MatchRateSection.querySelectorAll('dd.govuk-heading-l')
+  expect(level3MatchesFigure.length).toBe(3)
+  expect(level3MatchesFigure[0].textContent).toBe("3")
+  expect(level3MatchesFigure[1].textContent).toBe("6")
+  expect(level3MatchesFigure[2].textContent).toBe("9")
+  const level3Percentages = level3MatchRateSection.querySelectorAll('dd.btms-percentage')
+  expect(level3Percentages.length).toBe(2)
+  expect(level3Percentages[0].textContent).toBe("(33.33%)")
+  expect(level3Percentages[1].textContent).toBe("(66.67%)")
+})
+
+test('handles upstream errors in the level matches API', async () => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: {} })
+    .mockRejectedValueOnce(new Error('boom'))
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { payload, statusCode } = await server.inject({
+    method: 'get',
+    url: paths.REPORTING,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(statusCode).toBe(500)
+
+  expect(
+    getByRole(document.body, 'heading', {
+      name: 'Sorry, there is a problem with this service'
+    })
+  ).toBeInTheDocument()
+})
+
+test('handles request for restricted report that does not exist', async () => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { payload, statusCode } = await server.inject({
+    method: 'get',
+    url: '/restricted-reporting/foo.csv',
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(statusCode).toBe(404)
+  getByRole(document.body, 'heading', {
+    name: 'Page not found'
+  })
+  expect(document.title).toBe('Page not found - Border Trade Matching Service')
+})
+
+test('handles request for restricted report with invalid params', async () => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { payload, statusCode } = await server.inject({
+    method: 'get',
+    url: '/restricted-reporting/level-matching.csv?startDate=&amp;endDate=',
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(statusCode).toBe(400)
+  getByRole(document.body, 'heading', {
+    name: 'Sorry, there is a problem with this service'
+  })
+})
+
+test.each([
+  {
+    level1: 1,
+    level2: 1,
+    level3: 1,
+    total: 'FOO',
+    expectedTotal: '0'
+  },
+  {
+    level1: 'FOO',
+    level2: 'FOO',
+    level3: 'FOO',
+    total: 1,
+    expectedTotal: '1'
+  }
+])('handles level matching figures that are invalid', async (options) => {
+  const levelMatchingData = {
+    level1: options.level1,
+    level2: options.level2,
+    level3: options.level3,
+    total: options.total
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: {} })
+  .mockResolvedValueOnce({ payload: levelMatchingData })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.REPORTING}#level-matching-view`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(getByRole(document.body, 'button', { name: 'Download as CSV' })).toBeInTheDocument()
+  expect(getByText(document.body, 'This data is only available from 15th May 2026.')).toBeInTheDocument()
+
+  const level1MatchRateSection = document.body.querySelector('[aria-labelledby="level1-summary-heading"]')
+  expect(level1MatchRateSection).toBeInTheDocument()
+  const level1MatchesFigure = level1MatchRateSection.querySelectorAll('dd.govuk-heading-l')
+  expect(level1MatchesFigure.length).toBe(3)
+  expect(level1MatchesFigure[0].textContent).toBe("0")
+  expect(level1MatchesFigure[1].textContent).toBe("0")
+  expect(level1MatchesFigure[2].textContent).toBe(options.expectedTotal)
+  const level1Percentages = level1MatchRateSection.querySelectorAll('dd.btms-percentage')
+  expect(level1Percentages.length).toBe(2)
+  expect(level1Percentages[0].textContent).toBe("(0%)")
+  expect(level1Percentages[1].textContent).toBe("(0%)")
+
+  const level2MatchRateSection = document.body.querySelector('[aria-labelledby="level2-summary-heading"]')
+  const level2MatchesFigure = level2MatchRateSection.querySelectorAll('dd.govuk-heading-l')
+  expect(level2MatchesFigure.length).toBe(3)
+  expect(level2MatchesFigure[0].textContent).toBe("0")
+  expect(level2MatchesFigure[1].textContent).toBe("0")
+  expect(level2MatchesFigure[2].textContent).toBe(options.expectedTotal)
+  const level2Percentages = level2MatchRateSection.querySelectorAll('dd.btms-percentage')
+  expect(level2Percentages.length).toBe(2)
+  expect(level2Percentages[0].textContent).toBe("(0%)")
+  expect(level2Percentages[1].textContent).toBe("(0%)")
+
+  const level3MatchRateSection = document.body.querySelector('[aria-labelledby="level3-summary-heading"]')
+  const level3MatchesFigure = level3MatchRateSection.querySelectorAll('dd.govuk-heading-l')
+  expect(level3MatchesFigure.length).toBe(3)
+  expect(level3MatchesFigure[0].textContent).toBe("0")
+  expect(level3MatchesFigure[1].textContent).toBe("0")
+  expect(level3MatchesFigure[2].textContent).toBe(options.expectedTotal)
+  const level3Percentages = level3MatchRateSection.querySelectorAll('dd.btms-percentage')
+  expect(level3Percentages.length).toBe(2)
+  expect(level3Percentages[0].textContent).toBe("(0%)")
+  expect(level3Percentages[1].textContent).toBe("(0%)")
 })
