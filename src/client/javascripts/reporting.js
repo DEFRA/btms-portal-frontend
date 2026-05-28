@@ -4,16 +4,20 @@ import Chart from 'chart.js/auto'
 
 createAll(Tabs)
 
+const makeTabActive = (tabId) => {
+  const panel = document.getElementById(tabId)
+  panel.id = ''
+  document.getElementById(`tab_${tabId}`).click()
+  panel.id = tabId
+  panel.setAttribute('class', 'govuk-tabs__panel')
+}
+
 const preventScroll = () => {
   const url = new URL(window.location.href)
   const tab = url.searchParams.get('tab')
 
-  if (tab === 'charts-view') {
-    const panel = document.getElementById('charts-view')
-    panel.id = ''
-    document.getElementById('tab_charts-view').click()
-    panel.id = 'charts-view'
-    panel.setAttribute('class', 'govuk-tabs__panel')
+  if (tab === 'charts-view' || tab === 'level-matching-view') {
+    makeTabActive(tab)
   }
 }
 
@@ -122,7 +126,8 @@ const initTabsHook = () => {
 
   const tabs = [
     document.getElementById('tab_summary-view'),
-    document.getElementById('tab_charts-view')
+    document.getElementById('tab_charts-view'),
+    document.getElementById('tab_level-matching-view')
   ]
   tabs.forEach((tab) =>
     tab.addEventListener('click', (event) => setLinkHrefs(event.target.href))
