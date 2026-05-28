@@ -105,5 +105,9 @@
     "webpack": "^5.106.2",
     "webpack-assets-manifest": "^5.2.1",
     "webpack-cli": "^7.0.2"
+  },
+  "overrides": {
+    "@hapi/content": "6.0.2",
+    "@hapi/wreck": "18.1.1"
   }
 }
