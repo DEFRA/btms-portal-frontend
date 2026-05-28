@@ -1,7 +1,7 @@
 import { dateRange } from './schemas/date-range.js'
 import { paths, CACHE_CONTROL_NO_STORE } from './route-constants.js'
-import { getReports } from '../services/reporting.js'
-import { mapReports } from '../models/reports.js'
+import { getMatchingReports, getReports } from '../services/reporting.js'
+import { mapMatchingReports, mapReports } from '../models/reports.js'
 import { format } from 'date-fns'
 import {
   getFromAndTo,
@@ -11,6 +11,8 @@ import {
   formatYesterday,
   formatReportingDate
 } from '../utils/dates.js'
+import { isInFeatureGroup } from '../auth/check-groups.js'
+import { AUTH_FEATURES } from '../auth/auth-constants.js'
 
 const getQueryString = (startDate, endDate, tab) => {
   const query = new URLSearchParams({
@@ -126,6 +128,15 @@ export const reporting = {
     )
     const dateProps = getDateProps(tab)
 
+    const showLevelMatchingReports = isInFeatureGroup(AUTH_FEATURES.LEVEL_MATCHING_REPORTS, request.auth.credentials.scope)
+
+    let matchingReports = []
+    if (showLevelMatchingReports) {
+      const matchingReportsPayload = await getMatchingReports(request, from , to)
+
+      matchingReports = mapMatchingReports(matchingReportsPayload)
+    }
+
     return h.view('reporting', {
       reports,
       labels,
@@ -134,7 +145,9 @@ export const reporting = {
       timePeriod,
       startDate: format(startDate, dateFormat),
       endDate: format(endDate, dateFormat),
-      tab
+      tab,
+      showLevelMatchingReports,
+      matchingReports
     })
   }
 }

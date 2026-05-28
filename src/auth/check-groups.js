@@ -8,3 +8,9 @@ export const checkGroups = (groups) => {
     throw boom.forbidden('group not allowed')
   }
 }
+
+export const isInFeatureGroup = (featureGroup, userScopes) => {
+  const featureGroups = config.get(`auth.feature.${featureGroup}.allowedScopes`)
+
+  return featureGroups != null && userScopes?.some((scope) => featureGroups.includes(scope))
+}

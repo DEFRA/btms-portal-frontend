@@ -12,6 +12,7 @@ const paths = {
   LATEST_ACTIVITY: '/latest-activity',
   REPORTING: '/reporting',
   REPORTING_CSV: '/reporting/{name}',
+  RESTRICTED_REPORTING_CSV: '/restricted-reporting/{name}',
   SEARCH: '/search',
   SEARCH_RESULT: '/search-result',
   SIGN_IN: '/sign-in',
@@ -38,5 +39,6 @@ const CACHE_CONTROL_NO_STORE = {
 
 export const NO_MATCH_CSV = 'no-matches.csv'
 export const MANUAL_RELEASE_CSV = 'manual-releases.csv'
+export const LEVEL_MATCHING_CSV = 'level-matching.csv'
 
 export { paths, queryStringParams, CACHE_CONTROL_NO_STORE }

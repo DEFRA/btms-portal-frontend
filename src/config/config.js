@@ -440,6 +440,17 @@ const config = convict({
       doc: 'Auth provider origins for CSP header',
       format: Array,
       default: []
+    },
+    feature: {
+      levelMatchingReports: {
+        allowedScopes: {
+          doc: 'Allowed Security Groups for accessing Level Matching Reports',
+          format: Array,
+          sensitive: true,
+          env: 'AUTH_FEATURE_LEVEL_MATCHING_REPORTS_ALLOWED_SCOPES',
+          default: ['admin']
+        }
+      }
     }
   },
   ipaffs: {

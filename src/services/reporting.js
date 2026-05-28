@@ -27,6 +27,22 @@ export const getReports = async (request, from, to, intervals) => {
   }
 }
 
+export const getMatchingReports = async (request, from , to) => {
+  const query = new URLSearchParams({ from, to })
+
+  try {
+    const { payload } = await wreck.get(`${reportingApiConfig.baseUrl}/matches/summary/levels?${query}`, {
+      headers: { authorization },
+      json: 'strict'
+    })
+
+    return payload
+  } catch (error) {
+    request.logger.setBindings({ error })
+    throw error
+  }
+}
+
 export const getLatestActivity = async (request) => {
   try {
     const [lastCreated, lastSent, lastReceived] = await Promise.all([

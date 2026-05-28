@@ -47,6 +47,16 @@
       min-width: 30%;
     }
   }
+
+  .btms-reports-heading {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .govuk-inset-text {
+    margin-top: 0;
+    font-size: 16px;
+  }
 }
 
 .btms-chart {

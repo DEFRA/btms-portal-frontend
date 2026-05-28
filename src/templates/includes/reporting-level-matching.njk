@@ -1,0 +1,33 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set descriptions = {
+  level1: 'Checks the CHED reference on the clearance request exists in IPAFFS and is the correct CHED type.',
+  level2: 'Includes all Level 1 criteria and checks the commodity codes on the clearance request appear on the CHED.',
+  level3: 'Includes all Level 2 criteria and checks the declared weight or quantity matches between the clearance request and the CHED.'
+} %}
+
+{% set downloadUrls = {} %}
+
+<div class="btms-reports">
+  <div class="btms-reports-heading">
+    <h2 class="govuk-heading-l">Higher levels of matching</h2>
+    <span class="btms-download-csv">
+    {{
+      govukButton({
+        text: 'Download as CSV',
+        classes: "govuk-button--secondary",
+        preventDoubleClick: true,
+        href: '/restricted-reporting/level-matching.csv?' ~ csvQuery
+      })
+    }}
+    </span>
+  </div>
+
+  <div class="govuk-inset-text">
+    This data is only available from 15th May 2026.
+  </div>
+
+  {% for report in matchingReports %}
+    {% include "./report-section.njk" %}
+  {% endfor %}
+</div>
