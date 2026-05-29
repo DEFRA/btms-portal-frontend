@@ -128,6 +128,7 @@ const mapDecisionNotificationResourceEvent = (resourceMessage) => {
       return {
         chedReference: result.documentReference,
         checkCode: result.checkCode,
+        documentCode: result.documentCode,
         authority: checkCodeToAuthorityNameMapping[result.checkCode]
           || checkCodeToAuthorityMapping[result.checkCode],
         decisionCode: result.decisionCode,
