@@ -83,6 +83,7 @@ test('maps Decision Notification Resource Event', () => {
       + '            "itemNumber": 1,\n'
       + '            "documentReference": "CHEDA.GB.2025.0000001",\n'
       + '            "checkCode": "H221",\n'
+      + '            "documentCode": "N002",\n'
       + '            "decisionCode": "X00",\n'
       + '            "internalDecisionCode": "E70"\n'
       + '          }\n'
@@ -107,6 +108,7 @@ test('maps Decision Notification Resource Event', () => {
           {
             "authority": "APHA",
             "checkCode": "H221",
+            "documentCode": "N002",
             "chedReference": "CHEDA.GB.2025.0000001",
             "decision": "No match - CHED cannot be found",
             "decisionCode": "X00"
@@ -152,6 +154,7 @@ test('maps Decision Notification Resource Event with unknown internal decision c
       + '            "itemNumber": 1,\n'
       + '            "documentReference": "CHEDA.GB.2025.0000001",\n'
       + '            "checkCode": "H221",\n'
+      + '            "documentCode": "N002",\n'
       + '            "decisionCode": "X00",\n'
       + '            "internalDecisionCode": "E1000"\n'
       + '          }\n'
@@ -176,6 +179,7 @@ test('maps Decision Notification Resource Event with unknown internal decision c
           {
             "authority": "APHA",
             "checkCode": "H221",
+            "documentCode": "N002",
             "chedReference": "CHEDA.GB.2025.0000001",
             "decision": "No match",
             "decisionCode": "X00"
