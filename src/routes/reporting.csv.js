@@ -72,13 +72,13 @@ const restrictedReportMapRowHandler = (value) => {
     value.itemNumber,
     value.commodityCode,
     value.checkCode,
-    value.description,
+    `"${value.description}"`,
     value.quantityOrWeight,
     value.chedReference,
     value.match,
     value.authority,
     value.decision,
-    value.decisionReasons,
+    `"${value.decisionReasons ?? ""}"`,
     value.declarantId,
     value.dispatchCountryCode
   ].join(',') + '\n'
