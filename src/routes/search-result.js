@@ -18,8 +18,18 @@ const searchTermValidator = (key, pattern, value) => {
 }
 
 function getNanosecondsAsNumber(nanosecondDate) {
-  let nanosecondPart = nanosecondDate.split('.')[1].split('Z')[0]
-  nanosecondPart = nanosecondPart.padEnd(NANOSECOND_PRECISION, "0")
+  let nanosecondPart = 0
+
+  if (nanosecondDate.includes('.')) {
+    nanosecondPart = nanosecondDate.split('.')[1]
+
+    if (nanosecondPart.includes('Z')) {
+      nanosecondPart = nanosecondPart.split('Z')[0]
+    }
+
+    nanosecondPart = nanosecondPart.padEnd(NANOSECOND_PRECISION, "0")
+  }
+
   return Number(nanosecondPart)
 }
 
