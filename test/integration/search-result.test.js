@@ -1,10 +1,10 @@
 import globalJsdom from 'global-jsdom'
 import wreck from '@hapi/wreck'
-import { getAllByRole, getByRole, queryByRole } from '@testing-library/dom'
+import { getAllByRole, getByRole, queryByRole, queryByText } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { paths, queryStringParams } from '../../src/routes/route-constants.js'
 import { initialiseServer } from '../utils/initialise-server.js'
-import { setupAuthedUserSession } from '../unit/utils/session-helper.js'
+import { createAuthedUser, setupAuthedUserSession } from '../unit/utils/session-helper.js'
 import { initFilters } from '../../src/client/javascripts/filters.js'
 
 const provider = {
@@ -1393,4 +1393,328 @@ test('handles upstream errors when retrieving resource events for unmatched CHED
 
   const eventTitles = Array.from(document.body.querySelectorAll('.moj-timeline__item .moj-timeline__header .moj-timeline__title span:nth-child(1)')).map(title => title.innerHTML)
   expect(eventTitles.length).toBe(0)
+})
+
+test.each([
+  {
+    level2DecisionCode: 'E20',
+    shouldShowLevel2BannerText: true,
+    level3DecisionCode: 'E99',
+    shouldShowLevel3BannerText: false,
+  },
+  {
+    level2DecisionCode: 'E99',
+    shouldShowLevel2BannerText: false,
+    level3DecisionCode: 'E30',
+    shouldShowLevel3BannerText: true,
+  },
+  {
+    level2DecisionCode: 'E99',
+    shouldShowLevel2BannerText: false,
+    level3DecisionCode: 'E31',
+    shouldShowLevel3BannerText: true,
+  },
+  {
+    level2DecisionCode: 'E20',
+    shouldShowLevel2BannerText: true,
+    level3DecisionCode: 'E30',
+    shouldShowLevel3BannerText: true,
+  },
+  {
+    level2DecisionCode: 'E99',
+    shouldShowLevel2BannerText: false,
+    level3DecisionCode: 'E99',
+    shouldShowLevel3BannerText: false,
+  }
+])('Should show relevant banner text and Tab link for Levels', async (options) => {
+  const levelNoMatchDeclarations = [
+    {
+      movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
+      clearanceRequest: {
+        declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+        commodities: [
+          {
+            itemNumber: 1,
+            taricCommodityCode: '0304719030',
+            goodsDescription: 'FROZEN MSC A COD FILLETS',
+            netMass: '17088.98',
+            supplementaryUnits: 0,
+            documents: [
+              {
+                documentReference: 'CHEDA.GB.2025.0000001',
+                documentCode: 'N002'
+              }
+            ],
+            checks: [{ checkCode: 'H218', departmentCode: 'HMI' }]
+          }
+        ]
+      },
+      clearanceDecision: {
+        results: [
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'X00',
+            documentReference: 'CHEDA.GB.2025.0000001',
+            internalDecisionCode: options.level2DecisionCode
+          }
+        ]
+      },
+      finalisation: {
+        finalState: '0',
+        isManualRelease: false
+      },
+      updated: '2025-05-06T13:11:59.257Z'
+    },
+    {
+      movementReferenceNumber: '24GB0Z8WEJ9ZBTL73B',
+      clearanceRequest: {
+        declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+        commodities: [
+          {
+            itemNumber: 1,
+            taricCommodityCode: '0304719030',
+            goodsDescription: 'FROZEN MSC A COD FILLETS',
+            netMass: '17088.98',
+            supplementaryUnits: 0,
+            documents: [
+              {
+                documentReference: 'CHEDA.GB.2025.0000002',
+                documentCode: 'N002'
+              }
+            ],
+            checks: [{ checkCode: 'H218', departmentCode: 'HMI' }]
+          }
+        ]
+      },
+      clearanceDecision: {
+        results: [
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'X00',
+            documentReference: 'CHEDA.GB.2025.0000001',
+            internalDecisionCode: options.level3DecisionCode
+          }
+        ]
+      },
+      finalisation: {
+        finalState: '0',
+        isManualRelease: false
+      },
+      updated: '2025-05-06T13:11:59.257Z'
+    }
+  ]
+
+  const declarationsWithLevelNoMatch = {
+    customsDeclarations: levelNoMatchDeclarations,
+    importPreNotifications
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: declarationsWithLevelNoMatch })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const server = await initialiseServer()
+  const authedUser = createAuthedUser(undefined, 'entraId')
+  authedUser.scope = ['admin']
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
+    auth: {
+      strategy: 'session',
+      credentials: {
+        ...authedUser
+      }
+    },
+    headers: {
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
+    }
+  })
+
+  globalJsdom(payload)
+  initFilters()
+
+  const level2BannerText = queryByText(document.body, 'If level 2 matching was applied, this declaration would not be released. At least one commodity code on this customs declaration is not listed on the CHED.')
+  if (options.shouldShowLevel2BannerText) {
+    expect(level2BannerText).toBeInTheDocument()
+  } else {
+    expect(level2BannerText).not.toBeInTheDocument()
+  }
+
+  const level3BannerText = queryByText(document.body, 'If level 3 matching was applied, this declaration would not be released. The declared weight or quantity on at least one item does not match the CHED.')
+  if (options.shouldShowLevel3BannerText) {
+    expect(level3BannerText).toBeInTheDocument()
+  } else {
+    expect(level3BannerText).not.toBeInTheDocument()
+  }
+
+  if (options.shouldShowLevel2BannerText || options.shouldShowLevel3BannerText) {
+    expect(
+      queryByRole(document.body, 'link', { name: 'View L2/L3 result' })
+    ).toBeInTheDocument()
+  } else {
+    expect(
+      queryByRole(document.body, 'link', { name: 'View L2/L3 result' })
+    ).not.toBeInTheDocument()
+  }
+})
+
+test.each([
+  {
+    provider: 'entraId',
+    scope: ['admin'],
+    shouldShowBannerAndTab: true
+  },
+  {
+    provider: 'entraId',
+    scope: [],
+    shouldShowBannerAndTab: false
+  },
+  {
+    provider: 'defraId',
+    scope: null,
+    shouldShowBannerAndTab: false
+  }
+])('Level Matching banner and Tab only visible to certain user scopes', async (options) => {
+  const levelNoMatchDeclarations = [
+    {
+      movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
+      clearanceRequest: {
+        declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+        commodities: [
+          {
+            itemNumber: 1,
+            taricCommodityCode: '0304719030',
+            goodsDescription: 'FROZEN MSC A COD FILLETS',
+            netMass: '17088.98',
+            supplementaryUnits: 0,
+            documents: [
+              {
+                documentReference: 'CHEDA.GB.2025.0000001',
+                documentCode: 'N002'
+              }
+            ],
+            checks: [{ checkCode: 'H218', departmentCode: 'HMI' }]
+          }
+        ]
+      },
+      clearanceDecision: {
+        results: [
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'X00',
+            documentReference: 'CHEDA.GB.2025.0000001',
+            internalDecisionCode: 'E20'
+          }
+        ]
+      },
+      finalisation: {
+        finalState: '0',
+        isManualRelease: false
+      },
+      updated: '2025-05-06T13:11:59.257Z'
+    },
+    {
+      movementReferenceNumber: '24GB0Z8WEJ9ZBTL73B',
+      clearanceRequest: {
+        declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+        commodities: [
+          {
+            itemNumber: 1,
+            taricCommodityCode: '0304719030',
+            goodsDescription: 'FROZEN MSC A COD FILLETS',
+            netMass: '17088.98',
+            supplementaryUnits: 0,
+            documents: [
+              {
+                documentReference: 'CHEDA.GB.2025.0000002',
+                documentCode: 'N002'
+              }
+            ],
+            checks: [{ checkCode: 'H218', departmentCode: 'HMI' }]
+          }
+        ]
+      },
+      clearanceDecision: {
+        results: [
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'X00',
+            documentReference: 'CHEDA.GB.2025.0000001',
+            internalDecisionCode: 'E30'
+          }
+        ]
+      },
+      finalisation: {
+        finalState: '0',
+        isManualRelease: false
+      },
+      updated: '2025-05-06T13:11:59.257Z'
+    }
+  ]
+
+  const declarationsWithLevelNoMatch = {
+    customsDeclarations: levelNoMatchDeclarations,
+    importPreNotifications
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: declarationsWithLevelNoMatch })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const server = await initialiseServer()
+  const authedUser = createAuthedUser(undefined, options.provider)
+  if (options.scope) {
+    authedUser.scope = options.scope
+  }
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
+    auth: {
+      strategy: 'session',
+      credentials: {
+        ...authedUser
+      }
+    },
+    headers: {
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
+    }
+  })
+
+  globalJsdom(payload)
+  initFilters()
+
+  const tabLinks = Array.from(document.body.querySelectorAll('.govuk-tabs__tab')).map(tab => tab.href)
+
+  if (options.shouldShowBannerAndTab) {
+    expect(
+      getByRole(document.body, 'region', {
+        name: 'Important'
+      })
+    ).toBeInTheDocument()
+    expect(tabLinks.length).toBe(3)
+    expect(tabLinks.some(tabLink => tabLink.endsWith('#levels-view'))).toBeTruthy()
+  } else {
+    expect(
+      queryByRole(document.body, 'region', {
+        name: 'Important'
+      })
+    ).not.toBeInTheDocument()
+    expect(
+      document.body.querySelector('#tab_levels-view')
+    ).not.toBeInTheDocument()
+    expect(tabLinks.length).toBe(2)
+    expect(tabLinks.some(tabLink => tabLink.endsWith('#levels-view'))).toBeFalsy()
+  }
 })

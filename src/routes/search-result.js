@@ -6,6 +6,8 @@ import { createRouteConfig } from './search-result-common.js'
 import { searchKeys } from '../services/search-patterns.js'
 import { mapResourceEvents } from '../models/resource-events.js'
 import { createLogger } from '../utils/logger.js'
+import { isInFeatureGroup } from '../auth/check-groups.js'
+import { AUTH_FEATURES } from '../auth/auth-constants.js'
 
 const NANOSECOND_PRECISION = 7
 
@@ -126,6 +128,14 @@ const getAllEvents = async (customsDeclarations, preNotifications) => {
   }
 }
 
+const includesInternalDecisionCodes = (customsDeclarations, codes) => {
+  return customsDeclarations.some(declaration => {
+    return declaration.clearanceDecision?.results?.some(result => {
+      return codes.includes(result.internalDecisionCode)
+    })
+  })
+}
+
 export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_RESULT, async (request, h) => {
   const searchTerm = request.query[queryStringParams.SEARCH_TERM].trim().toUpperCase()
   const searchResults = await getRelatedImportDeclarations(request.pre.searchQuery)
@@ -147,12 +157,20 @@ export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_
   const preNotifications = mapPreNotifications(searchResults, searchTerm)
   const timelineEvents = await getAllEvents(customsDeclarations, preNotifications)
 
+  const showLevelNoMatchBanner = isInFeatureGroup(AUTH_FEATURES.LEVEL_NO_MATCH_SEARCH_RESULTS, request.auth.credentials.scope)
+  const showLevel2NoMatchText = showLevelNoMatchBanner && includesInternalDecisionCodes(searchResults.customsDeclarations, [ 'E20' ])
+  const showLevel3NoMatchText = showLevelNoMatchBanner && includesInternalDecisionCodes(searchResults.customsDeclarations, [ 'E30', 'E31' ])
+  const showLevelsResultTab = showLevel2NoMatchText || showLevel3NoMatchText
+
   const viewModel = {
     resultsPage: true,
     searchTerm,
     customsDeclarations,
     preNotifications,
-    timelineEvents
+    timelineEvents,
+    showLevel2NoMatchText,
+    showLevel3NoMatchText,
+    showLevelsResultTab
   }
 
   return h.view('search-result', viewModel)

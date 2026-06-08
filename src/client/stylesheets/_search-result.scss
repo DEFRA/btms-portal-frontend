@@ -7,6 +7,15 @@
     margin-top: 0;
     @include govuk-font-size($size: 16);
   }
+
+  .btms-level-no-match-banner {
+    width: 66.67%;
+
+    .govuk-notification-banner__content p,
+    .govuk-notification-banner__content a {
+      font-size: 16px;
+    }
+  }
 }
 
 .btms-customs-declaration-summary {
