@@ -12,5 +12,5 @@ export const checkGroups = (groups) => {
 export const isInFeatureGroup = (featureGroup, userScopes) => {
   const featureGroups = config.get(`auth.feature.${featureGroup}.allowedScopes`)
 
-  return featureGroups != null && userScopes?.some((scope) => featureGroups.includes(scope))
+  return featureGroups != null && Boolean(userScopes?.some((scope) => featureGroups.includes(scope)))
 }
