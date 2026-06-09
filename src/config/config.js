@@ -450,6 +450,15 @@ const config = convict({
           env: 'AUTH_FEATURE_LEVEL_MATCHING_REPORTS_ALLOWED_SCOPES',
           default: ['admin']
         }
+      },
+      levelNoMatchBanner: {
+        allowedScopes: {
+          doc: 'Allowed Security Groups which will see the Level No Match Warning Banner on Search Results page',
+          format: Array,
+          sensitive: true,
+          env: 'AUTH_FEATURE_LEVEL_NO_MATCH_BANNER_ALLOWED_SCOPES',
+          default: ['admin']
+        }
       }
     }
   },
