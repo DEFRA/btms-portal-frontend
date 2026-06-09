@@ -1,10 +1,10 @@
 import globalJsdom from 'global-jsdom'
 import wreck from '@hapi/wreck'
-import { getAllByRole, getByRole, queryByRole } from '@testing-library/dom'
+import { getAllByRole, getByRole, queryByRole, queryByText } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { paths, queryStringParams } from '../../src/routes/route-constants.js'
 import { initialiseServer } from '../utils/initialise-server.js'
-import { setupAuthedUserSession } from '../unit/utils/session-helper.js'
+import { createAuthedUser, setupAuthedUserSession } from '../unit/utils/session-helper.js'
 import { initFilters } from '../../src/client/javascripts/filters.js'
 
 const provider = {
@@ -176,7 +176,7 @@ const declarationResourceEvents = [
       + '    "resource": {\n'
       + '      "clearanceRequest": {\n'
       + '        "externalVersion": 1,\n'
-      + '        "messageSentAt": "2025-01-02T09:00:00.000Z",\n'
+      + '        "messageSentAt": "2025-01-02T09:00:00Z",\n'
       + '        "commodities": [\n'
       + '          {\n'
       + '            "itemNumber": 1,\n'
@@ -228,7 +228,7 @@ const declarationResourceEvents = [
       + '            "internalDecisionCode": "E70"\n'
       + '          }\n'
       + '        ],\n'
-      + '        "created": "2025-01-05T09:00:00.000Z"\n'
+      + '        "created": "2025-01-05T09:00:00Z"\n'
       + '      },\n'
       + '      "finalisation": {\n'
       + '        "isManualRelease": true\n'
@@ -268,7 +268,7 @@ const declarationResourceEvents = [
       + '            "mode": null\n'
       + '          }\n'
       + '        ],\n'
-      + '        "created": "2025-01-01T09:00:00.000Z"\n'
+      + '        "created": "2025-01-01T09:00:00Z"\n'
       + '      },\n'
       + '      "finalisation": {\n'
       + '        "isManualRelease": true\n'
@@ -345,7 +345,7 @@ const declarationResourceEvents = [
       + '    "resource": {\n'
       + '      "externalErrors": [\n'
       + '        {\n'
-      + '          "messageSentAt": "2025-01-04T09:00:00.000Z",\n'
+      + '          "messageSentAt": "2025-01-04T09:00:00Z",\n'
       + '          "errors": [\n'
       + '            {\n'
       + '              "code": "HMRCVAL101",\n'
@@ -380,7 +380,7 @@ const declarationResourceEvents = [
       + '            }\n'
       + '          ],\n'
       + '          "externalVersion": 1,\n'
-      + '          "created": "2025-01-02T09:00:00.000Z"\n'
+      + '          "created": "2025-01-02T09:00:00Z"\n'
       + '        }\n'
       + '      ]\n'
       + '    }\n'
@@ -525,7 +525,7 @@ const importPreNotificationResourceEvents = [
       + '        "referenceNumber": "CHEDA.GB.2025.0000001",\n'
       + '        "status": "VALIDATED",\n'
       + '        "decisionDate": "2025-01-01T09:00:00.000Z",\n'
-      + '        "updatedSource": "2025-01-01T09:00:00.000Z",\n'
+      + '        "updatedSource": "2025-01-01T09:00:00Z",\n'
       + '        "partTwo": {\n'
       + '          "decision": {\n'
       + '            "decision": "Horse Re-entry"\n'
@@ -1393,4 +1393,309 @@ test('handles upstream errors when retrieving resource events for unmatched CHED
 
   const eventTitles = Array.from(document.body.querySelectorAll('.moj-timeline__item .moj-timeline__header .moj-timeline__title span:nth-child(1)')).map(title => title.innerHTML)
   expect(eventTitles.length).toBe(0)
+})
+
+test.each([
+  {
+    level2DecisionCode: 'E20',
+    shouldShowLevel2BannerText: true,
+    level3DecisionCode: 'E99',
+    shouldShowLevel3BannerText: false,
+  },
+  {
+    level2DecisionCode: 'E99',
+    shouldShowLevel2BannerText: false,
+    level3DecisionCode: 'E30',
+    shouldShowLevel3BannerText: true,
+  },
+  {
+    level2DecisionCode: 'E99',
+    shouldShowLevel2BannerText: false,
+    level3DecisionCode: 'E31',
+    shouldShowLevel3BannerText: true,
+  },
+  {
+    level2DecisionCode: 'E20',
+    shouldShowLevel2BannerText: true,
+    level3DecisionCode: 'E30',
+    shouldShowLevel3BannerText: true,
+  },
+  {
+    level2DecisionCode: 'E99',
+    shouldShowLevel2BannerText: false,
+    level3DecisionCode: 'E99',
+    shouldShowLevel3BannerText: false,
+  }
+])('Should show relevant banner text for Levels', async (options) => {
+  const levelNoMatchDeclarations = [
+    {
+      movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
+      clearanceRequest: {
+        declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+        commodities: [
+          {
+            itemNumber: 1,
+            taricCommodityCode: '0304719030',
+            goodsDescription: 'FROZEN MSC A COD FILLETS',
+            netMass: '17088.98',
+            supplementaryUnits: 0,
+            documents: [
+              {
+                documentReference: 'CHEDA.GB.2025.0000001',
+                documentCode: 'N002'
+              }
+            ],
+            checks: [{ checkCode: 'H218', departmentCode: 'HMI' }]
+          }
+        ]
+      },
+      clearanceDecision: {
+        results: [
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'X00',
+            documentReference: 'CHEDA.GB.2025.0000001',
+            internalDecisionCode: options.level2DecisionCode
+          }
+        ]
+      },
+      finalisation: {
+        finalState: '0',
+        isManualRelease: false
+      },
+      updated: '2025-05-06T13:11:59.257Z'
+    },
+    {
+      movementReferenceNumber: '24GB0Z8WEJ9ZBTL73B',
+      clearanceRequest: {
+        declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+        commodities: [
+          {
+            itemNumber: 1,
+            taricCommodityCode: '0304719030',
+            goodsDescription: 'FROZEN MSC A COD FILLETS',
+            netMass: '17088.98',
+            supplementaryUnits: 0,
+            documents: [
+              {
+                documentReference: 'CHEDA.GB.2025.0000002',
+                documentCode: 'N002'
+              }
+            ],
+            checks: [{ checkCode: 'H218', departmentCode: 'HMI' }]
+          }
+        ]
+      },
+      clearanceDecision: {
+        results: [
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'X00',
+            documentReference: 'CHEDA.GB.2025.0000001',
+            internalDecisionCode: options.level3DecisionCode
+          }
+        ]
+      },
+      finalisation: {
+        finalState: '0',
+        isManualRelease: false
+      },
+      updated: '2025-05-06T13:11:59.257Z'
+    }
+  ]
+
+  const declarationsWithLevelNoMatch = {
+    customsDeclarations: levelNoMatchDeclarations,
+    importPreNotifications
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: declarationsWithLevelNoMatch })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const server = await initialiseServer()
+  const authedUser = createAuthedUser(undefined, 'entraId')
+  authedUser.scope = ['admin']
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
+    auth: {
+      strategy: 'session',
+      credentials: {
+        ...authedUser
+      }
+    },
+    headers: {
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
+    }
+  })
+
+  globalJsdom(payload)
+  initFilters()
+
+  const level2BannerText = queryByText(document.body, 'If level 2 matching was applied, this declaration would not be released. At least one commodity code on this customs declaration is not listed on the CHED.')
+  if (options.shouldShowLevel2BannerText) {
+    expect(level2BannerText).toBeInTheDocument()
+  } else {
+    expect(level2BannerText).not.toBeInTheDocument()
+  }
+
+  const level3BannerText = queryByText(document.body, 'If level 3 matching was applied, this declaration would not be released. The declared weight or quantity on at least one item does not match the CHED.')
+  if (options.shouldShowLevel3BannerText) {
+    expect(level3BannerText).toBeInTheDocument()
+  } else {
+    expect(level3BannerText).not.toBeInTheDocument()
+  }
+})
+
+test.each([
+  {
+    provider: 'entraId',
+    scope: ['admin'],
+    shouldShowBanner: true
+  },
+  {
+    provider: 'entraId',
+    scope: [],
+    shouldShowBanner: false
+  },
+  {
+    provider: 'defraId',
+    scope: null,
+    shouldShowBanner: false
+  }
+])('Level Matching banner only visible to certain user scopes', async (options) => {
+  const levelNoMatchDeclarations = [
+    {
+      movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
+      clearanceRequest: {
+        declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+        commodities: [
+          {
+            itemNumber: 1,
+            taricCommodityCode: '0304719030',
+            goodsDescription: 'FROZEN MSC A COD FILLETS',
+            netMass: '17088.98',
+            supplementaryUnits: 0,
+            documents: [
+              {
+                documentReference: 'CHEDA.GB.2025.0000001',
+                documentCode: 'N002'
+              }
+            ],
+            checks: [{ checkCode: 'H218', departmentCode: 'HMI' }]
+          }
+        ]
+      },
+      clearanceDecision: {
+        results: [
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'X00',
+            documentReference: 'CHEDA.GB.2025.0000001',
+            internalDecisionCode: 'E20'
+          }
+        ]
+      },
+      finalisation: {
+        finalState: '0',
+        isManualRelease: false
+      },
+      updated: '2025-05-06T13:11:59.257Z'
+    },
+    {
+      movementReferenceNumber: '24GB0Z8WEJ9ZBTL73B',
+      clearanceRequest: {
+        declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+        commodities: [
+          {
+            itemNumber: 1,
+            taricCommodityCode: '0304719030',
+            goodsDescription: 'FROZEN MSC A COD FILLETS',
+            netMass: '17088.98',
+            supplementaryUnits: 0,
+            documents: [
+              {
+                documentReference: 'CHEDA.GB.2025.0000002',
+                documentCode: 'N002'
+              }
+            ],
+            checks: [{ checkCode: 'H218', departmentCode: 'HMI' }]
+          }
+        ]
+      },
+      clearanceDecision: {
+        results: [
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'X00',
+            documentReference: 'CHEDA.GB.2025.0000001',
+            internalDecisionCode: 'E30'
+          }
+        ]
+      },
+      finalisation: {
+        finalState: '0',
+        isManualRelease: false
+      },
+      updated: '2025-05-06T13:11:59.257Z'
+    }
+  ]
+
+  const declarationsWithLevelNoMatch = {
+    customsDeclarations: levelNoMatchDeclarations,
+    importPreNotifications
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: declarationsWithLevelNoMatch })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const server = await initialiseServer()
+  const authedUser = createAuthedUser(undefined, options.provider)
+  if (options.scope) {
+    authedUser.scope = options.scope
+  }
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
+    auth: {
+      strategy: 'session',
+      credentials: {
+        ...authedUser
+      }
+    },
+    headers: {
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
+    }
+  })
+
+  globalJsdom(payload)
+  initFilters()
+
+  if (options.shouldShowBanner) {
+    expect(
+      getByRole(document.body, 'region', {
+        name: 'Important'
+      })
+    ).toBeInTheDocument()
+  } else {
+    expect(
+      queryByRole(document.body, 'region', {
+        name: 'Important'
+      })
+    ).not.toBeInTheDocument()
+  }
 })

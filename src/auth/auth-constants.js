@@ -8,5 +8,6 @@ export const APP_SCOPES = {
 }
 
 export const AUTH_FEATURES = {
-  LEVEL_MATCHING_REPORTS: 'levelMatchingReports'
+  LEVEL_MATCHING_REPORTS: 'levelMatchingReports',
+  LEVEL_NO_MATCH_BANNER: 'levelNoMatchBanner'
 }
