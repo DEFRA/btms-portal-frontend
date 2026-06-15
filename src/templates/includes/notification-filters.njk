@@ -1,11 +1,11 @@
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 
-<div id="notification-filters-wrapper" hidden>
-  <form id="notification-filters" class="btms-filters">
+<div id="notification{{ tabContextSuffix }}-filters-wrapper" hidden>
+  <form id="notification{{ tabContextSuffix }}-filters" class="btms-filters">
     {{
       govukSelect({
-        id: "chedAuthority",
-        name: "chedAuthority",
+        id: "chedAuthority" ~ tabContext,
+        name: "chedAuthority" ~ tabContext,
         label: { text: "Authority" },
         items: [
           { text: 'Show all', value: '', selected: true },
@@ -18,7 +18,7 @@
         ]
       })
     }}
-    <div id="notification-reset" class="btms-clear-filters" hidden>
+    <div id="notification{{ tabContextSuffix }}-reset" class="btms-clear-filters" hidden>
       {% include "./button-reset.njk" %}
     </div>
   </form>

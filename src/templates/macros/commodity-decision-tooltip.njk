@@ -1,0 +1,7 @@
+{% macro commodityDecisionTooltip(id, decision, description) %}
+  {% set id = 'decision-tooltip-' ~ id %}
+  <div aria-describedby="{{ id }}">
+    <span class="btms-no-match">{{ decision }}</span>
+    <div role="tooltip" id="{{ id }}">{{ description }}</div>
+  </div>
+{% endmacro %}

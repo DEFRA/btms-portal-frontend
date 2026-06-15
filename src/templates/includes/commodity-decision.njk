@@ -1,0 +1,14 @@
+{% from "../macros/commodity-decision-tooltip.njk" import commodityDecisionTooltip %}
+
+{% if tabContext === tabContexts.LEVELS_RESULT and decision.match === true and decision.level2NoMatch === true %}
+  {{ commodityDecisionTooltip(commodity.id, 'No match - Incorrect commodity code', 'Commodity code ' ~ commodity.taricCommodityCode ~ ' cannot be found in IPAFFS. Check that the code is correct.') }}
+{% elif tabContext === tabContexts.LEVELS_RESULT and decision.match === true and decision.level3NoMatchWeight === true %}
+  {{ commodityDecisionTooltip(commodity.id, 'No match - Incorrect net weight', 'The declared weight of this item does not match CHED reference ' ~ decision.documentReference) }}
+{% elif tabContext === tabContexts.LEVELS_RESULT and decision.match === true and decision.level3NoMatchQuantity === true %}
+  {{ commodityDecisionTooltip(commodity.id, 'No match - Incorrect quantity', 'The declared quantity of this item does not match CHED reference ' ~ decision.documentReference) }}
+{% else %}
+  {% if decision.decision %}
+    {{ decision.decision }} -
+  {% endif %}
+  {{ decision.decisionDetail }}
+{% endif %}

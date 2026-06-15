@@ -1399,34 +1399,28 @@ test.each([
   {
     level2DecisionCode: 'E20',
     shouldShowLevel2BannerText: true,
-    level3DecisionCode: 'E99',
+    level3DecisionCode: '',
     shouldShowLevel3BannerText: false,
   },
   {
-    level2DecisionCode: 'E99',
+    level2DecisionCode: 'H01',
     shouldShowLevel2BannerText: false,
     level3DecisionCode: 'E30',
     shouldShowLevel3BannerText: true,
   },
   {
-    level2DecisionCode: 'E99',
+    level2DecisionCode: 'H01',
     shouldShowLevel2BannerText: false,
     level3DecisionCode: 'E31',
     shouldShowLevel3BannerText: true,
   },
   {
-    level2DecisionCode: 'E20',
-    shouldShowLevel2BannerText: true,
-    level3DecisionCode: 'E30',
-    shouldShowLevel3BannerText: true,
-  },
-  {
-    level2DecisionCode: 'E99',
+    level2DecisionCode: 'H01',
     shouldShowLevel2BannerText: false,
-    level3DecisionCode: 'E99',
+    level3DecisionCode: 'H01',
     shouldShowLevel3BannerText: false,
   }
-])('Should show relevant banner text and Tab link for Levels', async (options) => {
+])('Should show relevant banner text, Tab link and No Match Results for Levels', async (options) => {
   const levelNoMatchDeclarations = [
     {
       movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
@@ -1454,47 +1448,22 @@ test.each([
           {
             itemNumber: 1,
             checkCode: 'H218',
-            decisionCode: 'X00',
+            decisionCode: 'H01',
             documentReference: 'CHEDA.GB.2025.0000001',
-            internalDecisionCode: options.level2DecisionCode
-          }
-        ]
-      },
-      finalisation: {
-        finalState: '0',
-        isManualRelease: false
-      },
-      updated: '2025-05-06T13:11:59.257Z'
-    },
-    {
-      movementReferenceNumber: '24GB0Z8WEJ9ZBTL73B',
-      clearanceRequest: {
-        declarationUcr: '1GB126344356000-ABC35932Y1BHX',
-        commodities: [
-          {
-            itemNumber: 1,
-            taricCommodityCode: '0304719030',
-            goodsDescription: 'FROZEN MSC A COD FILLETS',
-            netMass: '17088.98',
-            supplementaryUnits: 0,
-            documents: [
-              {
-                documentReference: 'CHEDA.GB.2025.0000002',
-                documentCode: 'N002'
-              }
-            ],
-            checks: [{ checkCode: 'H218', departmentCode: 'HMI' }]
-          }
-        ]
-      },
-      clearanceDecision: {
-        results: [
+            internalDecisionCode: 'H01',
+            mode: 'Active',
+            level: 1,
+            ruleName: "InspectionRequiredDecisionRule"
+          },
           {
             itemNumber: 1,
             checkCode: 'H218',
-            decisionCode: 'X00',
+            decisionCode: 'H01',
             documentReference: 'CHEDA.GB.2025.0000001',
-            internalDecisionCode: options.level3DecisionCode
+            internalDecisionCode: options.level2DecisionCode,
+            mode: 'Passive',
+            level: 2,
+            ruleName: "CommodityCodeDecisionRule"
           }
         ]
       },
@@ -1505,6 +1474,19 @@ test.each([
       updated: '2025-05-06T13:11:59.257Z'
     }
   ]
+
+  if (options.level2DecisionCode !== 'E20') {
+    levelNoMatchDeclarations[0].clearanceDecision.results.push({
+      itemNumber: 1,
+      checkCode: 'H218',
+      decisionCode: 'H01',
+      documentReference: 'CHEDA.GB.2025.0000001',
+      internalDecisionCode: options.level3DecisionCode,
+      mode: 'Passive',
+      level: 3,
+      ruleName: "CommodityQuantityCheckDecisionRule"
+    })
+  }
 
   const declarationsWithLevelNoMatch = {
     customsDeclarations: levelNoMatchDeclarations,
@@ -1523,7 +1505,7 @@ test.each([
 
   const { payload } = await server.inject({
     method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73A`,
     auth: {
       strategy: 'session',
       credentials: {
@@ -1557,10 +1539,45 @@ test.each([
     expect(
       queryByRole(document.body, 'link', { name: 'View L2/L3 result' })
     ).toBeInTheDocument()
+
+    const noMatchStatus = document.body.querySelector('.btms-declaration-levels-result tbody tr td strong.govuk-tag--red')
+
+    if (options.level2DecisionCode === 'E20') {
+      expect(noMatchStatus).toBeInTheDocument()
+      const commodityCodeErrorHighlighted = document.body.querySelector('.btms-declaration-levels-result tbody tr td span.btms-details__commodity-code--no-match')
+      expect(commodityCodeErrorHighlighted).toBeInTheDocument()
+      expect(queryByText(document.body, 'No match - Incorrect commodity code'))
+        .toBeInTheDocument()
+      expect(queryByText(document.body, `Commodity code ${levelNoMatchDeclarations[0].clearanceRequest.commodities[0].taricCommodityCode} cannot be found in IPAFFS. Check that the code is correct.`))
+        .toBeInTheDocument()
+    }
+
+    if (options.level3DecisionCode === 'E30') {
+      expect(noMatchStatus).toBeInTheDocument()
+      const weightErrorHighlighted = document.body.querySelector('.btms-declaration-levels-result tbody tr td span.btms-details__commodity-weight-quantity--no-match')
+      expect(weightErrorHighlighted).toBeInTheDocument()
+      expect(queryByText(document.body, 'No match - Incorrect net weight'))
+        .toBeInTheDocument()
+      expect(queryByText(document.body, `The declared weight of this item does not match CHED reference ${levelNoMatchDeclarations[0].clearanceRequest.commodities[0].documents[0].documentReference}`))
+        .toBeInTheDocument()
+    }
+
+    if (options.level3DecisionCode === 'E31') {
+      expect(noMatchStatus).toBeInTheDocument()
+      const quantityErrorHighlighted = document.body.querySelector('.btms-declaration-levels-result tbody tr td span.btms-details__commodity-weight-quantity--no-match')
+      expect(quantityErrorHighlighted).toBeInTheDocument()
+      expect(queryByText(document.body, 'No match - Incorrect quantity'))
+        .toBeInTheDocument()
+      expect(queryByText(document.body, `The declared quantity of this item does not match CHED reference ${levelNoMatchDeclarations[0].clearanceRequest.commodities[0].documents[0].documentReference}`))
+        .toBeInTheDocument()
+    }
   } else {
     expect(
       queryByRole(document.body, 'link', { name: 'View L2/L3 result' })
     ).not.toBeInTheDocument()
+    expect(queryByText(document.body, 'No match - Incorrect commodity code')).not.toBeInTheDocument()
+    expect(queryByText(document.body, 'No match - Incorrect net weight')).not.toBeInTheDocument()
+    expect(queryByText(document.body, 'No match - Incorrect quantity')).not.toBeInTheDocument()
   }
 })
 
