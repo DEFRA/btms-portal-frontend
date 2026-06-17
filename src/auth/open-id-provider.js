@@ -3,7 +3,7 @@ import { getOpenIdConfig } from './open-id-client.js'
 import { checkOrganisation } from './check-organisation.js'
 import { checkGroups } from './check-groups.js'
 import { config } from '../config/config.js'
-import { APP_SCOPES, AUTH_PROVIDERS } from './auth-constants.js'
+import { APP_SCOPES, AUTH_PROVIDERS, KEY_TYPES } from './auth-constants.js'
 
 const entraAdminSecurityGroupId = config.get('auth.entraId.adminGroupId')
 
@@ -18,6 +18,39 @@ const setOrigins = (providerEndpoints) => {
   const updatedOrigins = [...new Set([...origins, ...newOrigins])]
 
   config.set('auth.origins', updatedOrigins)
+}
+
+const getPublicKey = async (kid, oidcConf) => {
+  const oidcJwksKeys = await getOpenIdConfig(oidcConf.jwks_uri)
+  const signingKey = oidcJwksKeys?.keys?.find(key => key.kid === kid)
+
+  if (signingKey) {
+    if (signingKey.kty === KEY_TYPES.RSA) {
+      return jwt.crypto.rsaPublicKeyToPEM(signingKey.n, signingKey.e)
+    } else {
+      throw new Error(
+        `Unexpected algorithm used for token signing: ${signingKey.kty}`
+      )
+    }
+  }
+
+  return null
+}
+
+const getVerifiedPayload = async (provider, token, oidcConf, authConfig) => {
+  const decodedToken = jwt.token.decode(token)
+  const publicKey = await getPublicKey(decodedToken.decoded.header.kid, oidcConf)
+
+  try {
+    jwt.token.verify(decodedToken, publicKey, {
+      iss: oidcConf.issuer,
+      aud: authConfig.clientId
+    })
+  } catch (error) {
+    throw new Error(`${provider} Token failed verification: ${error.message}`)
+  }
+
+  return decodedToken.decoded.payload
 }
 
 export const openIdProvider = async (name, authConfig) => {
@@ -46,12 +79,12 @@ export const openIdProvider = async (name, authConfig) => {
         )
       }
 
-      const payload = jwt.token.decode(credentials.token).decoded.payload
-
       credentials.logoutUrl = oidcConf.end_session_endpoint
       credentials.tokenUrl = oidcConf.token_endpoint
 
       if (credentials.provider === AUTH_PROVIDERS.DEFRA_ID) {
+        const payload = await getVerifiedPayload(credentials.provider, credentials.token, oidcConf, authConfig)
+
         checkOrganisation(payload.currentRelationshipId, payload.relationships)
 
         const displayName = [payload.firstName, payload.lastName]
@@ -71,8 +104,8 @@ export const openIdProvider = async (name, authConfig) => {
           roles: payload.roles
         }
       } else if (credentials.provider === AUTH_PROVIDERS.ENTRA_ID) {
-        const { groups = [] } = jwt.token.decode(params.id_token).decoded
-          .payload
+        const payload = await getVerifiedPayload(credentials.provider, params.id_token, oidcConf, authConfig)
+        const { groups = [] } = payload
         checkGroups(groups)
 
         credentials.externalSessionId = payload.sid
