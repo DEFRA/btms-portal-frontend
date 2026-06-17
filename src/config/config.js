@@ -451,12 +451,12 @@ const config = convict({
           default: ['admin']
         }
       },
-      levelNoMatchBanner: {
+      levelNoMatchSearchResults: {
         allowedScopes: {
-          doc: 'Allowed Security Groups which will see the Level No Match Warning Banner on Search Results page',
+          doc: 'Allowed Security Groups which will see the Level No Match Warning Banner and the L2/L3 Results Tab on Search Results page',
           format: Array,
           sensitive: true,
-          env: 'AUTH_FEATURE_LEVEL_NO_MATCH_BANNER_ALLOWED_SCOPES',
+          env: 'AUTH_FEATURE_LEVEL_NO_MATCH_SEARCH_RESULTS_ALLOWED_SCOPES',
           default: ['admin']
         }
       }
