@@ -1,6 +1,11 @@
 import globalJsdom from 'global-jsdom'
 import wreck from '@hapi/wreck'
-import { getAllByRole, getByRole, queryByRole, queryByText } from '@testing-library/dom'
+import {
+  getAllByRole,
+  getByRole,
+  queryByRole,
+  queryByText
+} from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { paths, queryStringParams } from '../../src/routes/route-constants.js'
 import { initialiseServer } from '../utils/initialise-server.js'
@@ -313,7 +318,7 @@ const declarationResourceEvents = [
       + '            "checkCode": "H221",\n'
       + '            "documentCode": "N002",\n'
       + '            "decisionCode": "H01",\n'
-      + '            "internalDecisionCode": "H01",\n'
+      + '            "internalDecisionCode": "E20",\n'
       + '            "mode": "Passive"\n'
       + '          }\n'
       + '        ],\n'
@@ -1136,6 +1141,12 @@ test('shows latest search results and timeline tabs', async () => {
   expect(createdDisplayText[11]).toBe("")
   expect(createdDisplayText[12]).toBe("")
   expect(createdDisplayText[13]).toBe("")
+
+  const timelineBtmsDecisionCodes = Array.from(document.body.querySelectorAll('.moj-timeline__item'))
+    .filter(elem => elem.querySelector('.moj-timeline__header .moj-timeline__title span').innerHTML === 'BTMS decision')
+    .map(btmsDecisionItem => btmsDecisionItem.querySelectorAll('.govuk-details__text .govuk-table .govuk-table__body .govuk-table__row .govuk-table__cell')[4].innerHTML)
+  expect(timelineBtmsDecisionCodes.length).toBe(4)
+  expect(timelineBtmsDecisionCodes.every(decisionCode => decisionCode === 'X00')).toBeTruthy()
 })
 
 test('handles resource event that cannot be parsed and mapped', async () => {
@@ -1784,4 +1795,142 @@ test('handles CHEDs in amend and modify status', async () => {
   const modifyInsetText = modifyNotification.querySelector(".govuk-inset-text")
   expect(modifyInsetText).toBeInTheDocument()
   expect(modifyInsetText).toHaveTextContent("The IPAFFS notification is currently in a 'Modify' status, so item information cannot be shown. Once the notification has been updated the item information will be displayed here.")
+})
+
+test.each(
+  [
+    {
+      decisionCode: 'E20',
+      decisionText: 'No match - Incorrect commodity code'
+    },
+    {
+      decisionCode: 'E30',
+      decisionText: 'No match - Incorrect net weight'
+    },
+    {
+      decisionCode: 'E31',
+      decisionText: 'No match - Incorrect quantity'
+    }
+  ]
+)('Should show repeated decision for multi authority declarations', async (options) => {
+  const levelNoMatchDeclarations = [
+    {
+      movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
+      clearanceRequest: {
+        declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+        commodities: [
+          {
+            itemNumber: 1,
+            taricCommodityCode: '08101000',
+            goodsDescription: 'Strawberries',
+            netMass: '17088.98',
+            supplementaryUnits: 0,
+            documents: [
+              {
+                documentReference: 'CHEDPP.GB.2025.0000001',
+                documentCode: 'C085'
+              }
+            ],
+            checks: [
+              {
+                checkCode: 'H218',
+                departmentCode: 'HMI'
+              },
+              {
+                checkCode: 'H219',
+                departmentCode: 'PHSI'
+              }
+            ]
+          }
+        ]
+      },
+      clearanceDecision: {
+        results: [
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'H01',
+            documentReference: 'CHEDPP.GB.2025.0000001',
+            internalDecisionCode: 'H01',
+            mode: 'Active',
+            level: 1,
+            ruleName: "InspectionRequiredDecisionRule"
+          },
+          {
+            itemNumber: 1,
+            checkCode: 'H219',
+            decisionCode: 'H01',
+            documentReference: 'CHEDPP.GB.2025.0000001',
+            internalDecisionCode: 'H01',
+            mode: 'Active',
+            level: 1,
+            ruleName: "InspectionRequiredDecisionRule"
+          },
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'H01',
+            documentReference: 'CHEDPP.GB.2025.0000001',
+            internalDecisionCode: options.decisionCode,
+            mode: 'Passive',
+            level: 2,
+            ruleName: "CommodityCodeDecisionRule"
+          },
+          {
+            itemNumber: 1,
+            checkCode: 'H219',
+            decisionCode: 'H01',
+            documentReference: 'CHEDPP.GB.2025.0000001',
+            internalDecisionCode: options.decisionCode,
+            mode: 'Passive',
+            level: 2,
+            ruleName: "CommodityCodeDecisionRule"
+          }
+        ]
+      },
+      finalisation: {
+        finalState: '0',
+        isManualRelease: false
+      },
+      updated: '2025-05-06T13:11:59.257Z'
+    }
+  ]
+
+
+  const declarationsWithLevelNoMatch = {
+    customsDeclarations: levelNoMatchDeclarations,
+    importPreNotifications
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: declarationsWithLevelNoMatch })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const server = await initialiseServer()
+  const authedUser = createAuthedUser(undefined, 'entraId')
+  authedUser.scope = ['admin']
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73A`,
+    auth: {
+      strategy: 'session',
+      credentials: {
+        ...authedUser
+      }
+    },
+    headers: {
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
+    }
+  })
+
+  globalJsdom(payload)
+  initFilters()
+
+  const noMatchDecisions = Array.from(document.body.querySelectorAll('table.btms-declaration-levels-result span.btms-no-match')).map(tableCell => tableCell.innerHTML)
+  expect(noMatchDecisions.length).toBe(2)
+  expect(noMatchDecisions.every(decisionText => decisionText === options.decisionText)).toBeTruthy()
 })
