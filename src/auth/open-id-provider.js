@@ -20,8 +20,8 @@ const setOrigins = (providerEndpoints) => {
   config.set('auth.origins', updatedOrigins)
 }
 
-const getPublicKey = async (kid, oidcConf) => {
-  const oidcJwksKeys = await getOpenIdConfig(oidcConf.jwks_uri)
+const getPublicKey = async (kid, oidcConf, authConfig, provider) => {
+  const oidcJwksKeys = await getOpenIdConfig(oidcConf.jwks_uri, authConfig.jwksClientTimeout)
   const signingKey = oidcJwksKeys?.keys?.find(key => key.kid === kid)
 
   if (signingKey) {
@@ -34,12 +34,12 @@ const getPublicKey = async (kid, oidcConf) => {
     }
   }
 
-  return null
+  throw new Error(`Unable to find ${provider} JWKS key matching kid: ${kid}`)
 }
 
 const getVerifiedPayload = async (provider, token, oidcConf, authConfig) => {
   const decodedToken = jwt.token.decode(token)
-  const publicKey = await getPublicKey(decodedToken.decoded.header.kid, oidcConf)
+  const publicKey = await getPublicKey(decodedToken.decoded.header.kid, oidcConf, authConfig, provider)
 
   try {
     jwt.token.verify(decodedToken, publicKey, {

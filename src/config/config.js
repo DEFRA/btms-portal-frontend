@@ -391,6 +391,12 @@ const config = convict({
         format: String,
         env: 'AUTH_DEFRA_ID_ACCOUNT_MANAGEMENT_URL',
         default: '#'
+      },
+      jwksClientTimeout: {
+        doc: 'Timeout in milliseconds before terminating call to JWKS URI',
+        format: Number,
+        env: 'AUTH_DEFRA_ID_JWKS_CLIENT_TIMEOUT',
+        default: 10000
       }
     },
     entraId: {
@@ -434,6 +440,12 @@ const config = convict({
         sensitive: true,
         env: 'AUTH_ENTRA_ID_ADMIN_GROUP_ID',
         default: ''
+      },
+      jwksClientTimeout: {
+        doc: 'Timeout in milliseconds before terminating call to JWKS URI',
+        format: Number,
+        env: 'AUTH_ENTRA_ID_JWKS_CLIENT_TIMEOUT',
+        default: 10000
       }
     },
     origins: {

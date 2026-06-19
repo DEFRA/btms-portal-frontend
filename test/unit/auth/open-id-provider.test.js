@@ -67,6 +67,16 @@ jest.mock('../../../src/auth/open-id-client.js', () => ({
             }
           ]
         }
+      case 'https://timeout/path':
+        return {
+          authorization_endpoint: 'http://some-auth-endpoint/path',
+          token_endpoint: 'http://some-token-endpoint/path',
+          end_session_endpoint: 'http://some-end-session-endpoint/path',
+          jwks_uri: 'https://jwks.timeout.endpoint',
+          issuer: 'https://login.microsoftonline.com/test/v2.0'
+        }
+      case 'https://jwks.timeout.endpoint':
+        throw new Error('Client request timeout')
       default:
         return {
           keys: [
@@ -532,7 +542,8 @@ test('jwks uri return an unexpected signing algorithm', async () => {
 test('no matching jwks key found', async () => {
   const provider = await openIdProvider(AUTH_PROVIDERS.DEFRA_ID, {
     oidcConfigurationUrl: 'https://test.it/path',
-    clientId: 'test'
+    clientId: 'test',
+    jwksClientTimeout: 1000
   })
 
   const currentRelationshipId = 'rel-id-909'
@@ -572,6 +583,51 @@ test('no matching jwks key found', async () => {
   const credentials = { provider: 'defraId', token: credentialsToken }
 
   expect(async () => provider.profile(credentials, {}, {})).rejects.toThrow(
-    'defraId Token failed verification: Cannot read properties of null (reading \'asymmetricKeyType\')'
+    'Unable to find defraId JWKS key matching kid: unknown_key_id'
+  )
+})
+
+test('jwks key retrieval timeout exception', async () => {
+  const provider = await openIdProvider(AUTH_PROVIDERS.DEFRA_ID, {
+    oidcConfigurationUrl: 'https://timeout/path',
+    clientId: 'test',
+    jwksClientTimeout: 100
+  })
+
+  config.set('auth.defraId.organisations', ['org-id-123'])
+
+  const credentialsToken = jwt.token.generate(
+    {
+      sub: 'testSub',
+      correlationId: 'testCorrelationId',
+      sessionId: 'testSessionId',
+      firstName: 'Test',
+      lastName: 'User',
+      email: 'testEmail',
+      uniqueReference: 'testUniqueRef',
+      currentRelationshipId: 'rel-id-909',
+      relationships: ['rel-id-909:org-id-123'],
+      roles: 'testRoles',
+      aud: 'test',
+      iss: 'https://login.microsoftonline.com/test/v2.0',
+      user: 'Test User',
+      exp: 4937356800,
+    },
+    {
+      key: privateKey,
+      algorithm: 'RS256'
+    },
+    {
+      ttlSec: 1,
+      header: {
+        kid: 'key_identifier'
+      }
+    }
+  )
+
+  const credentials = { provider: 'defraId', token: credentialsToken }
+
+  expect(async () => provider.profile(credentials, {}, {})).rejects.toThrow(
+    'Client request timeout'
   )
 })
