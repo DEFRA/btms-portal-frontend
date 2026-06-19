@@ -5,9 +5,10 @@ import { createLogger } from '../utils/logger.js'
 
 const logger = createLogger()
 
-const getOpenIdConfig = async (oidcConfigurationUrl) => {
+const getOpenIdConfig = async (oidcConfigurationUrl, timeout) => {
   const { payload } = await wreck.get(oidcConfigurationUrl, {
-    json: 'strict'
+    json: 'strict',
+    ...timeout && { timeout }
   })
 
   return payload
