@@ -11,6 +11,9 @@
 {% set timelineView %}
 {% include "./includes/search-result-timeline.njk" %}
 {% endset %}
+{% set levelsView %}
+{% include "./includes/search-result-levels.njk" %}
+{% endset %}
 
 {% set bannerTextHtml = [] %}
 {% if showLevel2NoMatchText %}
@@ -18,6 +21,34 @@
 {% endif %}
 {% if showLevel3NoMatchText %}
   {% set bannerTextHtml = (bannerTextHtml.push('<p>If level 3 matching was applied, this declaration would not be released. The declared weight or quantity on at least one item does not match the CHED.</p>'), bannerTextHtml) %}
+{% endif %}
+
+{% set resultsTabs = [
+  {
+    label: 'Latest',
+    id: 'latest-view',
+    panel: {
+      html: latestView
+    }
+  },
+  {
+    label: 'Timeline',
+    id: 'timeline-view',
+    panel: {
+      html: timelineView
+    }
+  }
+] %}
+{% if showLevelsResultTab %}
+  {% set bannerTextHtml = (bannerTextHtml.push('<a href="#levels-view">View L2/L3 result</a>'), bannerTextHtml) %}
+
+  {% set resultsTabs = (resultsTabs.push({
+    label: 'L2/L3 Result',
+    id: 'levels-view',
+    panel: {
+     html: levelsView
+    }
+  }), resultsTabs) %}
 {% endif %}
 
 {% block content %}
@@ -37,22 +68,7 @@
       {% endif %}
       {{ govukTabs({
         classes: 'btms-tabs',
-        items: [
-          {
-            label: 'Latest',
-            id: 'latest-view',
-            panel: {
-              html: latestView
-            }
-          },
-          {
-            label: 'Timeline',
-            id: 'timeline-view',
-            panel: {
-              html: timelineView
-            }
-          }
-        ]
+        items: resultsTabs
       }) }}
     </div>
   </div>

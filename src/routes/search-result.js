@@ -157,9 +157,10 @@ export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_
   const preNotifications = mapPreNotifications(searchResults, searchTerm)
   const timelineEvents = await getAllEvents(customsDeclarations, preNotifications)
 
-  const showLevelNoMatchBanner = isInFeatureGroup(AUTH_FEATURES.LEVEL_NO_MATCH_BANNER, request.auth.credentials.scope)
+  const showLevelNoMatchBanner = isInFeatureGroup(AUTH_FEATURES.LEVEL_NO_MATCH_SEARCH_RESULTS, request.auth.credentials.scope)
   const showLevel2NoMatchText = showLevelNoMatchBanner && includesInternalDecisionCodes(searchResults.customsDeclarations, [ 'E20' ])
   const showLevel3NoMatchText = showLevelNoMatchBanner && includesInternalDecisionCodes(searchResults.customsDeclarations, [ 'E30', 'E31' ])
+  const showLevelsResultTab = showLevel2NoMatchText || showLevel3NoMatchText
 
   const viewModel = {
     resultsPage: true,
@@ -168,7 +169,8 @@ export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_
     preNotifications,
     timelineEvents,
     showLevel2NoMatchText,
-    showLevel3NoMatchText
+    showLevel3NoMatchText,
+    showLevelsResultTab
   }
 
   return h.view('search-result', viewModel)

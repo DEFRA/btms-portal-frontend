@@ -1426,7 +1426,7 @@ test.each([
     level3DecisionCode: 'E99',
     shouldShowLevel3BannerText: false,
   }
-])('Should show relevant banner text for Levels', async (options) => {
+])('Should show relevant banner text and Tab link for Levels', async (options) => {
   const levelNoMatchDeclarations = [
     {
       movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
@@ -1552,25 +1552,35 @@ test.each([
   } else {
     expect(level3BannerText).not.toBeInTheDocument()
   }
+
+  if (options.shouldShowLevel2BannerText || options.shouldShowLevel3BannerText) {
+    expect(
+      queryByRole(document.body, 'link', { name: 'View L2/L3 result' })
+    ).toBeInTheDocument()
+  } else {
+    expect(
+      queryByRole(document.body, 'link', { name: 'View L2/L3 result' })
+    ).not.toBeInTheDocument()
+  }
 })
 
 test.each([
   {
     provider: 'entraId',
     scope: ['admin'],
-    shouldShowBanner: true
+    shouldShowBannerAndTab: true
   },
   {
     provider: 'entraId',
     scope: [],
-    shouldShowBanner: false
+    shouldShowBannerAndTab: false
   },
   {
     provider: 'defraId',
     scope: null,
-    shouldShowBanner: false
+    shouldShowBannerAndTab: false
   }
-])('Level Matching banner only visible to certain user scopes', async (options) => {
+])('Level Matching banner and Tab only visible to certain user scopes', async (options) => {
   const levelNoMatchDeclarations = [
     {
       movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
@@ -1685,18 +1695,27 @@ test.each([
   globalJsdom(payload)
   initFilters()
 
-  if (options.shouldShowBanner) {
+  const tabLinks = Array.from(document.body.querySelectorAll('.govuk-tabs__tab')).map(tab => tab.href)
+
+  if (options.shouldShowBannerAndTab) {
     expect(
       getByRole(document.body, 'region', {
         name: 'Important'
       })
     ).toBeInTheDocument()
+    expect(tabLinks.length).toBe(3)
+    expect(tabLinks.some(tabLink => tabLink.endsWith('#levels-view'))).toBeTruthy()
   } else {
     expect(
       queryByRole(document.body, 'region', {
         name: 'Important'
       })
     ).not.toBeInTheDocument()
+    expect(
+      document.body.querySelector('#tab_levels-view')
+    ).not.toBeInTheDocument()
+    expect(tabLinks.length).toBe(2)
+    expect(tabLinks.some(tabLink => tabLink.endsWith('#levels-view'))).toBeFalsy()
   }
 })
 

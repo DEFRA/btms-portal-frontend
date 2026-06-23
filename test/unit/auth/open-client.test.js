@@ -33,6 +33,18 @@ describe('#openIdClient', () => {
         })
       )
     })
+
+    test('Should call wreck get with timeout', async () => {
+      await getOpenIdConfig(oidcConfigUrl, 1000)
+
+      expect(wreck.get).toHaveBeenCalledWith(
+        oidcConfigUrl,
+        expect.objectContaining({
+          json: 'strict',
+          timeout: 1000
+        })
+      )
+    })
   })
 
   describe('#getOpenIdRefreshToken', () => {

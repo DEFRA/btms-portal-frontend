@@ -391,6 +391,12 @@ const config = convict({
         format: String,
         env: 'AUTH_DEFRA_ID_ACCOUNT_MANAGEMENT_URL',
         default: '#'
+      },
+      jwksClientTimeout: {
+        doc: 'Timeout in milliseconds before terminating call to JWKS URI',
+        format: Number,
+        env: 'AUTH_DEFRA_ID_JWKS_CLIENT_TIMEOUT',
+        default: 10000
       }
     },
     entraId: {
@@ -411,7 +417,7 @@ const config = convict({
         doc: 'ENTRA ID client secret',
         format: String,
         sensitive: true,
-        env: 'AUTH_ENTRA_ID_CLIENT_SECRET',
+        env: 'AUTH_ENTRA_ID_CLIENT_SECRET_RENEWAL',
         default: ''
       },
       groups: {
@@ -434,6 +440,12 @@ const config = convict({
         sensitive: true,
         env: 'AUTH_ENTRA_ID_ADMIN_GROUP_ID',
         default: ''
+      },
+      jwksClientTimeout: {
+        doc: 'Timeout in milliseconds before terminating call to JWKS URI',
+        format: Number,
+        env: 'AUTH_ENTRA_ID_JWKS_CLIENT_TIMEOUT',
+        default: 10000
       }
     },
     origins: {
@@ -451,12 +463,12 @@ const config = convict({
           default: ['admin']
         }
       },
-      levelNoMatchBanner: {
+      levelNoMatchSearchResults: {
         allowedScopes: {
-          doc: 'Allowed Security Groups which will see the Level No Match Warning Banner on Search Results page',
+          doc: 'Allowed Security Groups which will see the Level No Match Warning Banner and the L2/L3 Results Tab on Search Results page',
           format: Array,
           sensitive: true,
-          env: 'AUTH_FEATURE_LEVEL_NO_MATCH_BANNER_ALLOWED_SCOPES',
+          env: 'AUTH_FEATURE_LEVEL_NO_MATCH_SEARCH_RESULTS_ALLOWED_SCOPES',
           default: ['admin']
         }
       }
