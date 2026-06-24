@@ -86,14 +86,17 @@ test('post: previous URL not starting with relative path, fails validation and r
   expect(request.yar.flash('cookiesError')).toEqual([true])
 })
 
-test('post: previous URL starting with double slash is redirected to cookies page', async () => {
+test.each([
+ '//',
+ '/\\'
+])('post: previous URL starting with %s is redirected to cookies page', async (invalidPathPrefix) => {
   const server = await initialiseServer()
   const { headers, statusCode } = await server.inject({
     method: 'post',
     url: paths.COOKIES,
     payload: {
       analytics: 'yes',
-      previousUrl: '//phishing'
+      previousUrl: `${invalidPathPrefix}phishing`
     }
   })
 

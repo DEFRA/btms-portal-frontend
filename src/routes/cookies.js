@@ -43,8 +43,8 @@ export const cookiesPost = {
 
     request.yar.flash('showCookieConfirmationBanner', true)
 
-    if (previousUrl.startsWith('//')) {
-      return h.redirect('/cookies').takeover()
+    if (previousUrl.startsWith('//') || previousUrl.startsWith('/\\')) {
+      return h.redirect(paths.COOKIES).takeover()
     }
 
     return h.redirect(previousUrl)
