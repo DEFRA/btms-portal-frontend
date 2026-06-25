@@ -1,12 +1,23 @@
 const filterTypes = {
   declaration: ['decision', 'authority', 'match'],
   notification: ['chedAuthority'],
-  timeline: ['timelineMrn']
+  timeline: ['timelineMrn'],
+  declarationLevelsResult: ['decisionLevelsResult', 'authorityLevelsResult', 'matchLevelsResult'],
+  notificationLevelsResult: ['chedAuthorityLevelsResult']
 }
 
 const resultTypes = {
   declaration: 'items',
-  notification: 'commodities'
+  notification: 'commodities',
+  declarationLevelsResult: 'items',
+  notificationLevelsResult: 'commodities'
+}
+
+const filterTypeClassWrapper = {
+  declaration: 'declaration',
+  notification: 'notification',
+  declarationLevelsResult: 'declaration-levels-result',
+  notificationLevelsResult: 'notification-levels-result'
 }
 
 const noResultsInset = (type) => {
@@ -94,11 +105,23 @@ const setRow = {
     })
 
     row.hidden = authorityList.querySelectorAll('li:not([hidden])').length === 0
+  },
+  notificationLevelsResult: (state, row) => {
+    const authorityList = row.querySelector('ul')
+    const listItems = [...row.querySelectorAll('li')]
+
+    listItems.forEach((li) => {
+      li.hidden = filterTypes.notificationLevelsResult.some(
+        (key) => state[key] && li.dataset[key] !== state[key]
+      )
+    })
+
+    row.hidden = authorityList.querySelectorAll('li:not([hidden])').length === 0
   }
 }
 
 const setRows = (state, type) => {
-  const tables = [...document.querySelectorAll(`table.btms-${type}`)]
+  const tables = [...document.querySelectorAll(`table.btms-${filterTypeClassWrapper[type]}`)]
 
   tables.forEach((table) => {
     const rows = [...table.querySelectorAll('tbody tr')]
@@ -109,26 +132,29 @@ const setRows = (state, type) => {
 }
 
 const setUpFilters = (type) => {
-  const filtersWrapper = document.getElementById(`${type}-filters-wrapper`)
-  filtersWrapper.removeAttribute('hidden')
+  const filtersWrapper = document.getElementById(`${filterTypeClassWrapper[type]}-filters-wrapper`)
 
-  const filters = document.getElementById(`${type}-filters`)
-  filters.addEventListener('change', (event) => {
-    setState(event)
-    const state = getState(filterTypes[type])
-    clearButton(state, `${type}-reset`)
-    setRows(state, type)
-  })
-  filters.addEventListener('reset', () => {
-    const state = resetState(filterTypes[type])
-    clearButton(state, `${type}-reset`)
-    setRows(state, type)
-  })
+  if (filtersWrapper) {
+    filtersWrapper.removeAttribute('hidden')
 
-  const initialState = getState(filterTypes[type])
-  clearButton(initialState, `${type}-reset`)
-  selects(initialState)
-  setRows(initialState, type)
+    const filters = document.getElementById(`${filterTypeClassWrapper[type]}-filters`)
+    filters.addEventListener('change', (event) => {
+      setState(event)
+      const state = getState(filterTypes[type])
+      clearButton(state, `${filterTypeClassWrapper[type]}-reset`)
+      setRows(state, type)
+    })
+    filters.addEventListener('reset', () => {
+      const state = resetState(filterTypes[type])
+      clearButton(state, `${filterTypeClassWrapper[type]}-reset`)
+      setRows(state, type)
+    })
+
+    const initialState = getState(filterTypes[type])
+    clearButton(initialState, `${filterTypeClassWrapper[type]}-reset`)
+    selects(initialState)
+    setRows(initialState, type)
+  }
 }
 
 const setTimeline = (selectedTimelineMrn) => {
@@ -161,4 +187,5 @@ export const initFilters = () => {
   setUpFilters('declaration')
   setUpFilters('notification')
   setUpTimelineFilters()
+  setUpFilters('notificationLevelsResult')
 }

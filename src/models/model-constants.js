@@ -204,3 +204,14 @@ export const ORDERED_CDS_STATUSES = [
   CDS_STATUSES.FINALISED_TRANSFERRED_TO_MSS,
   CDS_STATUSES.UNKNOWN
 ]
+
+export const DECISION_MODE = {
+  ACTIVE: 'Active', // Decision that is sent downstream
+  PASSIVE: 'Passive' // Decision is not sent downstream
+}
+
+export const HIGHER_LEVEL_DECISION_CODE = {
+  COMMODITY_CODE_CHECK: 'E20', // Level 2
+  WEIGHT_CHECK: 'E30', // Level 3
+  QUANTITY_CHECK: 'E31' // Level 3
+}

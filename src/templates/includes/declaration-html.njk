@@ -4,7 +4,7 @@
 
 {% set maxLength = 24 %}
 
-<table class="govuk-table govuk-table--small-text-until-tablet btms-declaration">
+<table class="govuk-table govuk-table--small-text-until-tablet btms-declaration{{ tabContextSuffix }}">
   <thead class="govuk-table__head">
     <tr class="govuk-table__row">
       <th scope="col" class="govuk-table__header">Item number</th>
@@ -20,21 +20,26 @@
   {% for commodity in customsDeclaration.commodities %}
     <tbody class="govuk-table__body">
       {% for decision in commodity.decisions %}
-        <tr data-match="{{ decision.match }}" data-authority="{{ decision.authority.value }}" data-decision="{{ decision.decision }}">
+
+        {% set matchResult = decision.match %}
+        {% if tabContext === tabContexts.LEVELS_RESULT %}
+          {% if matchResult === true and (decision.level2NoMatch === true or decision.level3NoMatch === true) %}
+            {% set matchResult = false %}
+          {% endif %}
+        {% endif %}
+
+        <tr data-match{{ tabContextSuffix }}="{{ matchResult }}" data-authority{{ tabContextSuffix }}="{{ decision.authority.value }}" data-decision{{ tabContextSuffix }}="{{ decision.decision }}">
           <td class="govuk-table__cell">{{ commodity.itemNumber }}</td>
-          <td class="govuk-table__cell">{{ commodity.taricCommodityCode }}</td>
+          <td class="govuk-table__cell">{% include "./commodity-code.njk" %}</td>
           <td class="govuk-table__cell">{{ commodityDescription(commodity.goodsDescription, commodity.id, maxLength) }}</td>
-          <td class="govuk-table__cell">{{ commodity.weightOrQuantity }}</td>
+          <td class="govuk-table__cell">{% include "./commodity-weight-quantity.njk" %}</td>
           {{ documentReference(decision) }}
-          <td class="govuk-table__cell">{{ decisionMatch(decision.match) }}</td>
+          <td class="govuk-table__cell">{{ decisionMatch(matchResult) }}</td>
           <td class="govuk-table__cell">
             {{ decision.authority.text }}
           </td>
           <td class="govuk-table__cell">
-            {% if decision.decision %}
-              {{ decision.decision }} -
-            {% endif %}
-            {{ decision.decisionDetail }}
+            {% include "./commodity-decision.njk" %}
           </td>
         </tr>
       {% endfor %}

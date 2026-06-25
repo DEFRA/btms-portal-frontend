@@ -3,6 +3,11 @@
 {% from "govuk/components/tabs/macro.njk" import govukTabs %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 
+{% set tabContexts = {
+  LATEST_RESULT: "",
+  LEVELS_RESULT: "LevelsResult"
+} %}
+
 {% set pageTitle = "Showing result for " ~ searchTerm %}
 
 {% set latestView %}

@@ -119,16 +119,36 @@
     @include govuk-font-size($size: 14);
   }
 
-  .btms-declaration td:nth-child(3) {
-    width: 22%;
+  .btms-declaration {
+    td:nth-child(3) {
+      width: 22%;
+    }
   }
 
-  .btms-notification td:nth-child(3) {
-    width: 30%;
+  .btms-notification,
+  .btms-notification-levels-result {
+    td:nth-child(3) {
+      width: 30%;
+    }
   }
 
   .govuk-table td:last-child {
     width: 18%;
+  }
+
+  .btms-declaration-levels-result {
+    td:nth-child(3) {
+      width: 20%;
+    }
+
+    td:last-child {
+      width: 20%;
+    }
+  }
+
+  .btms-details__commodity-code--no-match,
+  .btms-details__commodity-weight-quantity--no-match {
+    color: $govuk-error-colour;
   }
 }
 
@@ -193,23 +213,52 @@
     visibility: hidden;
   }
 
+  .btms-declaration-levels-result
+  tbody
+  > tr:not([hidden])
+  + tr:not(:first-of-type)
+  > td:nth-child(-n + 1) {
+    visibility: hidden;
+  }
+
+  .btms-declaration-levels-result
+  tbody
+  > tr:not([hidden])
+  + tr[data-authority-levels-result="IUU"]
+  > td:nth-child(-n + 4) {
+    visibility: hidden;
+  }
+
   .btms-declaration
-    tbody
-    tr:not(:last-of-type):not(:has(+ tr[data-authority="IUU"]))
-    > td:nth-last-child(-n + 4) {
+  tbody
+  tr:not(:last-of-type):not(:has(+ tr[data-authority="IUU"]))
+  > td:nth-last-child(-n + 4) {
     border-bottom: 1px dashed $btms-light-to-mid-grey;
   }
 
-  .btms-declaration tbody:last-of-type tr:last-of-type > td {
-    border-bottom: none;
+  .btms-declaration-levels-result
+  tbody
+  tr:not(:last-of-type):not(:has(+ tr[data-authority-levels-result="IUU"]))
+  > td:nth-last-child(-n + 4) {
+    border-bottom: 1px dashed $btms-light-to-mid-grey;
   }
 
-  .btms-declaration tbody > tr:not(:last-of-type) > td {
-    border: none;
+  .btms-declaration,
+  .btms-declaration-levels-result {
+    tbody:last-of-type tr:last-of-type > td {
+      border-bottom: none;
+    }
+
+    tbody > tr:not(:last-of-type) > td {
+      border: none;
+    }
   }
 
-  .btms-notification tbody tr:last-child td {
-    border-bottom: none;
+  .btms-notification,
+  .btms-notification-levels-result {
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
   }
 
   .govuk-inset-text {

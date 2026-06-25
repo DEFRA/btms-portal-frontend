@@ -13,7 +13,9 @@ import {
   IUUDocumentCodes,
   DATE_FORMAT,
   NO_MATCH_DECISION_CODE,
-  CDS_STATUSES
+  CDS_STATUSES,
+  DECISION_MODE,
+  HIGHER_LEVEL_DECISION_CODE
 } from './model-constants.js'
 import { sortDescending } from './sort.js'
 import { paths, queryStringParams } from '../routes/route-constants.js'
@@ -186,10 +188,18 @@ export const getCustomsDeclarationOpenState = (finalisation) =>
     (finalisation.finalState === '1' || finalisation.finalState === '2')
   )
 
+const itemResultsContainPassiveDecisionCode = (clearanceDecision, commodity, decisionCode) => {
+  return clearanceDecision?.results.some(result => {
+    return result.itemNumber === commodity.itemNumber
+      && (result.mode === DECISION_MODE.PASSIVE)
+      && result.internalDecisionCode === decisionCode
+  })
+}
+
 const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
   const clearanceDecisions =
     clearanceDecision?.results.filter(
-      ({ itemNumber, mode }) => itemNumber === commodity.itemNumber && (mode == null || mode === 'Active')
+      ({ itemNumber, mode }) => itemNumber === commodity.itemNumber && (mode == null || mode === DECISION_MODE.ACTIVE)
     ) || []
 
   const allDecisionCodesAreNoMatch = clearanceDecisions.every(
@@ -198,6 +208,11 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
   const iuuRelatedChedpCheck = clearanceDecisions.find(
     (decision) => decision.checkCode === 'H222'
   )
+
+  const level2NoMatch = itemResultsContainPassiveDecisionCode(clearanceDecision, commodity, HIGHER_LEVEL_DECISION_CODE.COMMODITY_CODE_CHECK)
+  const level3NoMatchWeight = itemResultsContainPassiveDecisionCode(clearanceDecision, commodity, HIGHER_LEVEL_DECISION_CODE.WEIGHT_CHECK)
+  const level3NoMatchQuantity = itemResultsContainPassiveDecisionCode(clearanceDecision, commodity, HIGHER_LEVEL_DECISION_CODE.QUANTITY_CHECK)
+  const level3NoMatch = level3NoMatchWeight || level3NoMatchQuantity
 
   const decisions = clearanceDecisions.map((decision) => {
     const documentReferenceId = decision.documentReference
@@ -238,7 +253,11 @@ const mapCommodity = (commodity, notificationStatuses, clearanceDecision) => {
         value: checkCodeToAuthorityMapping[decision.checkCode]
       },
       documentReference: isIuuOutcome ? null : getDocumentReference(decision),
-      match: isIuuOutcome ? null : isMatch
+      match: isIuuOutcome ? null : isMatch,
+      level2NoMatch,
+      level3NoMatch,
+      level3NoMatchWeight,
+      level3NoMatchQuantity
     }
   })
 
