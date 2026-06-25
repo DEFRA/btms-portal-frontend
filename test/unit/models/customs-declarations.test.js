@@ -89,6 +89,10 @@ test('MRN, open, finalised, using netMass, matched', () => {
             {
               id: expect.any(String),
               documentReference: 'GBCHD2025.1234567',
+              level2NoMatch: false,
+              level3NoMatch: false,
+              level3NoMatchQuantity: false,
+              level3NoMatchWeight: false,
               match: true,
               decision: 'Release',
               decisionDetail: 'Inspection complete',
@@ -103,6 +107,10 @@ test('MRN, open, finalised, using netMass, matched', () => {
               id: expect.any(String),
               checkCode: 'H224',
               documentReference: null,
+              level2NoMatch: false,
+              level3NoMatch: false,
+              level3NoMatchQuantity: false,
+              level3NoMatchWeight: false,
               match: null,
               decision: 'Release',
               decisionDetail: 'IUU inspection complete',
@@ -228,6 +236,10 @@ test('a split consignment with a matching document', () => {
               documentReference: 'GBCHD2025.1234567V',
               id: expect.any(String),
               checkCode: 'H221',
+              level2NoMatch: false,
+              level3NoMatch: false,
+              level3NoMatchQuantity: false,
+              level3NoMatchWeight: false,
               match: true,
               decision: 'Release',
               decisionDetail: 'Inspection complete',
@@ -355,6 +367,10 @@ test('a split consignment without a matching document', () => {
               documentReference: 'GBCHD2025.1999997V',
               id: expect.any(String),
               checkCode: 'H221',
+              level2NoMatch: false,
+              level3NoMatch: false,
+              level3NoMatchQuantity: false,
+              level3NoMatchWeight: false,
               match: false,
               decision: '',
               decisionDetail: 'No match - CHED cannot be found',
@@ -445,6 +461,10 @@ test('an MRN, with no CHED, with no documents', () => {
             {
               id: expect.any(String),
               documentReference: null,
+              level2NoMatch: false,
+              level3NoMatch: false,
+              level3NoMatchQuantity: false,
+              level3NoMatchWeight: false,
               match: false,
               checkCode: 'H220',
               decision: '',
@@ -616,6 +636,10 @@ test('matches malformed references', () => {
             {
               id: expect.any(String),
               documentReference: 'GB.CHD.2025.0000002',
+              level2NoMatch: false,
+              level3NoMatch: false,
+              level3NoMatchQuantity: false,
+              level3NoMatchWeight: false,
               match: true,
               checkCode: 'H223',
               decision: 'Release',
@@ -793,6 +817,10 @@ test.each([
                 },
                 documentReference: documentReference || 'GBCHD2025.9710001',
                 id: expect.any(String),
+                level2NoMatch: false,
+                level3NoMatch: false,
+                level3NoMatchQuantity: false,
+                level3NoMatchWeight: false,
                 match: false
               }
             ],
@@ -1220,6 +1248,10 @@ test.each([
               {
                 id: expect.any(String),
                 documentReference: 'GBCHD2025.1234567',
+                level2NoMatch: false,
+                level3NoMatch: false,
+                level3NoMatchQuantity: false,
+                level3NoMatchWeight: false,
                 match: true,
                 checkCode: 'H222',
                 decision: options.chedDecision,
@@ -1233,6 +1265,10 @@ test.each([
               {
                 id: expect.any(String),
                 documentReference: null,
+                level2NoMatch: false,
+                level3NoMatch: false,
+                level3NoMatchQuantity: false,
+                level3NoMatchWeight: false,
                 match: null,
                 checkCode: 'H224',
                 decision: options.iuuDecision,
@@ -1574,6 +1610,10 @@ test('an MRN, with HMI authorities', () => {
             {
               id: expect.any(String),
               documentReference: null,
+              level2NoMatch: false,
+              level3NoMatch: false,
+              level3NoMatchQuantity: false,
+              level3NoMatchWeight: false,
               match: false,
               checkCode: 'H218',
               decision: '',
@@ -1597,6 +1637,10 @@ test('an MRN, with HMI authorities', () => {
             {
               id: expect.any(String),
               documentReference: null,
+              level2NoMatch: false,
+              level3NoMatch: false,
+              level3NoMatchQuantity: false,
+              level3NoMatchWeight: false,
               match: false,
               checkCode: 'H220',
               decision: '',
@@ -2219,3 +2263,180 @@ test('CHED ordering: handles decisions with unknown check codes (undefined autho
   expect(result[0].commodities[0].decisions[0].authority.text).toBeUndefined()
   expect(result[0].commodities[0].decisions[1].authority.text).toBeUndefined()
 })
+
+test.each([
+  {
+    level2NoMatch: true,
+    level3NoMatch: false,
+    level3NoMatchWeight: false,
+    level3NoMatchQuantity: false,
+    passiveLevel: 2,
+    passiveDecisionCode: 'E20',
+    passiveRuleName: 'CommodityCodeDecisionRule'
+  },
+  {
+    level2NoMatch: false,
+    level3NoMatch: true,
+    level3NoMatchWeight: true,
+    level3NoMatchQuantity: false,
+    passiveLevel: 3,
+    passiveDecisionCode: 'E30',
+    passiveRuleName: 'CommodityQuantityCheckDecisionRule'
+  },
+  {
+    level2NoMatch: false,
+    level3NoMatch: true,
+    level3NoMatchWeight: false,
+    level3NoMatchQuantity: true,
+    passiveLevel: 3,
+    passiveDecisionCode: 'E31',
+    passiveRuleName: 'CommodityQuantityCheckDecisionRule'
+  }
+])(
+  'higher level match indicators set based on passive decision code $passiveDecisionCode',
+  ({ level2NoMatch, level3NoMatch, level3NoMatchWeight, level3NoMatchQuantity, passiveLevel, passiveDecisionCode, passiveRuleName }) => {
+    const data = {
+      customsDeclarations: [
+        {
+          movementReferenceNumber: 'GB251234567890ABCD',
+          clearanceRequest: {
+            declarationUcr: '5GB123456789000-BDOV123456',
+            commodities: [
+              {
+                itemNumber: 1,
+                netMass: '9999',
+                documents: [
+                  {
+                    documentCode: 'N851',
+                    documentReference: 'GBCHD2025.9710001',
+                    documentStatus: 'AE',
+                    documentControl: 'P',
+                    documentQuantity: null
+                  }
+                ],
+                checks: [
+                  {
+                    checkCode: 'H219',
+                    departmentCode: 'PHSI'
+                  }
+                ]
+              }
+            ]
+          },
+          clearanceDecision: {
+            items: [
+              {
+                itemNumber: 1,
+                checks: [
+                  {
+                    checkCode: 'H219',
+                    decisionCode: 'H01',
+                    decisionsValidUntil: null,
+                    decisionReasons: [],
+                    decisionInternalFurtherDetail: ['H01']
+                  }
+                ]
+              }
+            ],
+            results: [
+              {
+                itemNumber: 1,
+                importPreNotification: 'CHEDPP.GB.2025.9710001',
+                documentReference: 'GBCHD2025.9710001',
+                checkCode: 'H219',
+                decisionCode: 'H01',
+                decisionReason: null,
+                internalDecisionCode: 'H01',
+                mode: 'Active',
+                level: 1,
+                ruleName: "InspectionRequiredDecisionRule"
+              },
+              {
+                itemNumber: 1,
+                importPreNotification: 'CHEDPP.GB.2025.9710001',
+                documentReference: 'GBCHD2025.9710001',
+                checkCode: 'H219',
+                decisionCode: 'X00',
+                decisionReason: null,
+                internalDecisionCode: passiveDecisionCode,
+                mode: 'Passive',
+                level: passiveLevel,
+                ruleName: passiveRuleName
+              }
+            ]
+          },
+          finalisation: {
+            isManualRelease: false,
+            finalState: '0'
+          },
+          updated: '2025-05-12T11:13:17.330Z'
+        }
+      ],
+      importPreNotifications: [
+        {
+          importPreNotification: {
+            referenceNumber: 'CHEDP.GB.2025.9710001',
+            status: 'VALIDATED'
+          }
+        }
+      ]
+    }
+
+    const result = mapCustomsDeclarations(data)
+
+    const expected = [
+      {
+        commodities: [
+          {
+            checks: [
+              {
+                checkCode: 'H219',
+                departmentCode: 'PHSI'
+              }
+            ],
+            decisions: [
+              {
+                decision: 'Hold',
+                decisionDetail: 'Awaiting decision',
+                decisionReason: null,
+                checkCode: 'H219',
+                authority: {
+                  text: 'PHSI',
+                  value: 'PHSI'
+                },
+                documentReference: 'GBCHD2025.9710001',
+                id: expect.any(String),
+                level2NoMatch,
+                level3NoMatch,
+                level3NoMatchQuantity,
+                level3NoMatchWeight,
+                match: true
+              }
+            ],
+            documents: [
+              {
+                documentCode: 'N851',
+                documentControl: 'P',
+                documentQuantity: null,
+                documentReference: 'GBCHD2025.9710001',
+                documentStatus: 'AE'
+              }
+            ],
+            id: expect.any(String),
+            itemNumber: 1,
+            netMass: '9999',
+            weightOrQuantity: 9999
+          }
+        ],
+        declarationUcr: '5GB123456789000-BDOV123456',
+        finalState: '0',
+        movementReferenceNumber: 'GB251234567890ABCD',
+        open: true,
+        status: 'Finalised - Released',
+        updated: '12 May 2025, 11:13'
+      }
+    ]
+
+    expect(result).toEqual(expected)
+  }
+)

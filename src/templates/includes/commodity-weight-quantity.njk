@@ -1,0 +1,5 @@
+{% if tabContext === tabContexts.LEVELS_RESULT and decision.level3NoMatch === true %}
+  <span class="btms-details__commodity-weight-quantity--no-match">{{ commodity.weightOrQuantity }}</span>
+{% else %}
+  {{ commodity.weightOrQuantity }}
+{% endif %}
