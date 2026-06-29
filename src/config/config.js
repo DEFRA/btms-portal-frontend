@@ -369,7 +369,7 @@ const config = convict({
         doc: 'Defra ID client secret',
         format: String,
         sensitive: true,
-        env: 'AUTH_DEFRA_ID_CLIENT_SECRET',
+        env: 'AUTH_DEFRA_ID_CLIENT_SECRET_RENEWAL',
         default: ''
       },
       scopes: {
