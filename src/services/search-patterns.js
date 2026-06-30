@@ -22,7 +22,7 @@ export const searchPatterns = [
   },
   {
     key: searchKeys.CDS_CHED_ID,
-    pattern: /^GBCHD2\d{3}\.\d{7}[VR]?$/,
+    pattern: /^GBCHD2\d{3}\.\d{7,8}[VR]?$/,
     description: 'CDS CHED'
   },
   {
