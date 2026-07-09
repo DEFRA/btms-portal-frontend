@@ -254,3 +254,10 @@ export const DLQ_ACTION = {
   REDRIVE: 'Redrive',
   DRAIN: 'Drain'
 }
+
+export const DLQ_GROUP = {
+  BTMS_GATEWAY: 'BTMS Gateway',
+  PROCESSOR: 'Processor',
+  REPORTING: 'Reporting',
+  DECISION_DERIVER: 'Decision Deriver'
+}
