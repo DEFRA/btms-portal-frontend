@@ -17,7 +17,7 @@ jest.mock('@hapi/wreck', () => ({
   get: jest.fn()
 }))
 
-test('Should render the admin redrive page', async () => {
+test('Should render the admin dlq page', async () => {
   wreck.get
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: provider })

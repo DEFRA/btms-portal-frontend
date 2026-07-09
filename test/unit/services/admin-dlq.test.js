@@ -10,7 +10,8 @@ const unexpectedDlqConfigs = {
           queueName: 'Expected Service Queue',
           sqsQueueName: 'unexpected_service_queue-deadletter',
           countEndpoint: 'admin/dlq/count',
-          redriveEndpoint: 'admin/dlq/redrive'
+          redriveEndpoint: 'admin/dlq/redrive',
+          drainEndpoint: 'admin/dlq/drain'
         }
       ]
     }
@@ -26,7 +27,8 @@ const dlqConfigs = {
           queueName: 'BTMS Gateway',
           sqsQueueName: 'trade_imports_data_upserted_btms-gateway-deadletter',
           countEndpoint: 'admin/dlq/count',
-          redriveEndpoint: 'admin/dlq/redrive'
+          redriveEndpoint: 'admin/dlq/redrive',
+          drainEndpoint: 'admin/dlq/drain'
         }
       ]
     }

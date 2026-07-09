@@ -12,3 +12,6 @@ export const getDlqCount = async (dlqCountEndpoint) =>
 
 export const postProcessorRedrive = async (redriveEndpoint) =>
   processorApiClient.post(redriveEndpoint)
+
+export const postProcessorDrain = async (drainEndpoint) =>
+  processorApiClient.post(drainEndpoint)

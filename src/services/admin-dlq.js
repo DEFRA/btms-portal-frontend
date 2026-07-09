@@ -1,7 +1,7 @@
-import { getDlqCount as getBtmsGatewayDlqCount, postBtmsGatewayRedrive } from './btms-gateway-client.js'
-import { getDlqCount as getProcessorDlqCount, postProcessorRedrive } from './imports-processor-client.js'
-import { getDlqCount as getReportingDlqCount, postReportingRedrive } from './reporting.js'
-import { getDlqCount as getDecisionDeriverDlqCount, postDecisionDeriverRedrive } from './decision-deriver-client.js'
+import { getDlqCount as getBtmsGatewayDlqCount, postBtmsGatewayRedrive, postBtmsGatewayDrain } from './btms-gateway-client.js'
+import { getDlqCount as getProcessorDlqCount, postProcessorRedrive, postProcessorDrain } from './imports-processor-client.js'
+import { getDlqCount as getReportingDlqCount, postReportingRedrive, postReportingDrain } from './reporting.js'
+import { getDlqCount as getDecisionDeriverDlqCount, postDecisionDeriverRedrive, postDecisionDeriverDrain } from './decision-deriver-client.js'
 import { createLogger } from '../utils/logger.js'
 
 const logger = createLogger()
@@ -66,8 +66,26 @@ const postRedriveRequest = async (groupName, redriveEndpoint) => {
   }
 }
 
+const postDrainRequest = async (groupName, drainEndpoint) => {
+  switch (groupName) {
+    case 'BTMS Gateway':
+      return postBtmsGatewayDrain(drainEndpoint)
+    case 'Processor':
+      return postProcessorDrain(drainEndpoint)
+    case 'Reporting':
+      return postReportingDrain(drainEndpoint)
+    case 'Decision Deriver':
+      return postDecisionDeriverDrain(drainEndpoint)
+    default:
+      logger.warn(
+        `Unknown DLQ Group ${groupName}. Drain not requested.`)
+      return undefined
+  }
+}
+
 export {
   getQueueCount,
   getDlqCounts,
-  postRedriveRequest
+  postRedriveRequest,
+  postDrainRequest
 }

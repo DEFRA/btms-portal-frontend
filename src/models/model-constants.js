@@ -249,3 +249,8 @@ export const EU_COUNTRY_CODES = new Set ([
   'SE', // Sweden
   'CH', // Switzerland
 ])
+
+export const DLQ_ACTION = {
+  REDRIVE: 'Redrive',
+  DRAIN: 'Drain'
+}
