@@ -1,3 +1,5 @@
+import { constants } from 'http2'
+
 export const DATE_FORMAT = 'd MMMM yyyy, HH:mm'
 
 export const ANIMAL_PLANT_HEALTH_AGENCY = 'APHA'
@@ -261,3 +263,8 @@ export const DLQ_GROUP = {
   REPORTING: 'Reporting',
   DECISION_DERIVER: 'Decision Deriver'
 }
+
+export const DLQ_ACTION_SUCCESSFUL_RESPONSE_STATUSES = new Set([
+  constants.HTTP_STATUS_OK,
+  constants.HTTP_STATUS_ACCEPTED
+])

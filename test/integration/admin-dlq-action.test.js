@@ -1,6 +1,6 @@
 import globalJsdom from 'global-jsdom'
 import wreck from '@hapi/wreck'
-import { getByRole, getByText } from '@testing-library/dom'
+import { getByRole, getByText, queryByRole } from '@testing-library/dom'
 import { paths } from '../../src/routes/route-constants.js'
 import { initialiseServer } from '../utils/initialise-server.js'
 import { setupAuthedAdminUserSession, setupAuthedUserSession } from '../unit/utils/session-helper.js'
@@ -64,6 +64,13 @@ test('Should show Action Confirmation page if valid queue requested', async () =
   expect(
     getByRole(document.body, 'heading', { name: 'Dead letter actions' })
   ).toBeInTheDocument()
+
+  expect(
+    queryByRole(document.body, 'button', { name: 'Redrive messages' })
+  ).not.toBeInTheDocument()
+  expect(
+    queryByRole(document.body, 'button', { name: 'Drain messages from queue' })
+  ).not.toBeInTheDocument()
 })
 
 test.each([
@@ -230,6 +237,150 @@ test('Post drain failure should show error page', async () => {
 
   wreck.post.mockImplementation(() => {
     throw new Error();
+  })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { statusCode, payload } = await server.inject({
+    method: 'post',
+    url: paths.ADMIN_DLQ_ACTION,
+    auth: {
+      strategy: 'session',
+      credentials
+    },
+    payload: {
+      confirmActionQueue: 'trade_imports_data_upserted_btms-gateway-deadletter',
+      confirmAction: 'Drain'
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(statusCode).toBe(500)
+
+  expect(
+    getByRole(document.body, 'heading', { name: 'Sorry, there is a problem with this service' })
+  ).toBeInTheDocument()
+})
+
+test('Invalid DLQ action should show error page', async () => {
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+
+  wreck.read.mockResolvedValue('{ "confirmActionQueue": "trade_imports_data_upserted_btms-gateway-deadletter", "confirmAction": "Foo" }')
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { statusCode, payload } = await server.inject({
+    method: 'post',
+    url: paths.ADMIN_DLQ_ACTION,
+    auth: {
+      strategy: 'session',
+      credentials
+    },
+    payload: {
+      confirmActionQueue: 'trade_imports_data_upserted_btms-gateway-deadletter',
+      confirmAction: 'Foo'
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(statusCode).toBe(500)
+
+  expect(
+    getByRole(document.body, 'heading', { name: 'Sorry, there is a problem with this service' })
+  ).toBeInTheDocument()
+})
+
+test('Should show actions available if queue counts are greater than zero', async () => {
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: { deadLetterQueueCount: 1 } })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { payload, statusCode } = await server.inject({
+    method: 'get',
+    url: `${paths.ADMIN_DLQ_ACTION}?queue=trade_imports_data_upserted_btms-gateway-deadletter`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(statusCode).toBe(200)
+
+  expect(
+    getByRole(document.body, 'button', { name: 'Redrive messages' })
+  ).toBeInTheDocument()
+  expect(
+    getByRole(document.body, 'button', { name: 'Drain messages from queue' })
+  ).toBeInTheDocument()
+})
+
+test('Invalid Redrive response should show error page', async () => {
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+
+  wreck.read.mockResolvedValue('{ "confirmActionQueue": "trade_imports_data_upserted_btms-gateway-deadletter", "confirmAction": "Redrive" }')
+
+  wreck.post.mockImplementation(() => {
+    return {
+      res: {
+        statusCode: 500,
+        statusMessage: 'Error occurred'
+      }
+    }
+  })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { statusCode, payload } = await server.inject({
+    method: 'post',
+    url: paths.ADMIN_DLQ_ACTION,
+    auth: {
+      strategy: 'session',
+      credentials
+    },
+    payload: {
+      confirmActionQueue: 'trade_imports_data_upserted_btms-gateway-deadletter',
+      confirmAction: 'Drain'
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(statusCode).toBe(500)
+
+  expect(
+    getByRole(document.body, 'heading', { name: 'Sorry, there is a problem with this service' })
+  ).toBeInTheDocument()
+})
+
+test('Invalid Drain response should show error page', async () => {
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+
+  wreck.read.mockResolvedValue('{ "confirmActionQueue": "trade_imports_data_upserted_btms-gateway-deadletter", "confirmAction": "Drain" }')
+
+  wreck.post.mockImplementation(() => {
+    return {
+      res: {
+        statusCode: 500,
+        statusMessage: 'Error occurred'
+      }
+    }
   })
 
   const server = await initialiseServer()
