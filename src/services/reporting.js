@@ -76,3 +76,6 @@ export const getDlqCount = async (dlqCountEndpoint) =>
 
 export const postReportingRedrive = async (redriveEndpoint) =>
   reportingApiClient.post(redriveEndpoint)
+
+export const postReportingDrain = async (drainEndpoint) =>
+  reportingApiClient.post(drainEndpoint)

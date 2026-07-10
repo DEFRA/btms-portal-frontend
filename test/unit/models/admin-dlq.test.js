@@ -9,7 +9,8 @@ const dlqConfigs = {
           queueName: 'Service 1 Queue 1',
           sqsQueueName: 'service_1_queue_1-deadletter',
           countEndpoint: 'admin/dlq/count',
-          redriveEndpoint: 'admin/dlq/redrive'
+          redriveEndpoint: 'admin/dlq/redrive',
+          drainEndpoint: 'admin/dlq/drain'
         }
       ]
     },
@@ -20,13 +21,15 @@ const dlqConfigs = {
           queueName: 'Service 2 Queue 1',
           sqsQueueName: 'service_2_queue_1-deadletter',
           countEndpoint: 'admin/dlq/count',
-          redriveEndpoint: 'admin/dlq/redrive'
+          redriveEndpoint: 'admin/dlq/redrive',
+          drainEndpoint: 'admin/dlq/drain'
         },
         {
           queueName: 'Service 2 Queue 2',
           sqsQueueName: 'service_2_queue_2-deadletter',
           countEndpoint: 'admin/dlq/count',
-          redriveEndpoint: 'admin/dlq/redrive'
+          redriveEndpoint: 'admin/dlq/redrive',
+          drainEndpoint: 'admin/dlq/drain'
         }
       ]
     }

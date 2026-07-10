@@ -33,7 +33,7 @@
                 <tr>
                   <td class="govuk-table__cell">{{ queue.queueName }}<span class="btms-admin-dlq__name">{{ queue.sqsQueueName }}</span></td>
                   <td class="govuk-table__cell btms-admin-dlq__count">{{ queue.queueCount }}</td>
-                  <td class="govuk-table__cell btms-admin-dlq__action">{% if queue.queueCount > 0 %}<a href="/admin/redrive?queue={{ queue.sqsQueueName }}">Take Action</a>{% endif %}</td>
+                  <td class="govuk-table__cell btms-admin-dlq__action">{% if queue.queueCount > 0 %}<a href="/admin/dlq/action?queue={{ queue.sqsQueueName }}">Take Action</a>{% endif %}</td>
                 </tr>
               {% endfor %}
             </tbody>

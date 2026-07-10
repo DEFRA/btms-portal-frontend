@@ -1,3 +1,5 @@
+import { constants } from 'http2'
+
 export const DATE_FORMAT = 'd MMMM yyyy, HH:mm'
 
 export const ANIMAL_PLANT_HEALTH_AGENCY = 'APHA'
@@ -248,4 +250,21 @@ export const EU_COUNTRY_CODES = new Set ([
   'ES', // Spain
   'SE', // Sweden
   'CH', // Switzerland
+])
+
+export const DLQ_ACTION = {
+  REDRIVE: 'Redrive',
+  DRAIN: 'Drain'
+}
+
+export const DLQ_GROUP = {
+  BTMS_GATEWAY: 'BTMS Gateway',
+  PROCESSOR: 'Processor',
+  REPORTING: 'Reporting',
+  DECISION_DERIVER: 'Decision Deriver'
+}
+
+export const DLQ_ACTION_SUCCESSFUL_RESPONSE_STATUSES = new Set([
+  constants.HTTP_STATUS_OK,
+  constants.HTTP_STATUS_ACCEPTED
 ])
