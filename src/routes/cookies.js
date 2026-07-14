@@ -26,7 +26,7 @@ export const cookiesPost = {
       payload: joi
         .object({
           analytics: joi.string().valid('yes', 'no').required(),
-          previousUrl: joi.string().required()
+          previousUrl: joi.string().pattern(/^\//).required()
         })
         .unknown(),
       failAction: (request, h) => {
@@ -38,9 +38,15 @@ export const cookiesPost = {
   },
   handler: (request, h) => {
     const { analytics, previousUrl } = request.payload
+
     h.state('cookiePolicy', { analytics })
 
     request.yar.flash('showCookieConfirmationBanner', true)
+
+    if (previousUrl.startsWith('//') || previousUrl.startsWith('/\\')) {
+      return h.redirect(paths.COOKIES).takeover()
+    }
+
     return h.redirect(previousUrl)
   }
 }
