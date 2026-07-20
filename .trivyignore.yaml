@@ -45,3 +45,10 @@ vulnerabilities:
     reason: >
       Vulnerable sigstore is bundled inside npm itself, not the
       application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-48815
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/sigstore/package.json
+    reason: >
+      Vulnerable sigstore is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.

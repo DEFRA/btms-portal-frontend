@@ -31,7 +31,7 @@ export const getMatchingReports = async (request, from , to) => {
   const query = new URLSearchParams({ from, to })
 
   try {
-    const { payload } = await wreck.get(`${reportingApiConfig.baseUrl}/matches/summary/levels?${query}`, {
+    const { payload } = await wreck.get(`${reportingApiConfig.baseUrl}/matches/summary/levels-by-region?${query}`, {
       headers: { authorization },
       json: 'strict'
     })

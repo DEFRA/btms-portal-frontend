@@ -1,0 +1,6 @@
+{% from "../macros/tiles.njk" import tiles %}
+
+<h4>Matches</h4>
+{{ tiles(report.regionSplits.matches, downloadUrls) }}
+<h4>No matches</h4>
+{{ tiles(report.regionSplits.noMatches, downloadUrls) }}
