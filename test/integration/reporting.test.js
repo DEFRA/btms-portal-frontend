@@ -814,7 +814,7 @@ test('match rate figures are shown for all levels when viewed by authorized user
   globalJsdom(payload)
 
   expect(getByRole(document.body, 'button', { name: 'Download as CSV' })).toBeInTheDocument()
-  expect(getByText(document.body, 'This data is only available from 15th May 2026.')).toBeInTheDocument()
+  expect(getByText(document.body, 'This data is only available from 2nd June 2026.')).toBeInTheDocument()
 
   const level1MatchRateSection = document.body.querySelector('[aria-labelledby="level1-summary-heading"]')
   expect(level1MatchRateSection).toBeInTheDocument()
@@ -1055,7 +1055,7 @@ test.each([
   globalJsdom(payload)
 
   expect(getByRole(document.body, 'button', { name: 'Download as CSV' })).toBeInTheDocument()
-  expect(getByText(document.body, 'This data is only available from 15th May 2026.')).toBeInTheDocument()
+  expect(getByText(document.body, 'This data is only available from 2nd June 2026.')).toBeInTheDocument()
 
   const level1MatchRateSection = document.body.querySelector('[aria-labelledby="level1-summary-heading"]')
   expect(level1MatchRateSection).toBeInTheDocument()
