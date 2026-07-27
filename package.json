@@ -67,7 +67,7 @@
     "@stylistic/eslint-plugin": {
       "picomatch": "^4.0.4"
     },
-    "postcss": "^8.5.10",
+    "postcss": "^8.5.18",
     "@hapi/content": "6.0.2",
     "@hapi/wreck": "18.1.2",
     "@hapi/bell": {
@@ -81,7 +81,8 @@
     },
     "hapi-pulse": {
       "joi": "^17.13.4"
-    }
+    },
+    "svgo": "4.0.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.28.3",
