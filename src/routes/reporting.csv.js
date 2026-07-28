@@ -12,6 +12,7 @@ import {
   LEVEL_MATCHING_CSV
 } from './route-constants.js'
 import { APP_SCOPES } from '../auth/auth-constants.js'
+import { EU_COUNTRY_CODES } from '../models/model-constants.js'
 
 const createHandler = (mapRowHandler, headers, useV2 = false) => {
   return async (request, h) => {
@@ -80,11 +81,12 @@ const restrictedReportMapRowHandler = (value) => {
     value.decision,
     `"${value.decisionReasons ?? ""}"`,
     value.declarantId,
-    value.dispatchCountryCode
+    value.dispatchCountryCode,
+    EU_COUNTRY_CODES.has(value.dispatchCountryCode?.toUpperCase()) ? 'EU' : 'RoW',
   ].join(',') + '\n'
 }
 
-const restrictedReportHeaders = 'Level,Last updated,MRN,Item number,Commodity code,Check code,Description,Quantity/Weight,CHED reference,Match,Authority,Decision,Decision reason,EORI Number,Country Code\n'
+const restrictedReportHeaders = 'Level,Last updated,MRN,Item number,Commodity code,Check code,Description,Quantity/Weight,CHED reference,Match,Authority,Decision,Decision reason,EORI Number,Country Code,Country Region (EU or RoW)\n'
 
 export const restrictedReportingCsv = {
   method: 'get',

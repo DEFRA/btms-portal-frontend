@@ -167,7 +167,7 @@ test('reporting data', async () => {
   const datePickers = document.body.querySelectorAll(
     '[data-module="moj-date-picker"]'
   )
-  expect(datePickers.length).toBe(2)
+  expect(datePickers).toHaveLength(2)
   const minDate = format(subDays(new Date(), 122), 'dd/MM/yyyy')
   const startDateMin = datePickers[0].getAttribute('data-min-date')
   const endDateMin = datePickers[1].getAttribute('data-min-date')
@@ -644,11 +644,38 @@ test.each([
       levelMatchingTabAllowed: false
     }
 ])('Level Matching Tab is only visible for allowed user', async (user) => {
-  const levelMatchingData = {
-    level1: 0,
-    level2: 0,
-    level3: 0,
-    total: 0
+  const levelMatchingByRegionData = {
+    total: 1000,
+    eu: {
+      total: 780,
+      match: {
+        total: 750,
+        level1: 750,
+        level2: 712,
+        level3: 625
+      },
+      noMatch: {
+        total: 30,
+        level1: 30,
+        level2: 58,
+        level3: 81
+      }
+    },
+    row: {
+      total: 220,
+      match: {
+        total: 200,
+        level1: 200,
+        level2: 191,
+        level3: 240
+      },
+      noMatch: {
+        total: 20,
+        level1: 20,
+        level2: 39,
+        level3: 54
+      }
+    }
   }
 
   wreck.get
@@ -657,7 +684,7 @@ test.each([
     .mockResolvedValueOnce({ payload: {} })
 
   if (user.levelMatchingTabAllowed) {
-    wreck.get.mockResolvedValueOnce({ payload: levelMatchingData })
+    wreck.get.mockResolvedValueOnce({ payload: levelMatchingByRegionData })
   }
 
   const server = await initialiseServer()
@@ -732,18 +759,45 @@ test('user with no logged in session is redirected to sign in if attempting to g
 })
 
 test('match rate figures are shown for all levels when viewed by authorized user', async () => {
-  const levelMatchingData = {
-    level1: 9,
-    level2: 6,
-    level3: 3,
-    total: 9
+  const levelMatchingByRegionData = {
+    total: 1000,
+    eu: {
+      total: 780,
+      match: {
+        total: 750,
+        level1: 750,
+        level2: 712,
+        level3: 625
+      },
+      noMatch: {
+        total: 30,
+        level1: 30,
+        level2: 58,
+        level3: 81
+      }
+    },
+    row: {
+      total: 220,
+      match: {
+        total: 200,
+        level1: 200,
+        level2: 191,
+        level3: 240
+      },
+      noMatch: {
+        total: 20,
+        level1: 20,
+        level2: 39,
+        level3: 54
+      }
+    }
   }
 
   wreck.get
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: {} })
-    .mockResolvedValueOnce({ payload: levelMatchingData })
+    .mockResolvedValueOnce({ payload: levelMatchingByRegionData })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedAdminUserSession(server)
@@ -760,41 +814,75 @@ test('match rate figures are shown for all levels when viewed by authorized user
   globalJsdom(payload)
 
   expect(getByRole(document.body, 'button', { name: 'Download as CSV' })).toBeInTheDocument()
-  expect(getByText(document.body, 'This data is only available from 15th May 2026.')).toBeInTheDocument()
+  expect(getByText(document.body, 'This data is only available from 2nd June 2026.')).toBeInTheDocument()
 
   const level1MatchRateSection = document.body.querySelector('[aria-labelledby="level1-summary-heading"]')
   expect(level1MatchRateSection).toBeInTheDocument()
-  const level1MatchesFigure = level1MatchRateSection.querySelectorAll('dd.govuk-heading-l')
-  expect(level1MatchesFigure.length).toBe(3)
-  expect(level1MatchesFigure[0].textContent).toBe("9")
-  expect(level1MatchesFigure[1].textContent).toBe("0")
-  expect(level1MatchesFigure[2].textContent).toBe("9")
+  const level1Figures = level1MatchRateSection.querySelectorAll('dd.govuk-heading-l')
+  expect(level1Figures).toHaveLength(9)
+  expect(level1Figures[0].textContent).toBe("950") // Level 1 Matches
+  expect(level1Figures[1].textContent).toBe("50") // Level 1 No Matches
+  expect(level1Figures[2].textContent).toBe("1,000") // Level 1 Total
+  expect(level1Figures[3].textContent).toBe("750") // Level 1 EU Matches
+  expect(level1Figures[4].textContent).toBe("200") // Level 1 RoW Matches
+  expect(level1Figures[5].textContent).toBe("950") // Level 1 EU/RoW Matches Total
+  expect(level1Figures[6].textContent).toBe("30") // Level 1 EU No Matches
+  expect(level1Figures[7].textContent).toBe("20") // Level 1 RoW No Matches
+  expect(level1Figures[8].textContent).toBe("50") // Level 1 EU/RoW No Matches Total
   const level1Percentages = level1MatchRateSection.querySelectorAll('dd.btms-percentage')
-  expect(level1Percentages.length).toBe(2)
-  expect(level1Percentages[0].textContent).toBe("(100%)")
-  expect(level1Percentages[1].textContent).toBe("(0%)")
+  expect(level1Percentages).toHaveLength(6)
+  expect(level1Percentages[0].textContent).toBe("(95%)")
+  expect(level1Percentages[1].textContent).toBe("(5%)")
+  expect(level1Percentages[2].textContent).toBe("(75%)")
+  expect(level1Percentages[3].textContent).toBe("(20%)")
+  expect(level1Percentages[4].textContent).toBe("(3%)")
+  expect(level1Percentages[5].textContent).toBe("(2%)")
 
   const level2MatchRateSection = document.body.querySelector('[aria-labelledby="level2-summary-heading"]')
-  const level2MatchesFigure = level2MatchRateSection.querySelectorAll('dd.govuk-heading-l')
-  expect(level2MatchesFigure.length).toBe(3)
-  expect(level2MatchesFigure[0].textContent).toBe("6")
-  expect(level2MatchesFigure[1].textContent).toBe("3")
-  expect(level2MatchesFigure[2].textContent).toBe("9")
+  const level2Figures = level2MatchRateSection.querySelectorAll('dd.govuk-heading-l')
+  expect(level2Figures).toHaveLength(9)
+  expect(level2Figures[0].textContent).toBe("903")
+  expect(level2Figures[1].textContent).toBe("97")
+  expect(level2Figures[2].textContent).toBe("1,000")
+  expect(level2Figures[3].textContent).toBe("712")
+  expect(level2Figures[4].textContent).toBe("191")
+  expect(level2Figures[5].textContent).toBe("903")
+  expect(level2Figures[6].textContent).toBe("58")
+  expect(level2Figures[7].textContent).toBe("39")
+  expect(level2Figures[8].textContent).toBe("97")
   const level2Percentages = level2MatchRateSection.querySelectorAll('dd.btms-percentage')
-  expect(level2Percentages.length).toBe(2)
-  expect(level2Percentages[0].textContent).toBe("(66.67%)")
-  expect(level2Percentages[1].textContent).toBe("(33.33%)")
+  expect(level2Percentages).toHaveLength(6)
+  expect(level2Percentages[0].textContent).toBe("(90.30%)")
+  expect(level2Percentages[1].textContent).toBe("(9.70%)")
+  expect(level2Percentages[2].textContent).toBe("(71.20%)")
+  expect(level2Percentages[3].textContent).toBe("(19.10%)")
+  expect(level2Percentages[4].textContent).toBe("(5.80%)")
+  expect(level2Percentages[5].textContent).toBe("(3.90%)")
 
   const level3MatchRateSection = document.body.querySelector('[aria-labelledby="level3-summary-heading"]')
-  const level3MatchesFigure = level3MatchRateSection.querySelectorAll('dd.govuk-heading-l')
-  expect(level3MatchesFigure.length).toBe(3)
-  expect(level3MatchesFigure[0].textContent).toBe("3")
-  expect(level3MatchesFigure[1].textContent).toBe("6")
-  expect(level3MatchesFigure[2].textContent).toBe("9")
+  const level3Figures = level3MatchRateSection.querySelectorAll('dd.govuk-heading-l')
+  expect(level3Figures).toHaveLength(9)
+  expect(level3Figures[0].textContent).toBe("865")
+  expect(level3Figures[1].textContent).toBe("135")
+  expect(level3Figures[2].textContent).toBe("1,000")
+  expect(level3Figures[3].textContent).toBe("625")
+  expect(level3Figures[4].textContent).toBe("240")
+  expect(level3Figures[5].textContent).toBe("865")
+  expect(level3Figures[6].textContent).toBe("81")
+  expect(level3Figures[7].textContent).toBe("54")
+  expect(level3Figures[8].textContent).toBe("135")
   const level3Percentages = level3MatchRateSection.querySelectorAll('dd.btms-percentage')
-  expect(level3Percentages.length).toBe(2)
-  expect(level3Percentages[0].textContent).toBe("(33.33%)")
-  expect(level3Percentages[1].textContent).toBe("(66.67%)")
+  expect(level3Percentages).toHaveLength(6)
+  expect(level3Percentages[0].textContent).toBe("(86.50%)")
+  expect(level3Percentages[1].textContent).toBe("(13.50%)")
+  expect(level3Percentages[2].textContent).toBe("(62.50%)")
+  expect(level3Percentages[3].textContent).toBe("(24%)")
+  expect(level3Percentages[4].textContent).toBe("(8.10%)")
+  expect(level3Percentages[5].textContent).toBe("(5.40%)")
+
+  const regionSplitDetailsSections = Array.from(document.body.querySelectorAll('.btms-level-region-split__details'))
+  expect(regionSplitDetailsSections).toHaveLength(3)
+  expect(regionSplitDetailsSections.every(detailSection => !detailSection.hasAttribute('open'))).toBeTruthy()
 })
 
 test('handles upstream errors in the level matches API', async () => {
@@ -880,32 +968,77 @@ test('handles request for restricted report with invalid params', async () => {
 
 test.each([
   {
-    level1: 1,
-    level2: 1,
-    level3: 1,
+    euLevel1Match: 1,
+    euLevel1NoMatch: 1,
+    rowLevel1Match: 1,
+    rowLevel1NoMatch: 1,
+    euLevel2Match: 1,
+    euLevel2NoMatch: 1,
+    rowLevel2Match: 1,
+    rowLevel2NoMatch: 1,
+    euLevel3Match: 1,
+    euLevel3NoMatch: 1,
+    rowLevel3Match: 1,
+    rowLevel3NoMatch: 1,
     total: 'FOO',
     expectedTotal: '0'
   },
   {
-    level1: 'FOO',
-    level2: 'FOO',
-    level3: 'FOO',
+    euLevel1Match: 'FOO',
+    euLevel1NoMatch: 'FOO',
+    rowLevel1Match: 'FOO',
+    rowLevel1NoMatch: 'FOO',
+    euLevel2Match: 'FOO',
+    euLevel2NoMatch: 'FOO',
+    rowLevel2Match: 'FOO',
+    rowLevel2NoMatch: 'FOO',
+    euLevel3Match: 'FOO',
+    euLevel3NoMatch: 'FOO',
+    rowLevel3Match: 'FOO',
+    rowLevel3NoMatch: 'FOO',
     total: 1,
     expectedTotal: '1'
   }
 ])('handles level matching figures that are invalid', async (options) => {
-  const levelMatchingData = {
-    level1: options.level1,
-    level2: options.level2,
-    level3: options.level3,
-    total: options.total
+  const levelMatchingByRegionData = {
+    total: options.total,
+    eu: {
+      total: options.total,
+      match: {
+        total: options.total,
+        level1: options.euLevel1Match,
+        level2: options.euLevel2Match,
+        level3: options.euLevel3Match
+      },
+      noMatch: {
+        total: options.total,
+        level1: options.euLevel1NoMatch,
+        level2: options.euLevel2NoMatch,
+        level3: options.euLevel3NoMatch
+      }
+    },
+    row: {
+      total: options.total,
+      match: {
+        total: options.total,
+        level1: options.rowLevel1Match,
+        level2: options.rowLevel2Match,
+        level3: options.rowLevel2Match
+      },
+      noMatch: {
+        total: options.total,
+        level1: options.rowLevel1NoMatch,
+        level2: options.rowLevel2NoMatch,
+        level3: options.rowLevel3NoMatch
+      }
+    }
   }
 
   wreck.get
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: {} })
-  .mockResolvedValueOnce({ payload: levelMatchingData })
+  .mockResolvedValueOnce({ payload: levelMatchingByRegionData })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedAdminUserSession(server)
@@ -922,39 +1055,69 @@ test.each([
   globalJsdom(payload)
 
   expect(getByRole(document.body, 'button', { name: 'Download as CSV' })).toBeInTheDocument()
-  expect(getByText(document.body, 'This data is only available from 15th May 2026.')).toBeInTheDocument()
+  expect(getByText(document.body, 'This data is only available from 2nd June 2026.')).toBeInTheDocument()
 
   const level1MatchRateSection = document.body.querySelector('[aria-labelledby="level1-summary-heading"]')
   expect(level1MatchRateSection).toBeInTheDocument()
   const level1MatchesFigure = level1MatchRateSection.querySelectorAll('dd.govuk-heading-l')
-  expect(level1MatchesFigure.length).toBe(3)
+  expect(level1MatchesFigure).toHaveLength(9)
   expect(level1MatchesFigure[0].textContent).toBe("0")
   expect(level1MatchesFigure[1].textContent).toBe("0")
   expect(level1MatchesFigure[2].textContent).toBe(options.expectedTotal)
+  expect(level1MatchesFigure[3].textContent).toBe("0")
+  expect(level1MatchesFigure[4].textContent).toBe("0")
+  expect(level1MatchesFigure[5].textContent).toBe("0")
+  expect(level1MatchesFigure[6].textContent).toBe("0")
+  expect(level1MatchesFigure[7].textContent).toBe("0")
+  expect(level1MatchesFigure[8].textContent).toBe("0")
   const level1Percentages = level1MatchRateSection.querySelectorAll('dd.btms-percentage')
-  expect(level1Percentages.length).toBe(2)
+  expect(level1Percentages).toHaveLength(6)
   expect(level1Percentages[0].textContent).toBe("(0%)")
   expect(level1Percentages[1].textContent).toBe("(0%)")
+  expect(level1Percentages[2].textContent).toBe("(0%)")
+  expect(level1Percentages[3].textContent).toBe("(0%)")
+  expect(level1Percentages[4].textContent).toBe("(0%)")
+  expect(level1Percentages[5].textContent).toBe("(0%)")
 
   const level2MatchRateSection = document.body.querySelector('[aria-labelledby="level2-summary-heading"]')
   const level2MatchesFigure = level2MatchRateSection.querySelectorAll('dd.govuk-heading-l')
-  expect(level2MatchesFigure.length).toBe(3)
+  expect(level2MatchesFigure).toHaveLength(9)
   expect(level2MatchesFigure[0].textContent).toBe("0")
   expect(level2MatchesFigure[1].textContent).toBe("0")
   expect(level2MatchesFigure[2].textContent).toBe(options.expectedTotal)
+  expect(level2MatchesFigure[3].textContent).toBe("0")
+  expect(level2MatchesFigure[4].textContent).toBe("0")
+  expect(level2MatchesFigure[5].textContent).toBe("0")
+  expect(level2MatchesFigure[6].textContent).toBe("0")
+  expect(level2MatchesFigure[7].textContent).toBe("0")
+  expect(level2MatchesFigure[8].textContent).toBe("0")
   const level2Percentages = level2MatchRateSection.querySelectorAll('dd.btms-percentage')
-  expect(level2Percentages.length).toBe(2)
+  expect(level2Percentages).toHaveLength(6)
   expect(level2Percentages[0].textContent).toBe("(0%)")
   expect(level2Percentages[1].textContent).toBe("(0%)")
+  expect(level2Percentages[2].textContent).toBe("(0%)")
+  expect(level2Percentages[3].textContent).toBe("(0%)")
+  expect(level2Percentages[4].textContent).toBe("(0%)")
+  expect(level2Percentages[5].textContent).toBe("(0%)")
 
   const level3MatchRateSection = document.body.querySelector('[aria-labelledby="level3-summary-heading"]')
   const level3MatchesFigure = level3MatchRateSection.querySelectorAll('dd.govuk-heading-l')
-  expect(level3MatchesFigure.length).toBe(3)
+  expect(level3MatchesFigure).toHaveLength(9)
   expect(level3MatchesFigure[0].textContent).toBe("0")
   expect(level3MatchesFigure[1].textContent).toBe("0")
   expect(level3MatchesFigure[2].textContent).toBe(options.expectedTotal)
+  expect(level3MatchesFigure[3].textContent).toBe("0")
+  expect(level3MatchesFigure[4].textContent).toBe("0")
+  expect(level3MatchesFigure[5].textContent).toBe("0")
+  expect(level3MatchesFigure[6].textContent).toBe("0")
+  expect(level3MatchesFigure[7].textContent).toBe("0")
+  expect(level3MatchesFigure[8].textContent).toBe("0")
   const level3Percentages = level3MatchRateSection.querySelectorAll('dd.btms-percentage')
-  expect(level3Percentages.length).toBe(2)
+  expect(level3Percentages).toHaveLength(6)
   expect(level3Percentages[0].textContent).toBe("(0%)")
   expect(level3Percentages[1].textContent).toBe("(0%)")
+  expect(level3Percentages[2].textContent).toBe("(0%)")
+  expect(level3Percentages[3].textContent).toBe("(0%)")
+  expect(level3Percentages[4].textContent).toBe("(0%)")
+  expect(level3Percentages[5].textContent).toBe("(0%)")
 })
