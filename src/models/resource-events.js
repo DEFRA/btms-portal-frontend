@@ -104,9 +104,9 @@ const mapClearanceRequestResourceEvent = (resourceMessage) => {
 
   return {
     eventType: EVENT_TYPE.CDS_DECISION_REQUEST,
-    eventTitle: 'CDS decision request',
+    eventTitle: 'CDS clearance request',
     source: EVENT_SOURCE.CLEARANCE_REQUEST,
-    version: resourceMessage.resource?.clearanceRequest?.externalVersion,
+    externalVersion: resourceMessage.resource?.clearanceRequest?.externalVersion,
     created: resourceMessage.resource?.clearanceRequest?.messageSentAt ?? undefined,
     commodities
   }
@@ -150,7 +150,8 @@ const mapDecisionNotificationResourceEvent = (resourceMessage) => {
     source: EVENT_SOURCE.DECISION_NOTIFICATION,
     status: getCustomsDeclarationStatus(resourceMessage.resource?.finalisation, resourceMessage.resource?.clearanceDecision),
     finalState: resourceMessage.resource?.finalisation?.finalState,
-    version: resourceMessage.resource?.clearanceDecision?.decisionNumber,
+    decisionNumber: resourceMessage.resource?.clearanceDecision?.decisionNumber,
+    externalVersionNumber: resourceMessage.resource?.clearanceDecision?.externalVersionNumber,
     created: resourceMessage.resource?.clearanceDecision?.created ?? undefined,
     commodities
   }
