@@ -57,6 +57,16 @@
     margin-top: 0;
     font-size: 16px;
   }
+
+  .btms-level-region-split__details {
+    margin-top: 30px;
+    margin-bottom: 0;
+    font-size: 16px;
+
+    h4:first-of-type {
+      margin-top: 0;
+    }
+  }
 }
 
 .btms-chart {
@@ -112,7 +122,8 @@
   }
 }
 
-.btms-tiles {
+.btms-tiles,
+.btms-region-split-tiles {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;

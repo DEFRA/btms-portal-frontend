@@ -215,3 +215,37 @@ export const HIGHER_LEVEL_DECISION_CODE = {
   WEIGHT_CHECK: 'E30', // Level 3
   QUANTITY_CHECK: 'E31' // Level 3
 }
+
+export const EU_COUNTRY_CODES = new Set ([
+  'AT', // Austria
+  'BE', // Belgium
+  'BG', // Bulgaria
+  'HR', // Croatia
+  'CY', // Cyprus
+  'CZ', // Czech Republic
+  'DK', // Denmark
+  'EE', // Estonia
+  'FI', // Finland
+  'FR', // France
+  'DE', // Germany
+  'GR', // Greece
+  'HU', // Hungary
+  'IS', // Iceland
+  'IE', // Ireland
+  'IT', // Italy
+  'LV', // Latvia
+  'LI', // Liechtenstein
+  'LT', // Lithuania
+  'LU', // Luxembourg
+  'MT', // Malta
+  'NL', // Netherlands
+  'NO', // Norway
+  'PL', // Poland
+  'PT', // Portugal
+  'RO', // Romania
+  'SK', // Slovakia
+  'SI', // Slovenia
+  'ES', // Spain
+  'SE', // Sweden
+  'CH', // Switzerland
+])

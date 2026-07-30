@@ -1,3 +1,6 @@
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "../macros/tiles.njk" import tiles %}
+
 <section aria-labelledBy="{{ report.type }}-summary-heading" class="govuk-grid-row govuk-!-margin-bottom-6 btms-report">
   <div class="govuk-grid-column-full">
     <heading>
@@ -6,6 +9,20 @@
         <p class="govuk-body-s">{{ descriptions[report.type] }}</p>
       {% endif %}
     </heading>
-    {% include "./tiles.njk" %}
+    {{ tiles(report.tiles, downloadUrls) }}
+
+    {% if report.regionSplits %}
+      {% set regionSplitTiles %}
+      {% include "./region-split-tiles.njk" %}
+      {% endset %}
+      {{
+          govukDetails({
+            summaryText: regionSplitSummaryText[report.type],
+            html: regionSplitTiles,
+            open: false,
+            classes: 'btms-level-region-split__details'
+          })
+        }}
+    {% endif %}
   </div>
 </section>

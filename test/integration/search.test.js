@@ -240,9 +240,17 @@ test.each([
   '24GB6T3HFCIZV1HAR9',
   '24gb6t3hfcizv1har9',
   'CHEDP.GB.2025.4433124',
+  'CHEDP.GB.2025.4433124V',
+  'CHEDP.GB.2025.4433124R',
   'chedp.gb.2025.4433124',
+  'CHEDP.GB.2025.44331240',
+  'CHEDP.GB.2025.44331240V',
+  'CHEDP.GB.2025.44331240R',
+  'chedp.gb.2025.44331240',
   'GBCHD2025.4433124',
   'gbchd2025.4433124',
+  'GBCHD2025.44331242',
+  'gbchd2025.44331242',
   '4GB335031931000-WB2408-27WWL62745',
   '4gb335031931000-wb2408-27wwl62745'
 ])('redirects to search results page if valid non GMR search term', async (searchTerm) => {
