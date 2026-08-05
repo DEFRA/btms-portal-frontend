@@ -3,7 +3,11 @@ import wreck from '@hapi/wreck'
 import { getByRole, getByText } from '@testing-library/dom'
 import { paths } from '../../src/routes/route-constants.js'
 import { initialiseServer } from '../utils/initialise-server.js'
-import { setupAuthedAdminUserSession, setupAuthedUserSession } from '../unit/utils/session-helper.js'
+import {
+  setupAuthedAdminUserSession,
+  setupAuthedPrivateBetaUserSession,
+  setupAuthedUserSession
+} from '../unit/utils/session-helper.js'
 
 const provider = {
   authorization_endpoint: 'https://auth.endpoint',
@@ -153,13 +157,16 @@ test('Should render the admin dlq page with Take Action links when DLQ count is 
   ).toBeInTheDocument()
 })
 
-test('Should show the forbidden page when the user is not in the admin security group', async () => {
+test.each([
+  { userSetupHandler: setupAuthedUserSession },
+  { userSetupHandler: setupAuthedPrivateBetaUserSession }
+])('Should show the forbidden page when the user is not in the admin security group', async (options) => {
   wreck.get
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: provider })
 
   const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
+  const credentials = await options.userSetupHandler(server)
 
   const { payload } = await server.inject({
     method: 'get',

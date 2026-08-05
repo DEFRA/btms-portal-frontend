@@ -3,7 +3,11 @@ import wreck from '@hapi/wreck'
 import { getByRole, getByText } from '@testing-library/dom'
 import { paths } from '../../src/routes/route-constants.js'
 import { initialiseServer } from '../utils/initialise-server.js'
-import { setupAuthedAdminUserSession, setupAuthedUserSession } from '../unit/utils/session-helper.js'
+import {
+  setupAuthedAdminUserSession,
+  setupAuthedPrivateBetaUserSession,
+  setupAuthedUserSession
+} from '../unit/utils/session-helper.js'
 
 const provider = {
   authorization_endpoint: 'https://auth.endpoint',
@@ -67,25 +71,33 @@ test('Should show Redrive Confirmation page if valid redrive queue requested', a
 })
 
 test.each([
-  `${paths.ADMIN_REDRIVE}`,
-  `${paths.ADMIN_REDRIVE}?queue=foo`,
-  `${paths.ADMIN_REDRIVE}?queue=trade_imports_data_upserted_btms-gateway-deadletter`,
-  `${paths.ADMIN_REDRIVE}?queue=trade_imports_inbound_customs_declarations_processor-deadletter.fifo`,
-  `${paths.ADMIN_REDRIVE}?queue=trade_imports_data_upserted_processor-deadletter`,
-  `${paths.ADMIN_REDRIVE}?queue=trade_imports_data_upserted_reporting_api-deadletter`,
-  `${paths.ADMIN_REDRIVE}?queue=trade_imports_btms_activity_reporting_api-deadletter`,
-  `${paths.ADMIN_REDRIVE}?queue=trade_imports_data_upserted_decision_deriver-deadletter`
-])('Should show the forbidden page when the user is not in the admin security group', async (requestedPage) => {
+  { requestedPage: `${paths.ADMIN_REDRIVE}`, userSetupHandler: setupAuthedUserSession },
+  { requestedPage: `${paths.ADMIN_REDRIVE}?queue=foo`, userSetupHandler: setupAuthedUserSession },
+  { requestedPage: `${paths.ADMIN_REDRIVE}?queue=trade_imports_data_upserted_btms-gateway-deadletter`, userSetupHandler: setupAuthedUserSession },
+  { requestedPage: `${paths.ADMIN_REDRIVE}?queue=trade_imports_inbound_customs_declarations_processor-deadletter.fifo`, userSetupHandler: setupAuthedUserSession },
+  { requestedPage: `${paths.ADMIN_REDRIVE}?queue=trade_imports_data_upserted_processor-deadletter`, userSetupHandler: setupAuthedUserSession },
+  { requestedPage: `${paths.ADMIN_REDRIVE}?queue=trade_imports_data_upserted_reporting_api-deadletter`, userSetupHandler: setupAuthedUserSession },
+  { requestedPage: `${paths.ADMIN_REDRIVE}?queue=trade_imports_btms_activity_reporting_api-deadletter`, userSetupHandler: setupAuthedUserSession },
+  { requestedPage: `${paths.ADMIN_REDRIVE}?queue=trade_imports_data_upserted_decision_deriver-deadletter`, userSetupHandler: setupAuthedUserSession },
+  { requestedPage: `${paths.ADMIN_REDRIVE}`, userSetupHandler: setupAuthedPrivateBetaUserSession },
+  { requestedPage: `${paths.ADMIN_REDRIVE}?queue=foo`, userSetupHandler: setupAuthedPrivateBetaUserSession },
+  { requestedPage: `${paths.ADMIN_REDRIVE}?queue=trade_imports_data_upserted_btms-gateway-deadletter`, userSetupHandler: setupAuthedPrivateBetaUserSession },
+  { requestedPage: `${paths.ADMIN_REDRIVE}?queue=trade_imports_inbound_customs_declarations_processor-deadletter.fifo`, userSetupHandler: setupAuthedPrivateBetaUserSession },
+  { requestedPage: `${paths.ADMIN_REDRIVE}?queue=trade_imports_data_upserted_processor-deadletter`, userSetupHandler: setupAuthedPrivateBetaUserSession },
+  { requestedPage: `${paths.ADMIN_REDRIVE}?queue=trade_imports_data_upserted_reporting_api-deadletter`, userSetupHandler: setupAuthedPrivateBetaUserSession },
+  { requestedPage: `${paths.ADMIN_REDRIVE}?queue=trade_imports_btms_activity_reporting_api-deadletter`, userSetupHandler: setupAuthedPrivateBetaUserSession },
+  { requestedPage: `${paths.ADMIN_REDRIVE}?queue=trade_imports_data_upserted_decision_deriver-deadletter`, userSetupHandler: setupAuthedPrivateBetaUserSession }
+])('Should show the forbidden page when the user is not in the admin security group', async (options) => {
   wreck.get
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: provider })
 
   const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
+  const credentials = await options.userSetupHandler(server)
 
   const { payload } = await server.inject({
     method: 'get',
-    url: requestedPage,
+    url: options.requestedPage,
     auth: {
       strategy: 'session',
       credentials
