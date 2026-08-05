@@ -1607,6 +1607,11 @@ test.each([
     provider: 'defraId',
     scope: null,
     shouldShowBannerAndTab: false
+  },
+  {
+    provider: 'entraId',
+    scope: ['private_beta'],
+    shouldShowBannerAndTab: true
   }
 ])('Level Matching banner and Tab only visible to certain user scopes', async (options) => {
   const levelNoMatchDeclarations = [

@@ -441,6 +441,13 @@ const config = convict({
         env: 'AUTH_ENTRA_ID_ADMIN_GROUP_ID',
         default: ''
       },
+      privateBetaGroupId: {
+        doc: 'ENTRA ID - private beta security group identifier',
+        format: String,
+        sensitive: true,
+        env: 'AUTH_ENTRA_ID_PRIVATE_BETA_GROUP_ID',
+        default: 'NOT_CONFIGURED'
+      },
       jwksClientTimeout: {
         doc: 'Timeout in milliseconds before terminating call to JWKS URI',
         format: Number,
@@ -469,7 +476,7 @@ const config = convict({
           format: Array,
           sensitive: true,
           env: 'AUTH_FEATURE_LEVEL_NO_MATCH_SEARCH_RESULTS_ALLOWED_SCOPES',
-          default: ['admin']
+          default: ['admin','private_beta']
         }
       }
     }
