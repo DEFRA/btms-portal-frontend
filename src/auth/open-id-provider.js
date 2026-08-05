@@ -6,6 +6,12 @@ import { config } from '../config/config.js'
 import { APP_SCOPES, AUTH_PROVIDERS, KEY_TYPES } from './auth-constants.js'
 
 const entraAdminSecurityGroupId = config.get('auth.entraId.adminGroupId')
+const entraPrivateBetaSecurityGroupId = config.get('auth.entraId.privateBetaGroupId')
+
+const availableScopes = [
+  { groupId: entraAdminSecurityGroupId, scope: APP_SCOPES.ADMIN },
+  { groupId: entraPrivateBetaSecurityGroupId, scope: APP_SCOPES.PRIVATE_BETA }
+]
 
 const setOrigins = (providerEndpoints) => {
   const { origins } = config.get('auth')
@@ -51,6 +57,18 @@ const getVerifiedPayload = async (provider, token, oidcConf, authConfig) => {
   }
 
   return decodedToken.decoded.payload
+}
+
+const getScopes = (groups) => {
+  const scopes = []
+
+  availableScopes.forEach(availableScope => {
+    if (groups.includes(availableScope.groupId)) {
+      scopes.push(availableScope.scope)
+    }
+  })
+
+  return scopes
 }
 
 export const openIdProvider = async (name, authConfig) => {
@@ -115,9 +133,7 @@ export const openIdProvider = async (name, authConfig) => {
           email: payload.email,
           id: payload.sub
         }
-        if (groups.includes(entraAdminSecurityGroupId)) {
-          credentials.scope = [APP_SCOPES.ADMIN]
-        }
+        credentials.scope = getScopes(groups)
       } else {
         throw new Error(`Unexpected auth provider encountered: ${credentials.provider}`)
       }

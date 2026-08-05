@@ -220,7 +220,7 @@ test('entraId: credentials exist', async () => {
   const adminGroupId = 'test-admin-group-id'
   const anotherGroupId = 'test-group-id'
   config.set('auth.entraId.adminGroupId', adminGroupId)
-  config.set('auth.entraId.groups', [adminGroupId, anotherGroupId])
+  config.set('auth.entraId.groups', [anotherGroupId])
 
   const token = jwt.token.generate(
     {
@@ -417,7 +417,7 @@ test.each(
   const adminGroupId = 'test-admin-group-id'
   const anotherGroupId = 'test-group-id'
   config.set('auth.entraId.adminGroupId', adminGroupId)
-  config.set('auth.entraId.groups', [adminGroupId, anotherGroupId])
+  config.set('auth.entraId.groups', [anotherGroupId])
 
   const token = jwt.token.generate(
     {
@@ -630,4 +630,95 @@ test('jwks key retrieval timeout exception', async () => {
   expect(async () => provider.profile(credentials, {}, {})).rejects.toThrow(
     'Client request timeout'
   )
+})
+
+test.each([
+  {
+    userType: 'Standard',
+    credentialGroups: [
+      'test-group-id'
+    ],
+    expectedScopes: []
+  },
+  {
+    userType: 'Admin',
+    credentialGroups: [
+      'test-group-id',
+      'test-admin-group-id'
+    ],
+    expectedScopes: ['admin']
+  },
+  {
+    userType: 'Private Beta',
+    credentialGroups: [
+      'test-group-id',
+      'test-private-beta-group-id'
+    ],
+    expectedScopes: ['private_beta']
+  }
+])('entraId: $userType user scopes', async ({ userType, credentialGroups, expectedScopes}) => {
+  const provider = await openIdProvider(AUTH_PROVIDERS.ENTRA_ID, {
+    oidcConfigurationUrl: 'https://test.it/path',
+    clientId: 'test'
+  })
+
+  const standardUserGroupId = 'test-group-id'
+  const adminGroupId = 'test-admin-group-id'
+  const privateBetaGroupId = 'test-private-beta-group-id'
+  config.set('auth.entraId.adminGroupId', adminGroupId)
+  config.set('auth.entraId.privateBetaGroupId', privateBetaGroupId)
+  config.set('auth.entraId.groups', [standardUserGroupId])
+
+  const token = jwt.token.generate(
+    {
+      sub: 'testSub',
+      sid: 'testSessionId',
+      name: 'Entra Test User',
+      email: 'testEmail',
+      aud: 'test',
+      iss: 'https://login.microsoftonline.com/test/v2.0',
+    },
+    {
+      key: privateKey,
+      algorithm: 'RS256'
+    },
+    {
+      ttlSec: 1,
+      header: {
+        kid: keyIdentifier
+      }
+    }
+  )
+
+  const idToken = jwt.token.generate(
+    {
+      aud: 'test',
+      iss: 'https://login.microsoftonline.com/test/v2.0',
+      iat: 1765543445,
+      nbf: 1765543445,
+      exp: 4937356800,
+      groups: credentialGroups,
+      sub: 'testSub',
+      ver: '2.0',
+      sid: 'testSessionId',
+      name: 'Entra Test User',
+      email: 'testEmail'
+    },
+    {
+      key: privateKey,
+      algorithm: 'RS256'
+    },
+    {
+      ttlSec: 1,
+      header: {
+        kid: keyIdentifier
+      }
+    }
+  )
+
+  const credentials = { provider: AUTH_PROVIDERS.ENTRA_ID, token }
+
+  await provider.profile(credentials, { id_token: idToken }, {})
+
+  expect(credentials.scope).toEqual(expectedScopes)
 })
