@@ -17,7 +17,10 @@ jest.mock('@hapi/wreck', () => ({
   get: jest.fn()
 }))
 
-test('Accessing redrive complete page should show successful confirmation', async () => {
+test.each([
+  'Redrive',
+  'Drain'
+])('Accessing action complete page should show successful confirmation', async (action) => {
   wreck.get
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
@@ -27,7 +30,7 @@ test('Accessing redrive complete page should show successful confirmation', asyn
 
   const { payload, statusCode } = await server.inject({
     method: 'get',
-    url: `${paths.ADMIN_REDRIVE_COMPLETE}?queue=trade_imports_data_upserted_btms-gateway-deadletter`,
+    url: `${paths.ADMIN_DLQ_ACTION_COMPLETE}?queue=trade_imports_data_upserted_btms-gateway-deadletter&action=${action}`,
     auth: {
       strategy: 'session',
       credentials
@@ -39,7 +42,7 @@ test('Accessing redrive complete page should show successful confirmation', asyn
   expect(statusCode).toBe(200)
 
   expect(
-    getByRole(document.body, 'heading', { name: 'Redrive Request Successful' })
+    getByRole(document.body, 'heading', { name: `${action} request successful` })
   ).toBeInTheDocument()
 
   expect(getByRole(document.body, 'button', { name: 'Return to Admin page' }))
@@ -47,8 +50,8 @@ test('Accessing redrive complete page should show successful confirmation', asyn
 })
 
 test.each([
-  `${paths.ADMIN_REDRIVE_COMPLETE}`,
-  `${paths.ADMIN_REDRIVE_COMPLETE}?queue=foo`,
+  `${paths.ADMIN_DLQ_ACTION_COMPLETE}`,
+  `${paths.ADMIN_DLQ_ACTION_COMPLETE}?queue=foo`,
 ])('Should show the forbidden page when the user is not in the admin security group', async (requestedPage) => {
   wreck.get
   .mockResolvedValueOnce({ payload: provider })

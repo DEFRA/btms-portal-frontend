@@ -2,7 +2,7 @@
 {% from "govuk/components/panel/macro.njk" import govukPanel %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
-{% set pageTitle = "Admin - Redrive Request Successful" %}
+{% set pageTitle = "Admin - " ~ action ~ " request successful" %}
 
 {% block content %}
   <div class="govuk-tabs btms-admin-tabs">
@@ -15,13 +15,20 @@
       </li>
     </ul>
     <section class="btms-admin-dlq-tabs__panel" role="tabpanel">
-      <div class="btms-admin-dlq__redrive">
-        {{ govukPanel({
-          titleText: "Redrive Request Successful",
-          html: redrivenQueue ~ ' has been scheduled to be redriven'
-        }) }}
+      <div class="btms-admin-dlq__action-complete">
+        {% if action === 'Redrive' %}
+          {{ govukPanel({
+            titleText: "Redrive request successful",
+            html: actionQueue ~ ' has been scheduled to be redriven'
+          }) }}
+        {% else %}
+          {{ govukPanel({
+            titleText: "Drain request successful",
+            html: actionQueue ~ ' has been scheduled to be drained'
+          }) }}
+        {% endif %}
         <h2 class="govuk-heading-m">For information</h2>
-        <p>It can take a number of minutes for the Dead Letter Queue to update, this is dependant on the number of messages that require redriving. If the Dead Letter Queue count has not reduced please wait a number of minutes for the count to update.</p>
+        <p>It can take a number of minutes for the Dead Letter Queue to update, this is dependant on the number of messages in the queue.</p>
         {{ govukButton({
           text: "Return to Admin page",
           classes: "govuk-button--secondary",
