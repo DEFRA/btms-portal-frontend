@@ -82,7 +82,11 @@
     "hapi-pulse": {
       "joi": "^17.13.4"
     },
-    "svgo": "4.0.2"
+    "svgo": "4.0.2",
+    "nanoid": "3.3.17",
+    "postcss": {
+      "nanoid": "3.3.17"
+    }
   },
   "devDependencies": {
     "@babel/cli": "^7.28.3",

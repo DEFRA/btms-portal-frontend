@@ -9,3 +9,6 @@ export const getDlqCount = async (dlqCountEndpoint) =>
 
 export const postBtmsGatewayRedrive = async (redriveEndpoint) =>
   gatewayClient.post(redriveEndpoint)
+
+export const postBtmsGatewayDrain = async (drainEndpoint) =>
+  gatewayClient.post(drainEndpoint)

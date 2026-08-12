@@ -1,7 +1,7 @@
 @use "govuk-frontend" as *;
 
 .btms-admin-tabs {
-  .btms-admin-dlq__redrive {
+  .btms-admin-dlq__action {
     width: 90%;
 
     .govuk-inset-text {
@@ -10,7 +10,12 @@
     }
   }
 
-  .btms-admin-redrive__confirm {
-    margin-top: 70px;
+  .btms-admin-action__confirm {
+    margin-top: 10px;
+    display: inline-block;
+  }
+
+  .btms-admin-drain__request {
+    margin-left: 50px;
   }
 }
