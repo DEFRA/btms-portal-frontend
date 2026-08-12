@@ -71,3 +71,35 @@ test('post: no cookie option chosen', async () => {
 
   expect(request.yar.flash('cookiesError')).toEqual([true])
 })
+
+test('post: previous URL not starting with relative path, fails validation and redirected to cookies page', async () => {
+  const server = await initialiseServer()
+  const { headers, request, statusCode } = await server.inject({
+    method: 'post',
+    url: paths.COOKIES,
+    payload: { previousUrl: 'http://www.phishing.com' }
+  })
+
+  expect(statusCode).toBe(302)
+  expect(headers.location).toBe('/cookies')
+
+  expect(request.yar.flash('cookiesError')).toEqual([true])
+})
+
+test.each([
+ '//',
+ '/\\'
+])('post: previous URL starting with %s is redirected to cookies page', async (invalidPathPrefix) => {
+  const server = await initialiseServer()
+  const { headers, statusCode } = await server.inject({
+    method: 'post',
+    url: paths.COOKIES,
+    payload: {
+      analytics: 'yes',
+      previousUrl: `${invalidPathPrefix}phishing`
+    }
+  })
+
+  expect(statusCode).toBe(302)
+  expect(headers.location).toBe('/cookies')
+})

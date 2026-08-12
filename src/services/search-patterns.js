@@ -3,7 +3,7 @@ export const searchKeys = {
   CHED_ID: 'chedId',
   CDS_CHED_ID: 'chedId',
   PARTIAL_CHED: 'chedId',
-  CHED_LAST_SEVEN_DIGITS: 'chedId',
+  CHED_LAST_SEVEN_OR_EIGHT_DIGITS: 'chedId',
   DUCR: 'ducr',
   GMR_ID: 'gmrId',
   VRN_TRN: 'vrnOrTrn'
@@ -17,23 +17,23 @@ export const searchPatterns = [
   },
   {
     key: searchKeys.CHED_ID,
-    pattern: /^CHED([ADP]|P{2})\.GB\.2\d{3}\.\d{7}[VR]?$/,
+    pattern: /^CHED([ADP]|P{2})\.GB\.2\d{3}\.\d{7,8}[VR]?$/,
     description: 'CHED'
   },
   {
     key: searchKeys.CDS_CHED_ID,
-    pattern: /^GBCHD2\d{3}\.\d{7}[VR]?$/,
+    pattern: /^GBCHD2\d{3}\.\d{7,8}[VR]?$/,
     description: 'CDS CHED'
   },
   {
     key: searchKeys.PARTIAL_CHED,
-    pattern: /^2\d{3}\.\d{7}[VR]?$/,
+    pattern: /^2\d{3}\.\d{7,8}[VR]?$/,
     description: 'Partial CHED'
   },
   {
-    key: searchKeys.CHED_LAST_SEVEN_DIGITS,
-    pattern: /^\d{7}[VR]?$/,
-    description: 'last 7 digits of a CHED'
+    key: searchKeys.CHED_LAST_SEVEN_OR_EIGHT_DIGITS,
+    pattern: /^\d{7,8}[VR]?$/,
+    description: 'last 7 or 8 digits of a CHED'
   },
   {
     key: searchKeys.DUCR,
