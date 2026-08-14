@@ -3,8 +3,10 @@ import { getOpenIdRefreshToken } from './open-id-client.js'
 import { paths } from '../routes/route-constants.js'
 import { AUTH_PROVIDERS } from './auth-constants.js'
 
+const tokenSubStringLength = 5
+
 async function refreshAccessToken(request, authedUser) {
-  request.logger.info(`REFRESHING SESSION: Auth Provider: ${authedUser?.provider}. Existing Token expires at: ${authedUser?.expiresAt}, Current time: ${new Date().toISOString()} Existing session refresh token contains: ${authedUser?.refreshToken?.substring(0, 5)}...`)
+  request.logger.info(`REFRESHING SESSION: Auth Provider: ${authedUser?.provider}. Existing Token expires at: ${authedUser?.expiresAt}, Current time: ${new Date().toISOString()} Existing session refresh token contains: ${authedUser?.refreshToken?.substring(0, tokenSubStringLength)}...`)
 
   if (!authedUser.refreshToken) {
     request.logger.error(
