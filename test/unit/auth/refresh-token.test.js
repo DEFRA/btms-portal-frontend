@@ -17,7 +17,7 @@ test('refreshes user signed in with DefraId', async () => {
   const clientSecret = authConfig.defraId.clientSecret
   const redirectUri = config.get('appBaseUrl') + paths.SIGNIN_DEFRA_ID_CALLBACK
 
-  await refreshAccessToken({}, authedUser)
+  await refreshAccessToken({ logger: { info: jest.fn() } }, authedUser)
 
   expect(mockGetOpenIdRefreshToken.mock.calls).toEqual([
     [
@@ -40,7 +40,7 @@ test('refreshes user signed in with EntraId', async () => {
   const clientSecret = authConfig.entraId.clientSecret
   const redirectUri = config.get('appBaseUrl') + paths.SIGNIN_ENTRA_ID_CALLBACK
 
-  await refreshAccessToken({}, authedUser)
+  await refreshAccessToken({ logger: { info: jest.fn() } }, authedUser)
 
   expect(mockGetOpenIdRefreshToken.mock.calls).toEqual([
     [
@@ -59,7 +59,7 @@ test('refreshes user signed in with EntraId', async () => {
 
 test('logs missing if refresh token missing', async () => {
   const { refreshToken, ...authedUser } = createAuthedUser()
-  const request = { logger: { error: jest.fn() } }
+  const request = { logger: { error: jest.fn(), info: jest.fn() } }
   const expected = await refreshAccessToken(request, authedUser)
 
   expect(request.logger.error.mock.calls).toEqual([

@@ -20,6 +20,8 @@ async function setUserSession(request, sessionId) {
     userSession,
     sessionCacheTtl
   )
+
+  request.logger.info(`NEW SESSION: Auth Provider: ${request?.auth?.credentials?.provider}. New session refresh token contains: ${request?.auth?.credentials?.refreshToken?.substring(0, 5)}...`)
 }
 
 function removeUserSession(request) {
@@ -46,6 +48,8 @@ async function updateUserSession(request, refreshedSession) {
     },
     sessionCacheTtl
   )
+
+  request.logger.info(`UPDATED SESSION: Auth Provider: ${authedUser?.provider}. Updated refresh token contains: ${refreshedSession?.refresh_token?.substring(0, 5)}...`)
 
   return getUserSession(request)
 }

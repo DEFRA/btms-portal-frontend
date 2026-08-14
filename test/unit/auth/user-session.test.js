@@ -46,6 +46,9 @@ describe('#userSession', () => {
           credentials: {
             ...authedUser
           }
+        },
+        logger: {
+          info: jest.fn()
         }
       }
 
@@ -112,6 +115,9 @@ describe('#userSession', () => {
           userSession: {
             sessionId
           }
+        },
+        logger: {
+          info: jest.fn()
         }
       }
 
@@ -303,6 +309,9 @@ describe('#userSession', () => {
           userSession: {
             sessionId
           }
+        },
+        logger: {
+          info: jest.fn()
         }
       }
 
