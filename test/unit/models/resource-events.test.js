@@ -49,10 +49,10 @@ test('maps Clearance Request Resource Event', () => {
       }
     ],
     "created": "2025-01-01T09:00:00.000Z",
-    "eventTitle": "CDS decision request",
+    "eventTitle": "CDS clearance request",
     "eventType": "CdsDecisionRequest",
     "source": "CDS to BTMS",
-    "version": 1
+    "externalVersion": 1
   })
 })
 
@@ -72,6 +72,7 @@ test('maps Decision Notification Resource Event', () => {
       + '        ]\n'
       + '      },\n'
       + '      "clearanceDecision": {\n'
+      + '        "externalVersionNumber": 1,\n'
       + '        "decisionNumber": 1,\n'
       + '        "items": [\n'
       + '          {\n'
@@ -123,7 +124,8 @@ test('maps Decision Notification Resource Event', () => {
     "eventType": "BtmsDecision",
     "source": "BTMS to CDS",
     "status": "Finalised - Manually released",
-    "version": 1
+    "decisionNumber": 1,
+    "externalVersionNumber": 1
   })
 })
 
@@ -143,7 +145,8 @@ test('maps Decision Notification Resource Event with unknown internal decision c
       + '        ]\n'
       + '      },\n'
       + '      "clearanceDecision": {\n'
-      + '        "decisionNumber": 1,\n'
+      + '        "externalVersionNumber": 1,\n'
+      + '        "decisionNumber": 2,\n'
       + '        "items": [\n'
       + '          {\n'
       + '            "itemNumber": 1\n'
@@ -194,7 +197,8 @@ test('maps Decision Notification Resource Event with unknown internal decision c
     "eventType": "BtmsDecision",
     "source": "BTMS to CDS",
     "status": "Finalised - Manually released",
-    "version": 1
+    "decisionNumber": 2,
+    "externalVersionNumber": 1
   })
 })
 
