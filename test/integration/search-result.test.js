@@ -217,6 +217,7 @@ const declarationResourceEvents = [
       + '        ]\n'
       + '      },\n'
       + '      "clearanceDecision": {\n'
+      + '        "externalVersionNumber": 1,\n'
       + '        "decisionNumber": 1,\n'
       + '        "items": [\n'
       + '          {\n'
@@ -256,6 +257,7 @@ const declarationResourceEvents = [
       + '        ]\n'
       + '      },\n'
       + '      "clearanceDecision": {\n'
+      + '        "externalVersionNumber": 2,\n'
       + '        "decisionNumber": 2,\n'
       + '        "items": [\n'
       + '          {\n'
@@ -296,6 +298,7 @@ const declarationResourceEvents = [
       + '        ]\n'
       + '      },\n'
       + '      "clearanceDecision": {\n'
+      + '        "externalVersionNumber": 3,\n'
       + '        "decisionNumber": 3,\n'
       + '        "items": [\n'
       + '          {\n'
@@ -434,6 +437,7 @@ const declarationResourceEvents = [
       + '        ]\n'
       + '      },\n'
       + '      "clearanceDecision": {\n'
+      + '        "externalVersionNumber": 1,\n'
       + '        "decisionNumber": 1,\n'
       + '        "items": [\n'
       + '          {\n'
@@ -1115,11 +1119,11 @@ test('shows latest search results and timeline tabs', async () => {
   expect(eventTitles[1]).toBe('BTMS decision')
   expect(eventTitles[2]).toBe('CDS processing error')
   expect(eventTitles[3]).toBe('BTMS processing error')
-  expect(eventTitles[4]).toBe('CDS decision request')
+  expect(eventTitles[4]).toBe('CDS clearance request')
   expect(eventTitles[5]).toBe('BTMS decision')
   expect(eventTitles[6]).toBe('BTMS decision')
   expect(eventTitles[7]).toBe('CHEDA.GB.2025.0000001')
-  expect(eventTitles[8]).toBe('CDS decision request')
+  expect(eventTitles[8]).toBe('CDS clearance request')
   expect(eventTitles[9]).toBe('BTMS decision')
   expect(eventTitles[10]).toBe('CDS finalisation')
   expect(eventTitles[11]).toBe('CDS processing error')
@@ -1142,11 +1146,52 @@ test('shows latest search results and timeline tabs', async () => {
   expect(createdDisplayText[12]).toBe("")
   expect(createdDisplayText[13]).toBe("")
 
-  const timelineBtmsDecisionCodes = Array.from(document.body.querySelectorAll('.moj-timeline__item'))
+  const timelineClearanceRequestItems = Array.from(document.body.querySelectorAll('.moj-timeline__item'))
+    .filter(elem => elem.querySelector('.moj-timeline__header .moj-timeline__title span').innerHTML === 'CDS clearance request')
+
+  const timelineClearanceRequestVersionLabels = timelineClearanceRequestItems
+    .map(clearanceRequestItem => clearanceRequestItem.querySelectorAll('.moj-timeline__description .timeline-detail-row span')[0].innerHTML)
+  expect(timelineClearanceRequestVersionLabels).toHaveLength(2)
+  expect(timelineClearanceRequestVersionLabels.every(label => label === 'External version')).toBeTruthy()
+
+  const timelineClearanceRequestVersions = timelineClearanceRequestItems
+    .map(clearanceRequestItem => clearanceRequestItem.querySelectorAll('.moj-timeline__description .timeline-detail-row span')[1].innerHTML)
+  expect(timelineClearanceRequestVersions).toHaveLength(2)
+  expect(timelineClearanceRequestVersions.every(label => label === '1')).toBeTruthy()
+
+  const timelineBtmsDecisionItems = Array.from(document.body.querySelectorAll('.moj-timeline__item'))
     .filter(elem => elem.querySelector('.moj-timeline__header .moj-timeline__title span').innerHTML === 'BTMS decision')
+
+  const timelineBtmsDecisionCodes = timelineBtmsDecisionItems
     .map(btmsDecisionItem => btmsDecisionItem.querySelectorAll('.govuk-details__text .govuk-table .govuk-table__body .govuk-table__row .govuk-table__cell')[4].innerHTML)
-  expect(timelineBtmsDecisionCodes.length).toBe(4)
+  expect(timelineBtmsDecisionCodes).toHaveLength(4)
   expect(timelineBtmsDecisionCodes.every(decisionCode => decisionCode === 'X00')).toBeTruthy()
+
+  const timelineBtmsDecisionLabels = timelineBtmsDecisionItems
+    .map(btmsDecisionItem => btmsDecisionItem.querySelectorAll('.moj-timeline__description div:nth-child(2) span')[0].innerHTML)
+  expect(timelineBtmsDecisionLabels).toHaveLength(4)
+  expect(timelineBtmsDecisionLabels.every(label => label === 'Decision number')).toBeTruthy()
+
+  const timelineBtmsDecisionNumbers = timelineBtmsDecisionItems
+    .map(btmsDecisionItem => btmsDecisionItem.querySelectorAll('.moj-timeline__description div:nth-child(2) span')[1].innerHTML)
+  expect(timelineBtmsDecisionNumbers).toHaveLength(4)
+  expect(timelineBtmsDecisionNumbers[0]).toBe('1')
+  expect(timelineBtmsDecisionNumbers[1]).toBe('2')
+  expect(timelineBtmsDecisionNumbers[2]).toBe('3')
+  expect(timelineBtmsDecisionNumbers[3]).toBe('1')
+
+  const timelineBtmsDecisionExternalVersions = timelineBtmsDecisionItems
+    .map(btmsDecisionItem => btmsDecisionItem.querySelectorAll('.moj-timeline__description div:nth-child(3) span')[0].innerHTML)
+  expect(timelineBtmsDecisionExternalVersions).toHaveLength(4)
+  expect(timelineBtmsDecisionExternalVersions.every(label => label === 'External version')).toBeTruthy()
+
+  const timelineBtmsDecisionExternalVersionNumbers = timelineBtmsDecisionItems
+    .map(btmsDecisionItem => btmsDecisionItem.querySelectorAll('.moj-timeline__description div:nth-child(3) span')[1].innerHTML)
+  expect(timelineBtmsDecisionExternalVersionNumbers).toHaveLength(4)
+  expect(timelineBtmsDecisionExternalVersionNumbers[0]).toBe('1')
+  expect(timelineBtmsDecisionExternalVersionNumbers[1]).toBe('2')
+  expect(timelineBtmsDecisionExternalVersionNumbers[2]).toBe('3')
+  expect(timelineBtmsDecisionExternalVersionNumbers[3]).toBe('1')
 })
 
 test('handles resource event that cannot be parsed and mapped', async () => {
@@ -1197,10 +1242,10 @@ test('handles resource event that cannot be parsed and mapped', async () => {
   expect(eventTitles[1]).toBe('BTMS decision')
   expect(eventTitles[2]).toBe('CDS processing error')
   expect(eventTitles[3]).toBe('BTMS processing error')
-  expect(eventTitles[4]).toBe('CDS decision request')
+  expect(eventTitles[4]).toBe('CDS clearance request')
   expect(eventTitles[5]).toBe('BTMS decision')
   expect(eventTitles[6]).toBe('BTMS decision')
-  expect(eventTitles[7]).toBe('CDS decision request')
+  expect(eventTitles[7]).toBe('CDS clearance request')
   expect(eventTitles[8]).toBe('BTMS decision')
   expect(eventTitles[9]).toBe('CDS finalisation')
   expect(eventTitles[10]).toBe('CDS processing error')
