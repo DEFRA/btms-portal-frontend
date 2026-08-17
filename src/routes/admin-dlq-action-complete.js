@@ -5,11 +5,11 @@ import {
 } from './route-constants.js'
 import { APP_SCOPES } from '../auth/auth-constants.js'
 
-const ADMIN_REDRIVE_COMPLETE_TEMPLATE = 'admin-redrive-complete'
+const ADMIN_DLQ_ACTION_COMPLETE_TEMPLATE = 'admin-dlq-action-complete'
 
-export const adminRedriveComplete = {
+export const adminDlqActionComplete = {
   method: ['get'],
-  path: paths.ADMIN_REDRIVE_COMPLETE,
+  path: paths.ADMIN_DLQ_ACTION_COMPLETE,
   options: {
     auth: {
       scope: APP_SCOPES.ADMIN,
@@ -18,9 +18,10 @@ export const adminRedriveComplete = {
     cache: CACHE_CONTROL_NO_STORE
   },
   handler: async (request, h) => {
-    const redrivenQueue = request.query[queryStringParams.QUEUE]
+    const actionQueue = request.query[queryStringParams.QUEUE]
     const adminDlqPath = paths.ADMIN_DLQ
+    const action = request.query[queryStringParams.ACTION]
 
-    return h.view(ADMIN_REDRIVE_COMPLETE_TEMPLATE, { redrivenQueue, adminDlqPath })
+    return h.view(ADMIN_DLQ_ACTION_COMPLETE_TEMPLATE, { actionQueue, adminDlqPath, action })
   }
 }

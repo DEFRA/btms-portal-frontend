@@ -9,3 +9,6 @@ export const getDlqCount = async (dlqCountEndpoint) =>
 
 export const postDecisionDeriverRedrive = async (redriveEndpoint) =>
   decisionDeriverClient.post(redriveEndpoint)
+
+export const postDecisionDeriverDrain = async (drainEndpoint) =>
+  decisionDeriverClient.post(drainEndpoint)

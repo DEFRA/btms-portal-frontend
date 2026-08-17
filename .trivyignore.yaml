@@ -101,3 +101,52 @@ vulnerabilities:
     reason: >
       Vulnerable tar is bundled inside npm itself, not the
       application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-69152
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/brace-expansion/package.json
+    reason: >
+      Vulnerable brace-expansion is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-69192
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/ip-address/package.json
+    reason: >
+      Vulnerable ip-address is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-54272
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/ip-address/package.json
+    reason: >
+      Vulnerable ip-address is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-69198
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/ip-address/package.json
+    reason: >
+      Vulnerable ip-address is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-15157
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/undici/package.json
+    reason: >
+      Vulnerable undici is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-16728
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/undici/package.json
+    reason: >
+      Vulnerable undici is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-16729
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/undici/package.json
+    reason: >
+      Vulnerable undici is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.

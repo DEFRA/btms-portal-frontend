@@ -2,8 +2,8 @@ const paths = {
   ACCESSIBILITY: '/accessibility-statement',
   ADMIN_MESSAGES: '/admin/messages',
   ADMIN_DLQ: '/admin/dlq',
-  ADMIN_REDRIVE: '/admin/redrive',
-  ADMIN_REDRIVE_COMPLETE: '/admin/redrive-complete',
+  ADMIN_DLQ_ACTION: '/admin/dlq/action',
+  ADMIN_DLQ_ACTION_COMPLETE: '/admin/dlq/action-complete',
   CHROME_DEVTOOLS: '/.well-known/appspecific/com.chrome.devtools.json',
   COOKIES: '/cookies',
   GMR_SEARCH_RESULT: '/gmr-search-result',
@@ -29,7 +29,8 @@ const queryStringParams = {
   RESOURCE_TYPE: 'resourceType',
   SEARCH_TERM: 'searchTerm',
   SEARCH_TYPE: 'searchType',
-  QUEUE: 'queue'
+  QUEUE: 'queue',
+  ACTION: 'action'
 }
 
 const CACHE_CONTROL_NO_STORE = {
