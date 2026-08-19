@@ -34,7 +34,7 @@ export default {
     }
   },
   experiments: {
-    outputModule: true
+    outputModule: false
   },
   mode: NODE_ENV === 'production' ? 'production' : 'development',
   devtool: NODE_ENV === 'production' ? 'source-map' : 'inline-source-map',
@@ -54,9 +54,7 @@ export default {
         : 'javascripts/[name].js',
 
     path: path.join(dirname, '.public'),
-    publicPath: '/public/',
-    libraryTarget: 'module',
-    module: true
+    publicPath: '/public/'
   },
   resolve: {
     alias: {
