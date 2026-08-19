@@ -116,6 +116,33 @@ test('redirects to search page if no results', async () => {
   expect(headers.location).toBe(paths.SEARCH)
 })
 
+test('redirects to search page with not found error for non-ASCII search term', async () => {
+  const noResults = {
+    customsDeclarations: [],
+    goodsVehicleMovements: []
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: noResults })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { statusCode, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.VRN_TRN_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${encodeURIComponent('BIAŁA KIEŁBASA')}`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(302)
+  expect(headers.location).toBe(paths.SEARCH)
+})
+
 test('redirect non authorised requests', async () => {
   wreck.get
   .mockResolvedValueOnce({ payload: provider })

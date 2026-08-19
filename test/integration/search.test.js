@@ -167,6 +167,44 @@ test('renders search page with error: search term not found', async () => {
   ).toBeInTheDocument()
 })
 
+test('renders search page with error: non-ASCII search term not found', async () => {
+  const state = {
+    type: 'searchError',
+    message: {
+      searchTerm: 'BIAŁA KIEŁBASA',
+      isValid: false,
+      errorCode: 'SEARCH_TERM_NOT_FOUND'
+    }
+  }
+
+  const server = await initialiseServer(state)
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: paths.SEARCH,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+  initSearch()
+
+  const searchBox = getByRole(document.body, 'textbox', {
+    name: 'Enter an MRN, CHED, GMR, VRN or TRN'
+  })
+  expect(searchBox).toHaveClass('govuk-input--error')
+  expect(searchBox).toHaveValue('BIAŁA KIEŁBASA')
+
+  expect(
+    getByText(document.body, 'BIAŁA KIEŁBASA cannot be found', {
+      exact: false
+    })
+  ).toBeInTheDocument()
+})
+
 test('redirect non authorised requests', async () => {
   const server = await initialiseServer()
 
@@ -214,6 +252,23 @@ test('redirects to VRN TRN results page if search term is not a valid MRN, CHED,
 
   expect(statusCode).toBe(302)
   expect(headers.location).toBe(`${paths.VRN_TRN_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=FOO`)
+})
+
+test('redirects to VRN TRN results page with URL-encoded search term for non-ASCII input', async () => {
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { statusCode, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH}?${queryStringParams.SEARCH_TERM}=Biała Kiełbasa`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(302)
+  expect(headers.location).toBe(`${paths.VRN_TRN_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${encodeURIComponent('BIAŁA KIEŁBASA')}`)
 })
 
 test.each([

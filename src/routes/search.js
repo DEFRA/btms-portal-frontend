@@ -30,15 +30,17 @@ export const search = {
               pattern.test(value)
             )
 
+            const queryParams = `${queryStringParams.SEARCH_TERM}=${encodeURIComponent(value)}`
+
             if (!match) {
-              return h.redirect(`${paths.VRN_TRN_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${value}`).takeover()
+              return h.redirect(`${paths.VRN_TRN_SEARCH_RESULT}?${queryParams}`).takeover()
             }
 
             if (match.key === searchKeys.GMR_ID) {
-              return h.redirect(`${paths.GMR_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${value}`).takeover()
+              return h.redirect(`${paths.GMR_SEARCH_RESULT}?${queryParams}`).takeover()
             }
 
-            return h.redirect(`${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${value}`).takeover()
+            return h.redirect(`${paths.SEARCH_RESULT}?${queryParams}`).takeover()
           }
 
           return {}
