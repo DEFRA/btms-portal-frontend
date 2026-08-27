@@ -30,7 +30,7 @@ The BTMS Portal Frontend provides search for DEFRA Import Notifications (IPAFFS)
 
 ## Prerequisites
 
-- [Node.js](http://nodejs.org/) `>= v22`
+- [Node.js](http://nodejs.org/) `>= v24`
 - [npm](https://nodejs.org/) `>= v10.5.1` (installed with Node.js)
 - [Docker](https://www.docker.com/)
 
