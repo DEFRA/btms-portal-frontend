@@ -29,6 +29,8 @@ jobs:
           npm run build
           npm run lint
           npm test
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
       - name: Test Docker Image Build
         run: |
           set +e
@@ -38,7 +40,7 @@ jobs:
         run: |
           docker run -v /var/run/docker.sock:/var/run/docker.sock \
             -v ${{ github.workspace }}/.trivyignore.yaml:/work/.trivyignore.yaml \
-            aquasec/trivy:0.69.3 image \
+            aquasec/trivy:0.74.0 image \
             --ignore-unfixed \
             --ignorefile /work/.trivyignore.yaml \
             --exit-code 1 \
