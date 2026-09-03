@@ -3,7 +3,7 @@ import wreck from '@hapi/wreck'
 import { initialiseServer } from '../utils/initialise-server.js'
 import {
   createAuthedUser,
-  setupAuthedAdminUserSession,
+  setupAuthedAdminUserSession, setupAuthedPrivateBetaUserSession,
   setupAuthedUserSession
 } from '../unit/utils/session-helper.js'
 import { paths } from '../../src/routes/route-constants.js'
@@ -635,14 +635,18 @@ test('redirect non authorised requests', async () => {
 })
 
 test.each([
-    {
-      scope: ['admin'],
-      levelMatchingTabAllowed: true
-    },
-    {
-      scope: [],
-      levelMatchingTabAllowed: false
-    }
+  {
+    scope: ['admin'],
+    levelMatchingTabAllowed: true
+  },
+  {
+    scope: [],
+    levelMatchingTabAllowed: false
+  },
+  {
+    scope: ['private_beta'],
+    levelMatchingTabAllowed: false
+  }
 ])('Level Matching Tab is only visible for allowed user', async (user) => {
   const levelMatchingByRegionData = {
     total: 1000,
@@ -717,13 +721,16 @@ test.each([
   }
 })
 
-test('logged in user is redirected if not authorised to get level matching report CSV', async () => {
+test.each([
+  { userSetupHandler: setupAuthedUserSession },
+  { userSetupHandler: setupAuthedPrivateBetaUserSession }
+])('logged in user is redirected if not authorised to get level matching report CSV', async (options) => {
   wreck.get
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
 
   const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
+  const credentials = await options.userSetupHandler(server)
 
   const { payload, statusCode } = await server.inject({
     method: 'get',
