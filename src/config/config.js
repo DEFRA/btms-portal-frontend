@@ -129,6 +129,12 @@ const config = convict({
     default: isProduction,
     env: 'ENABLE_METRICS'
   },
+  isTracesChedsEnabled: {
+    doc: 'Show TRACES CHEDs on the search results page',
+    format: Boolean,
+    default: false,
+    env: 'SHOW_TRACES_CHEDS'
+  },
   session: {
     cache: {
       engine: {

@@ -6,6 +6,7 @@ import { createRouteConfig } from './search-result-common.js'
 import { searchKeys } from '../services/search-patterns.js'
 import { mapResourceEvents } from '../models/resource-events.js'
 import { createLogger } from '../utils/logger.js'
+import { config } from '../config/config.js'
 import { isInFeatureGroup } from '../auth/check-groups.js'
 import { AUTH_FEATURES } from '../auth/auth-constants.js'
 
@@ -170,7 +171,8 @@ export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_
     timelineEvents,
     showLevel2NoMatchText,
     showLevel3NoMatchText,
-    showLevelsResultTab
+    showLevelsResultTab,
+    showTracesCheds: config.get('isTracesChedsEnabled')
   }
 
   return h.view('search-result', viewModel)
