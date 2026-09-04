@@ -44,7 +44,7 @@
 {% else %}
   <p class="govuk-inset-text">There are no matching IPAFFS pre-notification (CHED) details</p>
 {% endfor %}
-{% if showTracesCheds %}
+{% if showTracesCheds and tabContext == tabContexts.LATEST_RESULT %}
   <h3 class="govuk-heading-m">TRACES CHED details</h3>
   {% for tracesChed in tracesCheds %}
     {% set tracesChedSummaryHTML %}

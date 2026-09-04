@@ -1,1 +1,24 @@
-<p class="govuk-inset-text">TRACES CHED details will be displayed here.</p>
+<table class="govuk-table govuk-table--small-text-until-tablet btms-notification{{ tabContextSuffix }}">
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header">Item number</th>
+      <th scope="col" class="govuk-table__header">Commodity code</th>
+      <th scope="col" class="govuk-table__header">Description</th>
+      <th scope="col" class="govuk-table__header">Quantity / Weight</th>
+      <th scope="col" class="govuk-table__header">Authority</th>
+      <th scope="col" class="govuk-table__header">Decision</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for commodity in tracesChed.commodities %}
+      <tr>
+        <td class="govuk-table__cell">{% if commodity.itemNumber == null %}{% else %}{{ commodity.itemNumber }}{% endif %}</td>
+        <td class="govuk-table__cell">{{ commodity.commodityCode }}</td>
+        <td class="govuk-table__cell">{{ commodity.description }}</td>
+        <td class="govuk-table__cell">{{ commodity.quantityWeight }}</td>
+        <td class="govuk-table__cell"></td>
+        <td class="govuk-table__cell"></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

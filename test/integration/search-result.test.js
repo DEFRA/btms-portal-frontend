@@ -4,7 +4,8 @@ import {
   getAllByRole,
   getByRole,
   queryByRole,
-  queryByText
+  queryByText,
+  within
 } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { paths, queryStringParams } from '../../src/routes/route-constants.js'
@@ -841,7 +842,25 @@ test('redirects to search page if no results', async () => {
 const createTracesChed = (identifier, updated) => ({
   ched: {
     exchangedDocument: {
-      identifier
+      identifier,
+      documentStatusCode: '1'
+    },
+    lastUpdated: updated,
+    specifiedConsignment: {
+      includedConsignmentItem: [
+        {
+          includedTradeLineItem: [
+            {
+              sequenceNumeric: 1,
+              applicableClassification: [
+                { systemId: 'CN', classCode: { value: '03019985' } }
+              ],
+              scientificName: 'Salmo salar',
+              grossWeight: { content: '100', unitCode: 'KGM' }
+            }
+          ]
+        }
+      ]
     }
   },
   created: '2025-01-01T09:00:00.000Z',
@@ -883,9 +902,11 @@ test('shows TRACES CHED placeholders when feature flag is enabled', async () => 
   expect(
     getByRole(document.body, 'group', { name: 'CHEDD.GB.2025.0000003' })
   ).toBeInTheDocument()
-  expect(
-    queryByText(document.body, 'TRACES CHED details will be displayed here.')
-  ).toBeInTheDocument()
+  const tracesChedDetails = getByRole(document.body, 'group', { name: 'CHEDD.GB.2025.0000003' })
+  expect(within(tracesChedDetails).getByText('CHED Status')).toBeInTheDocument()
+  expect(within(tracesChedDetails).getByText('Salmo salar')).toBeInTheDocument()
+  expect(within(tracesChedDetails).getByText('100 KGM')).toBeInTheDocument()
+  expect(within(tracesChedDetails).getByText('03019985')).toBeInTheDocument()
 })
 
 test('renders results page when only TRACES CHEDs are found and feature flag is enabled', async () => {
