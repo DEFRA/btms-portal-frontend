@@ -2,6 +2,17 @@ import { searchPatterns } from '../../../src/services/search-patterns.js'
 
 test.each([
   ['CHEDA.GB.2025.0000001', true],
+  ['CHEDA.NL.2025.0000001', true],
+  ['CHEDD.FR.2025.0000002', true],
+  ['CHEDP.IT.2025.0000003', true],
+  ['CHEDPP.DE.2025.0000004', true],
+  ['CHEDA.NL.2025.0000001V', true],
+  ['CHEDA.NL.2025.00000001R', true],
+  ['CHEDA.G.2025.0000001', false],
+  ['CHEDA.GBR.2025.0000001', false],
+  ['CHEDA.01.2025.0000001', false],
+  ['CHEDA.g1.2025.0000001', false],
+  ['CHEDA.2025.0000001', false],
   ['CHEDA.GB.2025.000000', false],
   ['CHEDA.GB.2025.0000001V', true],
   ['CHEDA.GB.2025.0000001R', true],
