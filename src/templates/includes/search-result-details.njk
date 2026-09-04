@@ -44,3 +44,27 @@
 {% else %}
   <p class="govuk-inset-text">There are no matching IPAFFS pre-notification (CHED) details</p>
 {% endfor %}
+{% if showTracesCheds %}
+  <h3 class="govuk-heading-m">TRACES CHED details</h3>
+  {% for tracesChed in tracesCheds %}
+    {% set tracesChedSummaryHTML %}
+    {% include "./traces-ched-summary.njk" %}
+    {% endset %}
+    {% set tracesChedHTML %}
+    {% include "./traces-ched-html.njk" %}
+    {% endset %}
+    {{
+      govukDetails({
+        summaryHtml: tracesChedSummaryHTML,
+        html: tracesChedHTML,
+        open: false,
+        classes: 'btms-details',
+        attributes: {
+          'aria-label': tracesChed.reference
+        }
+      })
+    }}
+  {% else %}
+    <p class="govuk-inset-text">There are no matching TRACES CHED details</p>
+  {% endfor %}
+{% endif %}

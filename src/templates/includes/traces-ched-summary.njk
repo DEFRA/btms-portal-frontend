@@ -1,0 +1,17 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{{
+  govukSummaryList({
+    classes: "btms-customs-declaration-summary",
+    rows: [
+      {
+        key: { text: "CHED Reference" },
+        value: { text: tracesChed.reference }
+      },
+      {
+        key: { text: "Last updated" },
+        value: { text: tracesChed.updated }
+      }
+    ]
+  })
+}}

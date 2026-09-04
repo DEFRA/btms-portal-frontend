@@ -8,9 +8,14 @@ import {
 } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { paths, queryStringParams } from '../../src/routes/route-constants.js'
+import { config } from '../../src/config/config.js'
 import { initialiseServer } from '../utils/initialise-server.js'
 import { createAuthedUser, setupAuthedUserSession } from '../unit/utils/session-helper.js'
 import { initFilters } from '../../src/client/javascripts/filters.js'
+
+afterEach(() => {
+  config.set('isTracesChedsEnabled', false)
+})
 
 const provider = {
   authorization_endpoint: 'https://auth.endpoint',
@@ -831,6 +836,163 @@ test('redirects to search page if no results', async () => {
 
   expect(statusCode).toBe(302)
   expect(headers.location).toBe(paths.SEARCH)
+})
+
+const createTracesChed = (identifier, updated) => ({
+  ched: {
+    exchangedDocument: {
+      identifier
+    }
+  },
+  created: '2025-01-01T09:00:00.000Z',
+  updated
+})
+
+test('shows TRACES CHED placeholders when feature flag is enabled', async () => {
+  config.set('isTracesChedsEnabled', true)
+  const relatedImportDeclarationsWithTracesCheds = {
+    ...relatedImportDeclarations,
+    cheds: [
+      createTracesChed('CHEDD.GB.2025.0000003', '2025-06-01T09:30:00.000Z')
+    ]
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: relatedImportDeclarationsWithTracesCheds })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(
+    getByRole(document.body, 'heading', { name: 'TRACES CHED details', level: 3 })
+  ).toBeInTheDocument()
+  expect(
+    getByRole(document.body, 'group', { name: 'CHEDD.GB.2025.0000003' })
+  ).toBeInTheDocument()
+  expect(
+    queryByText(document.body, 'TRACES CHED details will be displayed here.')
+  ).toBeInTheDocument()
+})
+
+test('renders results page when only TRACES CHEDs are found and feature flag is enabled', async () => {
+  config.set('isTracesChedsEnabled', true)
+  const onlyTracesCheds = {
+    customsDeclarations: [],
+    importPreNotifications: [],
+    cheds: [
+      createTracesChed('CHEDP.GB.2025.0000002', '2025-07-02T10:00:00.000Z')
+    ]
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: onlyTracesCheds })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload, statusCode } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=CHEDP.GB.2025.0000002`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(200)
+
+  globalJsdom(payload)
+
+  expect(
+    getByRole(document.body, 'group', { name: 'CHEDP.GB.2025.0000002' })
+  ).toBeInTheDocument()
+  expect(
+    getByRole(document.body, 'heading', { name: 'TRACES CHED details', level: 3 })
+  ).toBeInTheDocument()
+})
+
+test('redirects to search page when only TRACES CHEDs are found and feature flag is disabled', async () => {
+  config.set('isTracesChedsEnabled', false)
+  const onlyTracesCheds = {
+    customsDeclarations: [],
+    importPreNotifications: [],
+    cheds: [
+      createTracesChed('CHEDP.GB.2025.0000002', '2025-07-02T10:00:00.000Z')
+    ]
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: onlyTracesCheds })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { statusCode, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=CHEDP.GB.2025.0000002`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(302)
+  expect(headers.location).toBe(paths.SEARCH)
+})
+
+test('does not show TRACES CHED section when feature flag is disabled', async () => {
+  config.set('isTracesChedsEnabled', false)
+  const relatedImportDeclarationsWithTracesCheds = {
+    ...relatedImportDeclarations,
+    cheds: [
+      createTracesChed('CHEDD.GB.2025.0000003', '2025-06-01T09:30:00.000Z')
+    ]
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: relatedImportDeclarationsWithTracesCheds })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(
+    queryByRole(document.body, 'heading', { name: 'TRACES CHED details' })
+  ).not.toBeInTheDocument()
+  expect(
+    queryByRole(document.body, 'group', { name: 'CHEDD.GB.2025.0000003' })
+  ).not.toBeInTheDocument()
 })
 
 test('redirects to search page for missing search', async () => {
