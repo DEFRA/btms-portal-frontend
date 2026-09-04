@@ -851,12 +851,20 @@ const createTracesChed = (identifier, updated) => ({
         {
           includedTradeLineItem: [
             {
+              sequenceNumeric: 0,
+              applicableClassification: null,
+              scientificName: null,
+              netWeight: { content: '3600', unitCode: 'KGM' },
+              grossWeight: { content: '3700', unitCode: 'KGM' }
+            },
+            {
               sequenceNumeric: 1,
               applicableClassification: [
                 { systemId: 'CN', classCode: { value: '03019985' } }
               ],
               scientificName: 'Salmo salar',
-              grossWeight: { content: '100', unitCode: 'KGM' }
+              netWeight: { content: '1000', unitCode: 'KGM' },
+              grossWeight: null
             }
           ]
         }
@@ -903,9 +911,12 @@ test('shows TRACES CHED placeholders when feature flag is enabled', async () => 
     getByRole(document.body, 'group', { name: 'CHEDD.GB.2025.0000003' })
   ).toBeInTheDocument()
   const tracesChedDetails = getByRole(document.body, 'group', { name: 'CHEDD.GB.2025.0000003' })
+  expect(tracesChedDetails).toHaveAttribute('open')
   expect(within(tracesChedDetails).getByText('CHED Status')).toBeInTheDocument()
   expect(within(tracesChedDetails).getByText('Salmo salar')).toBeInTheDocument()
-  expect(within(tracesChedDetails).getByText('100 KGM')).toBeInTheDocument()
+  expect(within(tracesChedDetails).getByText('1000 KGM')).toBeInTheDocument()
+  expect(within(tracesChedDetails).queryByText('3600 KGM')).not.toBeInTheDocument()
+  expect(within(tracesChedDetails).queryByText('3700 KGM')).not.toBeInTheDocument()
   expect(within(tracesChedDetails).getByText('03019985')).toBeInTheDocument()
 })
 

@@ -4,19 +4,20 @@ import { sortDescending } from './sort.js'
 
 const CHED_CLASSIFICATION_SYSTEM_ID = 'CN'
 
-const mapClassificationToCommodityCode = (classifications) => {
-  const classification = classifications?.find(
-    ({ systemId }) => systemId === CHED_CLASSIFICATION_SYSTEM_ID
-  )
-  return classification?.classCode?.value
-}
+const findCnClassification = (classifications) =>
+  classifications?.find(({ systemId }) => systemId === CHED_CLASSIFICATION_SYSTEM_ID)
+
+// The first line i've seen in TRACES CHEDs is a total
+// This filters out anything that doesn't look like a commodity
+const isCommodityLine = (tradeLineItem) =>
+  Boolean(findCnClassification(tradeLineItem?.applicableClassification))
 
 const mapCommodity = (tradeLineItem) => ({
   itemNumber: typeof tradeLineItem?.sequenceNumeric === 'number' ? tradeLineItem.sequenceNumeric : undefined,
-  commodityCode: mapClassificationToCommodityCode(tradeLineItem?.applicableClassification),
+  commodityCode: findCnClassification(tradeLineItem?.applicableClassification)?.classCode?.value,
   description: tradeLineItem?.scientificName ?? undefined,
-  quantityWeight: tradeLineItem?.grossWeight?.content && tradeLineItem?.grossWeight?.unitCode
-    ? `${tradeLineItem.grossWeight.content} ${tradeLineItem.grossWeight.unitCode}`
+  quantityWeight: tradeLineItem?.netWeight?.content && tradeLineItem?.netWeight?.unitCode
+    ? `${tradeLineItem.netWeight.content} ${tradeLineItem.netWeight.unitCode}`
     : undefined
 })
 
@@ -26,7 +27,7 @@ const mapTracesChed = ({ ched }) => ({
   updated: ched?.lastUpdated ? format(new Date(ched.lastUpdated), DATE_FORMAT) : undefined,
   commodities: (ched?.specifiedConsignment?.includedConsignmentItem ?? []).flatMap(
     (consignmentItem) => consignmentItem?.includedTradeLineItem ?? []
-  ).map(mapCommodity)
+  ).filter(isCommodityLine).map(mapCommodity)
 })
 
 const isSearchTermMatch = (searchTerm, tracesChed) =>

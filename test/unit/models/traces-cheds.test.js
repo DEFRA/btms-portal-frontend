@@ -5,14 +5,14 @@ const createTradeLineItem = ({
   classificationSystemId = 'CN',
   commodityCode = '03019985',
   scientificName = null,
-  grossWeight = null
+  netWeight = null
 } = {}) => ({
   sequenceNumeric,
   applicableClassification: classificationSystemId
     ? [{ systemId: classificationSystemId, classCode: { value: commodityCode } }]
     : null,
   scientificName,
-  grossWeight
+  netWeight
 })
 
 const createTracesChed = (identifier, options = {}) => ({
@@ -53,17 +53,26 @@ describe('#mapTracesCheds', () => {
     ])
   })
 
-  test('should map commodities from trade line items', () => {
+  test('should map commodities from trade line items, excluding consignment totals lines', () => {
     const searchResults = {
       cheds: [
         createTracesChed('CHEDA.GB.2025.0000001', {
           tradeLineItems: [
             createTradeLineItem({
+              sequenceNumeric: 0,
+              classificationSystemId: null,
+              netWeight: { content: '3600', unitCode: 'KGM' }
+            }),
+            createTradeLineItem({
               sequenceNumeric: 1,
               scientificName: 'Salmo salar',
-              grossWeight: { content: '100', unitCode: 'KGM' }
+              netWeight: { content: '1000', unitCode: 'KGM' }
             }),
-            createTradeLineItem({ sequenceNumeric: 2, classificationSystemId: null })
+            createTradeLineItem({
+              sequenceNumeric: 2,
+              scientificName: 'Equus',
+              netWeight: { content: '2500', unitCode: 'KGM' }
+            })
           ]
         })
       ]
@@ -74,13 +83,13 @@ describe('#mapTracesCheds', () => {
         itemNumber: 1,
         commodityCode: '03019985',
         description: 'Salmo salar',
-        quantityWeight: '100 KGM'
+        quantityWeight: '1000 KGM'
       },
       {
         itemNumber: 2,
-        commodityCode: undefined,
-        description: undefined,
-        quantityWeight: undefined
+        commodityCode: '03019985',
+        description: 'Equus',
+        quantityWeight: '2500 KGM'
       }
     ])
   })
@@ -97,7 +106,7 @@ describe('#mapTracesCheds', () => {
                 { systemId: 'CN', classCode: { value: '03019985' } }
               ],
               scientificName: null,
-              grossWeight: null
+              netWeight: null
             }
           ]
         })
