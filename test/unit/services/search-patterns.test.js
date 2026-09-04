@@ -35,3 +35,14 @@ test.each([
 
   expect(searchPattern).toBeUndefined()
 })
+
+describe('The full CHED reference patterns used by the search service', () => {
+  test('should contain CHED in the description to identify full CHED references', () => {
+    const fullChedPatterns = searchPatterns.filter(
+      ({ description }) => description === 'CHED'
+    )
+
+    expect(fullChedPatterns).toHaveLength(1)
+    expect(fullChedPatterns.every(({ key }) => key === 'chedId')).toBe(true)
+  })
+})

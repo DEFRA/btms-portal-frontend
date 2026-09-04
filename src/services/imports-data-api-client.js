@@ -15,3 +15,9 @@ export const getRelatedImportDeclarations = (query) =>
 
 export const getResourceEvents = (resourceId) =>
   dataApiClient.get(`resource-events/${resourceId}`)
+
+export const getTracesChed = (chedId) =>
+  dataApiClient.get(`traces-cheds/${chedId}`)
+
+export const getTracesChedCustomsDeclarations = (chedId) =>
+  dataApiClient.get(`traces-cheds/${chedId}/customs-declarations`)
