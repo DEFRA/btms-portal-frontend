@@ -1098,6 +1098,36 @@ test('falls back to related import declarations when the TRACES CHED is not foun
   ).toBeInTheDocument()
 })
 
+test('shows no matching TRACES CHEDs message for an MRN search when no TRACES CHEDs are associated', async () => {
+  config.set('isTracesChedsEnabled', true)
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: relatedImportDeclarations })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(payload).toContain('24GB0Z8WEJ9ZBTL73B')
+  globalJsdom(payload)
+  expect(
+    queryByText(document.body, 'There are no matching TRACES notification (CHED) details')
+  ).toBeInTheDocument()
+})
+
 test('redirects to search page for missing search', async () => {
   wreck.get
     .mockResolvedValueOnce({ payload: provider })
