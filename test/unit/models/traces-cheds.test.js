@@ -47,11 +47,61 @@ describe('#mapTracesCheds', () => {
     expect(mapTracesCheds(searchResults, 'CHEDA.GB.2025.0000001')).toEqual([
       {
         reference: 'CHEDA.GB.2025.0000001',
-        status: '1',
+        status: 'New',
         updated: '1 June 2025, 09:30',
         commodities: []
       }
     ])
+  })
+
+  describe('document status code mapping', () => {
+    test.each([
+      ['1', 'New'],
+      ['41', 'Rejected'],
+      ['42', 'In Progress'],
+      ['47', 'Draft'],
+      ['64', 'Cancelled'],
+      ['70', 'Valid']
+    ])('should map documentStatusCode %s to %s', (documentStatusCode, expectedStatus) => {
+      const searchResults = {
+        cheds: [
+          createTracesChed('CHEDA.GB.2025.0000001', { documentStatusCode })
+        ]
+      }
+
+      expect(mapTracesCheds(searchResults, 'CHEDA.GB.2025.0000001')[0].status).toBe(expectedStatus)
+    })
+
+    test('should map an unmapped documentStatusCode to Unknown', () => {
+      const searchResults = {
+        cheds: [
+          createTracesChed('CHEDA.GB.2025.0000001', { documentStatusCode: '99' })
+        ]
+      }
+
+      expect(mapTracesCheds(searchResults, 'CHEDA.GB.2025.0000001')[0].status).toBe('Unknown (99)')
+    })
+
+    test('should map a missing documentStatusCode to Unknown', () => {
+      const searchResults = {
+        cheds: [
+          {
+            ched: {
+              exchangedDocument: {
+                identifier: 'CHEDA.GB.2025.0000001',
+                documentStatusCode: undefined
+              },
+              lastUpdated: null,
+              specifiedConsignment: {}
+            },
+            created: '2025-01-01T09:00:00.000Z',
+            updated: '2025-01-01T09:00:00.000Z'
+          }
+        ]
+      }
+
+      expect(mapTracesCheds(searchResults, 'CHEDA.GB.2025.0000001')[0].status).toBe('Unknown (undefined)')
+    })
   })
 
   test('should map commodities from trade line items, excluding consignment totals lines', () => {

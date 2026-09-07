@@ -94,6 +94,15 @@ export const chedStatusDescriptions = {
   VALIDATED: 'Valid'
 }
 
+export const tracesChedStatusCodeDescriptions = {
+  '1': 'New',
+  '41': 'Rejected',
+  '42': 'In Progress',
+  '47': 'Draft',
+  '64': 'Cancelled',
+  '70': 'Valid'
+}
+
 export const closedChedStatuses = ['CANCELLED', 'REPLACED']
 
 export const CDS_STATUSES = {

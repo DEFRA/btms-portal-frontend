@@ -1,8 +1,9 @@
 import { format } from 'date-fns'
-import { DATE_FORMAT } from './model-constants.js'
+import { DATE_FORMAT, tracesChedStatusCodeDescriptions } from './model-constants.js'
 import { sortDescending } from './sort.js'
 
 const CHED_CLASSIFICATION_SYSTEM_ID = 'CN'
+
 
 const findCnClassification = (classifications) =>
   classifications?.find(({ systemId }) => systemId === CHED_CLASSIFICATION_SYSTEM_ID)
@@ -25,14 +26,18 @@ const mapCommodity = (tradeLineItem) => {
   }
 }
 
-const mapTracesChed = ({ ched }) => ({
-  reference: ched?.exchangedDocument?.identifier,
-  status: ched?.exchangedDocument?.documentStatusCode,
-  updated: ched?.lastUpdated ? format(new Date(ched.lastUpdated), DATE_FORMAT) : undefined,
-  commodities: (ched?.specifiedConsignment?.includedConsignmentItem ?? []).flatMap(
-    (consignmentItem) => consignmentItem?.includedTradeLineItem ?? []
-  ).filter(isCommodityLine).map(mapCommodity)
-})
+const mapTracesChed = ({ ched }) => {
+  const documentStatusCode = ched?.exchangedDocument?.documentStatusCode
+
+  return {
+    reference: ched?.exchangedDocument?.identifier,
+    status: tracesChedStatusCodeDescriptions[documentStatusCode] ?? `Unknown (${documentStatusCode})`,
+    updated: ched?.lastUpdated ? format(new Date(ched.lastUpdated), DATE_FORMAT) : undefined,
+    commodities: (ched?.specifiedConsignment?.includedConsignmentItem ?? []).flatMap(
+      (consignmentItem) => consignmentItem?.includedTradeLineItem ?? []
+    ).filter(isCommodityLine).map(mapCommodity)
+  }
+}
 
 const isSearchTermMatch = (searchTerm, tracesChed) =>
   tracesChed.reference?.toUpperCase() === searchTerm
