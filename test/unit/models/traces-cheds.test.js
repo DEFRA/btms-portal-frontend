@@ -4,12 +4,13 @@ const createTradeLineItem = ({
   sequenceNumeric = 0,
   classificationSystemId = 'CN',
   commodityCode = '03019985',
+  className = null,
   scientificName = null,
   netWeight = null
 } = {}) => ({
   sequenceNumeric,
   applicableClassification: classificationSystemId
-    ? [{ systemId: classificationSystemId, classCode: { value: commodityCode } }]
+    ? [{ systemId: classificationSystemId, classCode: { value: commodityCode }, className: [className] }]
     : null,
   scientificName,
   netWeight
@@ -72,7 +73,14 @@ describe('#mapTracesCheds', () => {
               sequenceNumeric: 2,
               scientificName: 'Equus',
               netWeight: { content: '2500', unitCode: 'KGM' }
-            })
+            }),
+            createTradeLineItem({
+              sequenceNumeric: 3,
+              commodityCode: '05071000',
+              scientificName: null,
+              netWeight: { content: '2500', unitCode: 'KGM' },
+              className: 'PRODUCTS OF ANIMAL ORIGIN, NOT ELSEWHERE SPECIFIED OR INCLUDED'
+            }),
           ]
         })
       ]
@@ -89,6 +97,12 @@ describe('#mapTracesCheds', () => {
         itemNumber: 2,
         commodityCode: '03019985',
         description: 'Equus',
+        quantityWeight: '2500 KGM'
+      },
+      {
+        itemNumber: 3,
+        commodityCode: '05071000',
+        description: 'PRODUCTS OF ANIMAL ORIGIN, NOT ELSEWHERE SPECIFIED OR INCLUDED',
         quantityWeight: '2500 KGM'
       }
     ])
@@ -117,8 +131,61 @@ describe('#mapTracesCheds', () => {
       {
         itemNumber: 1,
         commodityCode: '03019985',
-        description: undefined,
+        description: 'UNKNOWN',
         quantityWeight: undefined
+      }
+    ])
+  })
+
+  test('should fall back to the CN class name when scientificName is null', () => {
+    const searchResults = {
+      cheds: [
+        createTracesChed('CHEDA.GB.2025.0000001', {
+          tradeLineItems: [
+            createTradeLineItem({
+              sequenceNumeric: 1,
+              commodityCode: '05071000',
+              scientificName: null,
+              netWeight: { content: '1000', unitCode: 'KGM' },
+              className: 'PRODUCTS OF ANIMAL ORIGIN, NOT ELSEWHERE SPECIFIED OR INCLUDED'
+            })
+          ]
+        })
+      ]
+    }
+
+    expect(mapTracesCheds(searchResults, 'CHEDA.GB.2025.0000001')[0].commodities).toEqual([
+      {
+        itemNumber: 1,
+        commodityCode: '05071000',
+        description: 'PRODUCTS OF ANIMAL ORIGIN, NOT ELSEWHERE SPECIFIED OR INCLUDED',
+        quantityWeight: '1000 KGM'
+      }
+    ])
+  })
+
+  test('should map description as UNKNOWN when scientificName and class name are missing', () => {
+    const searchResults = {
+      cheds: [
+        createTracesChed('CHEDA.GB.2025.0000001', {
+          tradeLineItems: [
+            createTradeLineItem({
+              sequenceNumeric: 1,
+              scientificName: null,
+              className: null,
+              netWeight: { content: '1000', unitCode: 'KGM' }
+            })
+          ]
+        })
+      ]
+    }
+
+    expect(mapTracesCheds(searchResults, 'CHEDA.GB.2025.0000001')[0].commodities).toEqual([
+      {
+        itemNumber: 1,
+        commodityCode: '03019985',
+        description: 'UNKNOWN',
+        quantityWeight: '1000 KGM'
       }
     ])
   })

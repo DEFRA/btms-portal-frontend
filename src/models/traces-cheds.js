@@ -12,14 +12,18 @@ const findCnClassification = (classifications) =>
 const isCommodityLine = (tradeLineItem) =>
   Boolean(findCnClassification(tradeLineItem?.applicableClassification))
 
-const mapCommodity = (tradeLineItem) => ({
-  itemNumber: typeof tradeLineItem?.sequenceNumeric === 'number' ? tradeLineItem.sequenceNumeric : undefined,
-  commodityCode: findCnClassification(tradeLineItem?.applicableClassification)?.classCode?.value,
-  description: tradeLineItem?.scientificName ?? undefined,
-  quantityWeight: tradeLineItem?.netWeight?.content && tradeLineItem?.netWeight?.unitCode
-    ? `${tradeLineItem.netWeight.content} ${tradeLineItem.netWeight.unitCode}`
-    : undefined
-})
+const mapCommodity = (tradeLineItem) => {
+  const cnClassification = findCnClassification(tradeLineItem?.applicableClassification)
+
+  return {
+    itemNumber: typeof tradeLineItem?.sequenceNumeric === 'number' ? tradeLineItem.sequenceNumeric : undefined,
+    commodityCode: cnClassification?.classCode?.value,
+    description: (tradeLineItem?.scientificName || cnClassification?.className?.[0]) ?? "UNKNOWN",
+    quantityWeight: tradeLineItem?.netWeight?.content && tradeLineItem?.netWeight?.unitCode
+      ? `${tradeLineItem.netWeight.content} ${tradeLineItem.netWeight.unitCode}`
+      : undefined
+  }
+}
 
 const mapTracesChed = ({ ched }) => ({
   reference: ched?.exchangedDocument?.identifier,
