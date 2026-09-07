@@ -905,7 +905,7 @@ test('shows TRACES CHED placeholders when feature flag is enabled', async () => 
   globalJsdom(payload)
 
   expect(
-    getByRole(document.body, 'heading', { name: 'TRACES CHED details', level: 3 })
+    getByRole(document.body, 'heading', { name: 'TRACES notification (CHED) details', level: 3 })
   ).toBeInTheDocument()
   expect(
     getByRole(document.body, 'group', { name: 'CHEDD.GB.2025.0000003' })
@@ -955,7 +955,7 @@ test('renders results page when only TRACES CHEDs are found and feature flag is 
     getByRole(document.body, 'group', { name: 'CHEDP.GB.2025.0000002' })
   ).toBeInTheDocument()
   expect(
-    getByRole(document.body, 'heading', { name: 'TRACES CHED details', level: 3 })
+    getByRole(document.body, 'heading', { name: 'TRACES notification (CHED) details', level: 3 })
   ).toBeInTheDocument()
 })
 
@@ -1020,7 +1020,7 @@ test('does not show TRACES CHED section when feature flag is disabled', async ()
   globalJsdom(payload)
 
   expect(
-    queryByRole(document.body, 'heading', { name: 'TRACES CHED details' })
+    queryByRole(document.body, 'heading', { name: 'TRACES notification (CHED) details' })
   ).not.toBeInTheDocument()
   expect(
     queryByRole(document.body, 'group', { name: 'CHEDD.GB.2025.0000003' })
@@ -1094,7 +1094,7 @@ test('falls back to related import declarations when the TRACES CHED is not foun
   expect(payload).toContain('24GB0Z8WEJ9ZBTL73B')
   globalJsdom(payload)
   expect(
-    queryByText(document.body, 'There are no matching TRACES CHED details')
+    queryByText(document.body, 'There are no matching TRACES notification (CHED) details')
   ).toBeInTheDocument()
 })
 
