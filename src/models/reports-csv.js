@@ -1,17 +1,13 @@
 import { Transform } from 'node:stream'
-import streamJson from 'stream-json'
-import pickFilter from 'stream-json/filters/Pick.js'
-import streamArrayStreamers from 'stream-json/streamers/StreamArray.js'
+import { parser } from 'stream-json'
+import { pick } from 'stream-json/filters/pick.js'
+import { streamArray } from 'stream-json/streamers/stream-array.js'
 import { formatReportingDate } from '../utils/dates.js'
 import {
   NO_MATCH_CSV,
   MANUAL_RELEASE_CSV,
   LEVEL_MATCHING_CSV
 } from '../routes/route-constants.js'
-
-const { parser } = streamJson
-const { pick } = pickFilter
-const { streamArray } = streamArrayStreamers
 
 const headings = {
   [NO_MATCH_CSV]: 'No matches',
@@ -42,8 +38,8 @@ export const mapReportsCsv = (res, name, startDate, endDate, mapRowHandler, repo
   })
 
   return res
-    .pipe(parser())
-    .pipe(pick({ filter: 'data' }))
-    .pipe(streamArray())
+    .pipe(parser.asStream())
+    .pipe(pick.asStream({ filter: 'data' }))
+    .pipe(streamArray.asStream())
     .pipe(toCsv)
 }
