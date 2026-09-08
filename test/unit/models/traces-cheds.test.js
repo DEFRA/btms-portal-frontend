@@ -20,7 +20,8 @@ const createTracesChed = (identifier, options = {}) => ({
   ched: {
     exchangedDocument: {
       identifier,
-      documentStatusCode: options.documentStatusCode ?? '1'
+      documentStatusCode: options.documentStatusCode ?? '1',
+      secondSignatoryAuthentication: options.secondSignatoryAuthentication ?? null
     },
     lastUpdated: options.lastUpdated ?? null,
     specifiedConsignment: {
@@ -52,6 +53,137 @@ describe('#mapTracesCheds', () => {
         commodities: []
       }
     ])
+  })
+
+  describe('decision mapping', () => {
+    const createClearanceSignatory = (clauses = []) => ({
+      typeCode: '1',
+      includedClause: clauses.map(({ identifier, content }) => ({ identifier, content }))
+    })
+
+    test('should map the DECISION_CONCLUSION decision onto every commodity', () => {
+      const searchResults = {
+        cheds: [
+          createTracesChed('CHEDA.GB.2025.0000001', {
+            tradeLineItems: [
+              createTradeLineItem({ sequenceNumeric: 1 }),
+              createTradeLineItem({ sequenceNumeric: 2 })
+            ],
+            secondSignatoryAuthentication: createClearanceSignatory([
+              { identifier: 'DECISION_CONCLUSION', content: 'ACCEPTABLE_FOR_FREE_CIRCULATION' },
+              { identifier: 'DOCUMENTARY_CHECK', content: 'NO' }
+            ])
+          })
+        ]
+      }
+
+      const commodities = mapTracesCheds(searchResults, 'CHEDA.GB.2025.0000001')[0].commodities
+
+      expect(commodities.map(({ decision }) => decision)).toEqual([
+        'Acceptable for free circulation',
+        'Acceptable for free circulation'
+      ])
+    })
+
+    test('should map all known DECISION_CONCLUSION values', () => {
+      const knownConclusions = [
+        ['ACCEPTABLE_FOR_INTERNAL_MARKET', 'Acceptable for internal market'],
+        ['ACCEPTABLE_FOR_FREE_CIRCULATION', 'Acceptable for free circulation'],
+        ['ACCEPTABLE_FOR_DIRECT_TRANSIT', 'Acceptable for direct transit'],
+        ['ACCEPTABLE_FOR_INDIRECT_TRANSIT', 'Acceptable for indirect transit'],
+        ['ACCEPTABLE_FOR_MONITORING', 'Acceptable for monitoring'],
+        ['ACCEPTABLE_FOR_ONWARD_TRANSPORTATION', 'Acceptable for onward transportation'],
+        ['ACCEPTABLE_FOR_ONWARD_TRAVEL', 'Acceptable for onward travel'],
+        ['ACCEPTABLE_FOR_PRIVATE_IMPORT', 'Acceptable for private import'],
+        ['ACCEPTABLE_FOR_TEMPORARY_ADMISSION', 'Acceptable for temporary admission'],
+        ['ACCEPTABLE_FOR_TRANSFER', 'Acceptable for transfer'],
+        ['ACCEPTABLE_FOR_TRANSHIPMENT', 'Acceptable for transhipment'],
+        ['ACCEPTABLE_FOR_TRANSIT_TO_US_OR_NATO_BASE', 'Acceptable for transit to US or NATO base'],
+        ['NOT_ACCEPTABLE', 'Not acceptable']
+      ]
+
+      for (const [content, expected] of knownConclusions) {
+        const searchResults = {
+          cheds: [
+            createTracesChed('CHEDA.GB.2025.0000001', {
+              tradeLineItems: [createTradeLineItem({ sequenceNumeric: 1 })],
+              secondSignatoryAuthentication: createClearanceSignatory([
+                { identifier: 'DECISION_CONCLUSION', content }
+              ])
+            })
+          ]
+        }
+
+        expect(mapTracesCheds(searchResults, 'CHEDA.GB.2025.0000001')[0].commodities).toEqual([
+          expect.objectContaining({ decision: expected })
+        ])
+      }
+    })
+
+    test('should show Unknown (CODE) when the DECISION_CONCLUSION value is unmapped', () => {
+      const searchResults = {
+        cheds: [
+          createTracesChed('CHEDA.GB.2025.0000001', {
+            tradeLineItems: [createTradeLineItem({ sequenceNumeric: 1 })],
+            secondSignatoryAuthentication: createClearanceSignatory([
+              { identifier: 'DECISION_CONCLUSION', content: 'SOME_NEW_CONCLUSION' }
+            ])
+          })
+        ]
+      }
+
+      expect(mapTracesCheds(searchResults, 'CHEDA.GB.2025.0000001')[0].commodities).toEqual([
+        expect.objectContaining({ decision: 'Unknown (SOME_NEW_CONCLUSION)' })
+      ])
+    })
+
+    test('should fall back to Decision not given when there is no second signatory authentication', () => {
+      const searchResults = {
+        cheds: [
+          createTracesChed('CHEDA.GB.2025.0000001', {
+            tradeLineItems: [createTradeLineItem({ sequenceNumeric: 1 })]
+          })
+        ]
+      }
+
+      expect(mapTracesCheds(searchResults, 'CHEDA.GB.2025.0000001')[0].commodities).toEqual([
+        expect.objectContaining({ decision: 'Decision not given' })
+      ])
+    })
+
+    test('should fall back to Decision not given when the DECISION_CONCLUSION is missing', () => {
+      const searchResults = {
+        cheds: [
+          createTracesChed('CHEDA.GB.2025.0000001', {
+            tradeLineItems: [createTradeLineItem({ sequenceNumeric: 1 })],
+            secondSignatoryAuthentication: createClearanceSignatory([
+              { identifier: 'DOCUMENTARY_CHECK', content: 'YES' }
+            ])
+          })
+        ]
+      }
+
+      expect(mapTracesCheds(searchResults, 'CHEDA.GB.2025.0000001')[0].commodities).toEqual([
+        expect.objectContaining({ decision: 'Decision not given' })
+      ])
+    })
+
+    test('should fall back to Decision not given when the DECISION_CONCLUSION content is empty', () => {
+      const searchResults = {
+        cheds: [
+          createTracesChed('CHEDA.GB.2025.0000001', {
+            tradeLineItems: [createTradeLineItem({ sequenceNumeric: 1 })],
+            secondSignatoryAuthentication: createClearanceSignatory([
+              { identifier: 'DECISION_CONCLUSION', content: null }
+            ])
+          })
+        ]
+      }
+
+      expect(mapTracesCheds(searchResults, 'CHEDA.GB.2025.0000001')[0].commodities).toEqual([
+        expect.objectContaining({ decision: 'Decision not given' })
+      ])
+    })
   })
 
   describe('document status code mapping', () => {
@@ -141,19 +273,22 @@ describe('#mapTracesCheds', () => {
         itemNumber: 1,
         commodityCode: '03019985',
         description: 'Salmo salar',
-        quantityWeight: '1000 KGM'
+        quantityWeight: '1000 KGM',
+        decision: 'Decision not given'
       },
       {
         itemNumber: 2,
         commodityCode: '03019985',
         description: 'Equus',
-        quantityWeight: '2500 KGM'
+        quantityWeight: '2500 KGM',
+        decision: 'Decision not given'
       },
       {
         itemNumber: 3,
         commodityCode: '05071000',
         description: 'PRODUCTS OF ANIMAL ORIGIN, NOT ELSEWHERE SPECIFIED OR INCLUDED',
-        quantityWeight: '2500 KGM'
+        quantityWeight: '2500 KGM',
+        decision: 'Decision not given'
       }
     ])
   })
@@ -182,7 +317,8 @@ describe('#mapTracesCheds', () => {
         itemNumber: 1,
         commodityCode: '03019985',
         description: 'UNKNOWN',
-        quantityWeight: undefined
+        quantityWeight: undefined,
+        decision: 'Decision not given'
       }
     ])
   })
@@ -209,7 +345,8 @@ describe('#mapTracesCheds', () => {
         itemNumber: 1,
         commodityCode: '05071000',
         description: 'PRODUCTS OF ANIMAL ORIGIN, NOT ELSEWHERE SPECIFIED OR INCLUDED',
-        quantityWeight: '1000 KGM'
+        quantityWeight: '1000 KGM',
+        decision: 'Decision not given'
       }
     ])
   })
@@ -235,7 +372,8 @@ describe('#mapTracesCheds', () => {
         itemNumber: 1,
         commodityCode: '03019985',
         description: 'UNKNOWN',
-        quantityWeight: '1000 KGM'
+        quantityWeight: '1000 KGM',
+        decision: 'Decision not given'
       }
     ])
   })

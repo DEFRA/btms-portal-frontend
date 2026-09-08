@@ -843,7 +843,13 @@ const createTracesChed = (identifier, updated) => ({
   ched: {
     exchangedDocument: {
       identifier,
-      documentStatusCode: '1'
+      documentStatusCode: '1',
+      secondSignatoryAuthentication: {
+        typeCode: '1',
+        includedClause: [
+          { identifier: 'DECISION_CONCLUSION', content: 'ACCEPTABLE_FOR_FREE_CIRCULATION' }
+        ]
+      }
     },
     lastUpdated: updated,
     specifiedConsignment: {
@@ -1025,6 +1031,38 @@ test('does not show TRACES CHED section when feature flag is disabled', async ()
   expect(
     queryByRole(document.body, 'group', { name: 'CHEDD.GB.2025.0000003' })
   ).not.toBeInTheDocument()
+})
+
+test('shows the decision on TRACES CHED commodity rows when feature flag is enabled', async () => {
+  config.set('isTracesChedsEnabled', true)
+
+  const createTracesChedReturn = createTracesChed('CHEDA.GB.2025.0000001', '2025-06-01T09:30:00.000Z')
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: createTracesChedReturn })
+    .mockResolvedValueOnce({ payload: { customsDeclarations } })
+    .mockResolvedValueOnce({ payload: declarationResourceEvents })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=CHEDA.GB.2025.0000001`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  const tracesChedDetails = getByRole(document.body, 'group', { name: 'CHEDA.GB.2025.0000001' })
+  expect(tracesChedDetails).toBeInTheDocument()
+  const decisionCell = within(tracesChedDetails).getAllByRole('cell')[5]
+  expect(decisionCell).toHaveTextContent('Acceptable for free circulation')
 })
 
 test('shows linked customs declarations for a TRACES CHED search when feature flag is enabled', async () => {
