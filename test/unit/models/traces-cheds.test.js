@@ -188,12 +188,21 @@ describe('#mapTracesCheds', () => {
 
   describe('document status code mapping', () => {
     test.each([
-      ['1', 'New'],
-      ['41', 'Rejected'],
-      ['42', 'In Progress'],
-      ['47', 'Draft'],
-      ['64', 'Cancelled'],
-      ['70', 'Valid']
+      ['1','New'],
+      ['35','Authorised for onward travel'],
+      ['41','Rejected'],
+      ['42','In progress'],
+      ['44','Replaced'],
+      ['47','Draft'],
+      ['55','Deleted'],
+      ['64','Cancelled'],
+      ['68','Split'],
+      ['70','Validated'],
+      ['97','Authorised for onward transportation'],
+      ['99','Authorised for transit'],
+      ['122','Partially rejected'],
+      ['124','Authorised for transfer to'],
+      ['146','Authorised for transhipment']
     ])('should map documentStatusCode %s to %s', (documentStatusCode, expectedStatus) => {
       const searchResults = {
         cheds: [
@@ -207,11 +216,11 @@ describe('#mapTracesCheds', () => {
     test('should map an unmapped documentStatusCode to Unknown', () => {
       const searchResults = {
         cheds: [
-          createTracesChed('CHEDA.GB.2025.0000001', { documentStatusCode: '99' })
+          createTracesChed('CHEDA.GB.2025.0000001', { documentStatusCode: '9999' })
         ]
       }
 
-      expect(mapTracesCheds(searchResults, 'CHEDA.GB.2025.0000001')[0].status).toBe('Unknown (99)')
+      expect(mapTracesCheds(searchResults, 'CHEDA.GB.2025.0000001')[0].status).toBe('Unknown (9999)')
     })
 
     test('should map a missing documentStatusCode to Unknown', () => {

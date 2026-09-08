@@ -13,22 +13,6 @@ export const PLANT_HEALTH_SEEDS_INSPECTORATE = 'PHSI'
 export const DECISION_NOT_GIVEN = 'Decision not given'
 export const NO_MATCH_DECISION_CODE = 'X00'
 
-export const tracesDecisionConclusionDescriptions = {
-  ACCEPTABLE_FOR_INTERNAL_MARKET: 'Acceptable for internal market',
-  ACCEPTABLE_FOR_FREE_CIRCULATION: 'Acceptable for free circulation',
-  ACCEPTABLE_FOR_DIRECT_TRANSIT: 'Acceptable for direct transit',
-  ACCEPTABLE_FOR_INDIRECT_TRANSIT: 'Acceptable for indirect transit',
-  ACCEPTABLE_FOR_MONITORING: 'Acceptable for monitoring',
-  ACCEPTABLE_FOR_ONWARD_TRANSPORTATION: 'Acceptable for onward transportation',
-  ACCEPTABLE_FOR_ONWARD_TRAVEL: 'Acceptable for onward travel',
-  ACCEPTABLE_FOR_PRIVATE_IMPORT: 'Acceptable for private import',
-  ACCEPTABLE_FOR_TEMPORARY_ADMISSION: 'Acceptable for temporary admission',
-  ACCEPTABLE_FOR_TRANSFER: 'Acceptable for transfer',
-  ACCEPTABLE_FOR_TRANSHIPMENT: 'Acceptable for transhipment',
-  ACCEPTABLE_FOR_TRANSIT_TO_US_OR_NATO_BASE: 'Acceptable for transit to US or NATO base',
-  NOT_ACCEPTABLE: 'Not acceptable'
-}
-
 export const chedTypes = {
   CHEDA: 'CVEDA',
   CHEDD: 'CED',
@@ -112,11 +96,37 @@ export const chedStatusDescriptions = {
 
 export const tracesChedStatusCodeDescriptions = {
   '1': 'New',
+  '35': 'Authorised for onward travel',
   '41': 'Rejected',
-  '42': 'In Progress',
+  '42': 'In progress',
+  '44': 'Replaced',
   '47': 'Draft',
+  '55': 'Deleted',
   '64': 'Cancelled',
-  '70': 'Valid'
+  '68': 'Split',
+  '70': 'Validated',
+  '97': 'Authorised for onward transportation',
+  '99': 'Authorised for transit',
+  '122': 'Partially rejected',
+  '124': 'Authorised for transfer to',
+  '146': 'Authorised for transhipment',
+
+}
+
+export const tracesDecisionConclusionDescriptions = {
+  ACCEPTABLE_FOR_INTERNAL_MARKET: 'Acceptable for internal market',
+  ACCEPTABLE_FOR_FREE_CIRCULATION: 'Acceptable for free circulation',
+  ACCEPTABLE_FOR_DIRECT_TRANSIT: 'Acceptable for direct transit',
+  ACCEPTABLE_FOR_INDIRECT_TRANSIT: 'Acceptable for indirect transit',
+  ACCEPTABLE_FOR_MONITORING: 'Acceptable for monitoring',
+  ACCEPTABLE_FOR_ONWARD_TRANSPORTATION: 'Acceptable for onward transportation',
+  ACCEPTABLE_FOR_ONWARD_TRAVEL: 'Acceptable for onward travel',
+  ACCEPTABLE_FOR_PRIVATE_IMPORT: 'Acceptable for private import',
+  ACCEPTABLE_FOR_TEMPORARY_ADMISSION: 'Acceptable for temporary admission',
+  ACCEPTABLE_FOR_TRANSFER: 'Acceptable for transfer',
+  ACCEPTABLE_FOR_TRANSHIPMENT: 'Acceptable for transhipment',
+  ACCEPTABLE_FOR_TRANSIT_TO_US_OR_NATO_BASE: 'Acceptable for transit to US or NATO base',
+  NOT_ACCEPTABLE: 'Not acceptable'
 }
 
 export const closedChedStatuses = ['CANCELLED', 'REPLACED']
