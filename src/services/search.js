@@ -1,3 +1,5 @@
+import { constants } from 'http2'
+
 import { config } from '../config/config.js'
 import {
   getRelatedImportDeclarations,
@@ -6,15 +8,15 @@ import {
 } from './imports-data-api-client.js'
 import { searchPatterns } from './search-patterns.js'
 
-const FULL_CHED_REF_DESCRIPTIONS = ['CHED']
+const FULL_CHED_REF_DESCRIPTIONS = new Set(['CHED'])
 
 const isFullChedReference = (chedId) =>
   searchPatterns
-    .filter(({ description }) => FULL_CHED_REF_DESCRIPTIONS.includes(description))
+    .filter(({ description }) => FULL_CHED_REF_DESCRIPTIONS.has(description))
     .some(({ pattern }) => pattern.test(chedId))
 
 const isNotFound = (error) =>
-  error?.isBoom && error?.output?.statusCode === 404
+  error?.isBoom && error?.output?.statusCode === constants.HTTP_STATUS_NOT_FOUND
 
 const fetchTracesChed = async (chedId) => {
   try {
