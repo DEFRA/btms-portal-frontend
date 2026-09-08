@@ -3,7 +3,11 @@ import wreck from '@hapi/wreck'
 import { getByRole, getByText } from '@testing-library/dom'
 import { paths, queryStringParams } from '../../src/routes/route-constants.js'
 import { initialiseServer } from '../utils/initialise-server.js'
-import { setupAuthedAdminUserSession, setupAuthedUserSession } from '../unit/utils/session-helper.js'
+import {
+  setupAuthedAdminUserSession,
+  setupAuthedPrivateBetaUserSession,
+  setupAuthedUserSession
+} from '../unit/utils/session-helper.js'
 import { ADMIN_SEARCH_TYPES } from '../../src/services/admin-messages.js'
 
 const provider = {
@@ -212,19 +216,21 @@ test('Should show a not found error with a search term that could not be found',
 })
 
 test.each([
-  `${paths.ADMIN_MESSAGES}`,
-  `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=24GBBGBKCDMS895999&${queryStringParams.SEARCH_TYPE}=information`
-])('Should show the forbidden page when the user is not in the admin security group', async (requestedPage) => {
+  { requestedPage: `${paths.ADMIN_MESSAGES}`, userSetupHandler: setupAuthedUserSession },
+  { requestedPage: `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=24GBBGBKCDMS895999&${queryStringParams.SEARCH_TYPE}=information`, userSetupHandler: setupAuthedUserSession },
+  { requestedPage: `${paths.ADMIN_MESSAGES}`, userSetupHandler: setupAuthedPrivateBetaUserSession },
+  { requestedPage: `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=24GBBGBKCDMS895999&${queryStringParams.SEARCH_TYPE}=information`, userSetupHandler: setupAuthedPrivateBetaUserSession }
+])('Should show the forbidden page when the user is not in the admin security group', async (options) => {
   wreck.get
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
 
   const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
+  const credentials = await options.userSetupHandler(server)
 
   const { payload } = await server.inject({
     method: 'get',
-    url: requestedPage,
+    url: options.requestedPage,
     auth: {
       strategy: 'session',
       credentials

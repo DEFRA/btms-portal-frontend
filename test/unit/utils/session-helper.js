@@ -14,6 +14,15 @@ export const setupAuthedUserSession = async (server, sessionId= crypto.randomUUI
   return authedUser
 }
 
+export const setupAuthedPrivateBetaUserSession = async (server, sessionId= crypto.randomUUID(), expiresAt = undefined) => {
+  const authedUser = createAuthedUser(expiresAt)
+  authedUser.scope = ['private_beta']
+
+  await server.app.cache.set(sessionId, authedUser)
+
+  return authedUser
+}
+
 export const setupAuthedAdminUserSession = async (server, sessionId= crypto.randomUUID(), expiresAt = undefined) => {
   const authedUser = createAuthedUser(expiresAt)
   authedUser.scope = ['admin']

@@ -3,7 +3,11 @@ import wreck from '@hapi/wreck'
 import { getByRole, getByText, queryByRole } from '@testing-library/dom'
 import { paths } from '../../src/routes/route-constants.js'
 import { initialiseServer } from '../utils/initialise-server.js'
-import { setupAuthedAdminUserSession, setupAuthedUserSession } from '../unit/utils/session-helper.js'
+import {
+  setupAuthedAdminUserSession,
+  setupAuthedPrivateBetaUserSession,
+  setupAuthedUserSession
+} from '../unit/utils/session-helper.js'
 
 const provider = {
   authorization_endpoint: 'https://auth.endpoint',
@@ -73,7 +77,7 @@ test('Should show Action Confirmation page if valid queue requested', async () =
   ).not.toBeInTheDocument()
 })
 
-test.each([
+const adminDlqActionRoutes = [
   `${paths.ADMIN_DLQ_ACTION}`,
   `${paths.ADMIN_DLQ_ACTION}?queue=foo`,
   `${paths.ADMIN_DLQ_ACTION}?queue=trade_imports_data_upserted_btms-gateway-deadletter&action=Redrive`,
@@ -88,17 +92,24 @@ test.each([
   `${paths.ADMIN_DLQ_ACTION}?queue=trade_imports_data_upserted_reporting_api-deadletter&action=Drain`,
   `${paths.ADMIN_DLQ_ACTION}?queue=trade_imports_btms_activity_reporting_api-deadletter&action=Drain`,
   `${paths.ADMIN_DLQ_ACTION}?queue=trade_imports_data_upserted_decision_deriver-deadletter&action=Drain`
-])('Should show the forbidden page when the user is not in the admin security group', async (requestedPage) => {
+].map(route => ([{
+  requestedPage: route, userSetupHandler: setupAuthedUserSession,
+}, {
+  requestedPage: route, userSetupHandler: setupAuthedPrivateBetaUserSession
+  }]
+)).flat()
+
+test.each(adminDlqActionRoutes)('Should show the forbidden page when the user is not in the admin security group', async (options) => {
   wreck.get
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: provider })
 
   const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
+  const credentials = await options.userSetupHandler(server)
 
   const { payload } = await server.inject({
     method: 'get',
-    url: requestedPage,
+    url: options.requestedPage,
     auth: {
       strategy: 'session',
       credentials

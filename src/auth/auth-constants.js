@@ -4,7 +4,8 @@ export const AUTH_PROVIDERS = {
 }
 
 export const APP_SCOPES = {
-  ADMIN: 'admin'
+  ADMIN: 'admin',
+  PRIVATE_BETA: 'private_beta'
 }
 
 export const AUTH_FEATURES = {

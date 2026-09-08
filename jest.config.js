@@ -29,7 +29,9 @@ export default {
   transformIgnorePatterns: [
     `node_modules/(?!${[
       '@defra/hapi-tracing', // Supports ESM only
-      '@csstools' // ESM-only CSS parsing packages, transitive deps via jsdom/cssstyle
+      '@csstools', // ESM-only CSS parsing packages, transitive deps via jsdom/cssstyle
+      'stream-json', // ESM only
+      'stream-chain' // ESM only, transitive dep of stream-json
     ].join('|')}/)`
   ],
   testTimeout: 7000
