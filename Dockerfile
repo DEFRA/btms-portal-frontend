@@ -34,10 +34,8 @@ ENV TZ="Europe/London"
 # Add curl to template.
 # CDP PLATFORM HEALTHCHECK REQUIREMENT
 USER root
-RUN apk update \
-    && apk upgrade \
-    && apk add curl \
-    && apk cache clean
+RUN apk upgrade --no-cache \
+    && apk add --no-cache curl
 
 USER node
 
