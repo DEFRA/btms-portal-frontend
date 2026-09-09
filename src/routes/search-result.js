@@ -1,11 +1,14 @@
 import { paths, queryStringParams } from './route-constants.js'
-import { getRelatedImportDeclarations, getResourceEvents } from '../services/imports-data-api-client.js'
+import { getResourceEvents } from '../services/imports-data-api-client.js'
+import { getSearchResults } from '../services/search.js'
 import { mapCustomsDeclarations } from '../models/customs-declarations.js'
 import { mapPreNotifications } from '../models/pre-notifications.js'
+import { mapTracesCheds } from '../models/traces-cheds.js'
 import { createRouteConfig } from './search-result-common.js'
 import { searchKeys } from '../services/search-patterns.js'
 import { mapResourceEvents } from '../models/resource-events.js'
 import { createLogger } from '../utils/logger.js'
+import { config } from '../config/config.js'
 import { isInFeatureGroup } from '../auth/check-groups.js'
 import { AUTH_FEATURES } from '../auth/auth-constants.js'
 
@@ -138,11 +141,13 @@ const includesInternalDecisionCodes = (customsDeclarations, codes) => {
 
 export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_RESULT, async (request, h) => {
   const searchTerm = request.query[queryStringParams.SEARCH_TERM].trim().toUpperCase()
-  const searchResults = await getRelatedImportDeclarations(request.pre.searchQuery)
+  const searchResults = await getSearchResults(request.pre.searchQuery)
+  const showTracesCheds = config.get('isTracesChedsEnabled')
 
   if (
     searchResults.customsDeclarations.length === 0 &&
-    searchResults.importPreNotifications.length === 0
+    searchResults.importPreNotifications.length === 0 &&
+    !(showTracesCheds && searchResults.cheds?.length > 0)
   ) {
     request.yar.flash('searchError', {
       searchTerm,
@@ -167,10 +172,12 @@ export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_
     searchTerm,
     customsDeclarations,
     preNotifications,
+    tracesCheds: showTracesCheds ? mapTracesCheds(searchResults, searchTerm) : [],
     timelineEvents,
     showLevel2NoMatchText,
     showLevel3NoMatchText,
-    showLevelsResultTab
+    showLevelsResultTab,
+    showTracesCheds
   }
 
   return h.view('search-result', viewModel)

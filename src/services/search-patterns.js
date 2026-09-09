@@ -17,7 +17,7 @@ export const searchPatterns = [
   },
   {
     key: searchKeys.CHED_ID,
-    pattern: /^CHED([ADP]|P{2})\.GB\.2\d{3}\.\d{7,8}[VR]?$/,
+    pattern: /^CHED([ADP]|P{2})\.[A-Z]{2}\.2\d{3}\.\d{7,8}[VR]?$/,
     description: 'CHED'
   },
   {
