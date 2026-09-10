@@ -72,15 +72,13 @@ const getChedTimelineEvents = async (preNotifications) => {
 }
 
 const getEventsFromCustomsDeclarations = async (customsDeclarations, preNotifications) => {
+  const chedTimelineEvents = await getChedTimelineEvents(preNotifications)
   const mrnEvents = []
 
   for (const declaration of customsDeclarations) {
     try {
       const declarationResourceEvents = await getResourceEvents(declaration.movementReferenceNumber)
       const declarationTimelineEvents = mapResourceEvents(declaration.movementReferenceNumber, undefined, declarationResourceEvents)
-
-      const chedTimelineEvents = await getChedTimelineEvents(preNotifications)
-
       const timelineEvents = declarationTimelineEvents.concat(chedTimelineEvents).sort((a, b) => sortCreatedDescending(a, b))
 
       mrnEvents.push({

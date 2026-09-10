@@ -580,6 +580,8 @@ test('shows search results', async () => {
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: relatedImportDeclarations })
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
@@ -660,6 +662,8 @@ test('results can be filtered', async () => {
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: relatedImportDeclarations })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
@@ -894,6 +898,8 @@ test('shows TRACES CHED placeholders when feature flag is enabled', async () => 
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: relatedImportDeclarationsWithTracesCheds })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
@@ -1407,8 +1413,8 @@ test('shows latest search results and timeline tabs', async () => {
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: relatedImportDeclarations })
-  .mockResolvedValueOnce({ payload: declarationResourceEvents })
   .mockResolvedValueOnce({ payload: importPreNotificationResourceEvents })
+  .mockResolvedValueOnce({ payload: declarationResourceEvents })
   .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
@@ -1447,7 +1453,7 @@ test('shows latest search results and timeline tabs', async () => {
   expect(timelineMrnFilter.options[1].text).toBe('24GB0Z8WEJ9ZBTL73A')
 
   const eventTitles = Array.from(document.body.querySelectorAll('.moj-timeline__item .moj-timeline__header .moj-timeline__title span:nth-child(1)')).map(title => title.innerHTML)
-  expect(eventTitles.length).toBe(14)
+  expect(eventTitles.length).toBe(16)
   expect(eventTitles[0]).toBe('CDS finalisation')
   expect(eventTitles[1]).toBe('BTMS decision')
   expect(eventTitles[2]).toBe('CDS processing error')
@@ -1462,6 +1468,8 @@ test('shows latest search results and timeline tabs', async () => {
   expect(eventTitles[11]).toBe('CDS processing error')
   expect(eventTitles[12]).toBe('BTMS processing error')
   expect(eventTitles[13]).toBe('CHEDA.GB.2025.0000001')
+  expect(eventTitles[14]).toBe('CHEDA.GB.2025.0000001')
+  expect(eventTitles[15]).toBe('CHEDA.GB.2025.0000001')
 
   const createdDisplayText = Array.from(document.body.querySelectorAll('.moj-timeline__item .moj-timeline__description .timeline-detail-row time')).map(time => time.innerHTML)
   expect(createdDisplayText[0]).toBe("05 January 2025, 09:00:00")
@@ -1478,6 +1486,8 @@ test('shows latest search results and timeline tabs', async () => {
   expect(createdDisplayText[11]).toBe("")
   expect(createdDisplayText[12]).toBe("")
   expect(createdDisplayText[13]).toBe("")
+  expect(createdDisplayText[14]).toBe("01 January 2025, 09:00:00")
+  expect(createdDisplayText[15]).toBe("")
 
   const timelineClearanceRequestItems = Array.from(document.body.querySelectorAll('.moj-timeline__item'))
     .filter(elem => elem.querySelector('.moj-timeline__header .moj-timeline__title span').innerHTML === 'CDS clearance request')
@@ -1651,8 +1661,8 @@ test('timeline can be filtered', async () => {
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: relatedImportDeclarations })
-  .mockResolvedValueOnce({ payload: declarationResourceEvents })
   .mockResolvedValueOnce({ payload: importPreNotificationResourceEvents })
+  .mockResolvedValueOnce({ payload: declarationResourceEvents })
   .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
@@ -1887,6 +1897,8 @@ test.each([
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: declarationsWithLevelNoMatch })
   .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
   const authedUser = createAuthedUser(undefined, 'entraId')
@@ -2081,6 +2093,9 @@ test.each([
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: declarationsWithLevelNoMatch })
   .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
   const authedUser = createAuthedUser(undefined, options.provider)
@@ -2140,6 +2155,8 @@ test('handles CHEDs in amend and modify status', async () => {
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: { customsDeclarations, importPreNotifications: amendModifyImportPreNotifications } })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
   .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
@@ -2289,6 +2306,8 @@ test.each(
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: declarationsWithLevelNoMatch })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
   .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
