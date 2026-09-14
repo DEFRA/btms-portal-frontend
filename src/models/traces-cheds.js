@@ -21,14 +21,13 @@ const isCommodityLine = (tradeLineItem) =>
 
 const mapCommodity = (tradeLineItem, decision) => {
   const cnClassification = findCnClassification(tradeLineItem?.applicableClassification)
+  const { netWeight, netVolume } = tradeLineItem
 
   return {
     itemNumber: typeof tradeLineItem?.sequenceNumeric === 'number' ? tradeLineItem.sequenceNumeric : undefined,
     commodityCode: cnClassification?.classCode?.value,
     description: (tradeLineItem?.scientificName || cnClassification?.className?.[0]) ?? "UNKNOWN",
-    quantityWeight: tradeLineItem?.netWeight?.content && tradeLineItem?.netWeight?.unitCode
-      ? `${tradeLineItem.netWeight.content} ${tradeLineItem.netWeight.unitCode}`
-      : undefined,
+    quantityOrWeight: netWeight?.content ? `${netWeight.content} ${netWeight.unitCode}` : netVolume?.content,
     decision
   }
 }
