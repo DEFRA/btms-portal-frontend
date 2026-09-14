@@ -6,14 +6,16 @@ const createTradeLineItem = ({
   commodityCode = '03019985',
   className = null,
   scientificName = null,
-  netWeight = null
+  netWeight = null,
+  netVolume = null
 } = {}) => ({
   sequenceNumeric,
   applicableClassification: classificationSystemId
     ? [{ systemId: classificationSystemId, classCode: { value: commodityCode }, className: [className] }]
     : null,
   scientificName,
-  netWeight
+  netWeight,
+  netVolume
 })
 
 const createTracesChed = (identifier, options = {}) => ({
@@ -282,21 +284,21 @@ describe('#mapTracesCheds', () => {
         itemNumber: 1,
         commodityCode: '03019985',
         description: 'Salmo salar',
-        quantityWeight: '1000 KGM',
+        quantityOrWeight: '1000 KGM',
         decision: 'Decision not given'
       },
       {
         itemNumber: 2,
         commodityCode: '03019985',
         description: 'Equus',
-        quantityWeight: '2500 KGM',
+        quantityOrWeight: '2500 KGM',
         decision: 'Decision not given'
       },
       {
         itemNumber: 3,
         commodityCode: '05071000',
         description: 'PRODUCTS OF ANIMAL ORIGIN, NOT ELSEWHERE SPECIFIED OR INCLUDED',
-        quantityWeight: '2500 KGM',
+        quantityOrWeight: '2500 KGM',
         decision: 'Decision not given'
       }
     ])
@@ -326,7 +328,7 @@ describe('#mapTracesCheds', () => {
         itemNumber: 1,
         commodityCode: '03019985',
         description: 'UNKNOWN',
-        quantityWeight: undefined,
+        quantityOrWeight: undefined,
         decision: 'Decision not given'
       }
     ])
@@ -354,7 +356,45 @@ describe('#mapTracesCheds', () => {
         itemNumber: 1,
         commodityCode: '05071000',
         description: 'PRODUCTS OF ANIMAL ORIGIN, NOT ELSEWHERE SPECIFIED OR INCLUDED',
-        quantityWeight: '1000 KGM',
+        quantityOrWeight: '1000 KGM',
+        decision: 'Decision not given'
+      }
+    ])
+  })
+
+  test('should fall back to the volume measure and show no unit for a count', () => {
+    const searchResults = {
+      cheds: [
+        createTracesChed('CHEDA.GB.2025.0000001', {
+          tradeLineItems: [
+            createTradeLineItem({
+              sequenceNumeric: 1,
+              scientificName: 'Equus',
+              netVolume: { content: '2', unitCode: 'H87' }
+            }),
+            createTradeLineItem({
+              sequenceNumeric: 2,
+              scientificName: 'Salmo salar',
+              netWeight: { content: '1000', unitCode: 'KGM' }
+            })
+          ]
+        })
+      ]
+    }
+
+    expect(mapTracesCheds(searchResults, 'CHEDA.GB.2025.0000001')[0].commodities).toEqual([
+      {
+        itemNumber: 1,
+        commodityCode: '03019985',
+        description: 'Equus',
+        quantityOrWeight: '2',
+        decision: 'Decision not given'
+      },
+      {
+        itemNumber: 2,
+        commodityCode: '03019985',
+        description: 'Salmo salar',
+        quantityOrWeight: '1000 KGM',
         decision: 'Decision not given'
       }
     ])
@@ -381,7 +421,7 @@ describe('#mapTracesCheds', () => {
         itemNumber: 1,
         commodityCode: '03019985',
         description: 'UNKNOWN',
-        quantityWeight: '1000 KGM',
+        quantityOrWeight: '1000 KGM',
         decision: 'Decision not given'
       }
     ])
