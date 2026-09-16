@@ -12,10 +12,10 @@
   <tbody>
     {% for commodity in tracesChed.commodities %}
       <tr>
-        <td class="govuk-table__cell">{% if commodity.itemNumber == null %}{% else %}{{ commodity.itemNumber }}{% endif %}</td>
+        <td class="govuk-table__cell">{{ commodity.itemNumber }}</td>
         <td class="govuk-table__cell">{{ commodity.commodityCode }}</td>
         <td class="govuk-table__cell">{{ commodity.description }}</td>
-        <td class="govuk-table__cell">{{ commodity.quantityWeight }}</td>
+        <td class="govuk-table__cell">{{ commodity.quantityOrWeight }}</td>
         <td class="govuk-table__cell"></td>
         <td class="govuk-table__cell">{{ commodity.decision }}</td>
       </tr>
