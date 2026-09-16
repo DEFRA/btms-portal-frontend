@@ -30,21 +30,18 @@ function getNanosecondsAsNumber(nanosecondDate) {
       nanosecondPart = nanosecondPart.split('Z')[0]
     }
 
-    nanosecondPart = nanosecondPart.padEnd(NANOSECOND_PRECISION, "0")
+    nanosecondPart = nanosecondPart.padEnd(NANOSECOND_PRECISION, '0')
   }
 
   return Number(nanosecondPart)
 }
 
 const sortCreatedDescending = (a, b) => {
-  if (a.created === undefined && b.created === undefined)
-    {return 0}
+  if (a.created === undefined && b.created === undefined) { return 0 }
 
-  if (a.created === undefined)
-    {return 1}
+  if (a.created === undefined) { return 1 }
 
-  if (b.created === undefined)
-    {return -1}
+  if (b.created === undefined) { return -1 }
 
   const aCreatedTime = new Date(a.created).getTime()
   const bCreatedTime = new Date(b.created).getTime()
@@ -60,73 +57,67 @@ const sortCreatedDescending = (a, b) => {
   return bCreatedTime - aCreatedTime
 }
 
-const getChedTimelineEvents = async (preNotifications) => {
-  let chedTimelineEvents = []
-
-  for (const preNotification of preNotifications) {
-    const preNotificationResourceEvents = await getResourceEvents(preNotification.referenceNumber)
-    chedTimelineEvents = chedTimelineEvents.concat(mapResourceEvents(undefined, preNotification.referenceNumber, preNotificationResourceEvents))
-  }
-
-  return chedTimelineEvents
-}
-
-const getEventsFromCustomsDeclarations = async (customsDeclarations, preNotifications) => {
-  const chedTimelineEvents = await getChedTimelineEvents(preNotifications)
-  const mrnEvents = []
+const getEventsFromCustomsDeclarations = async (customsDeclarations, chedGroups) => {
+  const allTimelineEvents = chedGroups.flatMap(({ timelineEvents }) => timelineEvents)
+  const customsDeclarationEvents = []
 
   for (const declaration of customsDeclarations) {
     try {
       const declarationResourceEvents = await getResourceEvents(declaration.movementReferenceNumber)
       const declarationTimelineEvents = mapResourceEvents(declaration.movementReferenceNumber, undefined, declarationResourceEvents)
-      const timelineEvents = declarationTimelineEvents.concat(chedTimelineEvents).sort((a, b) => sortCreatedDescending(a, b))
+      const timelineEvents = declarationTimelineEvents.concat(allTimelineEvents).sort(sortCreatedDescending)
 
-      mrnEvents.push({
+      customsDeclarationEvents.push({
         mrn: declaration.movementReferenceNumber,
         timelineEvents
       })
     } catch (error) {
       logger.warn(`Unable to retrieve and map timeline resource events for MRN ${declaration.movementReferenceNumber}. ERROR: ${error.message}`)
-      mrnEvents.push({
+
+      customsDeclarationEvents.push({
         mrn: declaration.movementReferenceNumber,
         timelineEvents: []
       })
     }
   }
 
-  return mrnEvents
+  return customsDeclarationEvents
 }
 
-const getEventsFromUnmatchedPreNotifications = async (preNotifications) => {
-  const preNotificationEvents = []
+const getTimelineEvents = async (referenceNumbers) => {
+  const timelineGroups = []
 
-  for (const preNotification of preNotifications) {
+  for (const referenceNumber of referenceNumbers) {
     try {
-      const preNotificationResourceEvents = await getResourceEvents(preNotification.referenceNumber)
-      const timelineEvents = mapResourceEvents(undefined, preNotification.referenceNumber, preNotificationResourceEvents)?.sort((a, b) => sortCreatedDescending(a, b))
+      const resourceEvents = await getResourceEvents(referenceNumber)
 
-      preNotificationEvents.push({
-        chedRef: preNotification.referenceNumber,
-        timelineEvents
+      timelineGroups.push({
+        chedRef: referenceNumber,
+        timelineEvents: mapResourceEvents(undefined, referenceNumber, resourceEvents).sort(sortCreatedDescending)
       })
     } catch (error) {
-      logger.warn(`Unable to retrieve and map timeline resource events for unmatched Pre Notification ${preNotification.referenceNumber}. ERROR: ${error.message}`)
-      preNotificationEvents.push({
-        chedRef: preNotification.referenceNumber,
+      logger.warn(`Unable to retrieve and map timeline resource events for ${referenceNumber}. ERROR: ${error.message}`)
+
+      timelineGroups.push({
+        chedRef: referenceNumber,
         timelineEvents: []
       })
     }
   }
 
-  return preNotificationEvents
+  return timelineGroups
 }
 
-const getAllEvents = async (customsDeclarations, preNotifications) => {
-  if (customsDeclarations.length > 0) {
-    return getEventsFromCustomsDeclarations(customsDeclarations, preNotifications)
-  } else {
-    return getEventsFromUnmatchedPreNotifications(preNotifications)
+const getAllEvents = async (customsDeclarations, preNotifications, tracesCheds) => {
+  const ipaffsChedGroups = await getTimelineEvents(preNotifications.map(({ referenceNumber }) => referenceNumber))
+  const tracesChedGroups = await getTimelineEvents(tracesCheds.map(({ reference }) => reference))
+  const chedGroups = ipaffsChedGroups.concat(tracesChedGroups)
+
+  if (customsDeclarations.length === 0) {
+    return chedGroups
   }
+
+  return getEventsFromCustomsDeclarations(customsDeclarations, chedGroups)
 }
 
 const includesInternalDecisionCodes = (customsDeclarations, codes) => {
@@ -158,11 +149,12 @@ export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_
 
   const customsDeclarations = mapCustomsDeclarations(searchResults, searchTerm)
   const preNotifications = mapPreNotifications(searchResults, searchTerm)
-  const timelineEvents = await getAllEvents(customsDeclarations, preNotifications)
+  const tracesCheds = showTracesCheds ? mapTracesCheds(searchResults, searchTerm) : []
+  const timelineEvents = await getAllEvents(customsDeclarations, preNotifications, tracesCheds)
 
   const showLevelNoMatchBanner = isInFeatureGroup(AUTH_FEATURES.LEVEL_NO_MATCH_SEARCH_RESULTS, request.auth.credentials.scope)
-  const showLevel2NoMatchText = showLevelNoMatchBanner && includesInternalDecisionCodes(searchResults.customsDeclarations, [ 'E20' ])
-  const showLevel3NoMatchText = showLevelNoMatchBanner && includesInternalDecisionCodes(searchResults.customsDeclarations, [ 'E30', 'E31' ])
+  const showLevel2NoMatchText = showLevelNoMatchBanner && includesInternalDecisionCodes(searchResults.customsDeclarations, ['E20'])
+  const showLevel3NoMatchText = showLevelNoMatchBanner && includesInternalDecisionCodes(searchResults.customsDeclarations, ['E30', 'E31'])
   const showLevelsResultTab = showLevel2NoMatchText || showLevel3NoMatchText
 
   const viewModel = {
@@ -170,7 +162,7 @@ export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_
     searchTerm,
     customsDeclarations,
     preNotifications,
-    tracesCheds: showTracesCheds ? mapTracesCheds(searchResults, searchTerm) : [],
+    tracesCheds,
     timelineEvents,
     showLevel2NoMatchText,
     showLevel3NoMatchText,
