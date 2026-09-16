@@ -1,4 +1,4 @@
-import { mapResourceEvents } from '../../../src/models/resource-events.js'
+import { mapResourceEvents, RESOURCE_TYPE } from '../../../src/models/resource-events.js'
 
 test('maps Clearance Request Resource Event', () => {
   const resourceEvents = [{
@@ -394,4 +394,51 @@ test('skips resource event if unable to parse and map', () => {
     "source": "IPAFFS to BTMS",
     "status": "VALIDATED"
   })
+})
+
+const tracesChedResourceEvent = (exchangedDocument, ched = {}) => ({
+  resourceType: RESOURCE_TYPE.TRACES_CHED,
+  message: JSON.stringify({
+    resource: {
+      id: 'CHEDP.GB.2026.8148251',
+      created: '2025-01-01T09:00:00.000Z',
+      updated: '2025-01-01T09:00:00.000Z',
+      ched: { exchangedDocument, ...ched }
+    }
+  })
+})
+
+test('maps Traces Ched Resource Event', () => {
+  const resourceEvents = [
+    tracesChedResourceEvent(
+      {
+        identifier: 'CHEDP.GB.2026.8148251',
+        documentStatusCode: '55'
+      },
+      { lastUpdated: '2026-09-09T09:16:18.000+00:00' }
+    )
+  ]
+
+  const result = mapResourceEvents(undefined, 'CHEDP.GB.2026.8148251', resourceEvents)
+
+  expect(result).toEqual([{
+    created: '2026-09-09T09:16:18.000+00:00',
+    eventTitle: 'CHEDP.GB.2026.8148251',
+    eventType: 'Ched',
+    source: 'TRACES to BTMS',
+    status: 'Deleted'
+  }])
+})
+
+test('maps an unknown Traces Ched status code', () => {
+  const resourceEvents = [
+    tracesChedResourceEvent({
+      identifier: 'CHEDP.GB.2026.8148251',
+      documentStatusCode: '999'
+    })
+  ]
+
+  const result = mapResourceEvents(undefined, 'CHEDP.GB.2026.8148251', resourceEvents)
+
+  expect(result[0].status).toBe('Unknown (999)')
 })

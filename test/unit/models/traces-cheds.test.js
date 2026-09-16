@@ -1,4 +1,5 @@
-import { mapTracesCheds } from '../../../src/models/traces-cheds.js'
+import { mapTracesCheds, getTracesChedStatus } from '../../../src/models/traces-cheds.js'
+import { mapResourceEvents, RESOURCE_TYPE } from '../../../src/models/resource-events.js'
 
 const createTradeLineItem = ({
   sequenceNumeric = 0,
@@ -432,5 +433,64 @@ describe('#mapTracesCheds', () => {
   test('should return an empty array when there are no TRACES CHEDs', () => {
     expect(mapTracesCheds({}, 'CHEDA.GB.2025.0000001')).toEqual([])
     expect(mapTracesCheds({ cheds: [] }, 'CHEDA.GB.2025.0000001')).toEqual([])
+  })
+})
+
+const tracesChedSearchResult = (documentStatusCode) => ({
+  cheds: [
+    {
+      ched: {
+        exchangedDocument: { identifier: 'CHEDA.GB.2025.0000001', documentStatusCode },
+        lastUpdated: null,
+        specifiedConsignment: {}
+      },
+      created: '2025-01-01T09:00:00.000Z',
+      updated: '2025-01-01T09:00:00.000Z'
+    }
+  ]
+})
+
+const tracesChedResourceEvent = (documentStatusCode) => ({
+  resourceType: RESOURCE_TYPE.TRACES_CHED,
+  message: JSON.stringify({
+    resource: {
+      id: 'CHEDA.GB.2025.0000001',
+      ched: {
+        exchangedDocument: { identifier: 'CHEDA.GB.2025.0000001', documentStatusCode },
+        lastUpdated: null
+      }
+    }
+  })
+})
+
+describe('getTracesChedStatus', () => {
+  test('is the single source of the status for both the search result screen and the timeline', () => {
+    const documentStatusCode = '55'
+
+    const searchResultStatus = mapTracesCheds(tracesChedSearchResult(documentStatusCode), 'CHEDA.GB.2025.0000001')[0].status
+    const timelineStatus = mapResourceEvents(undefined, 'CHEDA.GB.2025.0000001', [tracesChedResourceEvent(documentStatusCode)])[0].status
+
+    expect(searchResultStatus).toBe(getTracesChedStatus(documentStatusCode))
+    expect(timelineStatus).toBe(getTracesChedStatus(documentStatusCode))
+    expect(searchResultStatus).toBe(timelineStatus)
+  })
+
+  test('is the single source of the Unknown fallback for both the search result screen and the timeline', () => {
+    const documentStatusCode = '999'
+
+    const searchResultStatus = mapTracesCheds(tracesChedSearchResult(documentStatusCode), 'CHEDA.GB.2025.0000001')[0].status
+    const timelineStatus = mapResourceEvents(undefined, 'CHEDA.GB.2025.0000001', [tracesChedResourceEvent(documentStatusCode)])[0].status
+
+    expect(searchResultStatus).toBe(getTracesChedStatus(documentStatusCode))
+    expect(timelineStatus).toBe(getTracesChedStatus(documentStatusCode))
+    expect(searchResultStatus).toBe(timelineStatus)
+  })
+
+  test('describes a numeric document status code', () => {
+    expect(getTracesChedStatus(1)).toBe('New')
+  })
+
+  test('does not return inherited object members for an unmapped status code', () => {
+    expect(getTracesChedStatus('toString')).toBe('Unknown (toString)')
   })
 })
