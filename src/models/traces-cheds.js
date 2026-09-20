@@ -2,13 +2,36 @@ import { format } from 'date-fns'
 import {
   DATE_FORMAT,
   DECISION_NOT_GIVEN,
-  tracesChedStatusCodeDescriptions,
   tracesDecisionConclusionDescriptions
 } from './model-constants.js'
 import { sortDescending } from './sort.js'
 
 const CHED_CLASSIFICATION_SYSTEM_ID = 'CN'
 const DECISION_CONCLUSION_CLAUSE_ID = 'DECISION_CONCLUSION'
+
+const IN_PROGRESS_STATUS = 'In progress'
+
+// Single source of the TRACES CHED status, used by both the search result screen and the timeline.
+export const getTracesChedStatus = (documentStatusCode) => { //NOSONAR - readability
+  switch (`${documentStatusCode}`) {
+    case '1': return 'New'
+    case '35': return 'Authorised for onward travel'
+    case '41': return 'Rejected'
+    case '42': return IN_PROGRESS_STATUS
+    case '44': return 'Replaced'
+    case '47': return 'Draft'
+    case '55': return 'Deleted'
+    case '64': return 'Cancelled'
+    case '68': return 'Split'
+    case '70': return 'Validated'
+    case '97': return 'Authorised for onward transportation'
+    case '99': return 'Authorised for transit'
+    case '122': return 'Partially rejected'
+    case '124': return 'Authorised for transfer to'
+    case '146': return 'Authorised for transhipment'
+    default: return `Unknown (${documentStatusCode})`
+  }
+}
 
 
 const findCnClassification = (classifications) =>
@@ -46,7 +69,7 @@ const mapTracesChed = ({ ched }) => {
 
   return {
     reference: ched?.exchangedDocument?.identifier,
-    status: tracesChedStatusCodeDescriptions[documentStatusCode] ?? `Unknown (${documentStatusCode})`,
+    status: getTracesChedStatus(documentStatusCode),
     updated: ched?.lastUpdated ? format(new Date(ched.lastUpdated), DATE_FORMAT) : undefined,
     commodities: (ched?.specifiedConsignment?.includedConsignmentItem ?? []).flatMap(
       (consignmentItem) => consignmentItem?.includedTradeLineItem ?? []

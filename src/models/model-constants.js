@@ -97,25 +97,6 @@ export const chedStatusDescriptions = {
   VALIDATED: 'Valid'
 }
 
-export const tracesChedStatusCodeDescriptions = {
-  '1': 'New',
-  '35': 'Authorised for onward travel',
-  '41': 'Rejected',
-  '42': IN_PROGRESS_STATUS,
-  '44': 'Replaced',
-  '47': 'Draft',
-  '55': 'Deleted',
-  '64': 'Cancelled',
-  '68': 'Split',
-  '70': 'Validated',
-  '97': 'Authorised for onward transportation',
-  '99': 'Authorised for transit',
-  '122': 'Partially rejected',
-  '124': 'Authorised for transfer to',
-  '146': 'Authorised for transhipment',
-
-}
-
 export const tracesDecisionConclusionDescriptions = {
   ACCEPTABLE_FOR_INTERNAL_MARKET: 'Acceptable for internal market',
   ACCEPTABLE_FOR_FREE_CIRCULATION: 'Acceptable for free circulation',
