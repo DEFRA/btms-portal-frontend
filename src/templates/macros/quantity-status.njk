@@ -1,0 +1,12 @@
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+
+{% macro quantityStatus(status) %}
+  {% set statusClasses = {
+    "Unreserved": "govuk-tag--grey",
+    "Reserved": "govuk-tag--yellow",
+    "Finalised": "govuk-tag--green"
+  } %}
+  {% if statusClasses[status] %}
+    {{ govukTag({ text: status, classes: statusClasses[status] }) }}
+  {% endif %}
+{% endmacro %}

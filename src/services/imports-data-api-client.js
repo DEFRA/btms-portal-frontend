@@ -10,14 +10,11 @@ export const getCustomsDeclaration = (mrn) =>
 export const getImportPreNotification = (chedId) =>
   dataApiClient.get(`import-pre-notifications/${chedId}`)
 
-export const getRelatedImportDeclarations = (query) =>
-  dataApiClient.get(`related-import-declarations?${new URLSearchParams(query)}`)
+export const getRelatedImportDeclarations = async (query) => {
+  const results = await dataApiClient.get(`related-import-declarations?${new URLSearchParams(query)}`)
+
+  return config.get('isTracesChedsEnabled') ? results : { ...results, cheds: [], chedReservations: [] }
+}
 
 export const getResourceEvents = (resourceId) =>
   dataApiClient.get(`resource-events/${resourceId}`)
-
-export const getTracesChed = (chedId) =>
-  dataApiClient.get(`traces-cheds/${chedId}`)
-
-export const getTracesChedCustomsDeclarations = (chedId) =>
-  dataApiClient.get(`traces-cheds/${chedId}/customs-declarations`)

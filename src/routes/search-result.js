@@ -1,6 +1,5 @@
 import { paths, queryStringParams } from './route-constants.js'
-import { getResourceEvents } from '../services/imports-data-api-client.js'
-import { getSearchResults } from '../services/search.js'
+import { getRelatedImportDeclarations, getResourceEvents } from '../services/imports-data-api-client.js'
 import { mapCustomsDeclarations } from '../models/customs-declarations.js'
 import { mapPreNotifications } from '../models/pre-notifications.js'
 import { mapTracesCheds } from '../models/traces-cheds.js'
@@ -141,13 +140,14 @@ const includesInternalDecisionCodes = (customsDeclarations, codes) => {
 
 export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_RESULT, async (request, h) => {
   const searchTerm = request.query[queryStringParams.SEARCH_TERM].trim().toUpperCase()
-  const searchResults = await getSearchResults(request.pre.searchQuery)
   const showTracesCheds = config.get('isTracesChedsEnabled')
+  const showQuantityStatus = config.get('isQuantityStatusEnabled')
+  const searchResults = await getRelatedImportDeclarations(request.pre.searchQuery)
 
   if (
     searchResults.customsDeclarations.length === 0 &&
     searchResults.importPreNotifications.length === 0 &&
-    !(showTracesCheds && searchResults.cheds?.length > 0)
+    !(searchResults.cheds?.length > 0)
   ) {
     request.yar.flash('searchError', {
       searchTerm,
@@ -172,12 +172,13 @@ export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_
     searchTerm,
     customsDeclarations,
     preNotifications,
-    tracesCheds: showTracesCheds ? mapTracesCheds(searchResults, searchTerm) : [],
+    tracesCheds: mapTracesCheds(searchResults, searchTerm),
     timelineEvents,
     showLevel2NoMatchText,
     showLevel3NoMatchText,
     showLevelsResultTab,
-    showTracesCheds
+    showTracesCheds,
+    showQuantityStatus
   }
 
   return h.view('search-result', viewModel)
