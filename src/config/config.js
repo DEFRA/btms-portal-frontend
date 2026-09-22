@@ -136,6 +136,12 @@ const config = convict({
     default: false,
     env: 'SHOW_TRACES_CHEDS'
   },
+  isQuantityStatusEnabled: {
+    doc: 'Show the Quantity status column on the search results page',
+    format: Boolean,
+    default: false,
+    env: 'SHOW_QUANTITY_STATUS'
+  },
   session: {
     cache: {
       engine: {

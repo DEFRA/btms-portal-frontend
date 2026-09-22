@@ -16,6 +16,7 @@ import { initFilters } from '../../src/client/javascripts/filters.js'
 
 afterEach(() => {
   config.set('isTracesChedsEnabled', false)
+  config.set('isQuantityStatusEnabled', false)
 })
 
 const provider = {
@@ -996,6 +997,37 @@ test('redirects to search page when only TRACES CHEDs are found and feature flag
   expect(headers.location).toBe(paths.SEARCH)
 })
 
+test('redirects to search page when a full TRACES CHED reference search returns a CHED and the feature flag is disabled', async () => {
+  config.set('isTracesChedsEnabled', false)
+  const onlyTracesCheds = {
+    customsDeclarations: [],
+    importPreNotifications: [],
+    cheds: [
+      createTracesChed('CHEDA.GB.2025.0000001', '2025-07-02T10:00:00.000Z')
+    ]
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: onlyTracesCheds })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { statusCode, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=CHEDA.GB.2025.0000001`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(302)
+  expect(headers.location).toBe(paths.SEARCH)
+})
+
 test('does not show TRACES CHED section when feature flag is disabled', async () => {
   config.set('isTracesChedsEnabled', false)
   const relatedImportDeclarationsWithTracesCheds = {
@@ -1036,52 +1068,19 @@ test('does not show TRACES CHED section when feature flag is disabled', async ()
 test('shows the decision on TRACES CHED commodity rows when feature flag is enabled', async () => {
   config.set('isTracesChedsEnabled', true)
 
-  const createTracesChedReturn = createTracesChed('CHEDA.GB.2025.0000001', '2025-06-01T09:30:00.000Z')
+  const relatedImportDeclarationsWithTracesChed = {
+    customsDeclarations: [],
+    importPreNotifications: [],
+    goodsVehicleMovements: [],
+    cheds: [
+      createTracesChed('CHEDA.GB.2025.0000001', '2025-06-01T09:30:00.000Z')
+    ]
+  }
 
   wreck.get
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
-    .mockResolvedValueOnce({ payload: createTracesChedReturn })
-    .mockResolvedValueOnce({ payload: { customsDeclarations } })
-    .mockResolvedValueOnce({ payload: declarationResourceEvents })
-
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { payload } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=CHEDA.GB.2025.0000001`,
-    auth: {
-      strategy: 'session',
-      credentials
-    }
-  })
-
-  globalJsdom(payload)
-
-  const tracesChedDetails = getByRole(document.body, 'group', { name: 'CHEDA.GB.2025.0000001' })
-  expect(tracesChedDetails).toBeInTheDocument()
-  const decisionCell = within(tracesChedDetails).getAllByRole('cell')[5]
-  expect(decisionCell).toHaveTextContent('Acceptable for free circulation')
-})
-
-test('shows linked customs declarations for a TRACES CHED search when feature flag is enabled', async () => {
-  config.set('isTracesChedsEnabled', true)
-
-  wreck.get
-    .mockResolvedValueOnce({ payload: provider })
-    .mockResolvedValueOnce({ payload: provider })
-    .mockResolvedValueOnce({
-      payload: {
-        ched: {
-          exchangedDocument: { identifier: 'CHEDA.GB.2025.0000001' }
-        },
-        created: '2025-01-01T09:00:00.000Z',
-        updated: '2025-06-01T09:30:00.000Z'
-      }
-    })
-    .mockResolvedValueOnce({ payload: { customsDeclarations } })
-    .mockResolvedValueOnce({ payload: declarationResourceEvents })
+    .mockResolvedValueOnce({ payload: relatedImportDeclarationsWithTracesChed })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
@@ -1100,21 +1099,25 @@ test('shows linked customs declarations for a TRACES CHED search when feature fl
   expect(
     getByRole(document.body, 'group', { name: 'CHEDA.GB.2025.0000001' })
   ).toBeInTheDocument()
-  expect(
-    getByRole(document.body, 'group', { name: '24GB0Z8WEJ9ZBTL73B' })
-  ).toBeInTheDocument()
+  const tracesChedDetails = getByRole(document.body, 'group', { name: 'CHEDA.GB.2025.0000001' })
+  const decisionCell = within(tracesChedDetails).getAllByRole('cell')[5]
+  expect(decisionCell).toHaveTextContent('Acceptable for free circulation')
 })
 
-test('falls back to related import declarations when the TRACES CHED is not found', async () => {
+test('shows linked customs declarations for a TRACES CHED search when feature flag is enabled', async () => {
   config.set('isTracesChedsEnabled', true)
+
+  const relatedImportDeclarationsWithTracesCheds = {
+    ...relatedImportDeclarations,
+    cheds: [
+      createTracesChed('CHEDA.GB.2025.0000001', '2025-06-01T09:30:00.000Z')
+    ]
+  }
 
   wreck.get
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
-    .mockRejectedValueOnce({ isBoom: true, output: { statusCode: 404 } })
-    .mockResolvedValueOnce({ payload: relatedImportDeclarations })
-    .mockResolvedValueOnce({ payload: emptyResourceEvents })
-    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: relatedImportDeclarationsWithTracesCheds })
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
@@ -1129,11 +1132,322 @@ test('falls back to related import declarations when the TRACES CHED is not foun
     }
   })
 
-  expect(payload).toContain('24GB0Z8WEJ9ZBTL73B')
   globalJsdom(payload)
+
   expect(
-    queryByText(document.body, 'There are no matching TRACES notification (CHED) details')
+    getAllByRole(document.body, 'group', { name: 'CHEDA.GB.2025.0000001' })
+  ).toHaveLength(2)
+  expect(
+    getByRole(document.body, 'group', { name: '24GB0Z8WEJ9ZBTL73B' })
   ).toBeInTheDocument()
+})
+
+test.each([
+  { tracesChedsEnabled: false, quantityStatusEnabled: true },
+  { tracesChedsEnabled: true, quantityStatusEnabled: false },
+  { tracesChedsEnabled: false, quantityStatusEnabled: false }
+])(
+  'hides the Quantity status column when the TRACES CHEDs flag is $tracesChedsEnabled and the quantity status flag is $quantityStatusEnabled',
+  async ({ tracesChedsEnabled, quantityStatusEnabled }) => {
+    config.set('isTracesChedsEnabled', tracesChedsEnabled)
+    config.set('isQuantityStatusEnabled', quantityStatusEnabled)
+
+    wreck.get
+      .mockResolvedValueOnce({ payload: provider })
+      .mockResolvedValueOnce({ payload: provider })
+      .mockResolvedValueOnce({
+        payload: {
+          ...relatedImportDeclarations,
+          cheds: [createTracesChed('CHEDA.GB.2025.0000001', '2025-06-01T09:30:00.000Z')],
+          chedReservations: [
+            {
+              reservation: {
+                chedId: 'CHEDA.GB.2025.0000001',
+                mrn: '24GB0Z8WEJ9ZBTL73B',
+                status: 'Reserved',
+                timestamp: '2025-06-01T09:30:00.000Z',
+                commodities: []
+              }
+            }
+          ]
+        }
+      })
+      .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+    const server = await initialiseServer()
+    const credentials = await setupAuthedUserSession(server)
+
+    const { payload } = await server.inject({
+      method: 'get',
+      url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
+      auth: {
+        strategy: 'session',
+        credentials
+      }
+    })
+
+    globalJsdom(payload)
+
+    const table = document.querySelector('table.btms-declaration')
+
+    expect(getByRole(table, 'columnheader', { name: 'Commodity code' })).toBeInTheDocument()
+    expect(queryByRole(table, 'columnheader', { name: 'Quantity status' })).not.toBeInTheDocument()
+  }
+)
+
+describe('Quantity status column (flag on)', () => {
+  beforeEach(() => {
+    config.set('isTracesChedsEnabled', true)
+    config.set('isQuantityStatusEnabled', true)
+  })
+
+  const injectSearchResult = async (payload) => {
+    wreck.get
+      .mockResolvedValueOnce({ payload: provider })
+      .mockResolvedValueOnce({ payload: provider })
+      .mockResolvedValueOnce({ payload })
+      .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+    const server = await initialiseServer()
+    const credentials = await setupAuthedUserSession(server)
+
+    const { payload: html } = await server.inject({
+      method: 'get',
+      url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
+      auth: {
+        strategy: 'session',
+        credentials
+      }
+    })
+
+    globalJsdom(html)
+
+    return document.querySelector('table.btms-declaration')
+  }
+
+  const reservation = (status, { chedId = 'CHEDA.GB.2025.0000001', mrn = '24GB0Z8WEJ9ZBTL73B' } = {}) => ({
+    reservation: {
+      chedId,
+      mrn,
+      status,
+      timestamp: '2025-06-01T09:30:00.000Z',
+      commodities: []
+    }
+  })
+
+  const tracesChedResponse = (chedReservations) => ({
+    ...relatedImportDeclarations,
+    cheds: [createTracesChed('CHEDA.GB.2025.0000001', '2025-06-01T09:30:00.000Z')],
+    chedReservations
+  })
+
+  test('renders the Quantity status column header', async () => {
+    const table = await injectSearchResult(tracesChedResponse([reservation('Reserved')]))
+
+    expect(getByRole(table, 'columnheader', { name: 'Quantity status' })).toBeInTheDocument()
+  })
+
+  test.each([
+    {
+      name: 'a Reserved reservation renders Reserved in yellow',
+      reservations: [reservation('Reserved')],
+      rowName: /FROZEN MSC A COD FILLETS/,
+      expected: 'Reserved',
+      expectedClass: 'govuk-tag--yellow'
+    },
+    {
+      name: 'a Consumed reservation renders Finalised in green',
+      reservations: [reservation('Consumed')],
+      rowName: /FROZEN MSC A COD FILLETS/,
+      expected: 'Finalised',
+      expectedClass: 'govuk-tag--green'
+    },
+    {
+      name: 'a TRACES CHED with no matching reservation renders Unreserved in grey',
+      reservations: [reservation('Reserved', { mrn: '24GB0Z8WEJ9ZBTL73C' })],
+      rowName: /FROZEN MSC A COD FILLETS/,
+      expected: 'Unreserved',
+      expectedClass: 'govuk-tag--grey'
+    },
+    {
+      name: 'a declaration whose CHED is not a TRACES CHED renders a blank cell',
+      reservations: [reservation('Reserved', { mrn: '24GB0Z8WEJ9ZBTL73C' })],
+      rowName: /CHEDP.GB.2025.0000002/,
+      expected: ''
+    }
+  ])('$name', async ({ reservations, rowName, expected, expectedClass }) => {
+    const table = await injectSearchResult(tracesChedResponse(reservations))
+
+    const statusCell = within(getByRole(table, 'row', { name: rowName })).getAllByRole('cell')[4]
+
+    expect(statusCell.textContent.trim()).toBe(expected)
+
+    if (expectedClass) {
+      expect(statusCell.querySelector('strong')).toHaveClass(expectedClass)
+    }
+  })
+
+  test('shows the status on TRACES rows and a blank cell on IPAFFS rows when a declaration has both', async () => {
+    const table = await injectSearchResult(tracesChedResponse([reservation('Reserved')]))
+
+    const tracesRow = getByRole(table, 'row', { name: /FROZEN MSC A COD FILLETS/ })
+    const ipaffsRow = getByRole(table, 'row', { name: /FROZEN MSC HADDOCK FILLETS/ })
+
+    expect(within(tracesRow).getAllByRole('cell')[4].textContent.trim()).toBe('Reserved')
+    expect(within(ipaffsRow).getAllByRole('cell')[4].textContent.trim()).toBe('')
+  })
+
+  test('with IPAFFS CHEDs only, the Quantity status column is not shown', async () => {
+    const table = await injectSearchResult(relatedImportDeclarations)
+
+    expect(getByRole(table, 'columnheader', { name: 'Commodity code' })).toBeInTheDocument()
+    expect(queryByRole(table, 'columnheader', { name: 'Quantity status' })).not.toBeInTheDocument()
+  })
+})
+
+test('shows a blank Quantity status cell when there is no quantity status record', async () => {
+  config.set('isTracesChedsEnabled', true)
+  config.set('isQuantityStatusEnabled', true)
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({
+      payload: {
+        ...relatedImportDeclarations,
+        cheds: [createTracesChed('CHEDA.GB.2025.0000001', '2025-06-01T09:30:00.000Z')]
+      }
+    })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  const table = document.querySelector('table.btms-declaration')
+  const noMatchRow = getByRole(table, 'row', { name: /CHEDP.BB.2025.NOMATCH/ })
+
+  expect(within(noMatchRow).getAllByRole('cell')[4].textContent.trim()).toBe('')
+})
+
+test('shows the Quantity status column on all tabs', async () => {
+  config.set('isTracesChedsEnabled', true)
+  config.set('isQuantityStatusEnabled', true)
+
+  const levelNoMatchDeclarations = [
+    {
+      movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
+      clearanceRequest: {
+        declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+        commodities: [
+          {
+            itemNumber: 1,
+            taricCommodityCode: '0304719030',
+            goodsDescription: 'FROZEN MSC A COD FILLETS',
+            netMass: '17088.98',
+            supplementaryUnits: 0,
+            documents: [
+              {
+                documentReference: 'CHEDA.GB.2025.0000001',
+                documentCode: 'N002'
+              }
+            ],
+            checks: [{ checkCode: 'H218', departmentCode: 'HMI' }]
+          }
+        ]
+      },
+      clearanceDecision: {
+        results: [
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'X00',
+            documentReference: 'CHEDA.GB.2025.0000001',
+            internalDecisionCode: 'E20'
+          }
+        ]
+      },
+      finalisation: {
+        finalState: '0',
+        isManualRelease: false
+      },
+      updated: '2025-05-06T13:11:59.257Z'
+    }
+  ]
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({
+      payload: {
+        customsDeclarations: levelNoMatchDeclarations,
+        importPreNotifications,
+        cheds: [createTracesChed('CHEDA.GB.2025.0000001', '2025-06-01T09:30:00.000Z')]
+      }
+    })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const server = await initialiseServer()
+  const authedUser = createAuthedUser(undefined, 'entraId')
+  authedUser.scope = ['admin']
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73A`,
+    auth: {
+      strategy: 'session',
+      credentials: {
+        ...authedUser
+      }
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(document.querySelector('table.btms-declaration thead')).toHaveTextContent('Quantity status')
+  expect(document.querySelector('table.btms-declaration-levels-result thead')).toHaveTextContent('Quantity status')
+})
+
+test('redirects to search page when a TRACES CHED search returns no results', async () => {
+  config.set('isTracesChedsEnabled', true)
+
+  const noResults = {
+    customsDeclarations: [],
+    importPreNotifications: [],
+    goodsVehicleMovements: [],
+    cheds: [],
+    chedReservations: []
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: noResults })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { statusCode, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=CHEDA.GB.2025.0000001`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(302)
+  expect(headers.location).toBe(paths.SEARCH)
 })
 
 test('shows no matching TRACES CHEDs message for an MRN search when no TRACES CHEDs are associated', async () => {
@@ -1254,8 +1568,8 @@ test('handles upstream errors', async () => {
 
 test('redirects to search page if GMR search term', async () => {
   wreck.get
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
@@ -1349,16 +1663,16 @@ test.each([
   }
 ])('Links to GMR if related', async (options) => {
   const dataApiResults = {
-    customsDeclarations: [ createCustomsDeclaration('24GB0Z8WEJ9ZBTL73A', '1GB126344356000-ABC35932Y1BHA', '2025-01-01T09:00:00.000Z') ],
+    customsDeclarations: [createCustomsDeclaration('24GB0Z8WEJ9ZBTL73A', '1GB126344356000-ABC35932Y1BHA', '2025-01-01T09:00:00.000Z')],
     importPreNotifications: [],
     goodsVehicleMovements: options.goodsVehicleMovements
   }
 
   wreck.get
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: dataApiResults })
-  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: dataApiResults })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
@@ -1404,12 +1718,12 @@ test('shows latest search results and timeline tabs', async () => {
   }
 
   wreck.get
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: relatedImportDeclarations })
-  .mockResolvedValueOnce({ payload: declarationResourceEvents })
-  .mockResolvedValueOnce({ payload: importPreNotificationResourceEvents })
-  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: relatedImportDeclarations })
+    .mockResolvedValueOnce({ payload: declarationResourceEvents })
+    .mockResolvedValueOnce({ payload: importPreNotificationResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
@@ -1542,11 +1856,11 @@ test('handles resource event that cannot be parsed and mapped', async () => {
   }
 
   wreck.get
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: relatedImportDeclarations })
-  .mockResolvedValueOnce({ payload: declarationResourceEvents })
-  .mockResolvedValueOnce({ payload: invalidResourceEvents })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: relatedImportDeclarations })
+    .mockResolvedValueOnce({ payload: declarationResourceEvents })
+    .mockResolvedValueOnce({ payload: invalidResourceEvents })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
@@ -1600,10 +1914,10 @@ test('handles upstream errors when retrieving resource events', async () => {
   }
 
   wreck.get
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: relatedImportDeclarations })
-  .mockResolvedValueOnce({ payload: declarationResourceEvents })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: relatedImportDeclarations })
+    .mockResolvedValueOnce({ payload: declarationResourceEvents })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
@@ -1648,12 +1962,12 @@ test('timeline can be filtered', async () => {
   }
 
   wreck.get
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: relatedImportDeclarations })
-  .mockResolvedValueOnce({ payload: declarationResourceEvents })
-  .mockResolvedValueOnce({ payload: importPreNotificationResourceEvents })
-  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: relatedImportDeclarations })
+    .mockResolvedValueOnce({ payload: declarationResourceEvents })
+    .mockResolvedValueOnce({ payload: importPreNotificationResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
@@ -1708,10 +2022,10 @@ test('shows timeline for unmatched CHED', async () => {
   }
 
   wreck.get
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: relatedImportDeclarations })
-  .mockResolvedValueOnce({ payload: importPreNotificationResourceEvents })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: relatedImportDeclarations })
+    .mockResolvedValueOnce({ payload: importPreNotificationResourceEvents })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
@@ -1755,9 +2069,9 @@ test('handles upstream errors when retrieving resource events for unmatched CHED
   }
 
   wreck.get
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: relatedImportDeclarations })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: relatedImportDeclarations })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
@@ -1883,10 +2197,10 @@ test.each([
   }
 
   wreck.get
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: declarationsWithLevelNoMatch })
-  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: declarationsWithLevelNoMatch })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
   const authedUser = createAuthedUser(undefined, 'entraId')
@@ -2077,10 +2391,10 @@ test.each([
   }
 
   wreck.get
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: declarationsWithLevelNoMatch })
-  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: declarationsWithLevelNoMatch })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
   const authedUser = createAuthedUser(undefined, options.provider)
@@ -2137,10 +2451,10 @@ test('handles CHEDs in amend and modify status', async () => {
   ]
 
   wreck.get
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: { customsDeclarations, importPreNotifications: amendModifyImportPreNotifications } })
-  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: { customsDeclarations, importPreNotifications: amendModifyImportPreNotifications } })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedUserSession(server)
@@ -2286,10 +2600,10 @@ test.each(
   }
 
   wreck.get
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: provider })
-  .mockResolvedValueOnce({ payload: declarationsWithLevelNoMatch })
-  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: declarationsWithLevelNoMatch })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
   const authedUser = createAuthedUser(undefined, 'entraId')

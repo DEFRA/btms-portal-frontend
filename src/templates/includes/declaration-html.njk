@@ -1,8 +1,11 @@
 {% from "../macros/commodity-description.njk" import commodityDescription %}
 {% from "../macros/document-reference.njk" import documentReference %}
 {% from "../macros/decision-match.njk" import decisionMatch %}
+{% from "../macros/quantity-status.njk" import quantityStatus %}
 
 {% set maxLength = 24 %}
+
+{% set showQuantityStatusColumn = showQuantityStatus and customsDeclaration.hasTracesChed %}
 
 <table class="govuk-table govuk-table--small-text-until-tablet btms-declaration{{ tabContextSuffix }}">
   <thead class="govuk-table__head">
@@ -11,6 +14,9 @@
       <th scope="col" class="govuk-table__header">Commodity code</th>
       <th scope="col" class="govuk-table__header">Description</th>
       <th scope="col" class="govuk-table__header">Quantity / Weight</th>
+      {% if showQuantityStatusColumn %}
+        <th scope="col" class="govuk-table__header">Quantity status</th>
+      {% endif %}
       <th scope="col" class="govuk-table__header">CHED reference</th>
       <th scope="col" class="govuk-table__header">Match</th>
       <th scope="col" class="govuk-table__header">Authority</th>
@@ -33,6 +39,9 @@
           <td class="govuk-table__cell">{% include "./commodity-code.njk" %}</td>
           <td class="govuk-table__cell">{{ commodityDescription(commodity.goodsDescription, commodity.id, maxLength) }}</td>
           <td class="govuk-table__cell">{% include "./commodity-weight-quantity.njk" %}</td>
+          {% if showQuantityStatusColumn %}
+            <td class="govuk-table__cell">{{ quantityStatus(decision.quantityStatus) }}</td>
+          {% endif %}
           {{ documentReference(decision) }}
           <td class="govuk-table__cell">{{ decisionMatch(matchResult) }}</td>
           <td class="govuk-table__cell">

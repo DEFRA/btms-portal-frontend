@@ -150,6 +150,17 @@ export const CDS_STATUSES = {
   UNKNOWN: 'Unknown'
 }
 
+export const QUANTITY_STATUSES = {
+  UNRESERVED: 'Unreserved',
+  RESERVED: 'Reserved',
+  FINALISED: 'Finalised'
+}
+
+export const quantityStatusDescriptions = {
+  Reserved: QUANTITY_STATUSES.RESERVED,
+  Consumed: QUANTITY_STATUSES.FINALISED
+}
+
 export const finalStateMappings = {
   0: CDS_STATUSES.FINALISED_RELEASED,
   1: CDS_STATUSES.FINALISED_CANCELLED_AFTER_ARRIVAL,

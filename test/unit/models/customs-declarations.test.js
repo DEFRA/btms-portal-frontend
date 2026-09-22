@@ -93,6 +93,7 @@ test('MRN, open, finalised, using netMass, matched', () => {
               level3NoMatch: false,
               level3NoMatchQuantity: false,
               level3NoMatchWeight: false,
+              quantityStatus: undefined,
               match: true,
               decision: 'Release',
               decisionDetail: 'Inspection complete',
@@ -111,6 +112,7 @@ test('MRN, open, finalised, using netMass, matched', () => {
               level3NoMatch: false,
               level3NoMatchQuantity: false,
               level3NoMatchWeight: false,
+              quantityStatus: undefined,
               match: null,
               decision: 'Release',
               decisionDetail: 'IUU inspection complete',
@@ -142,7 +144,8 @@ test('MRN, open, finalised, using netMass, matched', () => {
       open: true,
       status: 'Finalised - Released',
       updated: '12 May 2025, 11:13',
-      finalState: '0'
+      finalState: '0',
+      hasTracesChed: false
     }
   ]
 
@@ -240,6 +243,7 @@ test('a split consignment with a matching document', () => {
               level3NoMatch: false,
               level3NoMatchQuantity: false,
               level3NoMatchWeight: false,
+              quantityStatus: undefined,
               match: true,
               decision: 'Release',
               decisionDetail: 'Inspection complete',
@@ -275,7 +279,8 @@ test('a split consignment with a matching document', () => {
       open: true,
       status: 'Finalised - Released',
       updated: '12 May 2025, 11:13',
-      finalState: '0'
+      finalState: '0',
+      hasTracesChed: false
     }
   ])
 })
@@ -371,6 +376,7 @@ test('a split consignment without a matching document', () => {
               level3NoMatch: false,
               level3NoMatchQuantity: false,
               level3NoMatchWeight: false,
+              quantityStatus: undefined,
               match: false,
               decision: '',
               decisionDetail: 'No match - CHED cannot be found',
@@ -406,7 +412,8 @@ test('a split consignment without a matching document', () => {
       open: true,
       status: 'Finalised - Released',
       updated: '12 May 2025, 11:13',
-      finalState: '0'
+      finalState: '0',
+      hasTracesChed: false
     }
   ])
 })
@@ -465,6 +472,7 @@ test('an MRN, with no CHED, with no documents', () => {
               level3NoMatch: false,
               level3NoMatchQuantity: false,
               level3NoMatchWeight: false,
+              quantityStatus: undefined,
               match: false,
               checkCode: 'H220',
               decision: '',
@@ -488,7 +496,8 @@ test('an MRN, with no CHED, with no documents', () => {
       declarationUcr: '5GB123456789000-BDOV123456',
       open: true,
       status: 'In progress',
-      updated: '12 May 2025, 11:13'
+      updated: '12 May 2025, 11:13',
+      hasTracesChed: false
     }
   ]
 
@@ -570,7 +579,8 @@ test('MRN, open, manual release, using supplementaryUnits, no decisions', () => 
       open: true,
       status: 'Finalised - Manually released',
       updated: '12 May 2025, 12:42',
-      finalState: '0'
+      finalState: '0',
+      hasTracesChed: false
     }
   ]
 
@@ -640,6 +650,7 @@ test('matches malformed references', () => {
               level3NoMatch: false,
               level3NoMatchQuantity: false,
               level3NoMatchWeight: false,
+              quantityStatus: undefined,
               match: true,
               checkCode: 'H223',
               decision: 'Release',
@@ -668,7 +679,8 @@ test('matches malformed references', () => {
       finalState: undefined,
       open: true,
       status: 'In progress',
-      updated: '12 May 2025, 11:13'
+      updated: '12 May 2025, 11:13',
+      hasTracesChed: false
     }
   ]
 
@@ -821,6 +833,7 @@ test.each([
                 level3NoMatch: false,
                 level3NoMatchQuantity: false,
                 level3NoMatchWeight: false,
+                quantityStatus: undefined,
                 match: false
               }
             ],
@@ -844,7 +857,8 @@ test.each([
         movementReferenceNumber: 'GB251234567890ABCD',
         open: true,
         status: 'Finalised - Released',
-        updated: '12 May 2025, 11:13'
+        updated: '12 May 2025, 11:13',
+        hasTracesChed: false
       }
     ]
 
@@ -1252,6 +1266,7 @@ test.each([
                 level3NoMatch: false,
                 level3NoMatchQuantity: false,
                 level3NoMatchWeight: false,
+                quantityStatus: undefined,
                 match: true,
                 checkCode: 'H222',
                 decision: options.chedDecision,
@@ -1269,6 +1284,7 @@ test.each([
                 level3NoMatch: false,
                 level3NoMatchQuantity: false,
                 level3NoMatchWeight: false,
+                quantityStatus: undefined,
                 match: null,
                 checkCode: 'H224',
                 decision: options.iuuDecision,
@@ -1301,7 +1317,8 @@ test.each([
         open: true,
         status: 'Finalised - Released',
         updated: '12 May 2025, 11:13',
-        finalState: '0'
+        finalState: '0',
+        hasTracesChed: false
       }
     ]
 
@@ -1614,6 +1631,7 @@ test('an MRN, with HMI authorities', () => {
               level3NoMatch: false,
               level3NoMatchQuantity: false,
               level3NoMatchWeight: false,
+              quantityStatus: undefined,
               match: false,
               checkCode: 'H218',
               decision: '',
@@ -1641,6 +1659,7 @@ test('an MRN, with HMI authorities', () => {
               level3NoMatch: false,
               level3NoMatchQuantity: false,
               level3NoMatchWeight: false,
+              quantityStatus: undefined,
               match: false,
               checkCode: 'H220',
               decision: '',
@@ -1664,7 +1683,8 @@ test('an MRN, with HMI authorities', () => {
       declarationUcr: '5GB123456789000-BDOV123456',
       open: true,
       status: 'In progress',
-      updated: '12 May 2025, 11:13'
+      updated: '12 May 2025, 11:13',
+      hasTracesChed: false
     }
   ]
 
@@ -2410,6 +2430,7 @@ test.each([
                 level3NoMatch,
                 level3NoMatchQuantity,
                 level3NoMatchWeight,
+                quantityStatus: undefined,
                 match: true
               }
             ],
@@ -2433,10 +2454,169 @@ test.each([
         movementReferenceNumber: 'GB251234567890ABCD',
         open: true,
         status: 'Finalised - Released',
-        updated: '12 May 2025, 11:13'
+        updated: '12 May 2025, 11:13',
+        hasTracesChed: false
       }
     ]
 
     expect(result).toEqual(expected)
   }
 )
+
+const QUANTITY_CHED_ID = 'CHEDA.GB.2025.0000001'
+const QUANTITY_MRN = 'GB251234567890ABCD'
+
+const declarationWithChed = ({
+  documentReference = QUANTITY_CHED_ID,
+  itemNumber = 1,
+  checkCode = 'H223',
+  documentCode = 'C678',
+  decisionCode = 'C03',
+  internalDecisionCode = 'E??'
+} = {}) => ({
+  movementReferenceNumber: QUANTITY_MRN,
+  clearanceRequest: {
+    declarationUcr: '5GB123456789000-BDOV123456',
+    commodities: [
+      {
+        itemNumber,
+        netMass: '9999',
+        documents: [{ documentCode, documentReference }],
+        checks: [{ checkCode }]
+      }
+    ]
+  },
+  clearanceDecision: {
+    results: [
+      {
+        itemNumber,
+        importPreNotification: QUANTITY_CHED_ID,
+        documentReference,
+        documentCode,
+        checkCode,
+        decisionCode,
+        decisionReason: null,
+        internalDecisionCode
+      }
+    ]
+  },
+  finalisation: { isManualRelease: false, finalState: '0' },
+  updated: '2025-05-12T11:13:17.330Z'
+})
+
+const withReservation = (status, { chedId = QUANTITY_CHED_ID, mrn = QUANTITY_MRN } = {}) => ({
+  cheds: [
+    { ched: { exchangedDocument: { identifier: chedId } } }
+  ],
+  importPreNotifications: [],
+  chedReservations: [
+    {
+      reservation: { chedId, mrn, status, timestamp: '2026-09-11T08:24:00Z', commodities: [] }
+    }
+  ]
+})
+
+const mapQuantityStatuses = (declaration, response) =>
+  mapCustomsDeclarations({ customsDeclarations: [declaration], ...response })[0].commodities
+    .flatMap((commodity) => commodity.decisions.map(({ quantityStatus }) => quantityStatus))
+
+const declarationHasTracesChed = (declaration, response) =>
+  mapCustomsDeclarations({ customsDeclarations: [declaration], ...response })[0].hasTracesChed
+
+const secondCommodity = (declaration) => {
+  declaration.clearanceRequest.commodities.push({
+    itemNumber: 2,
+    netMass: '500',
+    documents: [{ documentCode: 'C678', documentReference: QUANTITY_CHED_ID }],
+    checks: [{ checkCode: 'H223' }]
+  })
+  declaration.clearanceDecision.results.push({
+    ...declaration.clearanceDecision.results[0],
+    itemNumber: 2
+  })
+  return declaration
+}
+
+describe('quantity status', () => {
+  test.each([
+    ['Reserved', 'Reserved'],
+    ['Consumed', 'Finalised']
+  ])('upstream status %s renders as %s', (status, expected) => {
+    expect(mapQuantityStatuses(declarationWithChed(), withReservation(status))).toEqual([expected])
+  })
+
+  test('a GBCHD declaration reference does not link to a CHEDA reservation', () => {
+    expect(
+      mapQuantityStatuses(declarationWithChed({ documentReference: 'GBCHD2025.0000001' }), withReservation('Reserved'))
+    ).toEqual([undefined])
+  })
+
+  test('a TRACES CHED with no reservation renders as Unreserved', () => {
+    expect(
+      mapQuantityStatuses(declarationWithChed(), {
+        cheds: [{ ched: { exchangedDocument: { identifier: QUANTITY_CHED_ID } } }],
+        importPreNotifications: []
+      })
+    ).toEqual(['Unreserved'])
+  })
+
+  test('a CHED that is not a TRACES CHED renders a blank cell', () => {
+    expect(mapQuantityStatuses(declarationWithChed(), { cheds: [], importPreNotifications: [] })).toEqual([undefined])
+  })
+
+  test('a reservation for another MRN does not get linked, so the row stays Unreserved', () => {
+    expect(mapQuantityStatuses(declarationWithChed(), withReservation('Reserved', { mrn: '99GBDIFFERENTMRN0000' }))).toEqual(['Unreserved'])
+  })
+
+  test('a reservation for another CHED on the same MRN leaves the row blank', () => {
+    expect(mapQuantityStatuses(declarationWithChed(), withReservation('Reserved', { chedId: 'CHEDP.GB.2025.9999999' }))).toEqual([undefined])
+  })
+
+  test('IUU rows do not show quantity management status', () => {
+    const declaration = declarationWithChed({ checkCode: 'H224', documentCode: 'C673', decisionCode: 'C07' })
+    const decision = mapCustomsDeclarations({
+      customsDeclarations: [declaration],
+      ...withReservation('Reserved')
+    })[0].commodities[0].decisions[0]
+
+    expect(decision.documentReference).toBeNull()
+    expect(decision.quantityStatus).toBeUndefined()
+  })
+
+  test('HMI/GMS rows do not show quantity management status', () => {
+    const declaration = declarationWithChed({ checkCode: 'H220', internalDecisionCode: 'E87' })
+    const decision = mapCustomsDeclarations({
+      customsDeclarations: [declaration],
+      ...withReservation('Reserved')
+    })[0].commodities[0].decisions[0]
+
+    expect(decision.documentReference).toBe('Requires CHED')
+    expect(decision.quantityStatus).toBeUndefined()
+  })
+
+  test('status is keyed on declaration + CHED, so every item of a CHED shares the same status', () => {
+    expect(mapQuantityStatuses(secondCommodity(declarationWithChed()), withReservation('Reserved'))).toEqual([
+      'Reserved',
+      'Reserved'
+    ])
+  })
+
+  test('a declaration with a TRACES CHED reports hasTracesChed', () => {
+    expect(
+      declarationHasTracesChed(declarationWithChed(), {
+        cheds: [{ ched: { exchangedDocument: { identifier: QUANTITY_CHED_ID } } }],
+        importPreNotifications: []
+      })
+    ).toBe(true)
+  })
+
+  test('a declaration with a reservation but no TRACES CHED does not report hasTracesChed', () => {
+    expect(
+      declarationHasTracesChed(declarationWithChed(), withReservation('Reserved', { chedId: 'CHEDP.GB.2025.9999999' }))
+    ).toBe(false)
+  })
+
+  test('a declaration with no CHEDs at all does not report hasTracesChed', () => {
+    expect(declarationHasTracesChed(declarationWithChed(), { cheds: [], importPreNotifications: [] })).toBe(false)
+  })
+})

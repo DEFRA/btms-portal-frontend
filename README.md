@@ -115,6 +115,7 @@ Ask a member of the team to provide you with values.
 | SESSION_CACHE_ENGINE                 | Location of session storage ('redis' or 'memory')        |
 | IPAFFS_URL                           | URL for links out to IPAFFS from notifications           |
 | SHOW_TRACES_CHEDS                    | Feature flag: show TRACES CHEDs on results page (default off) |
+| SHOW_QUANTITY_STATUS                 | Feature flag: show the Quantity status column on results page (default off) |
 | TZ                                   | Europe/London                                            |
 
 ### Formatting
