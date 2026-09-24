@@ -33,6 +33,10 @@ test('no matches csv', async () => {
       {
         timestamp: '2025-09-22T11:47:49.998Z',
         reference: '25GBO2FGE22YTRF2C4'
+      },
+      {
+        timestamp: '2025-09-22T12:00:00.000Z',
+        reference: '25GBO1LJH43YMZO0X5,1'
       }
     ]
   }
@@ -59,8 +63,9 @@ test('no matches csv', async () => {
 Date range: 22 September 2025 at 00:00 to 22 September 2025 at 23:59
 
 MRN,Last updated
-25GBO1LJH43YMZO0X5,"22 September 25, 11:47"
-25GBO2FGE22YTRF2C4,"22 September 25, 11:47"
+"25GBO1LJH43YMZO0X5","22 September 25, 11:47"
+"25GBO2FGE22YTRF2C4","22 September 25, 11:47"
+"25GBO1LJH43YMZO0X5,1","22 September 25, 12:00"
 `)
 
   expect(headers['content-type']).toBe('text/csv; charset=utf-8')
@@ -120,8 +125,8 @@ test('manual releases csv', async () => {
 Date range: 22 September 2025 at 00:00 to 22 September 2025 at 23:59
 
 MRN,Last updated
-25GBO2YTP65OPRO1Y2,"22 September 25, 10:00"
-25GBO2WER23TUYO4D3,"22 September 25, 11:00"
+"25GBO2YTP65OPRO1Y2","22 September 25, 10:00"
+"25GBO2WER23TUYO4D3","22 September 25, 11:00"
 `)
 
   expect(headers['content-type']).toBe('text/csv; charset=utf-8')
@@ -267,7 +272,7 @@ test('higher level matching data csv', async () => {
         "commodityCode": "1601009105",
         "description": "SALSICCIA PURO SUINO 24GBBGBKCDMS135030",
         "quantityOrWeight": 100,
-        "chedReference": "CHEDA.GB.2025.1013501",
+        "chedReference": "CHEDA.GB.2025,1013501",
         "match": "Yes",
         "authority": "AHVLA",
         "checkCode": "H221",
@@ -285,7 +290,7 @@ test('higher level matching data csv', async () => {
         "commodityCode": "1601009105",
         "description": "SALSICCIA PURO SUINO 24GBBGBKCDMS135030",
         "quantityOrWeight": 100,
-        "chedReference": "CHEDA.GB.2025.1013501",
+        "chedReference": "CHEDA.GB.2025,1013501",
         "match": "No",
         "authority": "AHVLA",
         "checkCode": "H221",
@@ -403,6 +408,24 @@ test('higher level matching data csv', async () => {
         "mode": "Passive",
         "declarantId": "GB269573944000",
         "dispatchCountryCode": null
+      },
+      {
+        "timestamp": "2026-06-22T13:37:00.000Z",
+        "mrn": "24GBBGBKCDMA128017",
+        "itemNumber": 1,
+        "commodityCode": "1601009105",
+        "description": "SALSICCIA PURO SUINO",
+        "quantityOrWeight": 100,
+        "chedReference": "CHEDA.GB.2025,1112817",
+        "match": "No",
+        "authority": "AHVLA",
+        "checkCode": "H221",
+        "decision": "X00",
+        "decisionReasons": "Decision, with reasons",
+        "level": 2,
+        "mode": "Passive",
+        "declarantId": "GB269573944000",
+        "dispatchCountryCode": "IT"
       }
     ]
   }
@@ -429,14 +452,15 @@ test('higher level matching data csv', async () => {
 Date range: 22 June 2026 at 00:00 to 22 June 2026 at 23:59
 
 Level,Last updated,MRN,Item number,Commodity code,Check code,Description,Quantity/Weight,CHED reference,Match,Authority,Decision,Decision reason,EORI Number,Country Code,Country Region (EU or RoW)
-1,"22 June 26, 13:39",24GBBGBKCDMS135030,1,1601009105,H221,"SALSICCIA PURO SUINO 24GBBGBKCDMS135030",100,CHEDA.GB.2025.1013501,Yes,AHVLA,H01,"",GB269573944000,IT,EU
-2,"22 June 26, 13:39",24GBBGBKCDMS135030,1,1601009105,H221,"SALSICCIA PURO SUINO 24GBBGBKCDMS135030",100,CHEDA.GB.2025.1013501,No,AHVLA,X00,"",GB269573944000,IT,EU
-1,"22 June 26, 13:38",24GBBGBKCDMA128014,1,1601009105,H221,"SALSICCIA PURO SUINO",100,CHEDA.GB.2025.1112814,Yes,AHVLA,C06,"",GB269573944000,IT,EU
-2,"22 June 26, 13:38",24GBBGBKCDMA128014,1,1601009105,H221,"SALSICCIA PURO SUINO",100,CHEDA.GB.2025.1112814,No,AHVLA,X00,"",GB269573944000,IT,EU
-1,"22 June 26, 13:38",24GBBGBKCDMA128015,1,1601009105,H221,"SALSICCIA PURO SUINO",100,CHEDA.GB.2025.1112815,Yes,AHVLA,C06,"",GB269573944000,CA,RoW
-2,"22 June 26, 13:38",24GBBGBKCDMA128015,1,1601009105,H221,"SALSICCIA PURO SUINO",100,CHEDA.GB.2025.1112815,No,AHVLA,X00,"",GB269573944000,CA,RoW
-1,"22 June 26, 13:38",24GBBGBKCDMA128016,1,1601009105,H221,"SALSICCIA PURO SUINO",100,CHEDA.GB.2025.1112816,Yes,AHVLA,C06,"",GB269573944000,,RoW
-2,"22 June 26, 13:38",24GBBGBKCDMA128016,1,1601009105,H221,"SALSICCIA PURO SUINO",100,CHEDA.GB.2025.1112816,No,AHVLA,X00,"",GB269573944000,,RoW
+"1","22 June 26, 13:39","24GBBGBKCDMS135030","1","1601009105","H221","SALSICCIA PURO SUINO 24GBBGBKCDMS135030","100","CHEDA.GB.2025,1013501","Yes","AHVLA","H01","","GB269573944000","IT","EU"
+"2","22 June 26, 13:39","24GBBGBKCDMS135030","1","1601009105","H221","SALSICCIA PURO SUINO 24GBBGBKCDMS135030","100","CHEDA.GB.2025,1013501","No","AHVLA","X00","","GB269573944000","IT","EU"
+"1","22 June 26, 13:38","24GBBGBKCDMA128014","1","1601009105","H221","SALSICCIA PURO SUINO","100","CHEDA.GB.2025.1112814","Yes","AHVLA","C06","","GB269573944000","IT","EU"
+"2","22 June 26, 13:38","24GBBGBKCDMA128014","1","1601009105","H221","SALSICCIA PURO SUINO","100","CHEDA.GB.2025.1112814","No","AHVLA","X00","","GB269573944000","IT","EU"
+"1","22 June 26, 13:38","24GBBGBKCDMA128015","1","1601009105","H221","SALSICCIA PURO SUINO","100","CHEDA.GB.2025.1112815","Yes","AHVLA","C06","","GB269573944000","CA","RoW"
+"2","22 June 26, 13:38","24GBBGBKCDMA128015","1","1601009105","H221","SALSICCIA PURO SUINO","100","CHEDA.GB.2025.1112815","No","AHVLA","X00","","GB269573944000","CA","RoW"
+"1","22 June 26, 13:38","24GBBGBKCDMA128016","1","1601009105","H221","SALSICCIA PURO SUINO","100","CHEDA.GB.2025.1112816","Yes","AHVLA","C06","","GB269573944000","","RoW"
+"2","22 June 26, 13:38","24GBBGBKCDMA128016","1","1601009105","H221","SALSICCIA PURO SUINO","100","CHEDA.GB.2025.1112816","No","AHVLA","X00","","GB269573944000","","RoW"
+"2","22 June 26, 13:37","24GBBGBKCDMA128017","1","1601009105","H221","SALSICCIA PURO SUINO","100","CHEDA.GB.2025,1112817","No","AHVLA","X00","Decision, with reasons","GB269573944000","IT","EU"
 `)
 
   expect(headers['content-type']).toBe('text/csv; charset=utf-8')
