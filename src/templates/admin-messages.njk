@@ -49,12 +49,17 @@
         <input type="hidden" name="searchType" value="information" />
       </form>
 
-      {% if results %}
+      {% if results or tracesChedResults | length > 0 %}
       <div class="govuk-tabs govuk-!-margin-top-6">
         <ul class="govuk-tabs__list" role="tablist">
-          <li class="govuk-tabs__list-item govuk-tabs__list-item{% if searchType == searchTypes.INFORMATION %}--selected{% endif %}" role="presentation">
+          <li class="govuk-tabs__list-item govuk-tabs__list-item{% if searchType == searchTypes.INFORMATION and not showTracesChedInfo %}--selected{% endif %}" role="presentation">
             <a class="btms-admin-search__tab" href="{{ links.information }}">{{ resourceType }} Information</a>
           </li>
+          {% if tracesChedResults %}
+            <li class="govuk-tabs__list-item govuk-tabs__list-item{% if searchType == searchTypes.INFORMATION and showTracesChedInfo %}--selected{% endif %}" role="presentation">
+              <a class="btms-admin-search__tab" href="{{ links.tracesChedInformation }}">TRACES CHED Information</a>
+            </li>
+          {% endif %}
           <li class="govuk-tabs__list-item govuk-tabs__list-item{% if searchType == searchTypes.ALL_EVENTS %}--selected{% endif %}" role="presentation">
             <a class="btms-admin-search__tab" href="{{ links.allEvents }}">All events</a>
           </li>
@@ -74,7 +79,17 @@
               {% endfor %}
             {% else %}
               <div class="btms-admin-search-result">
-                <pre><code>{{ results | safe }}</code></pre>
+                {% if showTracesChedInfo %}
+                  {% if tracesChedResults | length > 0 %}
+                    <pre><code>{{ tracesChedResults | safe }}</code></pre>
+                  {% else %}
+                    <p>No results found.</p>
+                  {% endif %}
+                {% elif results | length > 0 %}
+                  <pre><code>{{ results | safe }}</code></pre>
+                {% else %}
+                  <p>No results found.</p>
+                {% endif %}
               </div>
             {% endif %}
           </div>

@@ -29,6 +29,7 @@ const queryStringParams = {
   RESOURCE_TYPE: 'resourceType',
   SEARCH_TERM: 'searchTerm',
   SEARCH_TYPE: 'searchType',
+  SHOW_TRACES_CHED_INFO: 'showTracesChedInfo',
   QUEUE: 'queue',
   ACTION: 'action'
 }
