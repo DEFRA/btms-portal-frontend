@@ -243,3 +243,184 @@ test.each([
     getByText(document.body, 'You do not have the correct permissions to access this service')
   ).toBeInTheDocument()
 })
+
+test.each([
+  {
+    chedInfoUrl: `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=CHEDPP.GB.2026.0000001&${queryStringParams.SEARCH_TYPE}=${ADMIN_SEARCH_TYPES.INFORMATION}`,
+    searchResultType: 'importPreNotification'
+  },
+  {
+    chedInfoUrl: `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=CHEDPP.GB.2026.0000001&${queryStringParams.SEARCH_TYPE}=${ADMIN_SEARCH_TYPES.INFORMATION}&${queryStringParams.SHOW_TRACES_CHED_INFO}=true`,
+    searchResultType: 'ched'
+  }
+])('Should include IPAFFS and Traces CHED info in CHED Info search', async ({ chedInfoUrl, searchResultType }) => {
+  const ipaffsChedSearchResult = { importPreNotification: {} }
+  const tracesChedSearchResult = { ched: {} }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: ipaffsChedSearchResult })
+    .mockResolvedValueOnce({ payload: tracesChedSearchResult })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: chedInfoUrl,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  const searchResult = document.querySelector('.btms-admin-search-result > pre > code')
+  const re = new RegExp(String.raw`${searchResultType}": {}`);
+  expect(getByText(searchResult, re)).toBeInTheDocument()
+
+  const tabs = [...document.querySelectorAll('a.btms-admin-search__tab')].map(tab => tab.text)
+  expect(tabs).toContain('IPAFFS CHED Information')
+  expect(tabs).toContain('TRACES CHED Information')
+})
+
+test('Should show results if there are only IPAFFs CHEDs', async () => {
+  const ipaffsChedSearchResult = { importPreNotification: {} }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: ipaffsChedSearchResult })
+    .mockRejectedValue({ output: { statusCode: 404 } }) // No Traces CHEDs
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=CHEDPP.GB.2026.0000001&${queryStringParams.SEARCH_TYPE}=${ADMIN_SEARCH_TYPES.INFORMATION}`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  const searchResult = document.querySelector('.btms-admin-search-result > pre > code')
+  expect(getByText(searchResult, /importPreNotification": {}/)).toBeInTheDocument()
+
+  const tabs = [...document.querySelectorAll('a.btms-admin-search__tab')].map(tab => tab.text)
+  expect(tabs).toContain('IPAFFS CHED Information')
+  expect(tabs).toContain('TRACES CHED Information')
+})
+
+test('Should show results if there are only TRACES CHEDs', async () => {
+  const tracesChedSearchResult = { ched: {} }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockRejectedValueOnce({ output: { statusCode: 404 } }) // No IPAFFS CHEDs
+    .mockResolvedValueOnce({ payload: tracesChedSearchResult })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=CHEDPP.GB.2026.0000001&${queryStringParams.SEARCH_TYPE}=${ADMIN_SEARCH_TYPES.INFORMATION}&${queryStringParams.SHOW_TRACES_CHED_INFO}=true`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  const searchResult = document.querySelector('.btms-admin-search-result > pre > code')
+  expect(getByText(searchResult, /ched": {}/)).toBeInTheDocument()
+
+  const tabs = [...document.querySelectorAll('a.btms-admin-search__tab')].map(tab => tab.text)
+  expect(tabs).toContain('IPAFFS CHED Information')
+  expect(tabs).toContain('TRACES CHED Information')
+})
+
+test('Should show not found if CHED search returns no results for both IPAFFS and Traces CHEDs', async () => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockRejectedValueOnce({ output: { statusCode: 404 } }) // No IPAFFS CHEDs
+    .mockRejectedValueOnce({ output: { statusCode: 404 } }) // No Traces CHEDs
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=CHEDPP.GB.2026.0000001&${queryStringParams.SEARCH_TYPE}=${ADMIN_SEARCH_TYPES.INFORMATION}`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(
+    getByText(document.body, 'CHEDPP.GB.2026.0000001 cannot be found')
+  ).toBeInTheDocument()
+})
+
+test('Should show error if IPAFFS CHED query fails', async () => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockRejectedValueOnce({ output: { statusCode: 500 } })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=CHEDPP.GB.2026.0000001&${queryStringParams.SEARCH_TYPE}=${ADMIN_SEARCH_TYPES.INFORMATION}`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(
+    getByText(document.body, 'Sorry, there is a problem with this service')
+  ).toBeInTheDocument()
+})
+
+test('Should show error if Traces CHED query fails', async () => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockRejectedValueOnce({ output: { statusCode: 404 } })
+    .mockRejectedValueOnce({ output: { statusCode: 500 } })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=CHEDPP.GB.2026.0000001&${queryStringParams.SEARCH_TYPE}=${ADMIN_SEARCH_TYPES.INFORMATION}`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(
+    getByText(document.body, 'Sorry, there is a problem with this service')
+  ).toBeInTheDocument()
+})
