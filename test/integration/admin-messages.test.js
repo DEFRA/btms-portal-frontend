@@ -69,6 +69,11 @@ test.each([
     searchTerm: '24GBBGBKCDMS895001',
     type: ADMIN_SEARCH_TYPES.ALL_EVENTS,
     resourceType: 'MRN'
+  },
+  {
+    searchTerm: '24gbbgbkcdms895001',
+    type: ADMIN_SEARCH_TYPES.INFORMATION,
+    resourceType: 'MRN'
   }
 ])(
   'Should show the admin search page',
@@ -109,7 +114,7 @@ test.each([
         break
       }
       case ADMIN_SEARCH_TYPES.INFORMATION: {
-        expect(getByText(searchResult, /mrn": "24GBBGBKCDMS895001"/)).toBeInTheDocument()
+        expect(getByText(searchResult, /mrn": "24GBBGBKCDMS895001"/i)).toBeInTheDocument()
         break
       }
     }
