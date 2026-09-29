@@ -10,8 +10,9 @@ import {
 import userEvent from '@testing-library/user-event'
 import { paths, queryStringParams } from '../../src/routes/route-constants.js'
 import { config } from '../../src/config/config.js'
+import { HIGHER_LEVEL_DECISION_CODE } from '../../src/models/model-constants.js'
 import { initialiseServer } from '../utils/initialise-server.js'
-import { createAuthedUser, setupAuthedUserSession } from '../unit/utils/session-helper.js'
+import { createAuthedUser, setupAuthedAdminUserSession, setupAuthedUserSession } from '../unit/utils/session-helper.js'
 import { initFilters } from '../../src/client/javascripts/filters.js'
 
 afterEach(() => {
@@ -1476,7 +1477,128 @@ test('shows no matching TRACES CHEDs message for an MRN search when no TRACES CH
   expect(payload).toContain('24GB0Z8WEJ9ZBTL73B')
   globalJsdom(payload)
   expect(
-    queryByText(document.body, 'There are no matching TRACES notification (CHED) details')
+    queryByText(document.body, 'There are no matching TRACES pre-notification (CHED) details')
+  ).toBeInTheDocument()
+})
+
+const createLevelNoMatchDeclaration = (internalDecisionCode, documentReference) => ({
+  movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
+  clearanceRequest: {
+    declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+    commodities: [
+      {
+        itemNumber: 1,
+        taricCommodityCode: '0304719030',
+        goodsDescription: 'FROZEN MSC A COD FILLETS',
+        netMass: '17088.98',
+        supplementaryUnits: 0,
+        documents: [
+          {
+            documentReference,
+            documentCode: 'N002'
+          }
+        ],
+        checks: [{ checkCode: 'H218', departmentCode: 'HMI' }]
+      }
+    ]
+  },
+  clearanceDecision: {
+    results: [
+      {
+        itemNumber: 1,
+        checkCode: 'H218',
+        decisionCode: 'X00',
+        documentReference,
+        internalDecisionCode
+      }
+    ]
+  },
+  finalisation: {
+    finalState: '0',
+    isManualRelease: false
+  },
+  updated: '2025-05-06T13:11:59.257Z'
+})
+
+test('shows the TRACES CHED section on the L2/L3 matching tab when a CHED is associated', async () => {
+  config.set('isTracesChedsEnabled', true)
+  const declarationsWithLevelNoMatchAndTracesChed = {
+    customsDeclarations: [
+      createLevelNoMatchDeclaration(HIGHER_LEVEL_DECISION_CODE.COMMODITY_CODE_CHECK, 'CHEDA.GB.2025.0000001')
+    ],
+    importPreNotifications: [],
+    cheds: [
+      createTracesChed('CHEDA.GB.2025.0000001', '2025-06-01T09:30:00.000Z')
+    ]
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: declarationsWithLevelNoMatchAndTracesChed })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73A`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  const levelsPanel = document.body.querySelector('#levels-view')
+  expect(levelsPanel).not.toBeNull()
+  expect(
+    getByRole(levelsPanel, 'heading', { name: 'TRACES notification (CHED) details', level: 3 })
+  ).toBeInTheDocument()
+  const tracesChedDetails = getByRole(levelsPanel, 'group', { name: 'CHEDA.GB.2025.0000001' })
+  expect(tracesChedDetails).toBeInTheDocument()
+  expect(within(tracesChedDetails).getByText('Salmo salar')).toBeInTheDocument()
+  expect(within(tracesChedDetails).getByText('1000 KGM')).toBeInTheDocument()
+})
+
+test('shows the TRACES CHED empty state on the L2/L3 matching tab when no CHEDs are associated', async () => {
+  config.set('isTracesChedsEnabled', true)
+  const declarationsWithLevelNoMatch = {
+    customsDeclarations: [
+      createLevelNoMatchDeclaration(HIGHER_LEVEL_DECISION_CODE.COMMODITY_CODE_CHECK, 'CHEDA.GB.2025.0000001')
+    ],
+    importPreNotifications
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: declarationsWithLevelNoMatch })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73A`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  const levelsPanel = document.body.querySelector('#levels-view')
+  expect(levelsPanel).not.toBeNull()
+  expect(
+    getByRole(levelsPanel, 'heading', { name: 'TRACES notification (CHED) details', level: 3 })
+  ).toBeInTheDocument()
+  expect(
+    queryByText(levelsPanel, 'There are no matching TRACES pre-notification (CHED) details')
   ).toBeInTheDocument()
 })
 
