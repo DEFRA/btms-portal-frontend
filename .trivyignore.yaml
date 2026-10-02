@@ -154,6 +154,76 @@ vulnerabilities:
   - id: CVE-2026-73566
     paths:
       - usr/local/lib/node_modules/npm/node_modules/tar/package.json
-    reason: >
+    reason: >-
       Vulnerable tar is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-102276
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/brace-expansion/package.json
+    reason: >-
+      Vulnerable brace-expansion is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-102277
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/brace-expansion/package.json
+    reason: >-
+      Vulnerable brace-expansion is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-102278
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/brace-expansion/package.json
+    reason: >-
+      Vulnerable brace-expansion is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-101910
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/ip-address/package.json
+    reason: >-
+      Vulnerable ip-address is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-101911
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/ip-address/package.json
+    reason: >-
+      Vulnerable ip-address is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-101912
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/ip-address/package.json
+    reason: >-
+      Vulnerable ip-address is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-101913
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/ip-address/package.json
+    reason: >-
+      Vulnerable ip-address is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-19534
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/undici/package.json
+    reason: >-
+      Vulnerable undici is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-85024
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/undici/package.json
+    reason: >-
+      Vulnerable undici is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-18540
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/undici/package.json
+    reason: >-
+      Vulnerable undici is bundled inside npm itself, not the
       application. Cannot be upgraded via package.json overrides.
