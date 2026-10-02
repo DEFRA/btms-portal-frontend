@@ -572,6 +572,58 @@ const importPreNotificationResourceEvents = [
   }
 ]
 
+const createTracesChed = (identifier, updated) => ({
+  ched: {
+    exchangedDocument: {
+      identifier,
+      documentStatusCode: '1',
+      secondSignatoryAuthentication: {
+        typeCode: '1',
+        includedClause: [
+          { identifier: 'DECISION_CONCLUSION', content: 'ACCEPTABLE_FOR_FREE_CIRCULATION' }
+        ]
+      }
+    },
+    lastUpdated: updated,
+    specifiedConsignment: {
+      includedConsignmentItem: [
+        {
+          includedTradeLineItem: [
+            {
+              sequenceNumeric: 0,
+              applicableClassification: null,
+              scientificName: null,
+              netWeight: { content: '3600', unitCode: 'KGM' },
+              grossWeight: { content: '3700', unitCode: 'KGM' }
+            },
+            {
+              sequenceNumeric: 1,
+              applicableClassification: [
+                { systemId: 'CN', classCode: { value: '03019985' } }
+              ],
+              scientificName: 'Salmo salar',
+              netWeight: { content: '1000', unitCode: 'KGM' },
+              grossWeight: null
+            }
+          ]
+        }
+      ]
+    }
+  },
+  created: '2025-01-01T09:00:00.000Z',
+  updated
+})
+
+const reservation = (status, { chedId = 'CHEDA.GB.2025.0000001', mrn = '24GB0Z8WEJ9ZBTL73B' } = {}) => ({
+  reservation: {
+    chedId,
+    mrn,
+    status,
+    timestamp: '2025-06-01T09:30:00.000Z',
+    commodities: []
+  }
+})
+
 jest.mock('@hapi/wreck', () => ({
   get: jest.fn()
 }))
@@ -843,48 +895,6 @@ test('redirects to search page if no results', async () => {
 
   expect(statusCode).toBe(302)
   expect(headers.location).toBe(paths.SEARCH)
-})
-
-const createTracesChed = (identifier, updated) => ({
-  ched: {
-    exchangedDocument: {
-      identifier,
-      documentStatusCode: '1',
-      secondSignatoryAuthentication: {
-        typeCode: '1',
-        includedClause: [
-          { identifier: 'DECISION_CONCLUSION', content: 'ACCEPTABLE_FOR_FREE_CIRCULATION' }
-        ]
-      }
-    },
-    lastUpdated: updated,
-    specifiedConsignment: {
-      includedConsignmentItem: [
-        {
-          includedTradeLineItem: [
-            {
-              sequenceNumeric: 0,
-              applicableClassification: null,
-              scientificName: null,
-              netWeight: { content: '3600', unitCode: 'KGM' },
-              grossWeight: { content: '3700', unitCode: 'KGM' }
-            },
-            {
-              sequenceNumeric: 1,
-              applicableClassification: [
-                { systemId: 'CN', classCode: { value: '03019985' } }
-              ],
-              scientificName: 'Salmo salar',
-              netWeight: { content: '1000', unitCode: 'KGM' },
-              grossWeight: null
-            }
-          ]
-        }
-      ]
-    }
-  },
-  created: '2025-01-01T09:00:00.000Z',
-  updated
 })
 
 test('shows TRACES CHED placeholders when feature flag is enabled', async () => {
@@ -1239,16 +1249,6 @@ describe('Quantity status column (flag on)', () => {
 
     return document.querySelector('table.btms-declaration')
   }
-
-  const reservation = (status, { chedId = 'CHEDA.GB.2025.0000001', mrn = '24GB0Z8WEJ9ZBTL73B' } = {}) => ({
-    reservation: {
-      chedId,
-      mrn,
-      status,
-      timestamp: '2025-06-01T09:30:00.000Z',
-      commodities: []
-    }
-  })
 
   const tracesChedResponse = (chedReservations) => ({
     ...relatedImportDeclarations,
@@ -2785,4 +2785,191 @@ test.each(
   const noMatchDecisions = Array.from(document.body.querySelectorAll('table.btms-declaration-levels-result span.btms-no-match')).map(tableCell => tableCell.innerHTML)
   expect(noMatchDecisions.length).toBe(2)
   expect(noMatchDecisions.every(decisionText => decisionText === options.decisionText)).toBeTruthy()
+})
+
+test.each([
+  {
+    internalDecisionCode: 'E40',
+    unsuccessfulReason: 'An unknown reservation error has occurred.',
+    level4Rule: 'Passive',
+    expectedMatchIndicator: 'Yes',
+    expectedDecision: 'Release'
+  },
+  {
+    internalDecisionCode: 'E41',
+    unsuccessfulReason: 'The commodity code on the customs declaration does not match the commodity code on the CHED. Update the customs declaration or CHED so the commodity codes match.',
+    level4Rule: 'Passive',
+    expectedMatchIndicator: 'Yes',
+    expectedDecision: 'Release'
+  },
+  {
+    internalDecisionCode: 'E42',
+    unsuccessfulReason: 'The CHED status does not allow its quantity to be reserved. Check the CHED in TRACES and update it as required.',
+    level4Rule: 'Passive',
+    expectedMatchIndicator: 'Yes',
+    expectedDecision: 'Release'
+  },
+  {
+    internalDecisionCode: 'E43',
+    unsuccessfulReason: 'The customs declaration is attempting to reserve more than the quantity available on the CHED. Amend the quantity on the customs declaration.',
+    level4Rule: 'Passive',
+    expectedMatchIndicator: 'Yes',
+    expectedDecision: 'Release'
+  },
+  {
+    internalDecisionCode: 'E44',
+    unsuccessfulReason: 'The quantity has already been consumed for this customs declaration and CHED. Update the customs declaration with a new CHED reference.',
+    level4Rule: 'Passive',
+    expectedMatchIndicator: 'Yes',
+    expectedDecision: 'Release'
+  },
+  {
+    internalDecisionCode: 'E45',
+    unsuccessfulReason: 'A CHED line number included in the reservation request does not correspond to a line that exists on the CHED. Contact the National Clearance Hub.',
+    level4Rule: 'Passive',
+    expectedMatchIndicator: 'Yes',
+    expectedDecision: 'Release'
+  },
+  {
+    internalDecisionCode: 'E46',
+    unsuccessfulReason: 'The unit of measure on the customs declaration and CHED do not match. Update a document so the units of measure align.',
+    level4Rule: 'Passive',
+    expectedMatchIndicator: 'Yes',
+    expectedDecision: 'Release'
+  },
+  {
+    internalDecisionCode: 'E47',
+    unsuccessfulReason: 'Due to a technical issue TRACES cannot run its automated calculation checks. Contact the National Clearance Hub.',
+    level4Rule: 'Passive',
+    expectedMatchIndicator: 'Yes',
+    expectedDecision: 'Release'
+  },
+  {
+    internalDecisionCode: 'E40',
+    unsuccessfulReason: 'An unknown reservation error has occurred.',
+    level4Rule: 'Active',
+    expectedMatchIndicator: 'No',
+    expectedDecision: 'No match - Unknown reservation error'
+  },
+  {
+    internalDecisionCode: 'E41',
+    unsuccessfulReason: 'The commodity code on the customs declaration does not match the commodity code on the CHED. Update the customs declaration or CHED so the commodity codes match.',
+    level4Rule: 'Active',
+    expectedMatchIndicator: 'No',
+    expectedDecision: 'No match - reservation commodity code mismatch'
+  },
+  {
+    internalDecisionCode: 'E42',
+    unsuccessfulReason: 'The CHED status does not allow its quantity to be reserved. Check the CHED in TRACES and update it as required.',
+    level4Rule: 'Active',
+    expectedMatchIndicator: 'No',
+    expectedDecision: 'No match - CHED status prevents reservation'
+  },
+  {
+    internalDecisionCode: 'E43',
+    unsuccessfulReason: 'The customs declaration is attempting to reserve more than the quantity available on the CHED. Amend the quantity on the customs declaration.',
+    level4Rule: 'Active',
+    expectedMatchIndicator: 'No',
+    expectedDecision: 'No match - Insufficient quantity'
+  },
+  {
+    internalDecisionCode: 'E44',
+    unsuccessfulReason: 'The quantity has already been consumed for this customs declaration and CHED. Update the customs declaration with a new CHED reference.',
+    level4Rule: 'Active',
+    expectedMatchIndicator: 'No',
+    expectedDecision: 'No match - quantity already consumed'
+  },
+  {
+    internalDecisionCode: 'E45',
+    unsuccessfulReason: 'A CHED line number included in the reservation request does not correspond to a line that exists on the CHED. Contact the National Clearance Hub.',
+    level4Rule: 'Active',
+    expectedMatchIndicator: 'No',
+    expectedDecision: 'No match - reservation line number mismatch'
+  },
+  {
+    internalDecisionCode: 'E46',
+    unsuccessfulReason: 'The unit of measure on the customs declaration and CHED do not match. Update a document so the units of measure align.',
+    level4Rule: 'Active',
+    expectedMatchIndicator: 'No',
+    expectedDecision: 'No match - unit of measure mismatch'
+  },
+  {
+    internalDecisionCode: 'E47',
+    unsuccessfulReason: 'Due to a technical issue TRACES cannot run its automated calculation checks. Contact the National Clearance Hub.',
+    level4Rule: 'Active',
+    expectedMatchIndicator: 'No',
+    expectedDecision: 'No match - quantity management unavailable'
+  }
+])('Should show Unsuccessful Quantity Status, Match indicator "$expectedMatchIndicator" and Decision text when Quantity Reservation is unsuccessful and Level 4 Rule is "$level4Rule"',
+  async ({internalDecisionCode, unsuccessfulReason, level4Rule, expectedMatchIndicator, expectedDecision}) => {
+  config.set('isTracesChedsEnabled', true)
+  config.set('isQuantityStatusEnabled', true)
+
+  const customsDeclaration = createCustomsDeclaration('24GB0Z8WEJ9ZBTL73B', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z')
+  customsDeclaration.clearanceDecision.results[0].decisionCode = level4Rule === 'Active' ? 'X00' : 'C03'
+  customsDeclaration.clearanceDecision.results[0].internalDecisionCode = level4Rule === 'Active' ? internalDecisionCode : null
+  customsDeclaration.clearanceDecision.results[0].mode = 'Active'
+
+  if (level4Rule === 'Passive') {
+    customsDeclaration.clearanceDecision.results.push({
+      ...customsDeclaration.clearanceDecision.results[0],
+      decisionCode: 'X00',
+      internalDecisionCode,
+      mode: 'Passive'
+    })
+  }
+
+  const chedReservation = reservation('Unsuccessful')
+
+  const relatedQuantityManagementRecords = {
+    customsDeclarations: [customsDeclaration],
+    importPreNotifications: [],
+    goodsVehicleMovements: [],
+    transitImportPreNotifications: [],
+    cheds: [createTracesChed('CHEDA.GB.2025.0000001', '2025-06-01T09:30:00.000Z')],
+    chedReservations: [chedReservation]
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: relatedQuantityManagementRecords })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
+    auth: {
+      strategy: 'session',
+      credentials
+    },
+    headers: {
+      cookie:
+        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
+    }
+  })
+
+  globalJsdom(payload)
+
+  const declarationsTable = document.querySelector('table.btms-declaration')
+
+  expect(getByRole(declarationsTable, 'columnheader', { name: 'Quantity status' })).toBeInTheDocument()
+
+  const commodityRowCells = within(getByRole(declarationsTable, 'row', { name: /FROZEN MSC A COD FILLETS/ })).getAllByRole('cell')
+
+  const statusCell = commodityRowCells[4]
+  expect(statusCell.textContent.trim()).toContain('Unsuccessful')
+  expect(statusCell.querySelector('strong')).toHaveClass('govuk-tag--red')
+  const tooltip = statusCell.querySelector('[role=tooltip]')
+  expect(tooltip).toBeInTheDocument()
+  expect(tooltip.textContent).toBe(unsuccessfulReason)
+
+  const matchStatusCell = commodityRowCells[6]
+  expect(matchStatusCell.textContent.trim()).toBe(expectedMatchIndicator)
+
+  const decisionCell = commodityRowCells[8]
+  expect(decisionCell.textContent.trim()).toContain(expectedDecision)
 })

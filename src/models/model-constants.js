@@ -153,12 +153,14 @@ export const CDS_STATUSES = {
 export const QUANTITY_STATUSES = {
   UNRESERVED: 'Unreserved',
   RESERVED: 'Reserved',
-  FINALISED: 'Finalised'
+  FINALISED: 'Finalised',
+  UNSUCCESSFUL: 'Unsuccessful'
 }
 
 export const quantityStatusDescriptions = {
   Reserved: QUANTITY_STATUSES.RESERVED,
-  Consumed: QUANTITY_STATUSES.FINALISED
+  Consumed: QUANTITY_STATUSES.FINALISED,
+  Unsuccessful: QUANTITY_STATUSES.UNSUCCESSFUL
 }
 
 export const finalStateMappings = {
@@ -179,6 +181,14 @@ export const iuuDecisionDisplay = {
 
 export const hmiGmsInternalDecisionCodes = new Set(['E87', 'E82'])
 export const noMatchInternalDecisionCodes = new Set([
+  'E40',
+  'E41',
+  'E42',
+  'E43',
+  'E44',
+  'E45',
+  'E46',
+  'E47',
   'E70',
   'E71',
   'E72',
@@ -191,6 +201,14 @@ export const noMatchInternalDecisionCodes = new Set([
   'E99'
 ])
 export const internalDecisionCodeDescriptions = {
+  E40: 'No match - Unknown reservation error',
+  E41: 'No match - reservation commodity code mismatch',
+  E42: 'No match - CHED status prevents reservation',
+  E43: 'No match - Insufficient quantity',
+  E44: 'No match - quantity already consumed',
+  E45: 'No match - reservation line number mismatch',
+  E46: 'No match - unit of measure mismatch',
+  E47: 'No match - quantity management unavailable',
   E70: 'No match - CHED cannot be found',
   E71: 'No match - CHED cancelled',
   E72: 'No match - CHED replaced',
@@ -317,3 +335,14 @@ export const DLQ_ACTION_SUCCESSFUL_RESPONSE_STATUSES = new Set([
   constants.HTTP_STATUS_OK,
   constants.HTTP_STATUS_ACCEPTED
 ])
+
+export const UNSUCCESSFUL_QUANTITY_RESERVATION_REASONS = {
+  E40: 'An unknown reservation error has occurred.',
+  E41: 'The commodity code on the customs declaration does not match the commodity code on the CHED. Update the customs declaration or CHED so the commodity codes match.',
+  E42: 'The CHED status does not allow its quantity to be reserved. Check the CHED in TRACES and update it as required.',
+  E43: 'The customs declaration is attempting to reserve more than the quantity available on the CHED. Amend the quantity on the customs declaration.',
+  E44: 'The quantity has already been consumed for this customs declaration and CHED. Update the customs declaration with a new CHED reference.',
+  E45: 'A CHED line number included in the reservation request does not correspond to a line that exists on the CHED. Contact the National Clearance Hub.',
+  E46: 'The unit of measure on the customs declaration and CHED do not match. Update a document so the units of measure align.',
+  E47: 'Due to a technical issue TRACES cannot run its automated calculation checks. Contact the National Clearance Hub.'
+}
