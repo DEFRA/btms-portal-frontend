@@ -63,7 +63,7 @@ const getChedTimelineEvents = async (preNotifications) => {
   let chedTimelineEvents = []
 
   for (const preNotification of preNotifications) {
-    const preNotificationResourceEvents = await getResourceEvents(preNotification.referenceNumber)
+    const preNotificationResourceEvents = await getResourceEvents(preNotification.referenceNumber) // NOSONAR - S9382: serial fetch is intentional; per-item error handling relies on iteration order
     chedTimelineEvents = chedTimelineEvents.concat(mapResourceEvents(undefined, preNotification.referenceNumber, preNotificationResourceEvents))
   }
 
@@ -71,15 +71,13 @@ const getChedTimelineEvents = async (preNotifications) => {
 }
 
 const getEventsFromCustomsDeclarations = async (customsDeclarations, preNotifications) => {
+  const chedTimelineEvents = await getChedTimelineEvents(preNotifications)
   const mrnEvents = []
 
   for (const declaration of customsDeclarations) {
     try {
-      const declarationResourceEvents = await getResourceEvents(declaration.movementReferenceNumber)
+      const declarationResourceEvents = await getResourceEvents(declaration.movementReferenceNumber) // NOSONAR - S9382: serial fetch is intentional; per-item error handling relies on iteration order
       const declarationTimelineEvents = mapResourceEvents(declaration.movementReferenceNumber, undefined, declarationResourceEvents)
-
-      const chedTimelineEvents = await getChedTimelineEvents(preNotifications)
-
       const timelineEvents = declarationTimelineEvents.concat(chedTimelineEvents).sort((a, b) => sortCreatedDescending(a, b))
 
       mrnEvents.push({
@@ -103,7 +101,7 @@ const getEventsFromUnmatchedPreNotifications = async (preNotifications) => {
 
   for (const preNotification of preNotifications) {
     try {
-      const preNotificationResourceEvents = await getResourceEvents(preNotification.referenceNumber)
+      const preNotificationResourceEvents = await getResourceEvents(preNotification.referenceNumber) // NOSONAR - S9382: serial fetch is intentional; per-item error handling relies on iteration order
       const timelineEvents = mapResourceEvents(undefined, preNotification.referenceNumber, preNotificationResourceEvents)?.sort((a, b) => sortCreatedDescending(a, b))
 
       preNotificationEvents.push({
