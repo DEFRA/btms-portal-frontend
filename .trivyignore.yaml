@@ -4,156 +4,72 @@ vulnerabilities:
   # resolved via package.json overrides; a fix requires the base image
   # to ship a newer npm version.
 
-  - id: CVE-2026-33750
+  - id: CVE-2026-102276
     paths:
       - usr/local/lib/node_modules/npm/node_modules/brace-expansion/package.json
     reason: >
       Vulnerable brace-expansion is bundled inside npm itself, not the
       application. Cannot be upgraded via package.json overrides.
 
-  - id: CVE-2026-33671
-    paths:
-      - usr/local/lib/node_modules/npm/node_modules/picomatch/package.json
-    reason: >
-      Vulnerable picomatch is bundled inside npm itself, not the
-      application. Cannot be upgraded via package.json overrides.
-
-  - id: CVE-2026-33672
-    paths:
-      - usr/local/lib/node_modules/npm/node_modules/picomatch/package.json
-    reason: >
-      Vulnerable picomatch is bundled inside npm itself, not the
-      application. Cannot be upgraded via package.json overrides.
-
-  - id: CVE-2026-42338
-    paths:
-      - usr/local/lib/node_modules/npm/node_modules/ip-address/package.json
-    reason: >
-      Vulnerable ip-address is bundled inside npm itself, not the
-      application. Cannot be upgraded via package.json overrides.
-
-  - id: CVE-2026-53655
-    paths:
-      - usr/local/lib/node_modules/npm/node_modules/tar/package.json
-    reason: >
-      Vulnerable tar is bundled inside npm itself, not the
-      application. Cannot be upgraded via package.json overrides.
-
-  - id: CVE-2026-48758
-    paths:
-      - usr/local/lib/node_modules/npm/node_modules/@sigstore/core/package.json
-    reason: >
-      Vulnerable sigstore is bundled inside npm itself, not the
-      application. Cannot be upgraded via package.json overrides.
-
-  - id: CVE-2026-48815
-    paths:
-      - usr/local/lib/node_modules/npm/node_modules/sigstore/package.json
-    reason: >
-      Vulnerable sigstore is bundled inside npm itself, not the
-      application. Cannot be upgraded via package.json overrides.
-
-  - id: CVE-2026-13149
+  - id: CVE-2026-102277
     paths:
       - usr/local/lib/node_modules/npm/node_modules/brace-expansion/package.json
     reason: >
       Vulnerable brace-expansion is bundled inside npm itself, not the
       application. Cannot be upgraded via package.json overrides.
 
-  - id: CVE-2026-14257
+  - id: CVE-2026-102278
     paths:
       - usr/local/lib/node_modules/npm/node_modules/brace-expansion/package.json
     reason: >
       Vulnerable brace-expansion is bundled inside npm itself, not the
       application. Cannot be upgraded via package.json overrides.
 
-  - id: CVE-2026-59873
-    paths:
-      - usr/local/lib/node_modules/npm/node_modules/tar/package.json
-    reason: >
-      Vulnerable tar is bundled inside npm itself, not the
-      application. Cannot be upgraded via package.json overrides.
-
-  - id: CVE-2026-59874
-    paths:
-      - usr/local/lib/node_modules/npm/node_modules/tar/package.json
-    reason: >
-      Vulnerable tar is bundled inside npm itself, not the
-      application. Cannot be upgraded via package.json overrides.
-
-  - id: CVE-2026-59871
-    paths:
-      - usr/local/lib/node_modules/npm/node_modules/tar/package.json
-    reason: >
-      Vulnerable tar is bundled inside npm itself, not the
-      application. Cannot be upgraded via package.json overrides.
-
-  - id: CVE-2026-59875
-    paths:
-      - usr/local/lib/node_modules/npm/node_modules/tar/package.json
-    reason: >
-      Vulnerable tar is bundled inside npm itself, not the
-      application. Cannot be upgraded via package.json overrides.
-
-  - id: GHSA-r292-9mhp-454m
-    paths:
-      - usr/local/lib/node_modules/npm/node_modules/tar/package.json
-    reason: >
-      Vulnerable tar is bundled inside npm itself, not the
-      application. Cannot be upgraded via package.json overrides.
-
-  - id: CVE-2026-69152
-    paths:
-      - usr/local/lib/node_modules/npm/node_modules/brace-expansion/package.json
-    reason: >
-      Vulnerable brace-expansion is bundled inside npm itself, not the
-      application. Cannot be upgraded via package.json overrides.
-
-  - id: CVE-2026-69192
+  - id: CVE-2026-101910
     paths:
       - usr/local/lib/node_modules/npm/node_modules/ip-address/package.json
     reason: >
       Vulnerable ip-address is bundled inside npm itself, not the
       application. Cannot be upgraded via package.json overrides.
 
-  - id: CVE-2026-54272
+  - id: CVE-2026-101911
     paths:
       - usr/local/lib/node_modules/npm/node_modules/ip-address/package.json
     reason: >
       Vulnerable ip-address is bundled inside npm itself, not the
       application. Cannot be upgraded via package.json overrides.
 
-  - id: CVE-2026-69198
+  - id: CVE-2026-101912
     paths:
       - usr/local/lib/node_modules/npm/node_modules/ip-address/package.json
     reason: >
       Vulnerable ip-address is bundled inside npm itself, not the
       application. Cannot be upgraded via package.json overrides.
 
-  - id: CVE-2026-15157
+  - id: CVE-2026-101913
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/ip-address/package.json
+    reason: >
+      Vulnerable ip-address is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-19534
     paths:
       - usr/local/lib/node_modules/npm/node_modules/undici/package.json
     reason: >
       Vulnerable undici is bundled inside npm itself, not the
       application. Cannot be upgraded via package.json overrides.
 
-  - id: CVE-2026-16728
+  - id: CVE-2026-85024
     paths:
       - usr/local/lib/node_modules/npm/node_modules/undici/package.json
     reason: >
       Vulnerable undici is bundled inside npm itself, not the
       application. Cannot be upgraded via package.json overrides.
 
-  - id: CVE-2026-16729
+  - id: CVE-2026-18540
     paths:
       - usr/local/lib/node_modules/npm/node_modules/undici/package.json
     reason: >
       Vulnerable undici is bundled inside npm itself, not the
-      application. Cannot be upgraded via package.json overrides.
-
-  - id: CVE-2026-73566
-    paths:
-      - usr/local/lib/node_modules/npm/node_modules/tar/package.json
-    reason: >
-      Vulnerable tar is bundled inside npm itself, not the
       application. Cannot be upgraded via package.json overrides.
