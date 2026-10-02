@@ -172,405 +172,6 @@ const relatedImportDeclarations = {
 
 const emptyResourceEvents = []
 
-const invalidResourceEvents = [
-  {
-    resourceType: 'CustomsDeclaration',
-    subResourceType: 'ClearanceRequest',
-    message: 'invalid json'
-  }
-]
-
-// Note - not full resource event samples, just enough to mock the usage in the implementation
-const declarationResourceEvents = [
-  {
-    resourceType: 'CustomsDeclaration',
-    subResourceType: 'ClearanceRequest',
-    message: '{\n'
-      + '    "resource": {\n'
-      + '      "clearanceRequest": {\n'
-      + '        "externalVersion": 1,\n'
-      + '        "messageSentAt": "2025-01-02T09:00:00Z",\n'
-      + '        "commodities": [\n'
-      + '          {\n'
-      + '            "itemNumber": 1,\n'
-      + '            "goodsDescription": "Horse Re-entry",\n'
-      + '            "taricCommodityCode": "1601009105",\n'
-      + '            "documents": [\n'
-      + '              {\n'
-      + '                "documentCode": "C640",\n'
-      + '                "documentReference": "CHEDA.GB.2025.0000001"\n'
-      + '              }\n'
-      + '            ],\n'
-      + '            "checks": [{\n'
-      + '              "checkCode": "H221"\n'
-      + '            }]\n'
-      + '          }\n'
-      + '        ]\n'
-      + '      }\n'
-      + '    }\n'
-      + '  }',
-  },
-  {
-    resourceType: 'CustomsDeclaration',
-    subResourceType: 'ClearanceDecision',
-    message: '{\n'
-      + '    "resource": {\n'
-      + '      "clearanceRequest": {\n'
-      + '        "commodities": [\n'
-      + '          {\n'
-      + '            "itemNumber": 1,\n'
-      + '            "goodsDescription": "Horse Re-entry",\n'
-      + '            "taricCommodityCode": "1601009105"\n'
-      + '          }\n'
-      + '        ]\n'
-      + '      },\n'
-      + '      "clearanceDecision": {\n'
-      + '        "externalVersionNumber": 1,\n'
-      + '        "decisionNumber": 1,\n'
-      + '        "items": [\n'
-      + '          {\n'
-      + '            "itemNumber": 1\n'
-      + '          }\n'
-      + '        ],\n'
-      + '        "results": [\n'
-      + '          {\n'
-      + '            "itemNumber": 1,\n'
-      + '            "documentReference": "CHEDA.GB.2025.0000001",\n'
-      + '            "checkCode": "H221",\n'
-      + '            "documentCode": "N002",\n'
-      + '            "decisionCode": "X00",\n'
-      + '            "internalDecisionCode": "E70"\n'
-      + '          }\n'
-      + '        ],\n'
-      + '        "created": "2025-01-05T09:00:00Z"\n'
-      + '      },\n'
-      + '      "finalisation": {\n'
-      + '        "isManualRelease": true\n'
-      + '      }\n'
-      + '    }\n'
-      + '  }'
-  },
-  {
-    resourceType: 'CustomsDeclaration',
-    subResourceType: 'ClearanceDecision',
-    message: '{\n'
-      + '    "resource": {\n'
-      + '      "clearanceRequest": {\n'
-      + '        "commodities": [\n'
-      + '          {\n'
-      + '            "itemNumber": 1,\n'
-      + '            "goodsDescription": "Horse Re-entry",\n'
-      + '            "taricCommodityCode": "1601009105"\n'
-      + '          }\n'
-      + '        ]\n'
-      + '      },\n'
-      + '      "clearanceDecision": {\n'
-      + '        "externalVersionNumber": 2,\n'
-      + '        "decisionNumber": 2,\n'
-      + '        "items": [\n'
-      + '          {\n'
-      + '            "itemNumber": 1\n'
-      + '          }\n'
-      + '        ],\n'
-      + '        "results": [\n'
-      + '          {\n'
-      + '            "itemNumber": 1,\n'
-      + '            "documentReference": "CHEDA.GB.2025.0000001",\n'
-      + '            "checkCode": "H221",\n'
-      + '            "documentCode": "N002",\n'
-      + '            "decisionCode": "X00",\n'
-      + '            "internalDecisionCode": "E70",\n'
-      + '            "mode": null\n'
-      + '          }\n'
-      + '        ],\n'
-      + '        "created": "2025-01-01T09:00:00Z"\n'
-      + '      },\n'
-      + '      "finalisation": {\n'
-      + '        "isManualRelease": true\n'
-      + '      }\n'
-      + '    }\n'
-      + '  }'
-  },
-  {
-    resourceType: 'CustomsDeclaration',
-    subResourceType: 'ClearanceDecision',
-    message: '{\n'
-      + '    "resource": {\n'
-      + '      "clearanceRequest": {\n'
-      + '        "commodities": [\n'
-      + '          {\n'
-      + '            "itemNumber": 1,\n'
-      + '            "goodsDescription": "Horse Re-entry",\n'
-      + '            "taricCommodityCode": "1601009105"\n'
-      + '          }\n'
-      + '        ]\n'
-      + '      },\n'
-      + '      "clearanceDecision": {\n'
-      + '        "externalVersionNumber": 3,\n'
-      + '        "decisionNumber": 3,\n'
-      + '        "items": [\n'
-      + '          {\n'
-      + '            "itemNumber": 1\n'
-      + '          }\n'
-      + '        ],\n'
-      + '        "results": [\n'
-      + '          {\n'
-      + '            "itemNumber": 1,\n'
-      + '            "documentReference": "CHEDA.GB.2025.0000001",\n'
-      + '            "checkCode": "H221",\n'
-      + '            "documentCode": "N002",\n'
-      + '            "decisionCode": "X00",\n'
-      + '            "internalDecisionCode": "E70",\n'
-      + '            "mode": "Active"\n'
-      + '          },\n'
-      + '          {\n'
-      + '            "itemNumber": 1,\n'
-      + '            "documentReference": "CHEDA.GB.2025.0000001",\n'
-      + '            "checkCode": "H221",\n'
-      + '            "documentCode": "N002",\n'
-      + '            "decisionCode": "H01",\n'
-      + '            "internalDecisionCode": "E20",\n'
-      + '            "mode": "Passive"\n'
-      + '          }\n'
-      + '        ],\n'
-      + '        "created": "2025-01-01T09:00:00.000Z"\n'
-      + '      },\n'
-      + '      "finalisation": {\n'
-      + '        "isManualRelease": true\n'
-      + '      }\n'
-      + '    }\n'
-      + '  }'
-  },
-  {
-    resourceType: 'CustomsDeclaration',
-    subResourceType: 'Finalisation',
-    message: '{\n'
-      + '    "resource": {\n'
-      + '      "finalisation": {\n'
-      + '        "isManualRelease": true,\n'
-      + '        "externalVersion": 1,\n'
-      + '        "messageSentAt": "2025-01-05T09:00:00.0000001Z"\n'
-      + '      }\n'
-      + '    }\n'
-      + '  }'
-  },
-  {
-    resourceType: 'CustomsDeclaration',
-    subResourceType: 'ExternalError',
-    message: '{\n'
-      + '    "resource": {\n'
-      + '      "externalErrors": [\n'
-      + '        {\n'
-      + '          "messageSentAt": "2025-01-04T09:00:00Z",\n'
-      + '          "errors": [\n'
-      + '            {\n'
-      + '              "code": "HMRCVAL101",\n'
-      + '              "message": "An error notification sent by CDS into BTMS"\n'
-      + '            }\n'
-      + '          ]\n'
-      + '        }\n'
-      + '      ]\n'
-      + '    }\n'
-      + '  }'
-  },
-  {
-    resourceType: 'ProcessingError',
-    message: '{\n'
-      + '    "resource": {\n'
-      + '      "processingErrors": [\n'
-      + '        {\n'
-      + '          "errors": [\n'
-      + '            {\n'
-      + '              "code": "ALVSVAL303",\n'
-      + '              "message": "An error detected in the Imports Processor"\n'
-      + '            }\n'
-      + '          ],\n'
-      + '          "externalVersion": 1,\n'
-      + '          "created": "2025-01-03T09:00:00.000Z"\n'
-      + '        },\n'
-      + '        {\n'
-      + '          "errors": [\n'
-      + '            {\n'
-      + '              "code": "ALVSVAL303",\n'
-      + '              "message": "An error detected in the Imports Processor"\n'
-      + '            }\n'
-      + '          ],\n'
-      + '          "externalVersion": 1,\n'
-      + '          "created": "2025-01-02T09:00:00Z"\n'
-      + '        }\n'
-      + '      ]\n'
-      + '    }\n'
-      + '  }'
-  },
-  {
-    resourceType: 'CustomsDeclaration',
-    subResourceType: 'ClearanceRequest',
-    message: '{\n'
-      + '    "resource": {\n'
-      + '      "clearanceRequest": {\n'
-      + '        "externalVersion": 1,\n'
-      + '        "messageSentAt": null,\n'
-      + '        "commodities": [\n'
-      + '          {\n'
-      + '            "itemNumber": 1,\n'
-      + '            "goodsDescription": "Horse Re-entry",\n'
-      + '            "taricCommodityCode": "1601009105",\n'
-      + '            "documents": [\n'
-      + '              {\n'
-      + '                "documentCode": "C640",\n'
-      + '                "documentReference": "CHEDA.GB.2025.0000001"\n'
-      + '              }\n'
-      + '            ],\n'
-      + '            "checks": [{\n'
-      + '              "checkCode": "H221"\n'
-      + '            }]\n'
-      + '          }\n'
-      + '        ]\n'
-      + '      }\n'
-      + '    }\n'
-      + '  }',
-  },
-  {
-    resourceType: 'CustomsDeclaration',
-    subResourceType: 'ClearanceDecision',
-    message: '{\n'
-      + '    "resource": {\n'
-      + '      "clearanceRequest": {\n'
-      + '        "commodities": [\n'
-      + '          {\n'
-      + '            "itemNumber": 1,\n'
-      + '            "goodsDescription": "Horse Re-entry",\n'
-      + '            "taricCommodityCode": "1601009105"\n'
-      + '          }\n'
-      + '        ]\n'
-      + '      },\n'
-      + '      "clearanceDecision": {\n'
-      + '        "externalVersionNumber": 1,\n'
-      + '        "decisionNumber": 1,\n'
-      + '        "items": [\n'
-      + '          {\n'
-      + '            "itemNumber": 1\n'
-      + '          }\n'
-      + '        ],\n'
-      + '        "results": [\n'
-      + '          {\n'
-      + '            "itemNumber": 1,\n'
-      + '            "documentReference": "CHEDA.GB.2025.0000001",\n'
-      + '            "checkCode": "H221",\n'
-      + '            "documentCode": "N002",\n'
-      + '            "decisionCode": "X00",\n'
-      + '            "internalDecisionCode": "E70"\n'
-      + '          }\n'
-      + '        ],\n'
-      + '        "created": null\n'
-      + '      },\n'
-      + '      "finalisation": {\n'
-      + '        "isManualRelease": true\n'
-      + '      }\n'
-      + '    }\n'
-      + '  }'
-  },
-  {
-    resourceType: 'CustomsDeclaration',
-    subResourceType: 'Finalisation',
-    message: '{\n'
-      + '    "resource": {\n'
-      + '      "finalisation": {\n'
-      + '        "isManualRelease": true,\n'
-      + '        "externalVersion": 1,\n'
-      + '        "messageSentAt": null\n'
-      + '      }\n'
-      + '    }\n'
-      + '  }'
-  },
-  {
-    resourceType: 'CustomsDeclaration',
-    subResourceType: 'ExternalError',
-    message: '{\n'
-      + '    "resource": {\n'
-      + '      "externalErrors": [\n'
-      + '        {\n'
-      + '          "messageSentAt": null,\n'
-      + '          "errors": [\n'
-      + '            {\n'
-      + '              "code": "HMRCVAL101",\n'
-      + '              "message": "An error notification sent by CDS into BTMS"\n'
-      + '            }\n'
-      + '          ]\n'
-      + '        }\n'
-      + '      ]\n'
-      + '    }\n'
-      + '  }'
-  },
-  {
-    resourceType: 'ProcessingError',
-    message: '{\n'
-      + '    "resource": {\n'
-      + '      "processingErrors": [\n'
-      + '        {\n'
-      + '          "errors": [\n'
-      + '            {\n'
-      + '              "code": "ALVSVAL303",\n'
-      + '              "message": "An error detected in the Imports Processor"\n'
-      + '            }\n'
-      + '          ],\n'
-      + '          "externalVersion": 1,\n'
-      + '          "created": null\n'
-      + '        },\n'
-      + '        {\n'
-      + '          "errors": [\n'
-      + '            {\n'
-      + '              "code": "ALVSVAL303",\n'
-      + '              "message": "An error detected in the Imports Processor"\n'
-      + '            }\n'
-      + '          ],\n'
-      + '          "externalVersion": 1,\n'
-      + '          "created": null\n'
-      + '        }\n'
-      + '      ]\n'
-      + '    }\n'
-      + '  }'
-  }
-]
-
-const importPreNotificationResourceEvents = [
-  {
-    resourceType: 'ImportPreNotification',
-    message: '{\n'
-      + '    "resource": {\n'
-      + '      "importPreNotification": {\n'
-      + '        "referenceNumber": "CHEDA.GB.2025.0000001",\n'
-      + '        "status": "VALIDATED",\n'
-      + '        "decisionDate": "2025-01-01T09:00:00.000Z",\n'
-      + '        "updatedSource": "2025-01-01T09:00:00Z",\n'
-      + '        "partTwo": {\n'
-      + '          "decision": {\n'
-      + '            "decision": "Horse Re-entry"\n'
-      + '          }\n'
-      + '        }\n'
-      + '      }\n'
-      + '    }\n'
-      + '  }'
-  },
-  {
-    resourceType: 'ImportPreNotification',
-    message: '{\n'
-      + '    "resource": {\n'
-      + '      "importPreNotification": {\n'
-      + '        "referenceNumber": "CHEDA.GB.2025.0000001",\n'
-      + '        "status": "VALIDATED",\n'
-      + '        "decisionDate": "2025-01-01T09:00:00.000Z",\n'
-      + '        "updatedSource": null,\n'
-      + '        "partTwo": {\n'
-      + '          "decision": {\n'
-      + '            "decision": "Horse Re-entry"\n'
-      + '          }\n'
-      + '        }\n'
-      + '      }\n'
-      + '    }\n'
-      + '  }'
-  }
-]
 
 const createTracesChed = (identifier, updated) => ({
   ched: {
@@ -628,6 +229,35 @@ jest.mock('@hapi/wreck', () => ({
   get: jest.fn()
 }))
 
+const COOKIE_POLICY_HEADER = {
+  cookie: 'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
+}
+
+const searchResultUrl = (searchTerm) => `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${searchTerm}`
+
+const injectSearchResult = async (url) => {
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  return server.inject({
+    method: 'get',
+    url,
+    auth: { strategy: 'session', credentials }
+  })
+}
+
+const injectSearchResultWithCookie = async (url) => {
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  return server.inject({
+    method: 'get',
+    url,
+    auth: { strategy: 'session', credentials },
+    headers: COOKIE_POLICY_HEADER
+  })
+}
+
 test('shows search results', async () => {
   wreck.get
     .mockResolvedValueOnce({ payload: provider })
@@ -637,21 +267,7 @@ test('shows search results', async () => {
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { payload, headers } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
-    auth: {
-      strategy: 'session',
-      credentials
-    },
-    headers: {
-      cookie:
-        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
-    }
-  })
+  const { payload, headers } = await injectSearchResultWithCookie(searchResultUrl('24GB0Z8WEJ9ZBTL73B'))
 
   expect(headers['cache-control']).toBe('no-store')
 
@@ -881,17 +497,7 @@ test('redirects to search page if no results', async () => {
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: noResults })
 
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { statusCode, headers } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73Y`,
-    auth: {
-      strategy: 'session',
-      credentials
-    }
-  })
+  const { statusCode, headers } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73Y'))
 
   expect(statusCode).toBe(302)
   expect(headers.location).toBe(paths.SEARCH)
@@ -914,17 +520,7 @@ test('shows TRACES CHED placeholders when feature flag is enabled', async () => 
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { payload } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
-    auth: {
-      strategy: 'session',
-      credentials
-    }
-  })
+  const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73B'))
 
   globalJsdom(payload)
 
@@ -958,18 +554,9 @@ test('renders results page when only TRACES CHEDs are found and feature flag is 
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: onlyTracesCheds })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { payload, statusCode } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
-    auth: {
-      strategy: 'session',
-      credentials
-    }
-  })
+  const { payload, statusCode } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73B'))
 
   expect(statusCode).toBe(200)
 
@@ -998,17 +585,7 @@ test('redirects to search page when only TRACES CHEDs are found and feature flag
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: onlyTracesCheds })
 
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { statusCode, headers } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
-    auth: {
-      strategy: 'session',
-      credentials
-    }
-  })
+  const { statusCode, headers } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73B'))
 
   expect(statusCode).toBe(302)
   expect(headers.location).toBe(paths.SEARCH)
@@ -1062,17 +639,7 @@ test('does not show TRACES CHED section when feature flag is disabled', async ()
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { payload } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
-    auth: {
-      strategy: 'session',
-      credentials
-    }
-  })
+  const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73B'))
 
   globalJsdom(payload)
 
@@ -1100,18 +667,9 @@ test('shows the decision on TRACES CHED commodity rows when feature flag is enab
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: relatedImportDeclarationsWithTracesChed })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { payload } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=CHEDA.GB.2025.0000001`,
-    auth: {
-      strategy: 'session',
-      credentials
-    }
-  })
+  const { payload } = await injectSearchResult(searchResultUrl('CHEDA.GB.2025.0000001'))
 
   globalJsdom(payload)
 
@@ -1140,18 +698,9 @@ test('shows linked customs declarations for a TRACES CHED search when feature fl
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { payload } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=CHEDA.GB.2025.0000001`,
-    auth: {
-      strategy: 'session',
-      credentials
-    }
-  })
+  const { payload } = await injectSearchResult(searchResultUrl('CHEDA.GB.2025.0000001'))
 
   globalJsdom(payload)
 
@@ -1480,17 +1029,7 @@ test('shows no matching TRACES CHEDs message for an MRN search when no TRACES CH
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { payload } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
-    auth: {
-      strategy: 'session',
-      credentials
-    }
-  })
+  const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73B'))
 
   expect(payload).toContain('24GB0Z8WEJ9ZBTL73B')
   globalJsdom(payload)
@@ -1627,17 +1166,7 @@ test('redirects to search page for missing search', async () => {
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
 
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { statusCode, headers } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=`,
-    auth: {
-      strategy: 'session',
-      credentials
-    }
-  })
+  const { statusCode, headers } = await injectSearchResult(searchResultUrl(''))
 
   expect(statusCode).toBe(302)
   expect(headers.location).toBe(paths.SEARCH)
@@ -1648,17 +1177,7 @@ test('redirects to search page for incorrect search', async () => {
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
 
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { statusCode, headers } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=NOT_SEARCHABLE`,
-    auth: {
-      strategy: 'session',
-      credentials
-    }
-  })
+  const { statusCode, headers } = await injectSearchResult(searchResultUrl('NOT_SEARCHABLE'))
 
   expect(statusCode).toBe(302)
   expect(headers.location).toBe(paths.SEARCH)
@@ -1685,17 +1204,7 @@ test('handles upstream errors', async () => {
     .mockResolvedValueOnce({ payload: provider })
     .mockRejectedValueOnce(new Error('boom'))
 
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { statusCode, payload } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73Y`,
-    auth: {
-      strategy: 'session',
-      credentials
-    }
-  })
+  const { statusCode, payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73Y'))
 
   globalJsdom(payload)
 
@@ -1713,17 +1222,7 @@ test('redirects to search page if GMR search term', async () => {
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
 
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { statusCode, headers } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=GMRA00000AB1`,
-    auth: {
-      strategy: 'session',
-      credentials
-    }
-  })
+  const { statusCode, headers } = await injectSearchResult(searchResultUrl('GMRA00000AB1'))
 
   expect(statusCode).toBe(302)
   expect(headers.location).toBe(paths.SEARCH)
@@ -1761,21 +1260,7 @@ test.each([
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { payload, headers } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${options.searchTerm}`,
-    auth: {
-      strategy: 'session',
-      credentials
-    },
-    headers: {
-      cookie:
-        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
-    }
-  })
+  const { payload, headers } = await injectSearchResultWithCookie(searchResultUrl(`${options.searchTerm}`))
 
   expect(headers['cache-control']).toBe('no-store')
 
@@ -1816,21 +1301,7 @@ test.each([
     .mockResolvedValueOnce({ payload: dataApiResults })
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { payload, headers } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73A`,
-    auth: {
-      strategy: 'session',
-      credentials
-    },
-    headers: {
-      cookie:
-        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
-    }
-  })
+  const { payload, headers } = await injectSearchResultWithCookie(searchResultUrl('24GB0Z8WEJ9ZBTL73A'))
 
   expect(headers['cache-control']).toBe('no-store')
 
@@ -1842,406 +1313,6 @@ test.each([
   } else {
     expect(queryByRole(document.body, 'link', { name: 'GMRA00000AB1' })).not.toBeInTheDocument()
   }
-})
-
-test('shows latest search results and timeline tabs', async () => {
-  const customsDeclarations = [
-    createCustomsDeclaration('24GB0Z8WEJ9ZBTL73A', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z'),
-    createCustomsDeclaration('24GB0Z8WEJ9ZBTL73B', '1GB126344356000-ABC35932Y1BHY', '2025-05-06T13:11:59.257Z')
-  ]
-
-  const importPreNotifications = [
-    createImportPreNotification('CHEDA.GB.2025.0000001', 'CVEDA', 'CANCELLED', '2025-04-22T16:55:17.330Z', '1', '0101', 'Equus asinus', '2')
-  ]
-
-  const relatedImportDeclarations = {
-    customsDeclarations,
-    importPreNotifications
-  }
-
-  wreck.get
-    .mockResolvedValueOnce({ payload: provider })
-    .mockResolvedValueOnce({ payload: provider })
-    .mockResolvedValueOnce({ payload: relatedImportDeclarations })
-    .mockResolvedValueOnce({ payload: importPreNotificationResourceEvents })
-    .mockResolvedValueOnce({ payload: declarationResourceEvents })
-    .mockResolvedValueOnce({ payload: emptyResourceEvents })
-
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { payload, headers } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
-    auth: {
-      strategy: 'session',
-      credentials
-    },
-    headers: {
-      cookie:
-        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
-    }
-  })
-
-  expect(headers['cache-control']).toBe('no-store')
-
-  globalJsdom(payload)
-  initFilters()
-
-  const summarySections = document.body.querySelectorAll('.govuk-tabs__panel .govuk-details.btms-details')
-  expect(summarySections.length).toBeGreaterThan(0)
-
-  const mrnTimelines = document.body.querySelectorAll('.govuk-tabs__panel .mrn-timeline')
-  expect(mrnTimelines.length).toBe(2)
-  expect(mrnTimelines[0].hasAttribute('hidden')).toBeFalsy()
-  expect(mrnTimelines[1].hasAttribute('hidden')).toBeTruthy()
-
-  const timelineMrnFilter = document.getElementById('timelineMrn')
-  expect(timelineMrnFilter).toBeInTheDocument()
-  expect(timelineMrnFilter.options.length).toBe(2)
-  expect(timelineMrnFilter.options[0].text).toBe('24GB0Z8WEJ9ZBTL73B')
-  expect(timelineMrnFilter.options[1].text).toBe('24GB0Z8WEJ9ZBTL73A')
-
-  const eventTitles = Array.from(document.body.querySelectorAll('.moj-timeline__item .moj-timeline__header .moj-timeline__title span:nth-child(1)')).map(title => title.innerHTML)
-  expect(eventTitles.length).toBe(16)
-  expect(eventTitles[0]).toBe('CDS finalisation')
-  expect(eventTitles[1]).toBe('BTMS decision')
-  expect(eventTitles[2]).toBe('CDS processing error')
-  expect(eventTitles[3]).toBe('BTMS processing error')
-  expect(eventTitles[4]).toBe('CDS clearance request')
-  expect(eventTitles[5]).toBe('BTMS decision')
-  expect(eventTitles[6]).toBe('BTMS decision')
-  expect(eventTitles[7]).toBe('CHEDA.GB.2025.0000001')
-  expect(eventTitles[8]).toBe('CDS clearance request')
-  expect(eventTitles[9]).toBe('BTMS decision')
-  expect(eventTitles[10]).toBe('CDS finalisation')
-  expect(eventTitles[11]).toBe('CDS processing error')
-  expect(eventTitles[12]).toBe('BTMS processing error')
-  expect(eventTitles[13]).toBe('CHEDA.GB.2025.0000001')
-  expect(eventTitles[14]).toBe('CHEDA.GB.2025.0000001')
-  expect(eventTitles[15]).toBe('CHEDA.GB.2025.0000001')
-
-  const createdDisplayText = Array.from(document.body.querySelectorAll('.moj-timeline__item .moj-timeline__description .timeline-detail-row time')).map(time => time.innerHTML)
-  expect(createdDisplayText[0]).toBe("05 January 2025, 09:00:00")
-  expect(createdDisplayText[1]).toBe("05 January 2025, 09:00:00")
-  expect(createdDisplayText[2]).toBe("04 January 2025, 09:00:00")
-  expect(createdDisplayText[3]).toBe("03 January 2025, 09:00:00")
-  expect(createdDisplayText[4]).toBe("02 January 2025, 09:00:00")
-  expect(createdDisplayText[5]).toBe("01 January 2025, 09:00:00")
-  expect(createdDisplayText[6]).toBe("01 January 2025, 09:00:00")
-  expect(createdDisplayText[7]).toBe("01 January 2025, 09:00:00")
-  expect(createdDisplayText[8]).toBe("")
-  expect(createdDisplayText[9]).toBe("")
-  expect(createdDisplayText[10]).toBe("")
-  expect(createdDisplayText[11]).toBe("")
-  expect(createdDisplayText[12]).toBe("")
-  expect(createdDisplayText[13]).toBe("")
-  expect(createdDisplayText[14]).toBe("01 January 2025, 09:00:00")
-  expect(createdDisplayText[15]).toBe("")
-
-  const timelineClearanceRequestItems = Array.from(document.body.querySelectorAll('.moj-timeline__item'))
-    .filter(elem => elem.querySelector('.moj-timeline__header .moj-timeline__title span').innerHTML === 'CDS clearance request')
-
-  const timelineClearanceRequestVersionLabels = timelineClearanceRequestItems
-    .map(clearanceRequestItem => clearanceRequestItem.querySelectorAll('.moj-timeline__description .timeline-detail-row span')[0].innerHTML)
-  expect(timelineClearanceRequestVersionLabels).toHaveLength(2)
-  expect(timelineClearanceRequestVersionLabels.every(label => label === 'External version')).toBeTruthy()
-
-  const timelineClearanceRequestVersions = timelineClearanceRequestItems
-    .map(clearanceRequestItem => clearanceRequestItem.querySelectorAll('.moj-timeline__description .timeline-detail-row span')[1].innerHTML)
-  expect(timelineClearanceRequestVersions).toHaveLength(2)
-  expect(timelineClearanceRequestVersions.every(label => label === '1')).toBeTruthy()
-
-  const timelineBtmsDecisionItems = Array.from(document.body.querySelectorAll('.moj-timeline__item'))
-    .filter(elem => elem.querySelector('.moj-timeline__header .moj-timeline__title span').innerHTML === 'BTMS decision')
-
-  const timelineBtmsDecisionCodes = timelineBtmsDecisionItems
-    .map(btmsDecisionItem => btmsDecisionItem.querySelectorAll('.govuk-details__text .govuk-table .govuk-table__body .govuk-table__row .govuk-table__cell')[4].innerHTML)
-  expect(timelineBtmsDecisionCodes).toHaveLength(4)
-  expect(timelineBtmsDecisionCodes.every(decisionCode => decisionCode === 'X00')).toBeTruthy()
-
-  const timelineBtmsDecisionLabels = timelineBtmsDecisionItems
-    .map(btmsDecisionItem => btmsDecisionItem.querySelectorAll('.moj-timeline__description div:nth-child(2) span')[0].innerHTML)
-  expect(timelineBtmsDecisionLabels).toHaveLength(4)
-  expect(timelineBtmsDecisionLabels.every(label => label === 'Decision number')).toBeTruthy()
-
-  const timelineBtmsDecisionNumbers = timelineBtmsDecisionItems
-    .map(btmsDecisionItem => btmsDecisionItem.querySelectorAll('.moj-timeline__description div:nth-child(2) span')[1].innerHTML)
-  expect(timelineBtmsDecisionNumbers).toHaveLength(4)
-  expect(timelineBtmsDecisionNumbers[0]).toBe('1')
-  expect(timelineBtmsDecisionNumbers[1]).toBe('2')
-  expect(timelineBtmsDecisionNumbers[2]).toBe('3')
-  expect(timelineBtmsDecisionNumbers[3]).toBe('1')
-
-  const timelineBtmsDecisionExternalVersions = timelineBtmsDecisionItems
-    .map(btmsDecisionItem => btmsDecisionItem.querySelectorAll('.moj-timeline__description div:nth-child(3) span')[0].innerHTML)
-  expect(timelineBtmsDecisionExternalVersions).toHaveLength(4)
-  expect(timelineBtmsDecisionExternalVersions.every(label => label === 'External version')).toBeTruthy()
-
-  const timelineBtmsDecisionExternalVersionNumbers = timelineBtmsDecisionItems
-    .map(btmsDecisionItem => btmsDecisionItem.querySelectorAll('.moj-timeline__description div:nth-child(3) span')[1].innerHTML)
-  expect(timelineBtmsDecisionExternalVersionNumbers).toHaveLength(4)
-  expect(timelineBtmsDecisionExternalVersionNumbers[0]).toBe('1')
-  expect(timelineBtmsDecisionExternalVersionNumbers[1]).toBe('2')
-  expect(timelineBtmsDecisionExternalVersionNumbers[2]).toBe('3')
-  expect(timelineBtmsDecisionExternalVersionNumbers[3]).toBe('1')
-})
-
-test('handles resource event that cannot be parsed and mapped', async () => {
-  const customsDeclarations = [
-    createCustomsDeclaration('24GB0Z8WEJ9ZBTL73A', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z')
-  ]
-
-  const importPreNotifications = [
-    createImportPreNotification('CHEDA.GB.2025.0000001', 'CVEDA', 'CANCELLED', '2025-04-22T16:55:17.330Z', '1', '0101', 'Equus asinus', '2')
-  ]
-
-  const relatedImportDeclarations = {
-    customsDeclarations,
-    importPreNotifications
-  }
-
-  wreck.get
-    .mockResolvedValueOnce({ payload: provider })
-    .mockResolvedValueOnce({ payload: provider })
-    .mockResolvedValueOnce({ payload: relatedImportDeclarations })
-    .mockResolvedValueOnce({ payload: declarationResourceEvents })
-    .mockResolvedValueOnce({ payload: invalidResourceEvents })
-
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { payload, headers } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73A`,
-    auth: {
-      strategy: 'session',
-      credentials
-    },
-    headers: {
-      cookie:
-        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
-    }
-  })
-
-  expect(headers['cache-control']).toBe('no-store')
-
-  globalJsdom(payload)
-  initFilters()
-
-  const eventTitles = Array.from(document.body.querySelectorAll('.moj-timeline__item .moj-timeline__header .moj-timeline__title span:nth-child(1)')).map(title => title.innerHTML)
-  expect(eventTitles.length).toBe(12)
-  expect(eventTitles[0]).toBe('CDS finalisation')
-  expect(eventTitles[1]).toBe('BTMS decision')
-  expect(eventTitles[2]).toBe('CDS processing error')
-  expect(eventTitles[3]).toBe('BTMS processing error')
-  expect(eventTitles[4]).toBe('CDS clearance request')
-  expect(eventTitles[5]).toBe('BTMS decision')
-  expect(eventTitles[6]).toBe('BTMS decision')
-  expect(eventTitles[7]).toBe('CDS clearance request')
-  expect(eventTitles[8]).toBe('BTMS decision')
-  expect(eventTitles[9]).toBe('CDS finalisation')
-  expect(eventTitles[10]).toBe('CDS processing error')
-  expect(eventTitles[11]).toBe('BTMS processing error')
-})
-
-test('handles upstream errors when retrieving resource events', async () => {
-  const customsDeclarations = [
-    createCustomsDeclaration('24GB0Z8WEJ9ZBTL73A', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z')
-  ]
-
-  const importPreNotifications = [
-    createImportPreNotification('CHEDA.GB.2025.0000001', 'CVEDA', 'CANCELLED', '2025-04-22T16:55:17.330Z', '1', '0101', 'Equus asinus', '2')
-  ]
-
-  const relatedImportDeclarations = {
-    customsDeclarations,
-    importPreNotifications
-  }
-
-  wreck.get
-    .mockResolvedValueOnce({ payload: provider })
-    .mockResolvedValueOnce({ payload: provider })
-    .mockResolvedValueOnce({ payload: relatedImportDeclarations })
-    .mockResolvedValueOnce({ payload: declarationResourceEvents })
-
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { payload, headers } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73A`,
-    auth: {
-      strategy: 'session',
-      credentials
-    },
-    headers: {
-      cookie:
-        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
-    }
-  })
-
-  expect(headers['cache-control']).toBe('no-store')
-
-  globalJsdom(payload)
-  initFilters()
-
-  const eventTitles = Array.from(document.body.querySelectorAll('.moj-timeline__item .moj-timeline__header .moj-timeline__title span:nth-child(1)')).map(title => title.innerHTML)
-  expect(eventTitles.length).toBe(0)
-})
-
-test('timeline can be filtered', async () => {
-  const user = userEvent.setup()
-
-  const customsDeclarations = [
-    createCustomsDeclaration('24GB0Z8WEJ9ZBTL73A', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z'),
-    createCustomsDeclaration('24GB0Z8WEJ9ZBTL73B', '1GB126344356000-ABC35932Y1BHY', '2025-05-06T13:11:59.257Z')
-  ]
-
-  const importPreNotifications = [
-    createImportPreNotification('CHEDA.GB.2025.0000001', 'CVEDA', 'CANCELLED', '2025-04-22T16:55:17.330Z', '1', '0101', 'Equus asinus', '2')
-  ]
-
-  const relatedImportDeclarations = {
-    customsDeclarations,
-    importPreNotifications
-  }
-
-  wreck.get
-    .mockResolvedValueOnce({ payload: provider })
-    .mockResolvedValueOnce({ payload: provider })
-    .mockResolvedValueOnce({ payload: relatedImportDeclarations })
-    .mockResolvedValueOnce({ payload: importPreNotificationResourceEvents })
-    .mockResolvedValueOnce({ payload: declarationResourceEvents })
-    .mockResolvedValueOnce({ payload: emptyResourceEvents })
-
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const query = {
-    [queryStringParams.SEARCH_TERM]: '24GB0Z8WEJ9ZBTL73B',
-    timelineMrn: '24GB0Z8WEJ9ZBTL73B'
-  }
-  const queryString = new URLSearchParams(query).toString()
-
-  const { payload } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryString}#timeline-view`,
-    auth: { strategy: 'session', credentials },
-    headers: {
-      cookie:
-        'cookiePolicy=' + Buffer.from('{"analytics":false}').toString('base64')
-    }
-  })
-
-  globalJsdom(payload)
-
-  window.history.pushState({}, 'test', `?${queryString}`)
-  initFilters()
-
-  const timelineMrnFilter = document.getElementById('timelineMrn')
-
-  const mrnTimelines = document.body.querySelectorAll('.govuk-tabs__panel .mrn-timeline')
-  expect(mrnTimelines.length).toBe(2)
-  expect(mrnTimelines[0].hasAttribute('hidden')).toBeFalsy()
-  expect(mrnTimelines[1].hasAttribute('hidden')).toBeTruthy()
-
-  await user.selectOptions(timelineMrnFilter, '24GB0Z8WEJ9ZBTL73A')
-  expect(mrnTimelines[0].hasAttribute('hidden')).toBeTruthy()
-  expect(mrnTimelines[1].hasAttribute('hidden')).toBeFalsy()
-
-  await user.selectOptions(timelineMrnFilter, '24GB0Z8WEJ9ZBTL73B')
-  expect(mrnTimelines[0].hasAttribute('hidden')).toBeFalsy()
-  expect(mrnTimelines[1].hasAttribute('hidden')).toBeTruthy()
-})
-
-test('shows timeline for unmatched CHED', async () => {
-  const customsDeclarations = []
-
-  const importPreNotifications = [
-    createImportPreNotification('CHEDA.GB.2025.0000001', 'CVEDA', 'CANCELLED', '2025-04-22T16:55:17.330Z', '1', '0101', 'Equus asinus', '2')
-  ]
-
-  const relatedImportDeclarations = {
-    customsDeclarations,
-    importPreNotifications
-  }
-
-  wreck.get
-    .mockResolvedValueOnce({ payload: provider })
-    .mockResolvedValueOnce({ payload: provider })
-    .mockResolvedValueOnce({ payload: relatedImportDeclarations })
-    .mockResolvedValueOnce({ payload: importPreNotificationResourceEvents })
-
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const query = {
-    [queryStringParams.SEARCH_TERM]: '24GB0Z8WEJ9ZBTL73B',
-    timelineMrn: '24GB0Z8WEJ9ZBTL73B'
-  }
-  const queryString = new URLSearchParams(query).toString()
-
-  const { payload } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryString}#timeline-view`,
-    auth: { strategy: 'session', credentials },
-    headers: {
-      cookie:
-        'cookiePolicy=' + Buffer.from('{"analytics":false}').toString('base64')
-    }
-  })
-
-  globalJsdom(payload)
-
-  window.history.pushState({}, 'test', `?${queryString}`)
-  initFilters()
-
-  const mrnTimelines = document.body.querySelectorAll('.govuk-tabs__panel .mrn-timeline')
-  expect(mrnTimelines.length).toBe(1)
-  expect(mrnTimelines[0].hasAttribute('hidden')).toBeFalsy()
-})
-
-test('handles upstream errors when retrieving resource events for unmatched CHED', async () => {
-  const customsDeclarations = []
-
-  const importPreNotifications = [
-    createImportPreNotification('CHEDA.GB.2025.0000001', 'CVEDA', 'CANCELLED', '2025-04-22T16:55:17.330Z', '1', '0101', 'Equus asinus', '2')
-  ]
-
-  const relatedImportDeclarations = {
-    customsDeclarations,
-    importPreNotifications
-  }
-
-  wreck.get
-    .mockResolvedValueOnce({ payload: provider })
-    .mockResolvedValueOnce({ payload: provider })
-    .mockResolvedValueOnce({ payload: relatedImportDeclarations })
-
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { payload, headers } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73A`,
-    auth: {
-      strategy: 'session',
-      credentials
-    },
-    headers: {
-      cookie:
-        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
-    }
-  })
-
-  expect(headers['cache-control']).toBe('no-store')
-
-  globalJsdom(payload)
-  initFilters()
-
-  const eventTitles = Array.from(document.body.querySelectorAll('.moj-timeline__item .moj-timeline__header .moj-timeline__title span:nth-child(1)')).map(title => title.innerHTML)
-  expect(eventTitles.length).toBe(0)
 })
 
 test.each([
@@ -2609,21 +1680,7 @@ test('handles CHEDs in amend and modify status', async () => {
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
-  const server = await initialiseServer()
-  const credentials = await setupAuthedUserSession(server)
-
-  const { payload, headers } = await server.inject({
-    method: 'get',
-    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`,
-    auth: {
-      strategy: 'session',
-      credentials
-    },
-    headers: {
-      cookie:
-        'cookiePolicy=' + Buffer.from('{"analytics": "no"}').toString('base64')
-    }
-  })
+  const { payload, headers } = await injectSearchResultWithCookie(searchResultUrl('24GB0Z8WEJ9ZBTL73B'))
 
   expect(headers['cache-control']).toBe('no-store')
 
