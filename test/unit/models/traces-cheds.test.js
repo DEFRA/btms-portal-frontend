@@ -19,6 +19,94 @@ const createTradeLineItem = ({
   netVolume
 })
 
+const createCustomsDeclaration = (mrn, ducr, updated) => {
+  return {
+    movementReferenceNumber: mrn,
+    clearanceRequest: {
+      declarationUcr: ducr,
+      commodities: [
+        {
+          itemNumber: 1,
+          taricCommodityCode: '0304719030',
+          goodsDescription: 'FROZEN MSC A COD FILLETS',
+          netMass: '17088.98',
+          supplementaryUnits: 0,
+          documents: [
+            {
+              documentReference: 'CHEDA.GB.2025.0000001',
+              documentCode: 'N002'
+            }
+          ],
+          checks: [{ checkCode: 'H218', departmentCode: 'HMI' }]
+        },
+        {
+          itemNumber: 2,
+          taricCommodityCode: '0304720000',
+          goodsDescription: 'FROZEN MSC HADDOCK FILLETS',
+          netMass: '4618.35',
+          documents: [
+            {
+              documentReference: 'CHEDP.GB.2025.0000002',
+              documentCode: 'N853'
+            }
+          ],
+          checks: [
+            {
+              departmentCode: 'HMI',
+              checkCode: 'H222'
+            }
+          ]
+        },
+        {
+          itemNumber: 3,
+          taricCommodityCode: '1602321990',
+          goodsDescription: 'JBB VIENNESE ROAST 2 KG',
+          netMass: '87.07',
+          documents: [
+            {
+              documentReference: 'CHEDP.BB.2025.NOMATCH',
+              documentCode: 'N002'
+            }
+          ],
+          checks: [{ checkCode: 'H220', departmentCode: 'HMI' }]
+        }
+      ]
+    },
+    clearanceDecision: {
+      results: [
+        {
+          itemNumber: 1,
+          checkCode: 'H218',
+          decisionCode: 'C03',
+          documentReference: 'CHEDA.GB.2025.0000001'
+        },
+        {
+          itemNumber: 2,
+          checkCode: 'H222',
+          decisionCode: 'H01',
+          documentReference: 'CHEDP.GB.2025.0000002',
+          mode: null
+        },
+        {
+          itemNumber: 3,
+          checkCode: 'H220',
+          decisionCode: 'X00',
+          documentReference: 'CHEDP.BB.2025.NOMATCH',
+          decisionReason:
+            'This CHED reference cannot be found on the customs declaration. Please check that the reference is correct.',
+          internalDecisionCode: 'E70',
+          mode: 'Active'
+        }
+      ]
+    },
+    finalisation: {
+      finalState: '0',
+      isManualRelease: false
+    },
+    updated
+  }
+}
+
 const createTracesChed = (identifier, options = {}) => ({
   ched: {
     exchangedDocument: {
@@ -66,6 +154,7 @@ describe('#mapTracesCheds', () => {
 
     test('should map the DECISION_CONCLUSION decision onto every commodity', () => {
       const searchResults = {
+        customsDeclarations: [createCustomsDeclaration('24GB0Z8WEJ9ZBTL73B', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z')],
         cheds: [
           createTracesChed('CHEDA.GB.2025.0000001', {
             tradeLineItems: [
@@ -107,6 +196,7 @@ describe('#mapTracesCheds', () => {
 
       for (const [content, expected] of knownConclusions) {
         const searchResults = {
+          customsDeclarations: [createCustomsDeclaration('24GB0Z8WEJ9ZBTL73B', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z')],
           cheds: [
             createTracesChed('CHEDA.GB.2025.0000001', {
               tradeLineItems: [createTradeLineItem({ sequenceNumeric: 1 })],
@@ -125,6 +215,7 @@ describe('#mapTracesCheds', () => {
 
     test('should show Unknown (CODE) when the DECISION_CONCLUSION value is unmapped', () => {
       const searchResults = {
+        customsDeclarations: [createCustomsDeclaration('24GB0Z8WEJ9ZBTL73B', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z')],
         cheds: [
           createTracesChed('CHEDA.GB.2025.0000001', {
             tradeLineItems: [createTradeLineItem({ sequenceNumeric: 1 })],
@@ -138,6 +229,69 @@ describe('#mapTracesCheds', () => {
       expect(mapTracesCheds(searchResults, 'CHEDA.GB.2025.0000001')[0].commodities).toEqual([
         expect.objectContaining({ decision: 'Unknown (SOME_NEW_CONCLUSION)' })
       ])
+    })
+
+    test.each([
+      {
+        chedStatus: '1',
+        chedStatusDescription: 'NEW'
+      },
+      {
+        chedStatus: '42',
+        chedStatusDescription: 'IN PROGRESS'
+      }
+    ])('should show Decision not given when CHED is $chedStatusDescription and there are no associated Customs Declarations', ({chedStatus, chedStatusDescription}) => {
+      const searchResults = {
+        cheds: [
+          createTracesChed('CHEDA.GB.2025.0000001', {
+            documentStatusCode: chedStatus,
+            tradeLineItems: [createTradeLineItem({ sequenceNumeric: 1 })],
+            secondSignatoryAuthentication: createClearanceSignatory([
+              { identifier: 'DECISION_CONCLUSION', content: 'NOT_ACCEPTABLE' }
+            ])
+          })
+        ]
+      }
+
+      expect(mapTracesCheds(searchResults, 'CHEDA.GB.2025.0000001')[0].commodities).toEqual([
+        expect.objectContaining({ decision: 'Decision not given' })
+      ])
+    })
+
+    test('should map all known DECISION_CONCLUSION values if status is not NEW or IN PROGRESS and there are no associated Customs Declarations', () => {
+      const knownConclusions = [
+        ['ACCEPTABLE_FOR_INTERNAL_MARKET', 'Acceptable for internal market'],
+        ['ACCEPTABLE_FOR_FREE_CIRCULATION', 'Acceptable for free circulation'],
+        ['ACCEPTABLE_FOR_DIRECT_TRANSIT', 'Acceptable for direct transit'],
+        ['ACCEPTABLE_FOR_INDIRECT_TRANSIT', 'Acceptable for indirect transit'],
+        ['ACCEPTABLE_FOR_MONITORING', 'Acceptable for monitoring'],
+        ['ACCEPTABLE_FOR_ONWARD_TRANSPORTATION', 'Acceptable for onward transportation'],
+        ['ACCEPTABLE_FOR_ONWARD_TRAVEL', 'Acceptable for onward travel'],
+        ['ACCEPTABLE_FOR_PRIVATE_IMPORT', 'Acceptable for private import'],
+        ['ACCEPTABLE_FOR_TEMPORARY_ADMISSION', 'Acceptable for temporary admission'],
+        ['ACCEPTABLE_FOR_TRANSFER', 'Acceptable for transfer'],
+        ['ACCEPTABLE_FOR_TRANSHIPMENT', 'Acceptable for transhipment'],
+        ['ACCEPTABLE_FOR_TRANSIT_TO_US_OR_NATO_BASE', 'Acceptable for transit to US or NATO base'],
+        ['NOT_ACCEPTABLE', 'Not acceptable']
+      ]
+
+      for (const [content, expected] of knownConclusions) {
+        const searchResults = {
+          cheds: [
+            createTracesChed('CHEDA.GB.2025.0000001', {
+              documentStatusCode: '70',
+              tradeLineItems: [createTradeLineItem({ sequenceNumeric: 1 })],
+              secondSignatoryAuthentication: createClearanceSignatory([
+                { identifier: 'DECISION_CONCLUSION', content }
+              ])
+            })
+          ]
+        }
+
+        expect(mapTracesCheds(searchResults, 'CHEDA.GB.2025.0000001')[0].commodities).toEqual([
+          expect.objectContaining({ decision: expected })
+        ])
+      }
     })
 
     test('should fall back to Decision not given when there is no second signatory authentication', () => {
