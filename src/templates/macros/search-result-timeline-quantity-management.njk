@@ -1,0 +1,58 @@
+{% macro quantityManagement(timelineEvent) %}
+  {% set statusClasses = {
+    "Reserved": "govuk-tag--yellow",
+    "Finalised": "govuk-tag--green",
+    "Unsuccessful": "govuk-tag--red"
+  } %}
+
+  <div class="timeline-detail-row">
+    <span class="timeline-detail-label">Quantity status</span>
+    <span class="govuk-tag {{ statusClasses[timelineEvent.status] }}">{{ timelineEvent.status }}</span>
+  </div>
+  {% if timelineEvent.status === "Unsuccessful" %}
+    <div class="timeline-detail-row">
+      <span class="timeline-detail-label">Unsuccessful reason</span>
+      <span>{{ timelineEvent.unsuccessfulReason }}</span>
+    </div>
+  {% endif %}
+  <div class="timeline-detail-row">
+    <span class="timeline-detail-label">CHED reference</span>
+    <span>{{ timelineEvent.chedReference }}</span>
+  </div>
+  <div class="timeline-detail-row">
+    <span class="timeline-detail-label">Created</span>
+    <time datetime="{{ timelineEvent.created}}">{% if timelineEvent.created %}{{ timelineEvent.created | date("DD MMMM yyyy, HH:mm:ss") }}{% endif %}</time>
+  </div>
+  {% if timelineEvent.status !== "Unsuccessful" and timelineEvent.commodities | length > 0 %}
+    <details class="govuk-details">
+      <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+          More details
+        </span>
+      </summary>
+      <div class="govuk-details__text">
+        <table class="govuk-table">
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">Item No.</th>
+              <th scope="col" class="govuk-table__header">Commodity code</th>
+              <th scope="col" class="govuk-table__header">Quantity</th>
+              <th scope="col" class="govuk-table__header">Unit of measure</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            {% for commodity in timelineEvent.commodities %}
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell">{{ commodity.itemNo }}</td>
+                <td class="govuk-table__cell">{{ commodity.commodityCode }}</td>
+                <td class="govuk-table__cell">{{ commodity.quantity }}</td>
+                <td class="govuk-table__cell">{{ commodity.unitOfMeasure }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </details>
+  {% endif %}
+
+{% endmacro %}

@@ -56,19 +56,41 @@ const sortCreatedDescending = (a, b) => {
   return bCreatedTime - aCreatedTime
 }
 
-const getEventsFromCustomsDeclarations = async (customsDeclarations, chedGroups) => {
-  const allTimelineEvents = chedGroups.flatMap(({ timelineEvents }) => timelineEvents)
+const getQuantityManagementEvents = async (showQuantityStatus, declarationChedGroups, declaration) => {
+  let quantityManagementEvents = []
+
+  if (showQuantityStatus) {
+    for (const chedGroup of declarationChedGroups) {
+      const chedReservationEvents = await getResourceEvents(`${chedGroup.chedRef}_${declaration.movementReferenceNumber}`) // NOSONAR - S9382: fetch inside loop is intentional
+      const reservationEvents = mapResourceEvents(undefined, chedGroup.chedRef, chedReservationEvents)
+      quantityManagementEvents = quantityManagementEvents.concat(reservationEvents)
+    }
+  }
+
+  return quantityManagementEvents
+}
+
+const getEventsFromCustomsDeclarations = async (customsDeclarations, chedGroups, showQuantityStatus) => {
   const customsDeclarationEvents = []
 
   for (const declaration of customsDeclarations) {
     try {
       const declarationResourceEvents = await getResourceEvents(declaration.movementReferenceNumber) // NOSONAR - S9382: serial fetch is intentional; per-item error handling relies on iteration order
       const declarationTimelineEvents = mapResourceEvents(declaration.movementReferenceNumber, undefined, declarationResourceEvents)
-      const timelineEvents = declarationTimelineEvents.concat(allTimelineEvents).sort(sortCreatedDescending)
+
+      const declarationChedGroups = chedGroups.filter(chedEvent =>
+        declaration?.commodities?.some(commodity =>
+          commodity.documents?.some(document =>
+            document.documentReference?.toUpperCase() === chedEvent.chedRef.toUpperCase())))
+      const declarationChedEvents = declarationChedGroups.flatMap(({ timelineEvents }) => timelineEvents)
+
+      const quantityManagementEvents = await getQuantityManagementEvents(showQuantityStatus, declarationChedGroups, declaration) // NOSONAR - S9382: fetch inside loop is intentional
+
+      const mrnEvents = declarationTimelineEvents.concat(declarationChedEvents).concat(quantityManagementEvents).sort(sortCreatedDescending)
 
       customsDeclarationEvents.push({
         mrn: declaration.movementReferenceNumber,
-        timelineEvents
+        timelineEvents: mrnEvents
       })
     } catch (error) {
       logger.warn(`Unable to retrieve and map timeline resource events for MRN ${declaration.movementReferenceNumber}. ERROR: ${error.message}`)
@@ -107,7 +129,7 @@ const getTimelineEvents = async (referenceNumbers) => {
   return timelineGroups
 }
 
-const getAllEvents = async (customsDeclarations, preNotifications, tracesCheds) => {
+const getAllEvents = async (customsDeclarations, preNotifications, tracesCheds, showQuantityStatus) => {
   const ipaffsChedGroups = await getTimelineEvents(preNotifications.map(({ referenceNumber }) => referenceNumber))
   const tracesChedGroups = await getTimelineEvents(tracesCheds.map(({ reference }) => reference))
   const chedGroups = ipaffsChedGroups.concat(tracesChedGroups)
@@ -116,7 +138,7 @@ const getAllEvents = async (customsDeclarations, preNotifications, tracesCheds) 
     return chedGroups
   }
 
-  return getEventsFromCustomsDeclarations(customsDeclarations, chedGroups)
+  return getEventsFromCustomsDeclarations(customsDeclarations, chedGroups, showQuantityStatus)
 }
 
 const includesInternalDecisionCodes = (customsDeclarations, codes) => {
@@ -150,7 +172,7 @@ export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_
   const customsDeclarations = mapCustomsDeclarations(searchResults, searchTerm)
   const preNotifications = mapPreNotifications(searchResults, searchTerm)
   const tracesCheds = showTracesCheds ? mapTracesCheds(searchResults, searchTerm) : []
-  const timelineEvents = await getAllEvents(customsDeclarations, preNotifications, tracesCheds)
+  const timelineEvents = await getAllEvents(customsDeclarations, preNotifications, tracesCheds, showQuantityStatus)
 
   const showLevelNoMatchBanner = isInFeatureGroup(AUTH_FEATURES.LEVEL_NO_MATCH_SEARCH_RESULTS, request.auth.credentials.scope)
   const showLevel2NoMatchText = showLevelNoMatchBanner && includesInternalDecisionCodes(searchResults.customsDeclarations, ['E20'])

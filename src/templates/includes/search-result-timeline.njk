@@ -6,6 +6,7 @@
 {% from "../macros/search-result-timeline-cds-error.njk" import cdsErrorEvent %}
 {% from "../macros/search-result-timeline-cds-finalisation.njk" import cdsFinalisationEvent %}
 {% from "../macros/search-result-timeline-ched.njk" import chedEvent %}
+{% from "../macros/search-result-timeline-quantity-management.njk" import quantityManagement %}
 
 <div class="btms-timelines">
   {% if timelineEvents.length > 1 %}
@@ -54,6 +55,8 @@
         {% set eventHtml = cdsFinalisationEvent(timelineEvent) %}
       {% elif timelineEvent.eventType === 'Ched' %}
         {% set eventHtml = chedEvent(timelineEvent) %}
+      {% elif timelineEvent.eventType === 'QuantityManagement' %}
+        {% set eventHtml = quantityManagement(timelineEvent) %}
       {% endif %}
 
       {% set timelineItems = (timelineItems.push(
