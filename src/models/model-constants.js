@@ -327,3 +327,18 @@ export const UNSUCCESSFUL_QUANTITY_RESERVATION_REASONS = {
   E46: 'The unit of measure on the customs declaration and CHED do not match. Update a document so the units of measure align.',
   E47: 'Due to a technical issue TRACES cannot run its automated calculation checks. Contact the National Clearance Hub.'
 }
+
+export const QUANTITY_RESERVATION_UNSUCCESSFUL_REASON_DECISION = {
+  Unrecognised: internalDecisionCodeDescriptions['E40'],
+  BaseForExtract: internalDecisionCodeDescriptions['E40'],
+  PcaDocumentUsed: internalDecisionCodeDescriptions['E40'],
+  CountryOfDestinationMismatch: internalDecisionCodeDescriptions['E40'],
+  LicenceHolderMismatch: internalDecisionCodeDescriptions['E40'],
+  CnCodesMismatch: internalDecisionCodeDescriptions['E41'],
+  InappropriateStatus: internalDecisionCodeDescriptions['E42'],
+  QuantitiesInsufficient: internalDecisionCodeDescriptions['E43'],
+  WriteOffExists: internalDecisionCodeDescriptions['E44'],
+  LineNumbersMismatch: internalDecisionCodeDescriptions['E45'],
+  MeasurementUnitMismatch: internalDecisionCodeDescriptions['E46'],
+  QuantitiesCannotBeValidated: internalDecisionCodeDescriptions['E47']
+}
