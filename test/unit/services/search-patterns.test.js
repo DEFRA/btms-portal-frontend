@@ -34,7 +34,18 @@ test.each([
   ['GBCHD2024.52862422V', true],
   ['GBCHD2024.5286242R', true],
   ['GBCHD2024.52862422R', true],
-  ['GMRA00000AB1', true]
+  ['GMRA00000AB1', true],
+  ['26GBTEST9908000001', true],
+  ['26GBtest9908000001', true],
+  ['26gbtest9908000001', true],
+  ['26GB_TEST990800000', false],
+  ['26GB`TEST990800000', false],
+  ['26GB[TEST990800000', false],
+  ['26GB\\TEST990800000', false],
+  ['26GB]TEST990800000', false],
+  ['26GB^TEST990800000', false],
+  ['26GBTEST990800000', false],
+  ['26GBTEST99080000011', false]
 ])('The search pattern test for %s should equal %s', (search, expected) => {
   const searchPattern = searchPatterns.find(({ pattern }) =>
     pattern.test(search)

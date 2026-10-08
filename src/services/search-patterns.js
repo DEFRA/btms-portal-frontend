@@ -12,7 +12,7 @@ export const searchKeys = {
 export const searchPatterns = [
   {
     key: searchKeys.MRN,
-    pattern: /^\d{2}[A-Z]{2}[A-z0-9]{14}$/,
+    pattern: /^\d{2}[A-Za-z]{2}[A-Za-z0-9]{14}$/,
     description: 'MRN'
   },
   {
