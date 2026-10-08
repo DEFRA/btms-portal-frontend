@@ -540,6 +540,76 @@ test('shows TRACES CHED placeholders when feature flag is enabled', async () => 
   expect(within(tracesChedDetails).getByText('03019985')).toBeInTheDocument()
 })
 
+test('does not throw on load when TRACES CHEDs are shown and the MRN filter is still set up', async () => {
+  config.set('isTracesChedsEnabled', true)
+  const twoDeclarations = {
+    customsDeclarations: [
+      createCustomsDeclaration('24GB0Z8WEJ9ZBTL73B', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z'),
+      createCustomsDeclaration('24GB0Z8WEJ9ZBTL73A', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z')
+    ],
+    importPreNotifications,
+    cheds: [
+      createTracesChed('CHEDD.GB.2025.0000003', '2025-06-01T09:30:00.000Z')
+    ]
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: twoDeclarations })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73B'))
+
+  globalJsdom(payload)
+
+  const tracesTable = document.querySelector('table.btms-traces-ched')
+
+  expect(tracesTable).toBeInTheDocument()
+  expect(tracesTable).not.toHaveClass('btms-notification')
+
+  expect(() => initFilters()).not.toThrow()
+
+  const mrnFilterWrapper = document.getElementById('timeline-filters-wrapper')
+
+  expect(mrnFilterWrapper.hasAttribute('hidden')).toBe(false)
+  expect(document.getElementById('timelineMrn').options.length).toBe(2)
+})
+
+test('keeps notification rows visible when they have no authority list', () => {
+  globalJsdom()
+
+  document.body.innerHTML = `
+    <div id="notification-filters-wrapper" hidden>
+      <form id="notification-filters">
+        <div id="notification-reset"></div>
+      </form>
+    </div>
+    <table class="btms-notification">
+      <thead><tr><th>Item number</th></tr></thead>
+      <tbody><tr id="notification-no-list"><td>No authority list</td></tr></tbody>
+    </table>
+    <div id="notification-levels-result-filters-wrapper" hidden>
+      <form id="notification-levels-result-filters">
+        <div id="notification-levels-result-reset"></div>
+      </form>
+    </div>
+    <table class="btms-notification-levels-result">
+      <thead><tr><th>Item number</th></tr></thead>
+      <tbody><tr id="notification-levels-result-no-list"><td>No authority list</td></tr></tbody>
+    </table>
+  `
+
+  initFilters()
+
+  expect(document.getElementById('notification-no-list').hidden).toBe(false)
+  expect(document.getElementById('notification-levels-result-no-list').hidden).toBe(false)
+})
+
 test('renders results page when only TRACES CHEDs are found and feature flag is enabled', async () => {
   config.set('isTracesChedsEnabled', true)
   const onlyTracesCheds = {
