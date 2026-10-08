@@ -17,7 +17,8 @@ import {
   DECISION_MODE,
   HIGHER_LEVEL_DECISION_CODE,
   QUANTITY_STATUSES,
-  quantityStatusDescriptions
+  quantityStatusDescriptions,
+  UNSUCCESSFUL_QUANTITY_RESERVATION_REASONS
 } from './model-constants.js'
 import { sortDescending } from './sort.js'
 import { paths, queryStringParams } from '../routes/route-constants.js'
@@ -70,6 +71,10 @@ const isRefusalDecisionCode = (decisionCode) => {
 }
 const isReleaseDecisionCode = (decisionCode) => {
   return hasDesiredPrefix(decisionCode, 'c0')
+}
+
+const isUnsuccessfulQuantityReservationDecisionCode = (decisionCode) => {
+  return hasDesiredPrefix(decisionCode, 'e4')
 }
 
 export const getDecision = (decisionCode, internalDecisionCode) => {
@@ -219,6 +224,13 @@ const getQuantityStatus = (tracesChedIds, quantityStatuses, mrn, documentReferen
   return quantityStatuses[`${mrn}|${documentReference}`] ?? QUANTITY_STATUSES.UNRESERVED
 }
 
+const getUnsuccessfulQuantityStatusReason = (clearanceDecision, commodity) => {
+  const reservationResult = clearanceDecision?.results.find(
+    (result) => result.itemNumber === commodity.itemNumber && isUnsuccessfulQuantityReservationDecisionCode(result.internalDecisionCode))?.internalDecisionCode || null
+
+  return UNSUCCESSFUL_QUANTITY_RESERVATION_REASONS[reservationResult]
+}
+
 const mapCommodity = (commodity, context) => {
   const { notificationStatuses, clearanceDecision, quantityStatuses, tracesChedIds, mrn } = context
   const clearanceDecisions =
@@ -256,6 +268,9 @@ const mapCommodity = (commodity, context) => {
       !noMatchInternalDecisionCodes.has(decision.internalDecisionCode)
     )
 
+    const quantityStatus = getQuantityStatus(tracesChedIds, quantityStatuses, mrn, documentReference)
+    const quantityStatusReason = quantityStatus === QUANTITY_STATUSES.UNSUCCESSFUL ? getUnsuccessfulQuantityStatusReason(clearanceDecision, commodity) : undefined
+
     return {
       id: randomUUID(),
       checkCode: decision.checkCode,
@@ -278,7 +293,8 @@ const mapCommodity = (commodity, context) => {
       },
       documentReference,
       match: isIuuOutcome ? null : isMatch,
-      quantityStatus: getQuantityStatus(tracesChedIds, quantityStatuses, mrn, documentReference),
+      quantityStatus,
+      quantityStatusReason,
       level2NoMatch,
       level3NoMatch,
       level3NoMatchWeight,

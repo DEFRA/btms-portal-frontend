@@ -40,7 +40,7 @@
           <td class="govuk-table__cell">{{ commodityDescription(commodity.goodsDescription, commodity.id, maxLength) }}</td>
           <td class="govuk-table__cell">{% include "./commodity-weight-quantity.njk" %}</td>
           {% if showQuantityStatusColumn %}
-            <td class="govuk-table__cell">{{ quantityStatus(decision.quantityStatus) }}</td>
+            <td class="govuk-table__cell">{{ quantityStatus(decision.quantityStatus, decision.quantityStatusReason, commodity.id) }}</td>
           {% endif %}
           {{ documentReference(decision) }}
           <td class="govuk-table__cell">{{ decisionMatch(matchResult) }}</td>
