@@ -1,12 +1,21 @@
 {% from "govuk/components/tag/macro.njk" import govukTag %}
 
-{% macro quantityStatus(status) %}
+{% macro quantityStatus(status, unsuccessfulReason, commodityId) %}
   {% set statusClasses = {
     "Unreserved": "govuk-tag--grey",
     "Reserved": "govuk-tag--yellow",
-    "Finalised": "govuk-tag--green"
+    "Finalised": "govuk-tag--green",
+    "Unsuccessful": "govuk-tag--red"
   } %}
   {% if statusClasses[status] %}
-    {{ govukTag({ text: status, classes: statusClasses[status] }) }}
+    {% if status === "Unsuccessful" %}
+      {% set id = 'quantity-status-tooltip-' ~ commodityId %}
+      <span aria-describedby="{{ id }}" tabindex="0">
+        {{ govukTag({ text: status, classes: statusClasses[status] }) }}
+        <span role="tooltip" id="{{ id }}">{{ unsuccessfulReason }}</span>
+      </span>
+    {% else %}
+      {{ govukTag({ text: status, classes: statusClasses[status] }) }}
+    {% endif %}
   {% endif %}
 {% endmacro %}

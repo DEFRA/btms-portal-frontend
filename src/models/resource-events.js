@@ -1,4 +1,5 @@
 import { getCustomsDeclarationStatus } from './customs-declarations.js'
+import { getTracesChedStatus } from './traces-cheds.js'
 import {
   checkCodeToAuthorityMapping,
   checkCodeToAuthorityNameMapping,
@@ -11,10 +12,11 @@ import { createLogger } from '../utils/logger.js'
 
 const logger = createLogger()
 
-const RESOURCE_TYPE = {
+export const RESOURCE_TYPE = {
   IMPORT_PRE_NOTIFICATION: 'ImportPreNotification',
   CUSTOMS_DECLARATION: 'CustomsDeclaration',
-  PROCESSING_ERROR: 'ProcessingError'
+  PROCESSING_ERROR: 'ProcessingError',
+  TRACES_CHED: 'TracesChed'
 }
 
 const SUB_RESOURCE_TYPE = {
@@ -27,7 +29,8 @@ const SUB_RESOURCE_TYPE = {
 const EVENT_SOURCE_DESCRIPTIONS = {
   IPAFFS_TO_BTMS: 'IPAFFS to BTMS',
   CDS_TO_BTMS: 'CDS to BTMS',
-  BTMS_TO_CDS: 'BTMS to CDS'
+  BTMS_TO_CDS: 'BTMS to CDS',
+  TRACES_TO_BTMS: 'TRACES to BTMS'
 }
 
 const EVENT_SOURCE = {
@@ -36,7 +39,8 @@ const EVENT_SOURCE = {
   DECISION_NOTIFICATION: EVENT_SOURCE_DESCRIPTIONS.BTMS_TO_CDS,
   FINALISATION: EVENT_SOURCE_DESCRIPTIONS.CDS_TO_BTMS,
   CDS_ERROR: EVENT_SOURCE_DESCRIPTIONS.CDS_TO_BTMS,
-  PROCESSING_ERROR: EVENT_SOURCE_DESCRIPTIONS.BTMS_TO_CDS
+  PROCESSING_ERROR: EVENT_SOURCE_DESCRIPTIONS.BTMS_TO_CDS,
+  TRACES_CHED: EVENT_SOURCE_DESCRIPTIONS.TRACES_TO_BTMS
 }
 
 const EVENT_TYPE = {
@@ -235,6 +239,19 @@ const mapImportPreNotificationResourceEvent = (resourceMessage) => {
   }
 }
 
+const mapTracesChedResourceEvent = (resourceMessage) => {
+  const ched = resourceMessage.resource?.ched
+  const documentStatusCode = ched?.exchangedDocument?.documentStatusCode
+
+  return {
+    eventType: EVENT_TYPE.CHED,
+    eventTitle: ched?.exchangedDocument?.identifier,
+    source: EVENT_SOURCE.TRACES_CHED,
+    status: getTracesChedStatus(documentStatusCode),
+    created: ched?.lastUpdated
+  }
+}
+
 export const mapResourceEvents = (mrn, chedRef, resourceEvents) => {
   const mappedResourceEvents = []
 
@@ -267,6 +284,10 @@ export const mapResourceEvents = (mrn, chedRef, resourceEvents) => {
 
       if (resourceEvent.resourceType === RESOURCE_TYPE.IMPORT_PRE_NOTIFICATION) {
         mappedResourceEvents.push(mapImportPreNotificationResourceEvent(resourceMessage))
+      }
+
+      if (resourceEvent.resourceType === RESOURCE_TYPE.TRACES_CHED) {
+        mappedResourceEvents.push(mapTracesChedResourceEvent(resourceMessage))
       }
     } catch (error) {
       logger.warn(`Unable to parse and map timeline resource event for resource Id ${mrn || chedRef}. ERROR: ${error.message}`)
