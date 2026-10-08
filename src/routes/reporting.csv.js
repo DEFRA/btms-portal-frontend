@@ -13,6 +13,7 @@ import {
 } from './route-constants.js'
 import { APP_SCOPES } from '../auth/auth-constants.js'
 import { EU_COUNTRY_CODES } from '../models/model-constants.js'
+import { csvValue } from '../utils/csv.js'
 
 const createHandler = (mapRowHandler, headers, useV2 = false) => {
   return async (request, h) => {
@@ -36,8 +37,8 @@ const createHandler = (mapRowHandler, headers, useV2 = false) => {
 const reportMapRowHandler = (value) => {
   return [
     value.reference,
-    `"${format(new Date(value.timestamp), 'dd MMMM yy, HH:mm')}"`
-  ].join(',') + '\n'
+    format(new Date(value.timestamp), 'dd MMMM yy, HH:mm')
+  ].map(csvValue).join(',') + '\n'
 }
 
 const reportHeaders = 'MRN,Last updated\n'
@@ -68,22 +69,22 @@ export const reportingCsv = {
 const restrictedReportMapRowHandler = (value) => {
   return [
     value.level,
-    `"${format(new Date(value.timestamp), 'dd MMMM yy, HH:mm')}"`,
+    format(new Date(value.timestamp), 'dd MMMM yy, HH:mm'),
     value.mrn,
     value.itemNumber,
     value.commodityCode,
     value.checkCode,
-    `"${value.description}"`,
+    value.description,
     value.quantityOrWeight,
     value.chedReference,
     value.match,
     value.authority,
     value.decision,
-    `"${value.decisionReasons ?? ""}"`,
+    value.decisionReasons,
     value.declarantId,
     value.dispatchCountryCode,
-    EU_COUNTRY_CODES.has(value.dispatchCountryCode?.toUpperCase()) ? 'EU' : 'RoW',
-  ].join(',') + '\n'
+    EU_COUNTRY_CODES.has(value.dispatchCountryCode?.toUpperCase()) ? 'EU' : 'RoW'
+  ].map(csvValue).join(',') + '\n'
 }
 
 const restrictedReportHeaders = 'Level,Last updated,MRN,Item number,Commodity code,Check code,Description,Quantity/Weight,CHED reference,Match,Authority,Decision,Decision reason,EORI Number,Country Code,Country Region (EU or RoW)\n'
