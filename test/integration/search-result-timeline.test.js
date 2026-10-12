@@ -1216,6 +1216,7 @@ test('shows Quantity Management events', async () => {
             chedId: 'CHEDP.GB.2025.0000002',
             status: 'Unsuccessful',
             unsuccessfulReason: 'Unrecognised',
+            timestamp: '2025-07-02T10:01:00.000Z',
             commodities: [] // Unsuccessful reservations don't currently include commodities
           }
         }
@@ -1229,6 +1230,7 @@ test('shows Quantity Management events', async () => {
           reservation: {
             chedId: 'CHEDP.GB.2025.0000002',
             status: 'Reserved',
+            timestamp: '2025-07-02T10:02:00.000Z',
             commodities: [
               {
                 goodsItemNumber: 1,
@@ -1249,6 +1251,7 @@ test('shows Quantity Management events', async () => {
           reservation: {
             chedId: 'CHEDP.GB.2025.0000002',
             status: 'Consumed',
+            timestamp: '2025-07-02T10:03:00.000Z',
             commodities: [
               {
                 goodsItemNumber: 1,
