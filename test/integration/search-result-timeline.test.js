@@ -1201,3 +1201,252 @@ test('degrades gracefully when retrieving resource events for a pre notification
   const eventTitles = Array.from(document.body.querySelectorAll('.moj-timeline__item .moj-timeline__header .moj-timeline__title span:nth-child(1)')).map(title => title.innerHTML)
   expect(eventTitles).not.toContain('CHEDA.GB.2025.0000001')
 })
+
+test('shows Quantity Management events', async () => {
+  config.set('isTracesChedsEnabled', true)
+  config.set('isQuantityStatusEnabled', true)
+
+  const quantityManagementResourceEvents = [
+    {
+      resourceType: 'ChedReservation',
+      message: JSON.stringify({
+        resource: {
+          created: '2025-07-02T10:01:00.000Z',
+          reservation: {
+            chedId: 'CHEDP.GB.2025.0000002',
+            status: 'Unsuccessful',
+            unsuccessfulReason: 'Unrecognised',
+            commodities: [] // Unsuccessful reservations don't currently include commodities
+          }
+        }
+      })
+    },
+    {
+      resourceType: 'ChedReservation',
+      message: JSON.stringify({
+        resource: {
+          created: '2025-07-02T10:02:00.000Z',
+          reservation: {
+            chedId: 'CHEDP.GB.2025.0000002',
+            status: 'Reserved',
+            commodities: [
+              {
+                goodsItemNumber: 1,
+                commodityCode: '03019985',
+                quantity: 1000,
+                unitOfMeasure: 'KGM'
+              }
+            ]
+          }
+        }
+      })
+    },
+    {
+      resourceType: 'ChedReservation',
+      message: JSON.stringify({
+        resource: {
+          created: '2025-07-02T10:03:00.000Z',
+          reservation: {
+            chedId: 'CHEDP.GB.2025.0000002',
+            status: 'Consumed',
+            commodities: [
+              {
+                goodsItemNumber: 1,
+                commodityCode: '03019985',
+                quantity: 1000,
+                unitOfMeasure: 'KGM'
+              }
+            ]
+          }
+        }
+      })
+    }
+  ]
+
+  const ched = createTracesChed('CHEDP.GB.2025.0000002', '2025-07-02T10:00:00.000Z')
+  const tracesChedResourceEvents = tracesChedTimelineEvents('CHEDP.GB.2025.0000002', { lastUpdated: '2025-07-02T10:00:00.000Z' })
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({
+      payload: {
+        customsDeclarations: [
+          createCustomsDeclaration('24GB0Z8WEJ9ZBTL73B', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z')
+        ],
+        importPreNotifications: [],
+        cheds: [ched]
+      }
+    })
+    .mockResolvedValueOnce({ payload: tracesChedResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: quantityManagementResourceEvents })
+
+  const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73B'))
+
+  globalJsdom(payload)
+
+  const quantityManagementItems = Array.from(document.body.querySelectorAll('.moj-timeline__item'))
+    .filter(elem => elem.querySelector('.moj-timeline__header .moj-timeline__title span').innerHTML === 'Quantity Management')
+  expect(quantityManagementItems.length).toBe(3)
+  expect(quantityManagementItems.every(item => item.querySelector('.moj-timeline__header .moj-timeline__title span:nth-child(2)').innerHTML === 'TRACES to BTMS'))
+    .toBeTruthy()
+
+  expect(quantityManagementItems[0].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(1) span:nth-child(2)').innerHTML).toBe('Finalised')
+  expect(quantityManagementItems[0].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(1) span:nth-child(2)').classList.contains('govuk-tag--green')).toBeTruthy()
+  expect(quantityManagementItems[0].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(2) span:nth-child(2)').innerHTML).toBe('CHEDP.GB.2025.0000002')
+  expect(quantityManagementItems[0].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(3) time').innerHTML).toBe('02 July 2025, 10:03:00')
+  const finalisedEventDetails= quantityManagementItems[0].querySelector('.moj-timeline__description details')
+  expect(finalisedEventDetails).toBeInTheDocument()
+  expect(finalisedEventDetails.querySelector('td:nth-child(1)').innerHTML).toBe('1')
+  expect(finalisedEventDetails.querySelector('td:nth-child(2)').innerHTML).toBe('03019985')
+  expect(finalisedEventDetails.querySelector('td:nth-child(3)').innerHTML).toBe('1000')
+  expect(finalisedEventDetails.querySelector('td:nth-child(4)').innerHTML).toBe('KGM')
+
+  expect(quantityManagementItems[1].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(1) span:nth-child(2)').innerHTML).toBe('Reserved')
+  expect(quantityManagementItems[1].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(1) span:nth-child(2)').classList.contains('govuk-tag--yellow')).toBeTruthy()
+  expect(quantityManagementItems[1].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(2) span:nth-child(2)').innerHTML).toBe('CHEDP.GB.2025.0000002')
+  expect(quantityManagementItems[1].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(3) time').innerHTML).toBe('02 July 2025, 10:02:00')
+  const reservedEventDetails= quantityManagementItems[1].querySelector('.moj-timeline__description details')
+  expect(reservedEventDetails).toBeInTheDocument()
+  expect(reservedEventDetails.querySelector('td:nth-child(1)').innerHTML).toBe('1')
+  expect(reservedEventDetails.querySelector('td:nth-child(2)').innerHTML).toBe('03019985')
+  expect(reservedEventDetails.querySelector('td:nth-child(3)').innerHTML).toBe('1000')
+  expect(reservedEventDetails.querySelector('td:nth-child(4)').innerHTML).toBe('KGM')
+
+  expect(quantityManagementItems[2].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(1) span:nth-child(2)').innerHTML).toBe('Unsuccessful')
+  expect(quantityManagementItems[2].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(1) span:nth-child(2)').classList.contains('govuk-tag--red')).toBeTruthy()
+  expect(quantityManagementItems[2].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(2) span:nth-child(2)').innerHTML).toBe('No match - Unknown reservation error')
+  expect(quantityManagementItems[2].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(3) span:nth-child(2)').innerHTML).toBe('CHEDP.GB.2025.0000002')
+  expect(quantityManagementItems[2].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(4) time').innerHTML).toBe('02 July 2025, 10:01:00')
+  expect(quantityManagementItems[2].querySelector('.moj-timeline__description details')).not.toBeInTheDocument()
+})
+
+test.each([
+  {
+    unsuccessfulReason: 'Unrecognised',
+    expectedReasonText: 'No match - Unknown reservation error'
+  },
+  {
+    unsuccessfulReason: 'BaseForExtract',
+    expectedReasonText: 'No match - Unknown reservation error'
+  },
+  {
+    unsuccessfulReason: 'PcaDocumentUsed',
+    expectedReasonText: 'No match - Unknown reservation error'
+  },
+  {
+    unsuccessfulReason: 'CountryOfDestinationMismatch',
+    expectedReasonText: 'No match - Unknown reservation error'
+  },
+  {
+    unsuccessfulReason: 'LicenceHolderMismatch',
+    expectedReasonText: 'No match - Unknown reservation error'
+  },
+  {
+    unsuccessfulReason: 'CnCodesMismatch',
+    expectedReasonText: 'No match - reservation commodity code mismatch'
+  },
+  {
+    unsuccessfulReason: 'InappropriateStatus',
+    expectedReasonText: 'No match - CHED status prevents reservation'
+  },
+  {
+    unsuccessfulReason: 'QuantitiesInsufficient',
+    expectedReasonText: 'No match - Insufficient quantity'
+  },
+  {
+    unsuccessfulReason: 'WriteOffExists',
+    expectedReasonText: 'No match - quantity already consumed'
+  },
+  {
+    unsuccessfulReason: 'LineNumbersMismatch',
+    expectedReasonText: 'No match - reservation line number mismatch'
+  },
+  {
+    unsuccessfulReason: 'MeasurementUnitMismatch',
+    expectedReasonText: 'No match - unit of measure mismatch'
+  },
+  {
+    unsuccessfulReason: 'QuantitiesCannotBeValidated',
+    expectedReasonText: 'No match - quantity management unavailable'
+  }
+])('shows "$expectedReasonText" against Unsuccessful reservation events when unsuccessfulReason is "$unsuccessfulReason"', async ({ unsuccessfulReason, expectedReasonText }) => {
+  config.set('isTracesChedsEnabled', true)
+  config.set('isQuantityStatusEnabled', true)
+
+  const quantityManagementResourceEvents = [
+    {
+      resourceType: 'ChedReservation',
+      message: JSON.stringify({
+        resource: {
+          created: '2025-07-02T10:01:00.000Z',
+          reservation: {
+            chedId: 'CHEDP.GB.2025.0000002',
+            status: 'Unsuccessful',
+            unsuccessfulReason,
+            commodities: []
+          }
+        }
+      })
+    }
+  ]
+
+  const ched = createTracesChed('CHEDP.GB.2025.0000002', '2025-07-02T10:00:00.000Z')
+  const tracesChedResourceEvents = tracesChedTimelineEvents('CHEDP.GB.2025.0000002', { lastUpdated: '2025-07-02T10:00:00.000Z' })
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({
+      payload: {
+        customsDeclarations: [
+          createCustomsDeclaration('24GB0Z8WEJ9ZBTL73B', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z')
+        ],
+        importPreNotifications: [],
+        cheds: [ched]
+      }
+    })
+    .mockResolvedValueOnce({ payload: tracesChedResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: quantityManagementResourceEvents })
+
+  const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73B'))
+
+  globalJsdom(payload)
+
+  const quantityManagementItems = Array.from(document.body.querySelectorAll('.moj-timeline__item'))
+    .filter(elem => elem.querySelector('.moj-timeline__header .moj-timeline__title span').innerHTML === 'Quantity Management')
+  expect(quantityManagementItems[0].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(1) span:nth-child(2)').innerHTML).toBe('Unsuccessful')
+  expect(quantityManagementItems[0].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(1) span:nth-child(2)').classList.contains('govuk-tag--red')).toBeTruthy()
+  expect(quantityManagementItems[0].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(2) span:nth-child(2)').innerHTML).toBe(expectedReasonText)
+})
+
+test('does not show Quantity Management events if feature flag is off', async () => {
+  config.set('isTracesChedsEnabled', false)
+  config.set('isQuantityStatusEnabled', false)
+
+  const ched = createTracesChed('CHEDP.GB.2025.0000002', '2025-07-02T10:00:00.000Z')
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({
+      payload: {
+        customsDeclarations: [
+          createCustomsDeclaration('24GB0Z8WEJ9ZBTL73B', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z')
+        ],
+        importPreNotifications: [],
+        cheds: [ched]
+      }
+    })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73B'))
+
+  globalJsdom(payload)
+
+  const quantityManagementItems = Array.from(document.body.querySelectorAll('.moj-timeline__item'))
+  .filter(elem => elem.querySelector('.moj-timeline__header .moj-timeline__title span').innerHTML === 'Quantity Management')
+  expect(quantityManagementItems.length).toBe(0)
+})

@@ -2,6 +2,7 @@ import { format } from 'date-fns'
 import {
   DATE_FORMAT,
   DECISION_NOT_GIVEN,
+  TRACES_CHED_STATUS,
   tracesDecisionConclusionDescriptions
 } from './model-constants.js'
 import { sortDescending } from './sort.js'
@@ -55,7 +56,17 @@ const mapCommodity = (tradeLineItem, decision) => {
   }
 }
 
-const getDecision = (ched) => {
+const getDecision = (ched, documentStatusCode, customsDeclarations) => {
+  const tracesChedReference = ched?.exchangedDocument?.identifier
+  const hasAssociatedCustomsDeclaration = customsDeclarations?.some(declaration =>
+    declaration?.clearanceRequest?.commodities?.some(commodity =>
+      commodity?.documents?.some(document =>
+        document.documentReference === tracesChedReference)))
+
+  if ((documentStatusCode === TRACES_CHED_STATUS.NEW || documentStatusCode === TRACES_CHED_STATUS.IN_PROGRESS) && !hasAssociatedCustomsDeclaration) {
+    return DECISION_NOT_GIVEN
+  }
+
   const content = ched?.exchangedDocument
     ?.secondSignatoryAuthentication?.includedClause
     ?.find(({ identifier }) => identifier === DECISION_CONCLUSION_CLAUSE_ID)?.content
@@ -63,9 +74,9 @@ const getDecision = (ched) => {
   return content ? (tracesDecisionConclusionDescriptions[content] ?? `Unknown (${content})`) : undefined
 }
 
-const mapTracesChed = ({ ched }) => {
+const mapTracesChed = ({ ched }, customsDeclarations) => {
   const documentStatusCode = ched?.exchangedDocument?.documentStatusCode
-  const decision = getDecision(ched) ?? DECISION_NOT_GIVEN
+  const decision = getDecision(ched, documentStatusCode, customsDeclarations) ?? DECISION_NOT_GIVEN
 
   return {
     reference: ched?.exchangedDocument?.identifier,
@@ -80,7 +91,7 @@ const mapTracesChed = ({ ched }) => {
 const isSearchTermMatch = (searchTerm, tracesChed) =>
   tracesChed.reference?.toUpperCase() === searchTerm
 
-export const mapTracesCheds = ({ cheds = [] }, searchTerm) =>
+export const mapTracesCheds = ({ cheds = [], customsDeclarations = [] }, searchTerm) =>
   cheds
-    .map(mapTracesChed)
+    .map(ched => mapTracesChed(ched, customsDeclarations))
     .sort(sortDescending(searchTerm, isSearchTermMatch))

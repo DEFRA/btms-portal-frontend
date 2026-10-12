@@ -6,7 +6,8 @@ import {
   checkCodeToDocumentCodeMapping,
   decisionCodeDescriptions,
   internalDecisionCodeDescriptions,
-  NO_MATCH_DECISION_CODE
+  NO_MATCH_DECISION_CODE,
+  QUANTITY_RESERVATION_UNSUCCESSFUL_REASON_DECISION, quantityStatusDescriptions
 } from './model-constants.js'
 import { createLogger } from '../utils/logger.js'
 
@@ -16,7 +17,8 @@ export const RESOURCE_TYPE = {
   IMPORT_PRE_NOTIFICATION: 'ImportPreNotification',
   CUSTOMS_DECLARATION: 'CustomsDeclaration',
   PROCESSING_ERROR: 'ProcessingError',
-  TRACES_CHED: 'TracesChed'
+  TRACES_CHED: 'TracesChed',
+  CHED_RESERVATION: 'ChedReservation'
 }
 
 const SUB_RESOURCE_TYPE = {
@@ -30,7 +32,8 @@ const EVENT_SOURCE_DESCRIPTIONS = {
   IPAFFS_TO_BTMS: 'IPAFFS to BTMS',
   CDS_TO_BTMS: 'CDS to BTMS',
   BTMS_TO_CDS: 'BTMS to CDS',
-  TRACES_TO_BTMS: 'TRACES to BTMS'
+  TRACES_TO_BTMS: 'TRACES to BTMS',
+  TRACES_QUANTITY_MANAGEMENT: 'TRACES to BTMS'
 }
 
 const EVENT_SOURCE = {
@@ -40,7 +43,8 @@ const EVENT_SOURCE = {
   FINALISATION: EVENT_SOURCE_DESCRIPTIONS.CDS_TO_BTMS,
   CDS_ERROR: EVENT_SOURCE_DESCRIPTIONS.CDS_TO_BTMS,
   PROCESSING_ERROR: EVENT_SOURCE_DESCRIPTIONS.BTMS_TO_CDS,
-  TRACES_CHED: EVENT_SOURCE_DESCRIPTIONS.TRACES_TO_BTMS
+  TRACES_CHED: EVENT_SOURCE_DESCRIPTIONS.TRACES_TO_BTMS,
+  TRACES_QUANTITY_MANAGEMENT: EVENT_SOURCE_DESCRIPTIONS.TRACES_QUANTITY_MANAGEMENT
 }
 
 const EVENT_TYPE = {
@@ -49,7 +53,8 @@ const EVENT_TYPE = {
   CDS_DECISION_REQUEST: 'CdsDecisionRequest',
   CDS_ERROR: 'CdsError',
   CDS_FINALISATION: 'CdsFinalisation',
-  CHED: 'Ched'
+  CHED: 'Ched',
+  QUANTITY_MANAGEMENT: 'QuantityManagement'
 }
 
 const DECISION = {
@@ -252,6 +257,48 @@ const mapTracesChedResourceEvent = (resourceMessage) => {
   }
 }
 
+const mapChedReservation = (resourceMessage) => {
+  const resource = resourceMessage?.resource
+  const unsuccessfulReason = QUANTITY_RESERVATION_UNSUCCESSFUL_REASON_DECISION[resource?.reservation?.unsuccessfulReason]
+
+  const commodities = resource?.reservation?.commodities?.map(reservationCommodity => {
+    return {
+      itemNo: reservationCommodity?.goodsItemNumber,
+      commodityCode: reservationCommodity?.commodityCode,
+      quantity: reservationCommodity?.quantity,
+      unitOfMeasure: reservationCommodity?.unitOfMeasure
+    }
+  })
+
+  return {
+    eventType: EVENT_TYPE.QUANTITY_MANAGEMENT,
+    eventTitle: 'Quantity Management',
+    source: EVENT_SOURCE.TRACES_QUANTITY_MANAGEMENT,
+    status: quantityStatusDescriptions[resource?.reservation?.status],
+    unsuccessfulReason,
+    chedReference: resource?.reservation?.chedId,
+    created: resource?.created,
+    commodities
+  }
+}
+
+const mapCustomsDeclarationSubResource = (subResourceType, resourceMessage) => {
+  switch (subResourceType) {
+    case (SUB_RESOURCE_TYPE.CLEARANCE_REQUEST):
+      return mapClearanceRequestResourceEvent(resourceMessage)
+    case (SUB_RESOURCE_TYPE.CLEARANCE_DECISION):
+      return mapDecisionNotificationResourceEvent(resourceMessage)
+    case (SUB_RESOURCE_TYPE.FINALISATION):
+      return mapFinalisationResourceEvent(resourceMessage)
+    case (SUB_RESOURCE_TYPE.EXTERNAL_ERROR):
+      return mapCdsErrorResourceEvent(resourceMessage)
+    default:
+    // Do nothing
+  }
+
+  return null
+}
+
 export const mapResourceEvents = (mrn, chedRef, resourceEvents) => {
   const mappedResourceEvents = []
 
@@ -260,22 +307,9 @@ export const mapResourceEvents = (mrn, chedRef, resourceEvents) => {
       const resourceMessage = JSON.parse(resourceEvent.message)
 
       if (resourceEvent.resourceType === RESOURCE_TYPE.CUSTOMS_DECLARATION) {
-        switch (resourceEvent.subResourceType) {
-          case (SUB_RESOURCE_TYPE.CLEARANCE_REQUEST):
-            mappedResourceEvents.push(mapClearanceRequestResourceEvent(resourceMessage))
-            break
-          case (SUB_RESOURCE_TYPE.CLEARANCE_DECISION):
-            mappedResourceEvents.push(mapDecisionNotificationResourceEvent(resourceMessage))
-            break
-          case (SUB_RESOURCE_TYPE.FINALISATION):
-            mappedResourceEvents.push(mapFinalisationResourceEvent(resourceMessage))
-            break
-          case (SUB_RESOURCE_TYPE.EXTERNAL_ERROR):
-            mappedResourceEvents.push(mapCdsErrorResourceEvent(resourceMessage))
-            break
-          default:
-            // Do nothing
-        }
+        const subResourceEvent = mapCustomsDeclarationSubResource(resourceEvent.subResourceType, resourceMessage)
+
+        if (subResourceEvent) { mappedResourceEvents.push(subResourceEvent) }
       }
 
       if (resourceEvent.resourceType === RESOURCE_TYPE.PROCESSING_ERROR) {
@@ -288,6 +322,10 @@ export const mapResourceEvents = (mrn, chedRef, resourceEvents) => {
 
       if (resourceEvent.resourceType === RESOURCE_TYPE.TRACES_CHED) {
         mappedResourceEvents.push(mapTracesChedResourceEvent(resourceMessage))
+      }
+
+      if (resourceEvent.resourceType === RESOURCE_TYPE.CHED_RESERVATION) {
+        mappedResourceEvents.push(mapChedReservation(resourceMessage))
       }
     } catch (error) {
       logger.warn(`Unable to parse and map timeline resource event for resource Id ${mrn || chedRef}. ERROR: ${error.message}`)
