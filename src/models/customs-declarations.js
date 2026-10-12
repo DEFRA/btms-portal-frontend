@@ -231,19 +231,27 @@ const getUnsuccessfulQuantityStatusReason = (clearanceDecision, commodity) => {
   return UNSUCCESSFUL_QUANTITY_RESERVATION_REASONS[reservationResult]
 }
 
-const mapCommodity = (commodity, context) => {
-  const { notificationStatuses, clearanceDecision, quantityStatuses, tracesChedIds, mrn } = context
-  const clearanceDecisions =
-    clearanceDecision?.results.filter(
-      ({ itemNumber, mode }) => itemNumber === commodity.itemNumber && (mode == null || mode === DECISION_MODE.ACTIVE)
-    ) || []
+const getActiveDecisions = (clearanceDecision, commodity) => {
+  return clearanceDecision?.results.filter(
+    ({ itemNumber, mode }) => itemNumber === commodity.itemNumber && (mode == null || mode === DECISION_MODE.ACTIVE)
+  ) || []
+}
 
-  const allDecisionCodesAreNoMatch = clearanceDecisions.every(
+const isAllDecisionCodesAreNoMatch = (clearanceDecisions) => {
+  return clearanceDecisions.every(
     (decision) => decision.decisionCode === NO_MATCH_DECISION_CODE
   )
-  const iuuRelatedChedpCheck = clearanceDecisions.find(
+}
+
+const isIuuRelatedChedpCheck = (clearanceDecisions) => {
+  return clearanceDecisions.find(
     (decision) => decision.checkCode === 'H222'
   )
+}
+
+const mapCommodity = (commodity, context) => {
+  const { notificationStatuses, clearanceDecision, quantityStatuses, tracesChedIds, mrn } = context
+  const clearanceDecisions = getActiveDecisions(clearanceDecision, commodity)
 
   const level2NoMatch = itemResultsContainPassiveDecisionCode(clearanceDecision, commodity, HIGHER_LEVEL_DECISION_CODE.COMMODITY_CODE_CHECK)
   const level3NoMatchWeight = itemResultsContainPassiveDecisionCode(clearanceDecision, commodity, HIGHER_LEVEL_DECISION_CODE.WEIGHT_CHECK)
@@ -288,8 +296,8 @@ const mapCommodity = (commodity, context) => {
         decision.internalDecisionCode,
         notificationStatus,
         isIuuOutcome,
-        allDecisionCodesAreNoMatch,
-        iuuRelatedChedpCheck
+        isAllDecisionCodesAreNoMatch(clearanceDecisions),
+        isIuuRelatedChedpCheck(clearanceDecisions)
       ),
       decisionReason: decision.decisionReason,
       authority: {
