@@ -271,6 +271,11 @@ const mapCommodity = (commodity, context) => {
     const quantityStatus = getQuantityStatus(tracesChedIds, quantityStatuses, mrn, documentReference)
     const quantityStatusReason = quantityStatus === QUANTITY_STATUSES.UNSUCCESSFUL ? getUnsuccessfulQuantityStatusReason(clearanceDecision, commodity) : undefined
 
+    const activeLevel2NoMatch = decision.internalDecisionCode === HIGHER_LEVEL_DECISION_CODE.COMMODITY_CODE_CHECK
+    const activeLevel3NoMatchWeight = decision.internalDecisionCode === HIGHER_LEVEL_DECISION_CODE.WEIGHT_CHECK
+    const activeLevel3NoMatchQuantity = decision.internalDecisionCode === HIGHER_LEVEL_DECISION_CODE.QUANTITY_CHECK
+    const activeLevel3NoMatch = activeLevel3NoMatchWeight || activeLevel3NoMatchQuantity
+
     return {
       id: randomUUID(),
       checkCode: decision.checkCode,
@@ -298,7 +303,11 @@ const mapCommodity = (commodity, context) => {
       level2NoMatch,
       level3NoMatch,
       level3NoMatchWeight,
-      level3NoMatchQuantity
+      level3NoMatchQuantity,
+      activeLevel2NoMatch,
+      activeLevel3NoMatch,
+      activeLevel3NoMatchWeight,
+      activeLevel3NoMatchQuantity
     }
   })
 

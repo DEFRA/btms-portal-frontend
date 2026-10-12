@@ -162,6 +162,9 @@ export const iuuDecisionDisplay = {
 
 export const hmiGmsInternalDecisionCodes = new Set(['E87', 'E82'])
 export const noMatchInternalDecisionCodes = new Set([
+  'E20',
+  'E30',
+  'E31',
   'E40',
   'E41',
   'E42',
@@ -182,6 +185,9 @@ export const noMatchInternalDecisionCodes = new Set([
   'E99'
 ])
 export const internalDecisionCodeDescriptions = {
+  E20: 'No match - Incorrect commodity code',
+  E30: 'No match - Incorrect net weight',
+  E31: 'No match - Incorrect quantity',
   E40: 'No match - Unknown reservation error',
   E41: 'No match - reservation commodity code mismatch',
   E42: 'No match - CHED status prevents reservation',
