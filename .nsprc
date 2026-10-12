@@ -1,0 +1,7 @@
+{
+  "1240992": {
+    "active": true,
+    "expiry": 1794042000000,
+    "notes": "As of 07/10/26 the latest version (3.0.3) of the braces package has a high severity vulnerability and no fix version available. This exception will expire in a month (07/11/26) and will be flagged during audit again."
+  }
+}

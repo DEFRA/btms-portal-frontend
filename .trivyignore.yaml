@@ -73,3 +73,10 @@ vulnerabilities:
     reason: >
       Vulnerable undici is bundled inside npm itself, not the
       application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-104844
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/postcss-selector-parser/package.json
+    reason: >
+      Vulnerable postcss-selector-parser is bundled inside npm itself, not
+      the application. Cannot be upgraded via package.json overrides.
