@@ -655,7 +655,7 @@ test('shows the decision on TRACES CHED commodity rows when feature flag is enab
   config.set('isTracesChedsEnabled', true)
 
   const relatedImportDeclarationsWithTracesChed = {
-    customsDeclarations: [],
+    customsDeclarations: [createCustomsDeclaration('24GB0Z8WEJ9ZBTL73B', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z')],
     importPreNotifications: [],
     goodsVehicleMovements: [],
     cheds: [
