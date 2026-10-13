@@ -1533,7 +1533,7 @@ test.each([
     shouldShowBannerAndTab: false
   },
   {
-    proauthProvidervider: 'defraId',
+    authProvider: 'defraId',
     scope: null,
     shouldShowBannerAndTab: false
   },
@@ -1542,7 +1542,7 @@ test.each([
     scope: ['private_beta'],
     shouldShowBannerAndTab: true
   }
-])('Level Matching banner and Tab visibility is "$shouldShowBannerAndTab" when user scopes is "$scope', async ({ authProvider, scope, shouldShowBannerAndTab}) => {
+])('Level Matching banner and Tab visibility is "$shouldShowBannerAndTab" when user scopes is "$scope"', async ({ authProvider, scope, shouldShowBannerAndTab}) => {
   const levelNoMatchDeclarations = [
     {
       movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
