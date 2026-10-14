@@ -1,3 +1,6 @@
+const COPY_TEXT_RESET_WAIT_TIME = 3000
+const DISABLED_BUTTON_CLASS = 'btms-copy-disable-click'
+
 /**
  * @param {string} textElementId - Id of the element whose text will be copied
  * @param {string} copyElementId - Id of the copy button element
@@ -14,16 +17,27 @@ export const initCopy = (textElementId, copyElementId, screenReaderAlertText, or
       e.preventDefault();
 
       const text = textElement.textContent.trim();
-      navigator.clipboard.writeText(text);
-      screenReaderAlert.textContent = screenReaderAlertText;
-      copyElement.classList.add('btms-copy-disable-click');
-      copyElement.textContent = "Copied";
+      navigator.clipboard.writeText(text).then(() => {
+        screenReaderAlert.textContent = screenReaderAlertText;
+        copyElement.classList.add(DISABLED_BUTTON_CLASS);
+        copyElement.textContent = "Copied";
 
-      setTimeout(() => {
-        screenReaderAlert.textContent = "";
-        copyElement.classList.remove('btms-copy-disable-click');
-        copyElement.textContent = originalCopyText;
-      }, 3000);
+        setTimeout(() => {
+          screenReaderAlert.textContent = "";
+          copyElement.classList.remove(DISABLED_BUTTON_CLASS);
+          copyElement.textContent = originalCopyText;
+        }, COPY_TEXT_RESET_WAIT_TIME);
+      }).catch(_ => {
+        screenReaderAlert.textContent = screenReaderAlertText;
+        copyElement.classList.add(DISABLED_BUTTON_CLASS);
+        copyElement.textContent = "Copy failed";
+
+        setTimeout(() => {
+          screenReaderAlert.textContent = "";
+          copyElement.classList.remove(DISABLED_BUTTON_CLASS);
+          copyElement.textContent = originalCopyText;
+        }, COPY_TEXT_RESET_WAIT_TIME);
+      });
 
       copyElement.blur();
       return true;

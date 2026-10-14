@@ -27,7 +27,7 @@ export const adminEnvironmentConfig = {
     },
     cache: CACHE_CONTROL_NO_STORE
   },
-  handler: async (request, h) => {
+  handler: async (_request, h) => {
     const frontendFlags = flagsList.map(({ flagName, flagConfig }) => {
       const flagStatus = config.get(flagConfig)
 

@@ -152,7 +152,7 @@ test('shows error message when Decision Deriver Config endpoint fails', async ()
 test('should copy text to clipboard', async () => {
   Object.assign(navigator, {
     clipboard: {
-      writeText: jest.fn()
+      writeText: jest.fn(() => Promise.resolve())
     }
   });
 
@@ -170,4 +170,26 @@ test('should copy text to clipboard', async () => {
   const copyButton = document.body.querySelector('button#copy-json')
   copyButton.click()
   expect(navigator.clipboard.writeText).toHaveBeenCalledWith(prettyPrint(decisionDeriverConfigPayload))
+})
+
+test('copy text failure should not throw exception', async () => {
+  Object.assign(navigator, {
+    clipboard: {
+      writeText: jest.fn(() => Promise.reject(new Error('boom')))
+    }
+  });
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: decisionDeriverConfigPayload })
+
+  await loadPageAsUser(setupAuthedAdminUserSession, paths.ADMIN_ENVIRONMENT_CONFIG)
+  initCopy('#decision-deriver-config-json','#copy-json', 'Decision Deriver Config JSON copied', 'Copy JSON')
+
+  const decisionDeriverConfig = document.body.querySelector('code#decision-deriver-config-json')
+  expect(decisionDeriverConfig).toBeInTheDocument()
+
+  const copyButton = document.body.querySelector('button#copy-json')
+  expect(() => copyButton.click()).not.toThrow()
 })
