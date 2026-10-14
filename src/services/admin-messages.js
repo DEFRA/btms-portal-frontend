@@ -1,4 +1,4 @@
-import { getCustomsDeclaration, getImportPreNotification, getResourceEvents } from './imports-data-api-client.js'
+import { getCustomsDeclaration, getImportPreNotification, getTracesChed, getResourceEvents } from './imports-data-api-client.js'
 import { getRawMessages } from './imports-processor-client.js'
 
 const ADMIN_SEARCH_TYPES = {
@@ -14,7 +14,8 @@ const NON_INFO_SEARCH_FUNCTIONS = {
 
 const INFO_SEARCH_FUNCTIONS = {
   "mrn": getCustomsDeclaration,
-  "chedId": getImportPreNotification
+  "chedId": getImportPreNotification,
+  "tracesChedId": getTracesChed
 }
 
 const isValidAdminSearchType = (adminSearchType) => {
