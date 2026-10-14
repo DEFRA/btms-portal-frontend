@@ -1,6 +1,18 @@
 const COPY_TEXT_RESET_WAIT_TIME = 3000
 const DISABLED_BUTTON_CLASS = 'btms-copy-disable-click'
 
+const setCopyFeedback = (copyElement, screenReaderAlert, screenReaderAlertText, originalCopyText, feedbackText) => {
+  screenReaderAlert.textContent = screenReaderAlertText;
+  copyElement.classList.add(DISABLED_BUTTON_CLASS);
+  copyElement.textContent = feedbackText;
+
+  setTimeout(() => {
+    screenReaderAlert.textContent = "";
+    copyElement.classList.remove(DISABLED_BUTTON_CLASS);
+    copyElement.textContent = originalCopyText;
+  }, COPY_TEXT_RESET_WAIT_TIME);
+}
+
 /**
  * @param {string} textElementId - Id of the element whose text will be copied
  * @param {string} copyElementId - Id of the copy button element
@@ -18,25 +30,9 @@ export const initCopy = (textElementId, copyElementId, screenReaderAlertText, or
 
       const text = textElement.textContent.trim();
       navigator.clipboard.writeText(text).then(() => {
-        screenReaderAlert.textContent = screenReaderAlertText;
-        copyElement.classList.add(DISABLED_BUTTON_CLASS);
-        copyElement.textContent = "Copied";
-
-        setTimeout(() => {
-          screenReaderAlert.textContent = "";
-          copyElement.classList.remove(DISABLED_BUTTON_CLASS);
-          copyElement.textContent = originalCopyText;
-        }, COPY_TEXT_RESET_WAIT_TIME);
+        setCopyFeedback(copyElement, screenReaderAlert, screenReaderAlertText, originalCopyText, 'Copied')
       }).catch(_ => {
-        screenReaderAlert.textContent = screenReaderAlertText;
-        copyElement.classList.add(DISABLED_BUTTON_CLASS);
-        copyElement.textContent = "Copy failed";
-
-        setTimeout(() => {
-          screenReaderAlert.textContent = "";
-          copyElement.classList.remove(DISABLED_BUTTON_CLASS);
-          copyElement.textContent = originalCopyText;
-        }, COPY_TEXT_RESET_WAIT_TIME);
+        setCopyFeedback(copyElement, screenReaderAlert, originalCopyText, 'Copy failed')
       });
 
       copyElement.blur();
