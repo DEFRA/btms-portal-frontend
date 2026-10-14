@@ -97,6 +97,24 @@ export const chedStatusDescriptions = {
   VALIDATED: 'Valid'
 }
 
+export const TRACES_CHED_STATUS = {
+  NEW: '1',
+  AUTHORISED_FOR_ONWARD_TRAVEL: '35',
+  REJECTED: '41',
+  IN_PROGRESS: '42',
+  REPLACED: '44',
+  DRAFT: '47',
+  DELETED: '55',
+  CANCELLED: '64',
+  SPLIT: '68',
+  VALIDATED: '70',
+  AUTHORISED_FOR_ONWARD_TRANSPORTATION: '97',
+  AUTHORISED_FOR_TRANSIT: '99',
+  PARTIALLY_REJECTED: '122',
+  AUTHORISED_FOR_TRANSFER_TO: '124',
+  AUTHORISED_FOR_TRANSHIPMENT: '146'
+}
+
 export const tracesDecisionConclusionDescriptions = {
   ACCEPTABLE_FOR_INTERNAL_MARKET: 'Acceptable for internal market',
   ACCEPTABLE_FOR_FREE_CIRCULATION: 'Acceptable for free circulation',
@@ -326,4 +344,19 @@ export const UNSUCCESSFUL_QUANTITY_RESERVATION_REASONS = {
   E45: 'A CHED line number included in the reservation request does not correspond to a line that exists on the CHED. Contact the National Clearance Hub.',
   E46: 'The unit of measure on the customs declaration and CHED do not match. Update a document so the units of measure align.',
   E47: 'Due to a technical issue TRACES cannot run its automated calculation checks. Contact the National Clearance Hub.'
+}
+
+export const QUANTITY_RESERVATION_UNSUCCESSFUL_REASON_DECISION = {
+  Unrecognised: internalDecisionCodeDescriptions['E40'],
+  BaseForExtract: internalDecisionCodeDescriptions['E40'],
+  PcaDocumentUsed: internalDecisionCodeDescriptions['E40'],
+  CountryOfDestinationMismatch: internalDecisionCodeDescriptions['E40'],
+  LicenceHolderMismatch: internalDecisionCodeDescriptions['E40'],
+  CnCodesMismatch: internalDecisionCodeDescriptions['E41'],
+  InappropriateStatus: internalDecisionCodeDescriptions['E42'],
+  QuantitiesInsufficient: internalDecisionCodeDescriptions['E43'],
+  WriteOffExists: internalDecisionCodeDescriptions['E44'],
+  LineNumbersMismatch: internalDecisionCodeDescriptions['E45'],
+  MeasurementUnitMismatch: internalDecisionCodeDescriptions['E46'],
+  QuantitiesCannotBeValidated: internalDecisionCodeDescriptions['E47']
 }
