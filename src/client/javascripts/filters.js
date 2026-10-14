@@ -104,7 +104,9 @@ const setRow = {
       )
     })
 
-    row.hidden = authorityList.querySelectorAll('li:not([hidden])').length === 0
+    row.hidden = authorityList
+      ? authorityList.querySelectorAll('li:not([hidden])').length === 0
+      : false
   },
   notificationLevelsResult: (state, row) => {
     const authorityList = row.querySelector('ul')
@@ -116,7 +118,9 @@ const setRow = {
       )
     })
 
-    row.hidden = authorityList.querySelectorAll('li:not([hidden])').length === 0
+    row.hidden = authorityList
+      ? authorityList.querySelectorAll('li:not([hidden])').length === 0
+      : false
   }
 }
 

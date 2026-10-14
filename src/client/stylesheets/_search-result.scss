@@ -126,7 +126,9 @@
   }
 
   .btms-notification,
-  .btms-notification-levels-result {
+  .btms-notification-levels-result,
+  .btms-traces-ched,
+  .btms-traces-ched-levels-result {
     td:nth-child(3) {
       width: 30%;
     }
@@ -255,7 +257,9 @@
   }
 
   .btms-notification,
-  .btms-notification-levels-result {
+  .btms-notification-levels-result,
+  .btms-traces-ched,
+  .btms-traces-ched-levels-result {
     tbody tr:last-child td {
       border-bottom: none;
     }
