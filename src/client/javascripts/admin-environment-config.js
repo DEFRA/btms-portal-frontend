@@ -32,7 +32,7 @@ export const initCopy = (textElementId, copyElementId, screenReaderAlertText, or
       navigator.clipboard.writeText(text).then(() => {
         setCopyFeedback(copyElement, screenReaderAlert, screenReaderAlertText, originalCopyText, 'Copied')
       }).catch(_ => {
-        setCopyFeedback(copyElement, screenReaderAlert, originalCopyText, 'Copy failed')
+        setCopyFeedback(copyElement, screenReaderAlert, 'Failed to copy to clipboard', originalCopyText, 'Copy failed')
       });
 
       copyElement.blur();
