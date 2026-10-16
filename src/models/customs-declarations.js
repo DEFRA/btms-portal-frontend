@@ -231,19 +231,27 @@ const getUnsuccessfulQuantityStatusReason = (clearanceDecision, commodity) => {
   return UNSUCCESSFUL_QUANTITY_RESERVATION_REASONS[reservationResult]
 }
 
-const mapCommodity = (commodity, context) => {
-  const { notificationStatuses, clearanceDecision, quantityStatuses, tracesChedIds, mrn } = context
-  const clearanceDecisions =
-    clearanceDecision?.results.filter(
-      ({ itemNumber, mode }) => itemNumber === commodity.itemNumber && (mode == null || mode === DECISION_MODE.ACTIVE)
-    ) || []
+const getActiveDecisions = (clearanceDecision, commodity) => {
+  return clearanceDecision?.results.filter(
+    ({ itemNumber, mode }) => itemNumber === commodity.itemNumber && (mode == null || mode === DECISION_MODE.ACTIVE)
+  ) || []
+}
 
-  const allDecisionCodesAreNoMatch = clearanceDecisions.every(
+const isAllDecisionCodesAreNoMatch = (clearanceDecisions) => {
+  return clearanceDecisions.every(
     (decision) => decision.decisionCode === NO_MATCH_DECISION_CODE
   )
-  const iuuRelatedChedpCheck = clearanceDecisions.find(
+}
+
+const isIuuRelatedChedpCheck = (clearanceDecisions) => {
+  return clearanceDecisions.find(
     (decision) => decision.checkCode === 'H222'
   )
+}
+
+const mapCommodity = (commodity, context) => {
+  const { notificationStatuses, clearanceDecision, quantityStatuses, tracesChedIds, mrn } = context
+  const clearanceDecisions = getActiveDecisions(clearanceDecision, commodity)
 
   const level2NoMatch = itemResultsContainPassiveDecisionCode(clearanceDecision, commodity, HIGHER_LEVEL_DECISION_CODE.COMMODITY_CODE_CHECK)
   const level3NoMatchWeight = itemResultsContainPassiveDecisionCode(clearanceDecision, commodity, HIGHER_LEVEL_DECISION_CODE.WEIGHT_CHECK)
@@ -271,6 +279,11 @@ const mapCommodity = (commodity, context) => {
     const quantityStatus = getQuantityStatus(tracesChedIds, quantityStatuses, mrn, documentReference)
     const quantityStatusReason = quantityStatus === QUANTITY_STATUSES.UNSUCCESSFUL ? getUnsuccessfulQuantityStatusReason(clearanceDecision, commodity) : undefined
 
+    const activeLevel2NoMatch = decision.internalDecisionCode === HIGHER_LEVEL_DECISION_CODE.COMMODITY_CODE_CHECK
+    const activeLevel3NoMatchWeight = decision.internalDecisionCode === HIGHER_LEVEL_DECISION_CODE.WEIGHT_CHECK
+    const activeLevel3NoMatchQuantity = decision.internalDecisionCode === HIGHER_LEVEL_DECISION_CODE.QUANTITY_CHECK
+    const activeLevel3NoMatch = activeLevel3NoMatchWeight || activeLevel3NoMatchQuantity
+
     return {
       id: randomUUID(),
       checkCode: decision.checkCode,
@@ -283,8 +296,8 @@ const mapCommodity = (commodity, context) => {
         decision.internalDecisionCode,
         notificationStatus,
         isIuuOutcome,
-        allDecisionCodesAreNoMatch,
-        iuuRelatedChedpCheck
+        isAllDecisionCodesAreNoMatch(clearanceDecisions),
+        isIuuRelatedChedpCheck(clearanceDecisions)
       ),
       decisionReason: decision.decisionReason,
       authority: {
@@ -298,7 +311,11 @@ const mapCommodity = (commodity, context) => {
       level2NoMatch,
       level3NoMatch,
       level3NoMatchWeight,
-      level3NoMatchQuantity
+      level3NoMatchQuantity,
+      activeLevel2NoMatch,
+      activeLevel3NoMatch,
+      activeLevel3NoMatchWeight,
+      activeLevel3NoMatchQuantity
     }
   })
 
