@@ -117,6 +117,20 @@ test('500: internal server error', async () => {
   )
 })
 
+test('404: inline script carries the CSP nonce', async () => {
+  const server = await initialiseServer()
+  const { payload, headers } = await server.inject({
+    method: 'get',
+    url: '/non-existent-path'
+  })
+
+  const nonce = /'nonce-([^']+)'/.exec(
+    headers['content-security-policy']
+  )[1]
+
+  expect(payload).toContain(`<script nonce="${nonce}">`)
+})
+
 test('502: bad gateway', async () => {
   const server = await initialiseServer()
   server.route({
