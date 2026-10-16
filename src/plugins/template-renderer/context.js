@@ -75,6 +75,7 @@ export async function context(request) {
 
   return {
     assetPath: `${assetPath}/assets`,
+    cspNonce: request.app.cspNonce,
     defaultHeaderOptions: {
       homepageUrl: 'https://www.gov.uk',
       serviceName
