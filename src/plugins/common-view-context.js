@@ -15,7 +15,6 @@ export const commonViewContext = {
 
         response.source.context = {
           ...response.source.context,
-          cspNonce: request.app.cspNonce,
           currentUrl: `${request.path}${queryString}`,
           gtmId: config.get('gtmId'),
           isAuthenticated
