@@ -1,4 +1,5 @@
 import { renderTemplate } from './template.test.helper.js'
+import { QUANTITY_STATUSES, quantityStatusDescriptions } from '../../../src/models/model-constants.js'
 
 const renderWithStatus = (quantityStatus) =>
   renderTemplate('includes/declaration-html.njk', {
@@ -30,9 +31,9 @@ const renderWithStatus = (quantityStatus) =>
 
 describe('Quantity status column', () => {
   test.each([
-    ['Unreserved', 'govuk-tag--grey'],
-    ['Reserved', 'govuk-tag--yellow'],
-    ['Finalised', 'govuk-tag--green']
+    [QUANTITY_STATUSES.UNRESERVED, 'govuk-tag--grey'],
+    [quantityStatusDescriptions.Reserved, 'govuk-tag--yellow'],
+    [quantityStatusDescriptions.Consumed, 'govuk-tag--green']
   ])('renders %s as a %s tag', (status, modifier) => {
     const $ = renderWithStatus(status)
 

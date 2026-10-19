@@ -1295,7 +1295,7 @@ test('shows Quantity Management events', async () => {
   expect(quantityManagementItems.every(item => item.querySelector('.moj-timeline__header .moj-timeline__title span:nth-child(2)').innerHTML === 'TRACES to BTMS'))
     .toBeTruthy()
 
-  expect(quantityManagementItems[0].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(1) span:nth-child(2)').innerHTML).toBe('Finalised')
+  expect(quantityManagementItems[0].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(1) span:nth-child(2)').innerHTML).toBe('Consumed')
   expect(quantityManagementItems[0].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(1) span:nth-child(2)').classList.contains('govuk-tag--green')).toBeTruthy()
   expect(quantityManagementItems[0].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(2) span:nth-child(2)').innerHTML).toBe('CHEDP.GB.2025.0000002')
   expect(quantityManagementItems[0].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(3) time').innerHTML).toBe('02 July 2025, 10:03:00')

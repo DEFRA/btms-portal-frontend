@@ -890,10 +890,10 @@ describe('Quantity status column (flag on)', () => {
       expectedClass: 'govuk-tag--yellow'
     },
     {
-      name: 'a Consumed reservation renders Finalised in green',
+      name: 'a Consumed reservation renders Consumed in green',
       reservations: [reservation('Consumed')],
       rowName: /FROZEN MSC A COD FILLETS/,
-      expected: 'Finalised',
+      expected: 'Consumed',
       expectedClass: 'govuk-tag--green'
     },
     {
