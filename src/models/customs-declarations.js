@@ -283,6 +283,7 @@ const mapCommodity = (commodity, context) => {
     const activeLevel3NoMatchWeight = decision.internalDecisionCode === HIGHER_LEVEL_DECISION_CODE.WEIGHT_CHECK
     const activeLevel3NoMatchQuantity = decision.internalDecisionCode === HIGHER_LEVEL_DECISION_CODE.QUANTITY_CHECK
     const activeLevel3NoMatch = activeLevel3NoMatchWeight || activeLevel3NoMatchQuantity
+    const level3DocumentReference = activeLevel3NoMatch ? getDocumentReference(decision) : null
 
     return {
       id: randomUUID(),
@@ -315,7 +316,8 @@ const mapCommodity = (commodity, context) => {
       activeLevel2NoMatch,
       activeLevel3NoMatch,
       activeLevel3NoMatchWeight,
-      activeLevel3NoMatchQuantity
+      activeLevel3NoMatchQuantity,
+      level3DocumentReference
     }
   })
 
