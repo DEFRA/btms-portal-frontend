@@ -11,13 +11,11 @@ export const commonViewContext = {
 
         const searchParams = new URLSearchParams(query)
         const queryString = searchParams.size > 0 ? `?${searchParams}` : ''
-        const { isAuthenticated } = request.auth
 
         response.source.context = {
           ...response.source.context,
           currentUrl: `${request.path}${queryString}`,
-          gtmId: config.get('gtmId'),
-          isAuthenticated
+          gtmId: config.get('gtmId')
         }
       }
 

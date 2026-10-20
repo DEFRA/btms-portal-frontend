@@ -49,7 +49,7 @@
     {% include "./includes/cookie-banner.njk" %}
   {% endif %}
   {{ govukHeader(headerOptions) }}
-  {% if navigationRequired and isAuthenticated %}
+  {% if navigationRequired and accountNavigation and accountNavigation.length %}
     {{ govukServiceNavigation({
       classes: 'btms-service-navigation' ~ navClass,
       navigation: navigation,
