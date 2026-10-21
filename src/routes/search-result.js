@@ -82,7 +82,7 @@ const getEventsFromCustomsDeclarations = async (customsDeclarations, chedGroups,
       const declarationChedGroups = chedGroups.filter(chedEvent =>
         declaration?.commodities?.some(commodity =>
           commodity.documents?.some(document =>
-            document.documentReference?.toUpperCase() === chedEvent.chedRef.toUpperCase())))
+            document.documentReference?.toUpperCase().split('.').pop() === chedEvent.chedRef.toUpperCase().split('.').pop())))
       const declarationChedEvents = declarationChedGroups.flatMap(({ timelineEvents }) => timelineEvents)
 
       const quantityManagementEvents = await getQuantityManagementEvents(showQuantityStatus, declarationChedGroups, declaration) // NOSONAR - S9382: fetch inside loop is intentional
