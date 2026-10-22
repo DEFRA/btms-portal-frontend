@@ -25,7 +25,7 @@ import { paths, queryStringParams } from '../routes/route-constants.js'
 
 const documentReferenceRegex = /\d{7}[VR]?$/
 
-const extractDocumentReferenceId = (documentReference) => {
+export const extractDocumentReferenceId = (documentReference) => {
   const match = documentReference?.match(documentReferenceRegex) ?? null
   if (match === null) {
     return null
