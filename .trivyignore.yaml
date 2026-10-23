@@ -53,6 +53,15 @@ vulnerabilities:
       Vulnerable ip-address is bundled inside npm itself, not the
       application. Cannot be upgraded via package.json overrides.
 
+  - id: CVE-2026-111997
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/ip-address/package.json
+    reason: >
+      Vulnerable ip-address is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides; npm 12.2.1
+      (current latest) still bundles ip-address 10.7.2, so a fix requires the
+      base image to ship a newer npm version.
+
   - id: CVE-2026-19534
     paths:
       - usr/local/lib/node_modules/npm/node_modules/undici/package.json
