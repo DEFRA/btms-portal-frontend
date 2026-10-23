@@ -152,13 +152,13 @@ export const CDS_STATUSES = {
 export const QUANTITY_STATUSES = {
   UNRESERVED: 'Unreserved',
   RESERVED: 'Reserved',
-  FINALISED: 'Finalised',
+  CONSUMED: 'Consumed',
   UNSUCCESSFUL: 'Unsuccessful'
 }
 
 export const quantityStatusDescriptions = {
   Reserved: QUANTITY_STATUSES.RESERVED,
-  Consumed: QUANTITY_STATUSES.FINALISED,
+  Consumed: QUANTITY_STATUSES.CONSUMED,
   Unsuccessful: QUANTITY_STATUSES.UNSUCCESSFUL
 }
 
