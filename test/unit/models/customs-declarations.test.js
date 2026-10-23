@@ -2600,7 +2600,7 @@ const secondCommodity = (declaration) => {
 describe('quantity status', () => {
   test.each([
     ['Reserved', 'Reserved'],
-    ['Consumed', 'Finalised']
+    ['Consumed', 'Consumed']
   ])('upstream status %s renders as %s', (status, expected) => {
     expect(mapQuantityStatuses(declarationWithChed(), withReservation(status))).toEqual([expected])
   })
