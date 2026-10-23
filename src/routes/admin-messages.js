@@ -6,7 +6,7 @@ import { mapAdminSearchResults } from '../models/admin-search-results.js'
 import { APP_SCOPES } from '../auth/auth-constants.js'
 
 const ADMIN_MESSAGES_TEMPLATE = 'admin-messages'
-const UNSUPPORTED_SEARCH_PATTERNS = new Set([ searchKeys.DUCR, searchKeys.GMR_ID ])
+const UNSUPPORTED_SEARCH_PATTERNS = new Set([ searchKeys.DUCR, searchKeys.GMR_ID, searchKeys.IUU_REFERENCE ])
 
 const createResultsModel = (searchTerm, searchType, resourceType, results, tracesChedResults, showTracesChedInfo) => {
   const baseLink = `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=${searchTerm}`

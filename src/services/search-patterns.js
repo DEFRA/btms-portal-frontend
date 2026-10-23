@@ -1,3 +1,7 @@
+import { config } from '../config/config.js'
+
+const enableIuuSearch = config.get('isIuuSearchEnabled')
+
 export const searchKeys = {
   MRN: 'mrn',
   CHED_ID: 'chedId',
@@ -7,7 +11,8 @@ export const searchKeys = {
   TRACES_CHED_ID: 'tracesChedId',
   DUCR: 'ducr',
   GMR_ID: 'gmrId',
-  VRN_TRN: 'vrnOrTrn'
+  VRN_TRN: 'vrnOrTrn',
+  IUU_REFERENCE: 'iuuReference'
 }
 
 export const searchPatterns = [
@@ -45,5 +50,10 @@ export const searchPatterns = [
     key: searchKeys.GMR_ID,
     pattern: /^GMR[A-Z][0-9A-Z]{8}$/,
     description: 'GMR ID'
-  }
+  },
+  ...enableIuuSearch ? [{
+    key: searchKeys.IUU_REFERENCE,
+    pattern: /^IUU\.[A-Z]{2}\.2\d{3}\.\d{7}$/,
+    description: 'IUU Reference'
+  }] : []
 ]
