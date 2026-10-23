@@ -2330,3 +2330,26 @@ test('show only show higher level result against the item document that has fail
   const matchDecisions = queryAllByText(document.body, 'Release - Inspection complete')
   expect(matchDecisions.length).toBe(1)
 })
+
+test('redirects to search page when IUU search is disabled', async () => {
+  config.set('isIuuSearchEnabled', false)
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { statusCode, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=IUU.GB.2026.0000001`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(302)
+  expect(headers.location).toBe(paths.SEARCH)
+})

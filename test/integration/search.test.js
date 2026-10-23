@@ -10,6 +10,11 @@ import { initialiseServer } from '../utils/initialise-server.js'
 import { setupAuthedUserSession } from '../unit/utils/session-helper.js'
 import { paths, queryStringParams } from '../../src/routes/route-constants.js'
 import { initSearch } from '../../src/client/javascripts/search.js'
+import { config } from '../../src/config/config.js'
+import {
+  searchKeys,
+  searchPatterns
+} from '../../src/services/search-patterns.js'
 
 test('renders search page', async () => {
   const user = userEvent.setup()
@@ -323,4 +328,77 @@ test.each([
 
   expect(statusCode).toBe(302)
   expect(headers.location).toBe(`${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${searchTerm.toUpperCase()}`)
+})
+
+test('allows IUU search option when isIuuSearchEnabled feature flag is enabled', async () => {
+  config.set('isIuuSearchEnabled', true)
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH}`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(document.title).toBe(
+    'Search for an MRN, CHED, IUU, GMR, VRN or TRN - Border Trade Matching Service'
+  )
+
+  const iuuLabelledSearchBox = getByRole(document.body, 'textbox', {
+    name: 'Enter an MRN, CHED, IUU, GMR, VRN or TRN'
+  })
+  expect(iuuLabelledSearchBox).toBeInTheDocument()
+
+  const iuuSearchExample = Array.from(
+    document.querySelectorAll('details.govuk-details div.govuk-details__text ul.govuk-list li'))
+    .find(exampleElement => exampleElement.textContent === 'IUU, IUU.GB.2026.1234567')
+  expect(iuuSearchExample).toBeInTheDocument()
+})
+
+test('redirects to default vrn trn search if IUU search is not enabled', async () => {
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { statusCode, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH}?${queryStringParams.SEARCH_TERM}=IUU.GB.2026.1234567`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(302)
+  expect(headers.location).toBe(`${paths.VRN_TRN_SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=IUU.GB.2026.1234567`)
+})
+
+test('redirects to search results page if valid IUU search term', async () => {
+  searchPatterns.push(
+    {
+      key: searchKeys.IUU_REFERENCE,
+      pattern: /^IUU\.[A-Z]{2}\.2\d{3}\.\d{7}$/,
+      description: 'IUU Reference'
+    })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { statusCode, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH}?${queryStringParams.SEARCH_TERM}=IUU.GB.2026.1234567`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(302)
+  expect(headers.location).toBe(`${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=IUU.GB.2026.1234567`)
 })
