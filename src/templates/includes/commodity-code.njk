@@ -1,4 +1,4 @@
-{% if tabContext === tabContexts.LEVELS_RESULT and decision.level2NoMatch === true %}
+{% if (tabContext === tabContexts.LEVELS_RESULT and decision.level2NoMatch === true) or (tabContext === tabContexts.LATEST_RESULT and decision.activeLevel2NoMatch === true) %}
   <span class="btms-details__commodity-code--no-match">{{ commodity.taricCommodityCode }}</span>
 {% else %}
   {{ commodity.taricCommodityCode }}
