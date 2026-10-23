@@ -170,7 +170,7 @@ test('Should show an error when no search term is supplied', async () => {
 })
 
 test.each([
-  'abcd123s', 'GMRA00S11AB1', '5GB412342342000-LU123AB123456L123'
+  'abcd123s', 'GMRA00S11AB1', '5GB412342342000-LU123AB123456L123', 'IUU.GB.2026.0000001'
 ])('Should show an error with an invalid search term', async (testSearchTerm) => {
   wreck.get
     .mockResolvedValueOnce({ payload: provider })

@@ -4,6 +4,7 @@ import {
   queryStringParams
 } from './route-constants.js'
 import { searchKeys, searchPatterns } from '../services/search-patterns.js'
+import { config } from '../config/config.js'
 
 export const search = {
   method: 'get',
@@ -51,6 +52,11 @@ export const search = {
   handler: (request, h) => {
     const [searchError] = request.yar.flash('searchError')
 
-    return h.view('search', searchError)
+    const showIuuSearch = config.get('isIuuSearchEnabled')
+
+    return h.view('search', {
+      ...searchError,
+      showIuuSearch
+    })
   }
 }
