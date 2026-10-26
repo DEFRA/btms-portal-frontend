@@ -12,7 +12,7 @@ export const searchKeys = {
   DUCR: 'ducr',
   GMR_ID: 'gmrId',
   VRN_TRN: 'vrnOrTrn',
-  IUU_REFERENCE: 'iuuReference'
+  IUU_REFERENCE: 'iuu'
 }
 
 export const searchPatterns = [
