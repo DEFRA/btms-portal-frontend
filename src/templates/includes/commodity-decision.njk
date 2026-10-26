@@ -6,6 +6,12 @@
   {{ commodityDecisionTooltip(commodity.id, 'No match - Incorrect net weight', 'The declared weight of this item does not match CHED reference ' ~ decision.documentReference) }}
 {% elif tabContext === tabContexts.LEVELS_RESULT and decision.match === true and decision.level3NoMatchQuantity === true %}
   {{ commodityDecisionTooltip(commodity.id, 'No match - Incorrect quantity', 'The declared quantity of this item does not match CHED reference ' ~ decision.documentReference) }}
+{% elif tabContext === tabContexts.LATEST_RESULT and decision.activeLevel2NoMatch === true %}
+  {{ commodityDecisionTooltip(commodity.id, decision.decisionDetail, 'Commodity code ' ~ commodity.taricCommodityCode ~ ' cannot be found in IPAFFS. Check that the code is correct.') }}
+{% elif tabContext === tabContexts.LATEST_RESULT and decision.activeLevel3NoMatchWeight === true %}
+  {{ commodityDecisionTooltip(commodity.id, decision.decisionDetail, 'The declared weight of this item does not match CHED reference ' ~ decision.level3DocumentReference) }}
+{% elif tabContext === tabContexts.LATEST_RESULT and decision.activeLevel3NoMatchQuantity === true %}
+  {{ commodityDecisionTooltip(commodity.id, decision.decisionDetail, 'The declared quantity of this item does not match CHED reference ' ~ decision.level3DocumentReference) }}
 {% else %}
   {% if decision.decision %}
     {{ decision.decision }} -

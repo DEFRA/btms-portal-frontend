@@ -1295,7 +1295,7 @@ test('shows Quantity Management events', async () => {
   expect(quantityManagementItems.every(item => item.querySelector('.moj-timeline__header .moj-timeline__title span:nth-child(2)').innerHTML === 'TRACES to BTMS'))
     .toBeTruthy()
 
-  expect(quantityManagementItems[0].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(1) span:nth-child(2)').innerHTML).toBe('Finalised')
+  expect(quantityManagementItems[0].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(1) span:nth-child(2)').innerHTML).toBe('Consumed')
   expect(quantityManagementItems[0].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(1) span:nth-child(2)').classList.contains('govuk-tag--green')).toBeTruthy()
   expect(quantityManagementItems[0].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(2) span:nth-child(2)').innerHTML).toBe('CHEDP.GB.2025.0000002')
   expect(quantityManagementItems[0].querySelector('.moj-timeline__description .timeline-detail-row:nth-child(3) time').innerHTML).toBe('02 July 2025, 10:03:00')
@@ -1452,4 +1452,110 @@ test('does not show Quantity Management events if feature flag is off', async ()
   const quantityManagementItems = Array.from(document.body.querySelectorAll('.moj-timeline__item'))
   .filter(elem => elem.querySelector('.moj-timeline__header .moj-timeline__title span').innerHTML === 'Quantity Management')
   expect(quantityManagementItems.length).toBe(0)
+})
+
+test.each([
+  '0000001',
+  '0000001R',
+  '0000001V',
+])('shows Timeline CHED events when Customs Declaration documentReference is in CDS format with identifier "%s"', async (chedIdentifier) => {
+  const customsDeclarations = [
+    {
+      movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
+      clearanceRequest: {
+        declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+        commodities: [
+          {
+            itemNumber: 1,
+            taricCommodityCode: '0304719030',
+            goodsDescription: 'FROZEN MSC A COD FILLETS',
+            netMass: '17088.98',
+            supplementaryUnits: 0,
+            documents: [
+              {
+                documentReference: `GBCHD2025.${chedIdentifier}`,
+                documentCode: 'N002'
+              }
+            ],
+            checks: [{ checkCode: 'H218', departmentCode: 'HMI' }]
+          }
+        ]
+      },
+      clearanceDecision: {
+        results: [
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'C03',
+            documentReference: `GBCHD2025.${chedIdentifier}`
+          }
+        ]
+      },
+      finalisation: {
+        finalState: '0',
+        isManualRelease: false
+      },
+      updated: '2025-05-06T13:11:59.257Z'
+    }
+  ]
+
+  const importPreNotifications = [
+    createImportPreNotification(`CHEDA.GB.2025.${chedIdentifier}`, 'CVEDA', 'CANCELLED', '2025-04-22T16:55:17.330Z', '1', '0101', 'Equus asinus', '2')
+  ]
+
+  const relatedImportDeclarations = {
+    customsDeclarations,
+    importPreNotifications
+  }
+
+  const ipaffsChedEvents = [
+    {
+      resourceType: 'ImportPreNotification',
+      message: '{\n'
+        + '    "resource": {\n'
+        + '      "importPreNotification": {\n'
+        + '        "referenceNumber": "CHEDA.GB.2025.' + chedIdentifier + '",\n'
+        + '        "status": "VALIDATED",\n'
+        + '        "decisionDate": "2025-01-01T09:00:00.000Z",\n'
+        + '        "updatedSource": "2025-01-01T09:00:00Z",\n'
+        + '        "partTwo": {\n'
+        + '          "decision": {\n'
+        + '            "decision": "Horse Re-entry"\n'
+        + '          }\n'
+        + '        }\n'
+        + '      }\n'
+        + '    }\n'
+        + '  }'
+    }
+  ]
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: relatedImportDeclarations })
+    .mockResolvedValueOnce({ payload: ipaffsChedEvents })
+    .mockResolvedValueOnce({ payload: declarationResourceEvents })
+
+  const { payload, headers } = await injectSearchResultWithCookie(searchResultUrl('24GB0Z8WEJ9ZBTL73A'))
+
+  expect(headers['cache-control']).toBe('no-store')
+
+  globalJsdom(payload)
+  initFilters()
+
+  const eventTitles = Array.from(document.body.querySelectorAll('.moj-timeline__item .moj-timeline__header .moj-timeline__title span:nth-child(1)')).map(title => title.innerHTML)
+  expect(eventTitles.length).toBe(13)
+  expect(eventTitles[0]).toBe('CDS finalisation')
+  expect(eventTitles[1]).toBe('BTMS decision')
+  expect(eventTitles[2]).toBe('CDS processing error')
+  expect(eventTitles[3]).toBe('BTMS processing error')
+  expect(eventTitles[4]).toBe('CDS clearance request')
+  expect(eventTitles[5]).toBe('BTMS decision')
+  expect(eventTitles[6]).toBe('BTMS decision')
+  expect(eventTitles[7]).toBe(`CHEDA.GB.2025.${chedIdentifier}`)
+  expect(eventTitles[8]).toBe('CDS clearance request')
+  expect(eventTitles[9]).toBe('BTMS decision')
+  expect(eventTitles[10]).toBe('CDS finalisation')
+  expect(eventTitles[11]).toBe('CDS processing error')
+  expect(eventTitles[12]).toBe('BTMS processing error')
 })

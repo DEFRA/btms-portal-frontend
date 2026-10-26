@@ -1,6 +1,6 @@
 import { paths, queryStringParams } from './route-constants.js'
 import { getRelatedImportDeclarations, getResourceEvents } from '../services/imports-data-api-client.js'
-import { mapCustomsDeclarations } from '../models/customs-declarations.js'
+import { extractDocumentReferenceId, mapCustomsDeclarations } from '../models/customs-declarations.js'
 import { mapPreNotifications } from '../models/pre-notifications.js'
 import { mapTracesCheds } from '../models/traces-cheds.js'
 import { createRouteConfig } from './search-result-common.js'
@@ -10,6 +10,7 @@ import { createLogger } from '../utils/logger.js'
 import { config } from '../config/config.js'
 import { isInFeatureGroup } from '../auth/check-groups.js'
 import { AUTH_FEATURES } from '../auth/auth-constants.js'
+import { DECISION_MODE } from '../models/model-constants.js'
 
 const NANOSECOND_PRECISION = 7
 
@@ -81,7 +82,7 @@ const getEventsFromCustomsDeclarations = async (customsDeclarations, chedGroups,
       const declarationChedGroups = chedGroups.filter(chedEvent =>
         declaration?.commodities?.some(commodity =>
           commodity.documents?.some(document =>
-            document.documentReference?.toUpperCase() === chedEvent.chedRef.toUpperCase())))
+            extractDocumentReferenceId(document.documentReference?.toUpperCase()) === extractDocumentReferenceId(chedEvent.chedRef.toUpperCase()))))
       const declarationChedEvents = declarationChedGroups.flatMap(({ timelineEvents }) => timelineEvents)
 
       const quantityManagementEvents = await getQuantityManagementEvents(showQuantityStatus, declarationChedGroups, declaration) // NOSONAR - S9382: fetch inside loop is intentional
@@ -144,7 +145,7 @@ const getAllEvents = async (customsDeclarations, preNotifications, tracesCheds, 
 const includesInternalDecisionCodes = (customsDeclarations, codes) => {
   return customsDeclarations.some(declaration => {
     return declaration.clearanceDecision?.results?.some(result => {
-      return codes.includes(result.internalDecisionCode)
+      return result.mode === DECISION_MODE.PASSIVE && codes.includes(result.internalDecisionCode)
     })
   })
 }
