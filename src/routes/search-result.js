@@ -151,6 +151,13 @@ const includesInternalDecisionCodes = (customsDeclarations, codes) => {
   })
 }
 
+const hasEmptyResults = (searchResults, showFisNotifications) => {
+  return searchResults.customsDeclarations.length === 0 &&
+    searchResults.importPreNotifications.length === 0 &&
+    !(searchResults.cheds?.length > 0) &&
+    (!showFisNotifications || (showFisNotifications && searchResults.iuus.length === 0))
+}
+
 export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_RESULT, async (request, h) => {
   const searchTerm = request.query[queryStringParams.SEARCH_TERM].trim().toUpperCase()
   const showTracesCheds = config.get('isTracesChedsEnabled')
@@ -158,12 +165,7 @@ export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_
   const showFisNotifications = config.get('isFisNotificationsEnabled')
   const searchResults = await getRelatedImportDeclarations(request.pre.searchQuery)
 
-  if (
-    searchResults.customsDeclarations.length === 0 &&
-    searchResults.importPreNotifications.length === 0 &&
-    !(searchResults.cheds?.length > 0) &&
-    (!showFisNotifications || (showFisNotifications && searchResults.iuus.length === 0))
-  ) {
+  if (hasEmptyResults(searchResults, showFisNotifications)) {
     request.yar.flash('searchError', {
       searchTerm,
       isValid: false,
