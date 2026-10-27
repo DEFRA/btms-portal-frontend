@@ -31,6 +31,9 @@ export default {
     },
     searchResult: {
       import: ['./javascripts/search-result.js']
+    },
+    adminEnvironmentConfig: {
+      import: ['./javascripts/admin-environment-config.js']
     }
   },
   experiments: {
