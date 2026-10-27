@@ -2,7 +2,7 @@ import globalJsdom from 'global-jsdom'
 import wreck from '@hapi/wreck'
 import {
   getAllByRole,
-  getByRole, queryAllByText,
+  getByRole, getByText, queryAllByText,
   queryByRole,
   queryByText,
   within
@@ -2329,4 +2329,146 @@ test('show only show higher level result against the item document that has fail
 
   const matchDecisions = queryAllByText(document.body, 'Release - Inspection complete')
   expect(matchDecisions.length).toBe(1)
+})
+
+test('show FIS Notifications when feature flag enabled', async () => {
+  config.set('isFisNotificationsEnabled', true)
+
+  const iuuSearchResults = {
+    customsDeclarations: [],
+    importPreNotifications: [],
+    cheds: [],
+    iuus: [
+      {
+        iuuNotification: {
+          reference: "IUU.GB.2026.0000001",
+          iuuOption: "IUUOK",
+          lastUpdated: "2026-10-27T09:01:00.000Z"
+        }
+      },
+      {
+        iuuNotification: {
+          reference: "IUU.GB.2026.0000002",
+          iuuOption: "IUUNotCompliant",
+          lastUpdated: "2026-10-27T09:02:00.000Z"
+        }
+      }
+    ]
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: iuuSearchResults })
+
+  const { payload, headers } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73A'))
+
+  expect(headers['cache-control']).toBe('no-store')
+
+  globalJsdom(payload)
+  initFilters()
+
+  expect(
+    getByRole(document.body, 'heading', { name: 'Fish Imports Service (FIS) notification details', level: 3 })
+  ).toBeInTheDocument()
+
+  const fisNotificationValues = document.body.querySelectorAll('.fis-details__summary .btms-fis-notification-summary .govuk-summary-list__row')
+  expect(fisNotificationValues.length).toBe(6)
+
+  expect(fisNotificationValues[0].querySelector('.govuk-summary-list__value').innerHTML).toContain('IUU.GB.2026.0000002')
+  expect(fisNotificationValues[1].querySelector('.govuk-summary-list__value span.govuk-tag--red').innerHTML).toContain('Rejected')
+  expect(fisNotificationValues[2].querySelector('.govuk-summary-list__value').innerHTML).toContain('27 October 2026, 09:02')
+
+  expect(fisNotificationValues[3].querySelector('.govuk-summary-list__value').innerHTML).toContain('IUU.GB.2026.0000001')
+  expect(fisNotificationValues[4].querySelector('.govuk-summary-list__value span.govuk-tag--green').innerHTML).toContain('Valid')
+  expect(fisNotificationValues[5].querySelector('.govuk-summary-list__value').innerHTML).toContain('27 October 2026, 09:01')
+})
+
+test('show no matching FIS Notifications message when IUU search results are empty', async () => {
+  config.set('isFisNotificationsEnabled', true)
+
+  const iuuSearchResults = {
+    ...relatedImportDeclarations,
+    cheds: [],
+    iuus: []
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: iuuSearchResults })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents }) //IPAFFS CHED resource events
+  .mockResolvedValueOnce({ payload: emptyResourceEvents }) //TRACES CHED resource events
+  .mockResolvedValueOnce({ payload: emptyResourceEvents }) // Customs Declaration resource events
+
+  const { payload, headers } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73A'))
+
+  expect(headers['cache-control']).toBe('no-store')
+
+  globalJsdom(payload)
+  initFilters()
+
+  expect(
+    getByRole(document.body, 'heading', { name: 'Fish Imports Service (FIS) notification details', level: 3 })
+  ).toBeInTheDocument()
+
+  const noMatchesMessage = getByText(document.body, 'There are no matching Fish Imports Service (FIS) notification details')
+  expect(noMatchesMessage).toBeInTheDocument()
+  expect(noMatchesMessage).toHaveClass('govuk-inset-text')
+})
+
+test.each([
+  {
+    iuuOption: 'IUUOK',
+    expectedStatus: 'Valid',
+    expectedClass: 'govuk-tag--green'
+  },
+  {
+    iuuOption: 'IUUNA',
+    expectedStatus: 'Valid',
+    expectedClass: 'govuk-tag--green'
+  },
+  {
+    iuuOption: 'IUUNotCompliant',
+    expectedStatus: 'Rejected',
+    expectedClass: 'govuk-tag--red'
+  },
+  {
+    iuuOption: null,
+    expectedStatus: 'In Progress',
+    expectedClass: 'govuk-tag--yellow'
+  }
+])('status should be "$expectedStatus" with label class "$expectedClass" when iuuOption is "$iuuOption".', async ({ iuuOption, expectedStatus, expectedClass }) => {
+  config.set('isFisNotificationsEnabled', true)
+
+  const iuuSearchResults = {
+    customsDeclarations: [],
+    importPreNotifications: [],
+    cheds: [],
+    iuus: [
+      {
+        iuuNotification: {
+          reference: "IUU.GB.2026.0000001",
+          iuuOption,
+          lastUpdated: "2026-10-27T09:00:00.000Z"
+        }
+      }
+    ]
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: iuuSearchResults })
+
+  const { payload, headers } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73A'))
+
+  expect(headers['cache-control']).toBe('no-store')
+
+  globalJsdom(payload)
+  initFilters()
+
+  const statusField = document.body.querySelector('.fis-details__summary .btms-fis-notification-summary .govuk-summary-list__row .govuk-summary-list__value span')
+  expect(statusField.innerHTML).toContain(expectedStatus)
+  expect(statusField).toHaveClass(expectedClass)
 })

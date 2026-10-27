@@ -142,6 +142,12 @@ const config = convict({
     default: false,
     env: 'SHOW_QUANTITY_STATUS'
   },
+  isFisNotificationsEnabled: {
+    doc: 'Show the FIS Notifications section on the search results page',
+    format: Boolean,
+    default: false,
+    env: 'SHOW_FIS_NOTIFICATIONS'
+  },
   session: {
     cache: {
       engine: {
