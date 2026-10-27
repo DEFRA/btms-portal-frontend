@@ -16,6 +16,7 @@ export const METRIC_NAMES = {
   DUCR: 'search.ducr',
   GMR_ID: 'search.gmrId',
   VRN_TRN: 'search.vrn.trn',
+  IUU_REFERENCE: 'search.iuuReference',
   SIGNIN_ENTRA_ID: 'signIn.entraId',
   SIGNIN_DEFRA_ID: 'signIn.defraId',
   GMR_NOT_FOUND: 'gmr.search.not.found',
@@ -32,7 +33,8 @@ const SEARCH_TYPE_METRIC_NAME_MAPPINGS = {
   [searchKeys.CHED_LAST_SEVEN_OR_EIGHT_DIGITS]: METRIC_NAMES.CHED_ID,
   [searchKeys.DUCR]: METRIC_NAMES.DUCR,
   [searchKeys.GMR_ID]: METRIC_NAMES.GMR_ID,
-  [searchKeys.VRN_TRN]: METRIC_NAMES.VRN_TRN
+  [searchKeys.VRN_TRN]: METRIC_NAMES.VRN_TRN,
+  [searchKeys.IUU_REFERENCE]: METRIC_NAMES.IUU_REFERENCE
 }
 
 export const getMetricNameBySearchType = (searchType) => {
