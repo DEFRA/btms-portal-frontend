@@ -52,3 +52,38 @@ test('no active user session', async () => {
   expect(statusCode).toBe(302)
   expect(headers.location).toBe('/')
 })
+
+test('user with no session is sent to the provider end session endpoint', async () => {
+  const server = await initialiseServer()
+  const { origin } = new URL(config.get('auth.entraId.oidcConfigurationUrl'))
+
+  const { headers, statusCode } = await server.inject({
+    method: 'get',
+    url: `${paths.SIGN_OUT}?provider=entraId`
+  })
+
+  expect(statusCode).toBe(302)
+  expect(headers.location.startsWith(origin)).toBe(true)
+  expect(headers.location).toContain(
+    `post_logout_redirect_uri=${config.get('appBaseUrl')}${paths.SIGNED_OUT}?provider=entraId`
+  )
+
+  const [cookie, age] = headers['set-cookie'][0].split(';')
+  expect(cookie.trim()).toBe('userSession=')
+  expect(age.trim()).toBe('Max-Age=0')
+})
+
+test.each(['notAProvider', 'constructor', '__proto__'])(
+  'user with no session and an unknown provider (%s) is sent to the landing page',
+  async (provider) => {
+    const server = await initialiseServer()
+
+    const { headers, statusCode } = await server.inject({
+      method: 'get',
+      url: `${paths.SIGN_OUT}?provider=${provider}`
+    })
+
+    expect(statusCode).toBe(302)
+    expect(headers.location).toBe(paths.LANDING)
+  }
+)
