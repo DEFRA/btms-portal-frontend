@@ -11,6 +11,7 @@ import { config } from '../config/config.js'
 import { isInFeatureGroup } from '../auth/check-groups.js'
 import { AUTH_FEATURES } from '../auth/auth-constants.js'
 import { DECISION_MODE } from '../models/model-constants.js'
+import { mapFisNotifications } from '../models/fis-notifications.js'
 
 const NANOSECOND_PRECISION = 7
 
@@ -154,12 +155,14 @@ export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_
   const searchTerm = request.query[queryStringParams.SEARCH_TERM].trim().toUpperCase()
   const showTracesCheds = config.get('isTracesChedsEnabled')
   const showQuantityStatus = config.get('isQuantityStatusEnabled')
+  const showFisNotifications = config.get('isFisNotificationsEnabled')
   const searchResults = await getRelatedImportDeclarations(request.pre.searchQuery)
 
   if (
     searchResults.customsDeclarations.length === 0 &&
     searchResults.importPreNotifications.length === 0 &&
-    !(searchResults.cheds?.length > 0)
+    !(searchResults.cheds?.length > 0) &&
+    (!showFisNotifications || (showFisNotifications && searchResults.iuus.length === 0))
   ) {
     request.yar.flash('searchError', {
       searchTerm,
@@ -174,6 +177,7 @@ export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_
   const preNotifications = mapPreNotifications(searchResults, searchTerm)
   const tracesCheds = showTracesCheds ? mapTracesCheds(searchResults, searchTerm) : []
   const timelineEvents = await getAllEvents(customsDeclarations, preNotifications, tracesCheds, showQuantityStatus)
+  const fisNotifications = showFisNotifications ? mapFisNotifications(searchResults, searchTerm) : []
 
   const showLevelNoMatchBanner = isInFeatureGroup(AUTH_FEATURES.LEVEL_NO_MATCH_SEARCH_RESULTS, request.auth.credentials.scope)
   const showLevel2NoMatchText = showLevelNoMatchBanner && includesInternalDecisionCodes(searchResults.customsDeclarations, ['E20'])
@@ -191,7 +195,9 @@ export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_
     showLevel3NoMatchText,
     showLevelsResultTab,
     showTracesCheds,
-    showQuantityStatus
+    showQuantityStatus,
+    showFisNotifications,
+    fisNotifications
   }
 
   return h.view('search-result', viewModel)
