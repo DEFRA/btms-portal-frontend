@@ -154,7 +154,7 @@ const includesInternalDecisionCodes = (customsDeclarations, codes) => {
 const hasEmptyResults = (searchResults, showFisNotifications) => {
   return searchResults.customsDeclarations.length === 0 &&
     searchResults.importPreNotifications.length === 0 &&
-    !(searchResults.cheds?.length > 0) &&
+    searchResults.cheds?.length <= 0 &&
     (!showFisNotifications || (showFisNotifications && searchResults.iuus.length === 0))
 }
 
