@@ -47,8 +47,12 @@ test('post: redirects to EntraId sign in', async () => {
   const { headers } = await server.inject({
     method: 'post',
     url: paths.SIGN_IN_CHOOSE,
+    headers: {
+      cookie: 'crumb=test-crumb'
+    },
     payload: {
-      authProvider: 'entraId'
+      authProvider: 'entraId',
+      crumb: 'test-crumb'
     }
   })
 
@@ -61,8 +65,12 @@ test('post: redirects to DefraId sign in', async () => {
   const { headers } = await server.inject({
     method: 'post',
     url: paths.SIGN_IN_CHOOSE,
+    headers: {
+      cookie: 'crumb=test-crumb'
+    },
     payload: {
-      authProvider: 'defraId'
+      authProvider: 'defraId',
+      crumb: 'test-crumb'
     }
   })
 
@@ -74,8 +82,31 @@ test('post: redirects back for invalid payload', async () => {
 
   const { headers } = await server.inject({
     method: 'post',
-    url: paths.SIGN_IN_CHOOSE
+    url: paths.SIGN_IN_CHOOSE,
+    headers: {
+      cookie: 'crumb=test-crumb'
+    },
+    payload: {
+      crumb: 'test-crumb'
+    }
   })
 
   expect(headers.location).toBe('/sign-in-choose')
+})
+
+test('post: with invalid crumb is forbidden', async () => {
+  const server = await initialiseServer()
+
+  const { statusCode } = await server.inject({
+    method: 'post',
+    url: paths.SIGN_IN_CHOOSE,
+    headers: {
+      cookie: 'crumb=test-crumb'
+    },
+    payload: {
+      crumb: 'invalid-crumb'
+    }
+  })
+
+  expect(statusCode).toBe(403)
 })

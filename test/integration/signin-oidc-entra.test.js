@@ -10,11 +10,14 @@ test('redirects to search when authenticated', async () => {
   const credentials = await setupAuthedUserSession(server)
 
   const { headers, statusCode } = await server.inject({
-    method: 'post',
+    method: 'get',
     url: paths.SIGNIN_ENTRA_ID_CALLBACK,
     auth: {
       strategy: 'entraId',
       credentials
+    },
+    headers: {
+      cookie: 'crumb=test-crumb'
     }
   })
 
@@ -26,7 +29,7 @@ test('redirects to auth provider when not authenticated', async () => {
   const server = await initialiseServer()
 
   const { headers, statusCode } = await server.inject({
-    method: 'post',
+    method: 'get',
     url: paths.SIGNIN_ENTRA_ID_CALLBACK
   })
 

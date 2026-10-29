@@ -6,6 +6,7 @@
 {% endif %}
 
 <form method="post" action="/sign-in-choose" class="btms-sign-in">
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
   {{
     govukRadios({
       name: "authProvider",
