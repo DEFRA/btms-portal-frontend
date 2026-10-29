@@ -79,7 +79,7 @@ const chedResults = async (handler, resourceType, searchTerm, searchType, showTr
 }
 
 export const adminMessages = {
-  method: ['get', 'post'],
+  method: ['get'],
   path: paths.ADMIN_MESSAGES,
   options: {
     auth: {

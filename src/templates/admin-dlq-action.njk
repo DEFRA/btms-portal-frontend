@@ -29,6 +29,7 @@
           <p>Clicking on Drain messages from queue will remove all the messages from the queue</p>
 
           <form id="redrive" method="post" action="/admin/dlq/action" class="btms-admin-action__confirm">
+            <input type="hidden" name="crumb" value="{{ crumb }}"/>
             {{ govukButton({
               text: "Redrive messages",
               classes: "govuk-button--warning",
@@ -38,6 +39,7 @@
             <input type="hidden" name="confirmAction" value="Redrive" />
           </form>
           <form id="drain" method="post" action="/admin/dlq/action" class="btms-admin-action__confirm">
+            <input type="hidden" name="crumb" value="{{ crumb }}"/>
             {{ govukButton({
               text: "Drain messages from queue",
               classes: "govuk-button--warning btms-admin-drain__request",

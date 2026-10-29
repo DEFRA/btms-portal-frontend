@@ -4,7 +4,7 @@ import { METRIC_NAMES, metricsCounter } from '../utils/metrics.js'
 import { AUTH_PROVIDERS } from '../auth/auth-constants.js'
 
 export const signinOidc = {
-  method: ['get', 'post'],
+  method: ['get'],
   path: paths.SIGNIN_DEFRA_ID_CALLBACK,
   options: {
     auth: AUTH_PROVIDERS.DEFRA_ID
