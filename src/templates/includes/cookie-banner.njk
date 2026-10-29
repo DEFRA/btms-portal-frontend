@@ -43,6 +43,7 @@
   }) }}
 {% else %}
   <form method="post" action="/cookies">
+    <input type="hidden" name="crumb" value="{{ crumb }}"/>
     <input type="hidden" name="previousUrl" value="{{ currentUrl }}" />
     {{ govukCookieBanner({
       ariaLabel: "Cookies on Border Trade Matching Service",
