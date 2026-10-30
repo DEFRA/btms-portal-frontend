@@ -26,3 +26,24 @@ vulnerabilities:
     reason: >
       Vulnerable undici is bundled inside npm itself, not the
       application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-109383
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/undici/package.json
+    reason: >
+      Vulnerable undici is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-87018
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/undici/package.json
+    reason: >
+      Vulnerable undici is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-109932
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/undici/package.json
+    reason: >
+      Vulnerable undici is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides.
