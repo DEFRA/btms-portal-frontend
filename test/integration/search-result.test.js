@@ -2330,3 +2330,113 @@ test('show only show higher level result against the item document that has fail
   const matchDecisions = queryAllByText(document.body, 'Release - Inspection complete')
   expect(matchDecisions.length).toBe(1)
 })
+
+test('IUU with E76 decision should render highlighted display and decision text', async () => {
+  const searchResults = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
+        importPreNotificationIdentifiers: ['0000001'],
+        iuuNotificationIdentifiers: ['IUU.GB.2026.0000001'],
+        clearanceRequest: {
+          declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+          commodities: [
+            {
+              itemNumber: 1,
+              taricCommodityCode: '0304719030',
+              goodsDescription: 'FROZEN MSC A COD FILLETS',
+              netMass: '1',
+              supplementaryUnits: 0,
+              documents: [
+                {
+                  documentReference: 'CHEDP.GB.2026.0000001',
+                  documentCode: 'N853'
+                },
+                {
+                  documentReference: 'IUU.GB.2026.0000001',
+                  documentCode: 'C673'
+                }
+              ],
+              checks: [
+                {
+                  checkCode: 'H222',
+                  departmentCode: 'PHA'
+                },
+                {
+                  checkCode: 'H224',
+                  departmentCode: 'PHA'
+                }
+              ]
+            }
+          ]
+        },
+        clearanceDecision: {
+          results: [
+            {
+              itemNumber: 1,
+              importPreNotification: 'CHEDP.GB.2026.0000001',
+              documentReference: 'CHEDP.GB.2026.0000001',
+              documentCode: 'N853',
+              checkCode: 'H222',
+              decisionCode: 'C03',
+              decisionReason: null,
+              internalDecisionCode: null
+            },
+            {
+              itemNumber: 1,
+              importPreNotification: 'CHEDP.GB.2026.0000001',
+              documentReference: 'CHEDP.GB.2026.0000001',
+              documentCode: 'N853',
+              checkCode: 'H224',
+              decisionCode: 'X00',
+              decisionReason: null,
+              internalDecisionCode: 'E76'
+            },
+          ]
+        },
+        finalisation: {
+          finalState: '0',
+          isManualRelease: false
+        },
+        updated: '2025-05-06T13:11:59.257Z'
+      }
+    ],
+    importPreNotifications: [
+      createImportPreNotification('CHEDP.GB.2026.0000001', 'CVEDP', 'CANCELLED', '2025-04-22T16:55:17.330Z', '1', '0304719030', 'FROZEN MSC A COD FILLETS', '1')
+    ]
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: searchResults })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73A'))
+
+  globalJsdom(payload)
+  initFilters()
+
+  const declaration = getByRole(document.body, 'group', {
+    name: '24GB0Z8WEJ9ZBTL73A'
+  })
+
+  expect(
+    getByRole(declaration, 'row', {
+      name: '1 0304719030 FROZEN MSC A COD FILLETS 1 CHEDP.GB.2026.0000001 Yes POAO Release - CHED cancelled'
+    })
+  ).toBeInTheDocument()
+
+  const iuuRow = getByRole(declaration, 'row', {
+    name: '1 0304719030 FROZEN MSC A COD FILLETS 1 IUU.GB.2026.0000001 IUU reference IUU.GB.2026.0000001 cannot be found. Check that the reference is correct and update your customs declaration as required No IUU No match - No matching IUU notification'
+  })
+  expect(iuuRow).toBeInTheDocument()
+  const redUnderlinesIuuReferenceCell = iuuRow.querySelector('td.btms-no-match')
+  expect(redUnderlinesIuuReferenceCell).toBeInTheDocument()
+
+  const iuuHoverover = declaration.querySelector('span[role=tooltip]')
+  expect(iuuHoverover).toBeInTheDocument()
+  expect(iuuHoverover.innerHTML).toContain('IUU reference IUU.GB.2026.0000001 cannot be found. Check that the reference is correct and update your customs declaration as required')
+})
