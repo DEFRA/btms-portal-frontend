@@ -249,6 +249,34 @@ const isIuuRelatedChedpCheck = (clearanceDecisions) => {
   )
 }
 
+const isMissingIuuNotification = (decision) => {
+  return decision.internalDecisionCode === 'E76'
+}
+
+const getIuuDocRefFromCommodity = (commodity) => {
+  return commodity.documents.find(document => IUUDocumentCodes.includes(document.documentCode))?.documentReference
+}
+
+const missingIuuNotificationReason = (iuuReference) => {
+  return `IUU reference ${iuuReference} cannot be found. Check that the reference is correct and update your customs declaration as required`
+}
+
+const getIuuReference = (missingIuuNotification, commodity) => {
+  return missingIuuNotification ? getIuuDocRefFromCommodity(commodity) : null
+}
+
+const getDecisionReason = (missingIuuNotification, iuuNotificationReference, decision) => {
+  return missingIuuNotification ? missingIuuNotificationReason(iuuNotificationReference) : decision.decisionReason
+}
+
+const determineDocRefDisplay = (missingIuuNotification, iuuNotificationReference, documentReference) => {
+  return missingIuuNotification ? iuuNotificationReference : documentReference
+}
+
+const determineMatchDisplay = (isIuuOutcome, missingIuuNotification, isMatch) => {
+  return isIuuOutcome && !missingIuuNotification ? null : isMatch
+}
+
 const mapCommodity = (commodity, context) => {
   const { notificationStatuses, clearanceDecision, quantityStatuses, tracesChedIds, mrn } = context
   const clearanceDecisions = getActiveDecisions(clearanceDecision, commodity)
@@ -284,6 +312,8 @@ const mapCommodity = (commodity, context) => {
     const activeLevel3NoMatchQuantity = decision.internalDecisionCode === HIGHER_LEVEL_DECISION_CODE.QUANTITY_CHECK
     const activeLevel3NoMatch = activeLevel3NoMatchWeight || activeLevel3NoMatchQuantity
     const level3DocumentReference = activeLevel3NoMatch ? getDocumentReference(decision) : null
+    const missingIuuNotification = isMissingIuuNotification(decision)
+    const iuuNotificationReference = getIuuReference(missingIuuNotification, commodity)
 
     return {
       id: randomUUID(),
@@ -300,13 +330,13 @@ const mapCommodity = (commodity, context) => {
         isAllDecisionCodesAreNoMatch(clearanceDecisions),
         isIuuRelatedChedpCheck(clearanceDecisions)
       ),
-      decisionReason: decision.decisionReason,
+      decisionReason: getDecisionReason(missingIuuNotification, iuuNotificationReference, decision),
       authority: {
         text: checkCodeToAuthorityNameMapping[decision.checkCode] || checkCodeToAuthorityMapping[decision.checkCode],
         value: checkCodeToAuthorityMapping[decision.checkCode]
       },
-      documentReference,
-      match: isIuuOutcome ? null : isMatch,
+      documentReference: determineDocRefDisplay(missingIuuNotification, iuuNotificationReference, documentReference),
+      match: determineMatchDisplay(isIuuOutcome, missingIuuNotification, isMatch),
       quantityStatus,
       quantityStatusReason,
       level2NoMatch,
