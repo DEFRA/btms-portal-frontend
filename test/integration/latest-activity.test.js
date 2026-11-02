@@ -3,7 +3,8 @@ import wreck from '@hapi/wreck'
 import { initialiseServer } from '../utils/initialise-server.js'
 import { setupAuthedUserSession } from '../unit/utils/session-helper.js'
 import { paths } from '../../src/routes/route-constants.js'
-import { getByRole } from '@testing-library/dom'
+import { getByRole, queryByRole } from '@testing-library/dom'
+import { config } from '../../src/config/config.js'
 
 jest.mock('@hapi/wreck', () => ({
   get: jest.fn()
@@ -12,6 +13,33 @@ jest.mock('@hapi/wreck', () => ({
 const provider = {
   authorization_endpoint: 'https://auth.endpoint',
   token_endpoint: 'https://token.endpoint'
+}
+
+afterEach(() => {
+  config.set('isTracesChedsEnabled', false)
+})
+
+const renderLatestActivity = async (lastReceivedData) => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: { decision: null } })
+    .mockResolvedValueOnce({ payload: { decision: null } })
+    .mockResolvedValueOnce({ payload: lastReceivedData })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: paths.LATEST_ACTIVITY,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
 }
 
 test('latest activity', async () => {
@@ -232,4 +260,72 @@ test('handles no latest activity data', async () => {
       name: 'Notification No Data Available'
     })
   ).toBeInTheDocument()
+})
+
+test('shows the last TRACES CHED received when SHOW_TRACES_CHEDS is on', async () => {
+  config.set('isTracesChedsEnabled', true)
+
+  await renderLatestActivity({
+    finalisation: null,
+    clearanceRequest: null,
+    preNotification: null,
+    tracesChed: {
+      timestamp: '2025-10-13T11:45:12.123Z',
+      reference: 'CHEDP.GB.2025.1234567'
+    }
+  })
+
+  expect(
+    getByRole(document.body, 'heading', { name: 'TRACES' })
+  ).toBeInTheDocument()
+
+  const tracesTable = getByRole(document.body, 'table', {
+    name: 'Latest activity for TRACES'
+  })
+  expect(
+    getByRole(tracesTable, 'columnheader', { name: 'Last received' })
+  ).toBeInTheDocument()
+  expect(
+    getByRole(tracesTable, 'row', {
+      name: 'Notification 13 October 2025, 11:45:12'
+    })
+  ).toBeInTheDocument()
+})
+
+test('shows no TRACES CHED data when SHOW_TRACES_CHEDS is on and none has been received', async () => {
+  config.set('isTracesChedsEnabled', true)
+
+  await renderLatestActivity({
+    finalisation: null,
+    clearanceRequest: null,
+    preNotification: null
+  })
+
+  const tracesTable = getByRole(document.body, 'table', {
+    name: 'Latest activity for TRACES'
+  })
+  expect(
+    getByRole(tracesTable, 'row', { name: 'Notification No Data Available' })
+  ).toBeInTheDocument()
+})
+
+test('does not show TRACES when SHOW_TRACES_CHEDS is off', async () => {
+  config.set('isTracesChedsEnabled', false)
+
+  await renderLatestActivity({
+    finalisation: null,
+    clearanceRequest: null,
+    preNotification: null,
+    tracesChed: {
+      timestamp: '2025-10-13T11:45:12.123Z',
+      reference: 'CHEDP.GB.2025.1234567'
+    }
+  })
+
+  expect(
+    queryByRole(document.body, 'heading', { name: 'TRACES' })
+  ).not.toBeInTheDocument()
+  expect(
+    queryByRole(document.body, 'table', { name: 'Latest activity for TRACES' })
+  ).not.toBeInTheDocument()
 })
