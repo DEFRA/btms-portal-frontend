@@ -8,7 +8,10 @@ test('get: renders page', async () => {
 
   const { payload } = await server.inject({
     method: 'get',
-    url: paths.SIGN_IN_CHOOSE
+    url: paths.SIGN_IN_CHOOSE,
+    headers: {
+      cookie: 'crumb=test-crumb'
+    }
   })
 
   globalJsdom(payload)
@@ -18,6 +21,11 @@ test('get: renders page', async () => {
   })
 
   expect(fieldSet).not.toHaveAttribute('aria-describedby', 'authProvider-error')
+
+  const signInFormCrumb = document.body.querySelector('form.btms-sign-in input[name="crumb"]')
+  expect(signInFormCrumb).toBeInTheDocument()
+  expect(signInFormCrumb.value).toBe('test-crumb')
+  expect(signInFormCrumb).toHaveAttribute('type', 'hidden')
 })
 
 test('get: renders page with error', async () => {
@@ -97,7 +105,7 @@ test('post: redirects back for invalid payload', async () => {
 test('post: with invalid crumb is forbidden', async () => {
   const server = await initialiseServer()
 
-  const { statusCode } = await server.inject({
+  const { payload, statusCode } = await server.inject({
     method: 'post',
     url: paths.SIGN_IN_CHOOSE,
     headers: {
@@ -108,5 +116,10 @@ test('post: with invalid crumb is forbidden', async () => {
     }
   })
 
+  globalJsdom(payload)
+
   expect(statusCode).toBe(403)
+  expect(
+    getByRole(document.body, 'heading', { name: 'You do not have the correct permissions to access this service' })
+  ).toBeInTheDocument()
 })

@@ -8,7 +8,10 @@ test('get: cookies page renders', async () => {
 
   const { payload } = await server.inject({
     method: 'get',
-    url: paths.COOKIES
+    url: paths.COOKIES,
+    headers: {
+      cookie: 'crumb=test-crumb'
+    }
   })
 
   globalJsdom(payload)
@@ -18,6 +21,11 @@ test('get: cookies page renders', async () => {
     level: 1
   })
   expect(document.title).toBe('Cookies - Border Trade Matching Service')
+
+  const cookiesFormCrumb = document.body.querySelector('form[action="/cookies"] input[name="crumb"]')
+  expect(cookiesFormCrumb).toBeInTheDocument()
+  expect(cookiesFormCrumb.value).toBe('test-crumb')
+  expect(cookiesFormCrumb).toHaveAttribute('type', 'hidden')
 })
 
 test('get: the cookie banner is not rendered', async () => {
@@ -128,7 +136,7 @@ test.each([
 test('post: with invalid crumb is forbidden', async () => {
   const server = await initialiseServer()
 
-  const { statusCode } = await server.inject({
+  const { payload, statusCode } = await server.inject({
     method: 'post',
     url: paths.COOKIES,
     headers: {
@@ -141,5 +149,10 @@ test('post: with invalid crumb is forbidden', async () => {
     }
   })
 
+  globalJsdom(payload)
+
   expect(statusCode).toBe(403)
+  expect(
+    getByRole(document.body, 'heading', { name: 'You do not have the correct permissions to access this service' })
+  ).toBeInTheDocument()
 })

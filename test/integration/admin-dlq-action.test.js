@@ -342,6 +342,9 @@ test('Should show actions available if queue counts are greater than zero', asyn
     auth: {
       strategy: 'session',
       credentials
+    },
+    headers: {
+      cookie: 'crumb=test-crumb'
     }
   })
 
@@ -355,6 +358,14 @@ test('Should show actions available if queue counts are greater than zero', asyn
   expect(
     getByRole(document.body, 'button', { name: 'Drain messages from queue' })
   ).toBeInTheDocument()
+  const redriveFormCrumb = document.body.querySelector('form.btms-admin-action__confirm input[name="crumb"]')
+  expect(redriveFormCrumb).toBeInTheDocument()
+  expect(redriveFormCrumb.value).toBe('test-crumb')
+  expect(redriveFormCrumb).toHaveAttribute('type', 'hidden')
+  const drainFormCrumb = document.body.querySelector('form.btms-admin-action__confirm input[name="crumb"]')
+  expect(drainFormCrumb).toBeInTheDocument()
+  expect(drainFormCrumb.value).toBe('test-crumb')
+  expect(drainFormCrumb).toHaveAttribute('type', 'hidden')
 })
 
 test('Invalid Redrive response should show error page', async () => {
@@ -463,7 +474,7 @@ test('Post with invalid crumb is forbidden', async () => {
   const server = await initialiseServer()
   const credentials = await setupAuthedAdminUserSession(server)
 
-  const { statusCode } = await server.inject({
+  const { payload, statusCode } = await server.inject({
     method: 'post',
     url: paths.ADMIN_DLQ_ACTION,
     auth: {
@@ -479,5 +490,10 @@ test('Post with invalid crumb is forbidden', async () => {
     }
   })
 
+  globalJsdom(payload)
+
   expect(statusCode).toBe(403)
+  expect(
+    getByRole(document.body, 'heading', { name: 'You do not have the correct permissions to access this service' })
+  ).toBeInTheDocument()
 })
