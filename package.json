@@ -58,7 +58,7 @@
     "hapi-pulse": "^4.0.0",
     "https-proxy-agent": "^7.0.6",
     "ioredis": "^5.8.2",
-    "joi": "^18.2.9",
+    "joi": "^18.3.1",
     "nunjucks": "^3.2.4",
     "pino": "^10.1.0",
     "pino-pretty": "^13.1.2",
@@ -69,7 +69,7 @@
       "picomatch": "^4.0.4"
     },
     "postcss": "^8.5.26",
-    "@hapi/content": "6.0.2",
+    "@hapi/content": "6.0.3",
     "@hapi/wreck": "18.1.2",
     "svgo": "4.1.0",
     "nanoid": "3.3.18",
@@ -91,10 +91,13 @@
     "source-map-js": "1.2.2",
     "fast-copy": "4.1.0",
     "@hapi/bell": {
-      "joi": "17.13.8"
+      "joi": "17.13.9"
     },
     "@hapi/catbox-redis": {
-      "joi": "17.13.8"
+      "joi": "17.13.9"
+    },
+    "hapi-pulse": {
+      "joi": "18.3.1"
     }
   },
   "devDependencies": {
