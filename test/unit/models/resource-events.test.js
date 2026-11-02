@@ -442,3 +442,49 @@ test('maps an unknown Traces Ched status code', () => {
 
   expect(result[0].status).toBe('Unknown (999)')
 })
+
+const iuuNotificationResourceEvent = ({ reference, iuuOption, lastUpdated }) => ({
+  resourceType: 'IuuNotification',
+  message: JSON.stringify({
+    resource: {
+      id: reference,
+      iuuNotification: { reference, iuuOption, lastUpdated }
+    }
+  })
+})
+
+test('maps Iuu Notification Resource Event', () => {
+  const resourceEvents = [
+    iuuNotificationResourceEvent({
+      reference: 'IUU.GB.2026.0014581',
+      iuuOption: 'IUUOK',
+      lastUpdated: '2026-10-26T19:17:47.000+00:00'
+    })
+  ]
+
+  const result = mapResourceEvents('24GB0Z8WEJ9ZBTL73A', undefined, resourceEvents)
+
+  expect(result).toEqual([{
+    created: '2026-10-26T19:17:47.000+00:00',
+    eventTitle: 'IUU.GB.2026.0014581',
+    eventType: 'FisNotification',
+    source: 'FIS to BTMS',
+    status: 'Valid',
+    statusClass: 'govuk-tag--green'
+  }])
+})
+
+test('maps Iuu Notification Resource Event with no IUU option', () => {
+  const resourceEvents = [
+    iuuNotificationResourceEvent({
+      reference: 'IUU.GB.2026.0014581',
+      iuuOption: null,
+      lastUpdated: '2026-10-26T19:17:47.000+00:00'
+    })
+  ]
+
+  const result = mapResourceEvents('24GB0Z8WEJ9ZBTL73A', undefined, resourceEvents)
+
+  expect(result[0].status).toBe('In Progress')
+  expect(result[0].statusClass).toBe('govuk-tag--yellow')
+})

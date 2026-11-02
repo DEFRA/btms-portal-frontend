@@ -20,4 +20,4 @@ export const getRelatedImportDeclarations = async (query) => {
 }
 
 export const getResourceEvents = (resourceId) =>
-  dataApiClient.get(`resource-events/${resourceId}`)
+  dataApiClient.get(`resource-events/${encodeURIComponent(resourceId)}`)

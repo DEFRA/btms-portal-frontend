@@ -2,6 +2,7 @@ import globalJsdom from 'global-jsdom'
 import wreck from '@hapi/wreck'
 import {
   getAllByRole,
+  getAllByText,
   getByRole, getByText, queryAllByText,
   queryByRole,
   queryByText,
@@ -18,6 +19,7 @@ import { initFilters } from '../../src/client/javascripts/filters.js'
 afterEach(() => {
   config.set('isTracesChedsEnabled', false)
   config.set('isQuantityStatusEnabled', false)
+  config.set('isFisNotificationsEnabled', false)
 })
 
 const provider = {
@@ -829,6 +831,9 @@ test.each([
     })
 
     globalJsdom(payload)
+
+    const reservationFetches = wreck.get.mock.calls.filter(([url]) => url.includes('_24GB0Z8WEJ9ZBTL73B'))
+    expect(reservationFetches).toHaveLength(quantityStatusEnabled ? 1 : 0)
 
     const table = document.querySelector('table.btms-declaration')
 
@@ -2895,4 +2900,172 @@ test.each([
   const statusField = document.body.querySelector('.fis-details__summary .btms-fis-notification-summary .govuk-summary-list__row .govuk-summary-list__value span')
   expect(statusField.innerHTML).toContain(expectedStatus)
   expect(statusField).toHaveClass(expectedClass)
+})
+
+const fisNotification = {
+  reference: 'IUU.GB.2026.0014581',
+  iuuOption: 'IUUOK',
+  lastUpdated: '2026-10-26T19:17:47.000Z'
+}
+
+const fisTimelineSearchResults = () => {
+  const declaration = createCustomsDeclaration('24GB0Z8WEJ9ZBTL73B', '5GB123456789000-BDOV123456', '2025-01-01T09:00:00.000Z')
+  declaration.clearanceRequest.commodities[0].documents.push({
+    documentCode: 'C673',
+    documentReference: fisNotification.reference
+  })
+
+  return {
+    customsDeclarations: [declaration],
+    importPreNotifications: [],
+    iuus: [{ iuuNotification: fisNotification }]
+  }
+}
+
+const iuuResourceEvents = [{
+  resourceType: 'IuuNotification',
+  message: JSON.stringify({
+    resource: {
+      id: fisNotification.reference,
+      iuuNotification: fisNotification
+    }
+  })
+}]
+
+test('shows FIS notification events on the timeline when the feature flag is enabled', async () => {
+  config.set('isFisNotificationsEnabled', true)
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: fisTimelineSearchResults() })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: iuuResourceEvents })
+
+  const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73B'))
+
+  globalJsdom(payload)
+
+  expect(getAllByText(document.body, 'FIS to BTMS')).toHaveLength(1)
+
+  const timeline = document.querySelector('.btms-search-result-timeline')
+  expect(within(timeline).getByText('IUU.GB.2026.0014581')).toBeInTheDocument()
+  expect(within(timeline).getByText('Valid')).toBeInTheDocument()
+  expect(within(timeline).getByText('Created')).toBeInTheDocument()
+  expect(timeline.querySelector('time[datetime="2026-10-26T19:17:47.000Z"]')).not.toBeNull()
+})
+
+test('does not show FIS notification events on the timeline when the feature flag is disabled', async () => {
+  config.set('isFisNotificationsEnabled', false)
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: fisTimelineSearchResults() })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73B'))
+
+  globalJsdom(payload)
+
+  expect(wreck.get).toHaveBeenCalledTimes(4)
+  expect(queryAllByText(document.body, 'FIS to BTMS')).toHaveLength(0)
+})
+
+const clearanceRequestResourceEvent = (messageSentAt) => ({
+  resourceType: 'CustomsDeclaration',
+  subResourceType: 'ClearanceRequest',
+  message: JSON.stringify({
+    resource: {
+      clearanceRequest: {
+        externalVersion: 1,
+        messageSentAt,
+        commodities: [
+          {
+            itemNumber: 1,
+            taricCommodityCode: '0304719030',
+            goodsDescription: 'FROZEN MSC A COD FILLETS',
+            documents: [],
+            checks: []
+          }
+        ]
+      }
+    }
+  })
+})
+
+const timelineLabels = () =>
+  Array.from(document.querySelectorAll('.btms-search-result-timeline .moj-timeline__item .moj-timeline__title'))
+    .map(el => el.textContent.replace(/\s+/g, ' ').trim())
+
+test('orders FIS notification events among the other timeline events by lastUpdated', async () => {
+  config.set('isFisNotificationsEnabled', true)
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: fisTimelineSearchResults() })
+    .mockResolvedValueOnce({ payload: [clearanceRequestResourceEvent('2026-10-26T20:00:00.000Z')] })
+    .mockResolvedValueOnce({ payload: iuuResourceEvents })
+
+  const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73B'))
+
+  globalJsdom(payload)
+
+  const labels = timelineLabels()
+
+  expect(labels[0]).toContain('CDS clearance request')
+  expect(labels[1]).toContain('IUU.GB.2026.0014581')
+  expect(labels[1]).toContain('FIS to BTMS')
+})
+
+test('keeps the other timeline events when a FIS notification fetch fails', async () => {
+  config.set('isFisNotificationsEnabled', true)
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: fisTimelineSearchResults() })
+    .mockResolvedValueOnce({ payload: [clearanceRequestResourceEvent('2026-10-26T20:00:00.000Z')] })
+    .mockRejectedValueOnce(new Error('boom'))
+
+  const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73B'))
+
+  globalJsdom(payload)
+
+  const labels = timelineLabels()
+
+  expect(labels.some((label) => label.includes('CDS clearance request'))).toBe(true)
+  expect(labels.some((label) => label.includes('FIS to BTMS'))).toBe(false)
+})
+
+test('escapes markup in FIS notification references', async () => {
+  config.set('isFisNotificationsEnabled', true)
+
+  const hostileEvent = {
+    ...iuuResourceEvents[0],
+    message: JSON.stringify({
+      resource: {
+        iuuNotification: {
+          reference: '<b>x</b>',
+          lastUpdated: '2026-10-26T19:17:47.122Z',
+          iuuOption: 'IUUOK'
+        }
+      }
+    })
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: fisTimelineSearchResults() })
+    .mockResolvedValueOnce({ payload: [] })
+    .mockResolvedValueOnce({ payload: [hostileEvent] })
+
+  const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73B'))
+
+  globalJsdom(payload)
+
+  expect(document.querySelector('.moj-timeline__title b')).toBeNull()
+  expect(timelineLabels().some((label) => label.includes('<b>x</b>'))).toBe(true)
 })
