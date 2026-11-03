@@ -1,17 +1,24 @@
 import { constants } from 'node:http2'
 import { paths, queryStringParams, CACHE_CONTROL_NO_STORE } from './route-constants.js'
-import { searchKeys, searchPatterns } from '../services/search-patterns.js'
+import { fisNotificationSearchPattern, searchKeys, searchPatterns } from '../services/search-patterns.js'
 import { ADMIN_SEARCH_TYPES, isValidAdminSearchType, search } from '../services/admin-messages.js'
 import { mapAdminSearchResults } from '../models/admin-search-results.js'
 import { APP_SCOPES } from '../auth/auth-constants.js'
+import { config } from '../config/config.js'
 
 const ADMIN_MESSAGES_TEMPLATE = 'admin-messages'
 const UNSUPPORTED_SEARCH_PATTERNS = new Set([ searchKeys.DUCR, searchKeys.GMR_ID ])
+
+const showFisNotifications = () => config.get('isFisNotificationsEnabled')
+
+const getAdminSearchPatterns = () =>
+  showFisNotifications() ? [...searchPatterns, fisNotificationSearchPattern] : searchPatterns
 
 const createResultsModel = (searchTerm, searchType, resourceType, results, tracesChedResults, showTracesChedInfo) => {
   const baseLink = `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=${searchTerm}`
   return {
     isValid: true,
+    showFisNotifications: showFisNotifications(),
     links: {
       information: `${baseLink}&${queryStringParams.SEARCH_TYPE}=${ADMIN_SEARCH_TYPES.INFORMATION}`,
       tracesChedInformation: `${baseLink}&${queryStringParams.SEARCH_TYPE}=${ADMIN_SEARCH_TYPES.INFORMATION}&${queryStringParams.SHOW_TRACES_CHED_INFO}=true`,
@@ -32,7 +39,8 @@ const createErrorModel = (errorCode, searchTerm) => {
   return {
     errorCode,
     isValid: false,
-    searchTerm
+    searchTerm,
+    showFisNotifications: showFisNotifications()
   }
 }
 
@@ -99,7 +107,7 @@ export const adminMessages = {
           throw new Error('SEARCH_TERM_REQUIRED')
         }
 
-        const matchingSearchPattern = searchPatterns.find(({ pattern }) =>
+        const matchingSearchPattern = getAdminSearchPatterns().find(({ pattern }) =>
           pattern.test(searchTerm)
         )
         if (matchingSearchPattern
@@ -125,7 +133,7 @@ export const adminMessages = {
 
     try {
       if (!searchTerm?.length || !searchType?.length) {
-        return h.view(ADMIN_MESSAGES_TEMPLATE)
+        return h.view(ADMIN_MESSAGES_TEMPLATE, { showFisNotifications: showFisNotifications() })
       }
 
       if (resourceType.key === searchKeys.CHED_ID) {

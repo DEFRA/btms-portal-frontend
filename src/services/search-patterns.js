@@ -7,7 +7,15 @@ export const searchKeys = {
   TRACES_CHED_ID: 'tracesChedId',
   DUCR: 'ducr',
   GMR_ID: 'gmrId',
-  VRN_TRN: 'vrnOrTrn'
+  VRN_TRN: 'vrnOrTrn',
+  IUU: 'iuu'
+}
+
+// Kept out of searchPatterns as only the admin messages search supports FIS Notifications
+export const fisNotificationSearchPattern = {
+  key: searchKeys.IUU,
+  pattern: /^IUU\.[A-Z]{2}\.2\d{3}\.\d{7}$/,
+  description: 'FIS'
 }
 
 export const searchPatterns = [
