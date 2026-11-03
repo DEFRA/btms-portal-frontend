@@ -2639,7 +2639,7 @@ describe('quantity status', () => {
       ...withReservation('Reserved')
     })[0].commodities[0].decisions[0]
 
-    expect(decision.documentReference).toBeNull()
+    expect(decision.documentReference).toBe('CHEDA.GB.2025.0000001')
     expect(decision.quantityStatus).toBeUndefined()
   })
 
@@ -2678,5 +2678,172 @@ describe('quantity status', () => {
 
   test('a declaration with no CHEDs at all does not report hasTracesChed', () => {
     expect(declarationHasTracesChed(declarationWithChed(), { cheds: [], importPreNotifications: [] })).toBe(false)
+  })
+})
+
+describe('IUU document reference and match display', () => {
+  test.each([
+    {
+      chedType: "IPAFFS",
+      matchStatus: true,
+      iuuDocRef: "IUU.GBVARIOUS",
+      decisionCode: 'H02',
+      internalDecisionCode: null,
+      iuuDecisionCode: 'H02',
+      iuuInternalDecisionCode: null,
+      chedReferenceDisplay: null,
+      matchDisplay: null
+    },
+    {
+      chedType: "IPAFFS",
+      matchStatus: false,
+      iuuDocRef: "IUU.GBVARIOUS",
+      decisionCode: 'X00',
+      internalDecisionCode: 'E99',
+      iuuDecisionCode: 'X00',
+      iuuInternalDecisionCode: 'E99',
+      chedReferenceDisplay: null,
+      matchDisplay: null
+    },
+    {
+      chedType: "TRACES",
+      matchStatus: false,
+      iuuDocRef: "IUU.GB.2026.0000001",
+      decisionCode: 'H02',
+      internalDecisionCode: null,
+      iuuDecisionCode: 'X00',
+      iuuInternalDecisionCode: 'E99',
+      chedReferenceDisplay: "IUU.GB.2026.0000001",
+      matchDisplay: false
+    },
+    {
+      chedType: "TRACES",
+      matchStatus: false,
+      iuuDocRef: "IUU.GB.2026.0000001",
+      decisionCode: 'H02',
+      internalDecisionCode: null,
+      iuuDecisionCode: 'X00',
+      iuuInternalDecisionCode: 'E76',
+      chedReferenceDisplay: "IUU.GB.2026.0000001",
+      matchDisplay: false
+    },
+    {
+      chedType: "TRACES",
+      matchStatus: true,
+      iuuDocRef: "IUU.GB.2026.0000001",
+      decisionCode: 'H02',
+      internalDecisionCode: null,
+      iuuDecisionCode: 'H02',
+      iuuInternalDecisionCode: null,
+      chedReferenceDisplay: "IUU.GB.2026.0000001",
+      matchDisplay: true
+    }
+  ])('when Customs Declaration is associated to $chedType CHED and match status is $matchStatus and IUU internalDecisionCode is $iuuInternalDecisionCode, then IUU line CHED Reference display is $chedReferenceDisplay and match display is $matchDisplay',
+    ({
+      chedType,
+      matchStatus,
+      iuuDocRef,
+      decisionCode,
+      internalDecisionCode,
+      iuuDecisionCode,
+      iuuInternalDecisionCode,
+      chedReferenceDisplay,
+      matchDisplay
+    }) => {
+      const data = {
+        customsDeclarations: [
+          {
+            movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
+            clearanceRequest: {
+              declarationUcr: '5GB123456789000-BDOV123456',
+              commodities: [
+                {
+                  itemNumber: 1,
+                  netMass: '9999',
+                  documents: [
+                    {
+                      documentCode: '9115',
+                      documentReference: 'CHEDP.GB.2026.1234567'
+                    },
+                    {
+                      documentCode: 'C673',
+                      documentReference: iuuDocRef
+                    }
+                  ],
+                  checks: [
+                    {
+                      checkCode: 'H219'
+                    },
+                    {
+                      checkCode: 'H224'
+                    }
+                  ]
+                }
+              ]
+            },
+            clearanceDecision: {
+              results: [
+                {
+                  itemNumber: 1,
+                  importPreNotification: 'CHEDP.GB.2026.1234567',
+                  documentReference: 'CHEDP.GB.2026.1234567',
+                  documentCode: '9115',
+                  checkCode: 'H219',
+                  decisionCode,
+                  decisionReason: null,
+                  internalDecisionCode
+                },
+                {
+                  itemNumber: 1,
+                  importPreNotification: 'CHEDP.GB.2026.1234567',
+                  documentReference: 'CHEDP.GB.2026.1234567',
+                  documentCode: 'C673',
+                  checkCode: 'H224',
+                  decisionCode: iuuDecisionCode,
+                  decisionReason: null,
+                  internalDecisionCode: iuuInternalDecisionCode
+                }
+              ]
+            },
+            finalisation: {
+              isManualRelease: false,
+              finalState: '0'
+            },
+            updated: '2025-05-12T11:13:17.330Z'
+          }
+        ]
+      }
+
+      if (chedType === "IPAFFS") {
+        data.importPreNotifications = [
+          {
+            importPreNotification: {
+              referenceNumber: 'CHEDP.GB.2026.1234567',
+              status: 'VALIDATED'
+            }
+          }
+        ]
+        data.cheds = []
+      } else {
+        data.importPreNotifications = []
+        data.cheds = [
+          {
+            ched: {
+              exchangedDocument: {
+                identifier: 'CHEDP.GB.2026.1234567'
+              }
+            }
+          }
+        ]
+      }
+
+      const result = mapCustomsDeclarations(data, '24GB0Z8WEJ9ZBTL73A')
+
+      const mainItemLine = result[0].commodities[0].decisions[0]
+      const iuuItemLine = result[0].commodities[0].decisions[1]
+      expect(mainItemLine.documentReference).toBe('CHEDP.GB.2026.1234567')
+      expect(mainItemLine.match).toBe(decisionCode !== 'X00')
+      expect(iuuItemLine.documentReference).toBe(chedReferenceDisplay)
+      expect(iuuItemLine.match).toBe(matchDisplay)
   })
 })
