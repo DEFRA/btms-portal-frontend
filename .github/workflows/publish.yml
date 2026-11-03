@@ -24,12 +24,12 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v6
 
       - name: Build and Publish
-        uses: DEFRA/cdp-build-action/build@bec36ef9df0ced91ac6b01d77aa63a8e8a8760a6
+        uses: DEFRA/cdp-build-action/build@3761ef22decf8615b8fd275cd9b7142f8d356a11
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Test Coverage Reports
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         with:
           node-version: 24
           cache: npm
@@ -39,7 +39,7 @@ jobs:
           npm test
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@22918119ff8e1ca75a623e15c8296b6ea4fbe28f
+        uses: SonarSource/sonarqube-scan-action@4d1dc0c91ee400dcf8a6dddf2f705ac36542e304
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
