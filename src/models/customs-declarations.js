@@ -258,23 +258,28 @@ const getIuuDocRefFromCommodity = (commodity) => {
 }
 
 const missingIuuNotificationReason = (iuuReference) => {
-  return `IUU reference ${iuuReference} cannot be found. Check that the reference is correct and update your customs declaration as required`
+  const referenceError = iuuReference ? `IUU reference ${iuuReference} cannot be found.` : 'IUU reference was not supplied.'
+  return `${referenceError} Check that the reference is correct and update your customs declaration as required`
 }
 
-const getIuuReference = (missingIuuNotification, commodity) => {
-  return missingIuuNotification ? getIuuDocRefFromCommodity(commodity) : null
+const getIuuReference = (missingIuuNotification, commodity, isTracesIuuDecision) => {
+  return missingIuuNotification || isTracesIuuDecision ? getIuuDocRefFromCommodity(commodity) : null
 }
 
 const getDecisionReason = (missingIuuNotification, iuuNotificationReference, decision) => {
   return missingIuuNotification ? missingIuuNotificationReason(iuuNotificationReference) : decision.decisionReason
 }
 
-const determineDocRefDisplay = (missingIuuNotification, iuuNotificationReference, documentReference) => {
-  return missingIuuNotification ? iuuNotificationReference : documentReference
+const determineDocRefDisplay = (missingIuuNotification, iuuNotificationReference, documentReference, isTracesIuuDecision) => {
+  return missingIuuNotification || isTracesIuuDecision ? iuuNotificationReference ?? 'IUU Reference Not Supplied' : documentReference
 }
 
-const determineMatchDisplay = (isIuuOutcome, missingIuuNotification, isMatch) => {
-  return isIuuOutcome && !missingIuuNotification ? null : isMatch
+const determineMatchDisplay = (isIuuOutcome, missingIuuNotification, isMatch, isTracesIuuDecision) => {
+  return isIuuOutcome && !missingIuuNotification && !isTracesIuuDecision ? null : isMatch
+}
+
+const isTracesIuuMatch = (tracesChedIds, decisionDocumentReference) => {
+  return tracesChedIds.has(decisionDocumentReference?.toUpperCase())
 }
 
 const mapCommodity = (commodity, context) => {
@@ -312,8 +317,9 @@ const mapCommodity = (commodity, context) => {
     const activeLevel3NoMatchQuantity = decision.internalDecisionCode === HIGHER_LEVEL_DECISION_CODE.QUANTITY_CHECK
     const activeLevel3NoMatch = activeLevel3NoMatchWeight || activeLevel3NoMatchQuantity
     const level3DocumentReference = activeLevel3NoMatch ? getDocumentReference(decision) : null
+    const isTracesIuuDecision = isIuuOutcome && isTracesIuuMatch(tracesChedIds, decision.documentReference)
     const missingIuuNotification = isMissingIuuNotification(decision)
-    const iuuNotificationReference = getIuuReference(missingIuuNotification, commodity)
+    const iuuNotificationReference = getIuuReference(missingIuuNotification, commodity, isTracesIuuDecision)
 
     return {
       id: randomUUID(),
@@ -335,8 +341,8 @@ const mapCommodity = (commodity, context) => {
         text: checkCodeToAuthorityNameMapping[decision.checkCode] || checkCodeToAuthorityMapping[decision.checkCode],
         value: checkCodeToAuthorityMapping[decision.checkCode]
       },
-      documentReference: determineDocRefDisplay(missingIuuNotification, iuuNotificationReference, documentReference),
-      match: determineMatchDisplay(isIuuOutcome, missingIuuNotification, isMatch),
+      documentReference: determineDocRefDisplay(missingIuuNotification, iuuNotificationReference, documentReference, isTracesIuuDecision),
+      match: determineMatchDisplay(isIuuOutcome, missingIuuNotification, isMatch, isTracesIuuDecision),
       quantityStatus,
       quantityStatusReason,
       level2NoMatch,

@@ -47,3 +47,21 @@ vulnerabilities:
     reason: >
       Vulnerable undici is bundled inside npm itself, not the
       application. Cannot be upgraded via package.json overrides.
+
+  - id: CVE-2026-118773
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/glob/package.json
+    reason: >
+      Vulnerable glob is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides; npm 12.2.1
+      (current latest) still bundles glob 13.0.6, so a fix requires the
+      base image to ship a newer npm version.
+
+  - id: CVE-2026-118764
+    paths:
+      - usr/local/lib/node_modules/npm/node_modules/minimatch/package.json
+    reason: >
+      Vulnerable minimatch is bundled inside npm itself, not the
+      application. Cannot be upgraded via package.json overrides; npm 12.2.1
+      (current latest) still bundles minimatch 10.2.5, so a fix requires the
+      base image to ship a newer npm version.
