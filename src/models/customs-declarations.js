@@ -258,7 +258,8 @@ const getIuuDocRefFromCommodity = (commodity) => {
 }
 
 const missingIuuNotificationReason = (iuuReference) => {
-  return `IUU reference ${iuuReference} cannot be found. Check that the reference is correct and update your customs declaration as required`
+  const referenceError = iuuReference ? `IUU reference ${iuuReference} cannot be found.` : 'IUU reference was not supplied.'
+  return `${referenceError} Check that the reference is correct and update your customs declaration as required`
 }
 
 const getIuuReference = (missingIuuNotification, commodity, isTracesIuuDecision) => {
@@ -270,7 +271,7 @@ const getDecisionReason = (missingIuuNotification, iuuNotificationReference, dec
 }
 
 const determineDocRefDisplay = (missingIuuNotification, iuuNotificationReference, documentReference, isTracesIuuDecision) => {
-  return missingIuuNotification || isTracesIuuDecision ? iuuNotificationReference : documentReference
+  return missingIuuNotification || isTracesIuuDecision ? iuuNotificationReference ?? 'IUU Reference Not Supplied' : documentReference
 }
 
 const determineMatchDisplay = (isIuuOutcome, missingIuuNotification, isMatch, isTracesIuuDecision) => {

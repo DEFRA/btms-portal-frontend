@@ -2620,3 +2620,114 @@ test.each([
     })
   ).toBeInTheDocument()
 })
+
+test.each([
+  {
+    iuuInternalDecisionCode: 'E99',
+    expectedIuuRow: '1 0304719030 FROZEN MSC A COD FILLETS 1 IUU Reference Not Supplied No IUU No match - Unknown error'
+  },
+  {
+    iuuInternalDecisionCode: 'E76',
+    expectedIuuRow: '1 0304719030 FROZEN MSC A COD FILLETS 1 IUU Reference Not Supplied IUU reference was not supplied. Check that the reference is correct and update your customs declaration as required No IUU No match - No matching IUU notification'
+  }
+])('TRACES CHED IUU with decision code $iuuInternalDecisionCode with missing reference should render relevant IUU row', async ({ iuuInternalDecisionCode, expectedIuuRow }) => {
+  config.set('isTracesChedsEnabled', true)
+
+  const searchResults = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
+        importPreNotificationIdentifiers: ['0000001'],
+        iuuNotificationIdentifiers: ['IUU.GB.2026.0000001'],
+        clearanceRequest: {
+          declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+          commodities: [
+            {
+              itemNumber: 1,
+              taricCommodityCode: '0304719030',
+              goodsDescription: 'FROZEN MSC A COD FILLETS',
+              netMass: '1',
+              supplementaryUnits: 0,
+              documents: [
+                {
+                  documentReference: 'CHEDP.GB.2026.0000001',
+                  documentCode: 'N853'
+                }
+              ],
+              checks: [
+                {
+                  checkCode: 'H222',
+                  departmentCode: 'PHA'
+                },
+                {
+                  checkCode: 'H224',
+                  departmentCode: 'PHA'
+                }
+              ]
+            }
+          ]
+        },
+        clearanceDecision: {
+          results: [
+            {
+              itemNumber: 1,
+              importPreNotification: 'CHEDP.GB.2026.0000001',
+              documentReference: 'CHEDP.GB.2026.0000001',
+              documentCode: 'N853',
+              checkCode: 'H222',
+              decisionCode: 'C03',
+              decisionReason: null,
+              internalDecisionCode: null
+            },
+            {
+              itemNumber: 1,
+              importPreNotification: 'CHEDP.GB.2026.0000001',
+              documentReference: 'CHEDP.GB.2026.0000001',
+              documentCode: 'N853',
+              checkCode: 'H224',
+              decisionCode: 'X00',
+              decisionReason: null,
+              internalDecisionCode: iuuInternalDecisionCode
+            },
+          ]
+        },
+        finalisation: {
+          finalState: '0',
+          isManualRelease: false
+        },
+        updated: '2025-05-06T13:11:59.257Z'
+      }
+    ],
+    importPreNotifications: [],
+    cheds: [
+      {
+        ched: {
+          exchangedDocument: {
+            identifier: 'CHEDP.GB.2026.0000001'
+          }
+        }
+      }
+    ]
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: searchResults })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73A'))
+
+  globalJsdom(payload)
+  initFilters()
+
+  const declaration = getByRole(document.body, 'group', {
+    name: '24GB0Z8WEJ9ZBTL73A'
+  })
+
+  const iuuRow = getByRole(declaration, 'row', {
+    name: expectedIuuRow
+  })
+  expect(iuuRow).toBeInTheDocument()
+})

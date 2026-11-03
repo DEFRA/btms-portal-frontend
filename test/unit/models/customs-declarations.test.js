@@ -2847,3 +2847,81 @@ describe('IUU document reference and match display', () => {
       expect(iuuItemLine.match).toBe(matchDisplay)
   })
 })
+
+test('when IUU reference is not supplied then relevant reference and tooltip is returned', () => {
+  const data = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
+        clearanceRequest: {
+          declarationUcr: '5GB123456789000-BDOV123456',
+          commodities: [
+            {
+              itemNumber: 1,
+              netMass: '9999',
+              documents: [
+                {
+                  documentCode: '9115',
+                  documentReference: 'CHEDP.GB.2026.1234567'
+                }
+              ],
+              checks: [
+                {
+                  checkCode: 'H219'
+                },
+                {
+                  checkCode: 'H224'
+                }
+              ]
+            }
+          ]
+        },
+        clearanceDecision: {
+          results: [
+            {
+              itemNumber: 1,
+              importPreNotification: 'CHEDP.GB.2026.1234567',
+              documentReference: 'CHEDP.GB.2026.1234567',
+              documentCode: '9115',
+              checkCode: 'H219',
+              decisionCode: 'H02',
+              decisionReason: null,
+              internalDecisionCode: null
+            },
+            {
+              itemNumber: 1,
+              importPreNotification: 'CHEDP.GB.2026.1234567',
+              documentReference: 'CHEDP.GB.2026.1234567',
+              documentCode: 'C673',
+              checkCode: 'H224',
+              decisionCode: 'X00',
+              decisionReason: null,
+              internalDecisionCode: 'E76'
+            }
+          ]
+        },
+        finalisation: {
+          isManualRelease: false,
+          finalState: '0'
+        },
+        updated: '2025-05-12T11:13:17.330Z'
+      }
+    ],
+    importPreNotifications: [],
+    cheds: [
+      {
+        ched: {
+          exchangedDocument: {
+            identifier: 'CHEDP.GB.2026.1234567'
+          }
+        }
+      }
+    ]
+  }
+
+  const result = mapCustomsDeclarations(data, '24GB0Z8WEJ9ZBTL73A')
+
+  const iuuItemLine = result[0].commodities[0].decisions[1]
+  expect(iuuItemLine.documentReference).toBe('IUU Reference Not Supplied')
+  expect(iuuItemLine.decisionReason).toBe('IUU reference was not supplied. Check that the reference is correct and update your customs declaration as required')
+})
