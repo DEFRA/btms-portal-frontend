@@ -1,7 +1,7 @@
 {% extends 'layout.njk' %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
-{% set searchTypesText = "an MRN, CHED or FIS Notification" if showFisNotifications else "an MRN or CHED" %}
+{% set searchTypesText = "an MRN, CHED or FIS Notification" %}
 {% set errors = {
   "SEARCH_TERM_REQUIRED": "Enter " ~ searchTypesText,
   "SEARCH_TERM_INVALID": "Enter " ~ searchTypesText ~ " in the correct format",

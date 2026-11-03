@@ -9,7 +9,6 @@ import {
   setupAuthedUserSession
 } from '../unit/utils/session-helper.js'
 import { ADMIN_SEARCH_TYPES } from '../../src/services/admin-messages.js'
-import { config } from '../../src/config/config.js'
 
 const provider = {
   authorization_endpoint: 'https://auth.endpoint',
@@ -166,7 +165,7 @@ test('Should show an error when no search term is supplied', async () => {
   globalJsdom(payload)
 
   expect(
-    getByText(document.body, 'Enter an MRN or CHED')
+    getByText(document.body, 'Enter an MRN, CHED or FIS Notification')
   ).toBeInTheDocument()
 })
 
@@ -192,7 +191,7 @@ test.each([
   globalJsdom(payload)
 
   expect(
-    getByText(document.body, 'Enter an MRN or CHED in the correct format')
+    getByText(document.body, 'Enter an MRN, CHED or FIS Notification in the correct format')
   ).toBeInTheDocument()
 })
 
@@ -456,49 +455,14 @@ describe('FIS Notifications', () => {
       .mockResolvedValueOnce({ payload: provider })
   })
 
-  afterEach(() => {
-    config.set('isFisNotificationsEnabled', false)
+  test('should show the FIS Notification label on the search box', async () => {
+    await renderAdminMessages()
+
+    expect(getByRole(document.body, 'textbox', { name: 'Search for an MRN, CHED or FIS Notification' })).toBeInTheDocument()
+    expect(document.title).toContain('Admin - Search for an MRN, CHED or FIS Notification')
   })
 
-  test.each([
-    { isFisNotificationsEnabled: true, expectedText: 'Search for an MRN, CHED or FIS Notification' },
-    { isFisNotificationsEnabled: false, expectedText: 'Search for an MRN or CHED' }
-  ])('should show "$expectedText" on the search box when SHOW_FIS_NOTIFICATIONS is $isFisNotificationsEnabled',
-    async ({ isFisNotificationsEnabled, expectedText }) => {
-      config.set('isFisNotificationsEnabled', isFisNotificationsEnabled)
-
-      await renderAdminMessages()
-
-      expect(getByRole(document.body, 'textbox', { name: expectedText })).toBeInTheDocument()
-      expect(document.title).toContain(`Admin - ${expectedText}`)
-    })
-
-  test.each([
-    { isFisNotificationsEnabled: true, expectedText: 'Enter an MRN, CHED or FIS Notification in the correct format' },
-    { isFisNotificationsEnabled: false, expectedText: 'Enter an MRN or CHED in the correct format' }
-  ])('should show "$expectedText" for an invalid search term when SHOW_FIS_NOTIFICATIONS is $isFisNotificationsEnabled',
-    async ({ isFisNotificationsEnabled, expectedText }) => {
-      config.set('isFisNotificationsEnabled', isFisNotificationsEnabled)
-
-      await renderAdminMessages(`?${queryStringParams.SEARCH_TERM}=abcd123s&${queryStringParams.SEARCH_TYPE}=${ADMIN_SEARCH_TYPES.INFORMATION}`)
-
-      expect(getByText(document.body, expectedText)).toBeInTheDocument()
-    })
-
-  test.each([
-    { isFisNotificationsEnabled: true, expectedText: 'Enter an MRN, CHED or FIS Notification' },
-    { isFisNotificationsEnabled: false, expectedText: 'Enter an MRN or CHED' }
-  ])('should show "$expectedText" when no search term is supplied and SHOW_FIS_NOTIFICATIONS is $isFisNotificationsEnabled',
-    async ({ isFisNotificationsEnabled, expectedText }) => {
-      config.set('isFisNotificationsEnabled', isFisNotificationsEnabled)
-
-      await renderAdminMessages(`?${queryStringParams.SEARCH_TERM}=&${queryStringParams.SEARCH_TYPE}=${ADMIN_SEARCH_TYPES.INFORMATION}`)
-
-      expect(getByText(document.body, expectedText)).toBeInTheDocument()
-    })
-
-  test('should show the FIS Information tab and FIS Notification payload when SHOW_FIS_NOTIFICATIONS is on', async () => {
-    config.set('isFisNotificationsEnabled', true)
+  test('should show the FIS Information tab and FIS Notification payload', async () => {
     wreck.get.mockResolvedValueOnce({
       payload: {
         iuuNotification: { reference: FIS_REFERENCE, iuuOption: 'IUUOK' },
@@ -522,20 +486,10 @@ describe('FIS Notifications', () => {
   })
 
   test('should show not found when the FIS Notification does not exist', async () => {
-    config.set('isFisNotificationsEnabled', true)
     wreck.get.mockRejectedValueOnce({ output: { statusCode: 404 } })
 
     await renderAdminMessages(`?${queryStringParams.SEARCH_TERM}=${FIS_REFERENCE}&${queryStringParams.SEARCH_TYPE}=${ADMIN_SEARCH_TYPES.INFORMATION}`)
 
     expect(getByText(document.body, `${FIS_REFERENCE} cannot be found`)).toBeInTheDocument()
-  })
-
-  test('should treat a FIS Notification reference as invalid when SHOW_FIS_NOTIFICATIONS is off', async () => {
-    config.set('isFisNotificationsEnabled', false)
-
-    await renderAdminMessages(`?${queryStringParams.SEARCH_TERM}=${FIS_REFERENCE}&${queryStringParams.SEARCH_TYPE}=${ADMIN_SEARCH_TYPES.INFORMATION}`)
-
-    expect(getByText(document.body, 'Enter an MRN or CHED in the correct format')).toBeInTheDocument()
-    expect(document.querySelector('.btms-admin-search-result')).toBeNull()
   })
 })
