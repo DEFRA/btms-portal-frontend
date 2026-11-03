@@ -277,7 +277,7 @@ const mapChedReservation = (resourceMessage) => {
     status: quantityStatusDescriptions[resource?.reservation?.status],
     unsuccessfulReason,
     chedReference: resource?.reservation?.chedId,
-    created: resource?.created,
+    created: resource?.reservation?.timestamp,
     commodities
   }
 }

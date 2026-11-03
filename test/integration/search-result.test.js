@@ -2,7 +2,7 @@ import globalJsdom from 'global-jsdom'
 import wreck from '@hapi/wreck'
 import {
   getAllByRole,
-  getByRole,
+  getByRole, queryAllByText,
   queryByRole,
   queryByText,
   within
@@ -540,6 +540,76 @@ test('shows TRACES CHED placeholders when feature flag is enabled', async () => 
   expect(within(tracesChedDetails).getByText('03019985')).toBeInTheDocument()
 })
 
+test('does not throw on load when TRACES CHEDs are shown and the MRN filter is still set up', async () => {
+  config.set('isTracesChedsEnabled', true)
+  const twoDeclarations = {
+    customsDeclarations: [
+      createCustomsDeclaration('24GB0Z8WEJ9ZBTL73B', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z'),
+      createCustomsDeclaration('24GB0Z8WEJ9ZBTL73A', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z')
+    ],
+    importPreNotifications,
+    cheds: [
+      createTracesChed('CHEDD.GB.2025.0000003', '2025-06-01T09:30:00.000Z')
+    ]
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: twoDeclarations })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73B'))
+
+  globalJsdom(payload)
+
+  const tracesTable = document.querySelector('table.btms-traces-ched')
+
+  expect(tracesTable).toBeInTheDocument()
+  expect(tracesTable).not.toHaveClass('btms-notification')
+
+  expect(() => initFilters()).not.toThrow()
+
+  const mrnFilterWrapper = document.getElementById('timeline-filters-wrapper')
+
+  expect(mrnFilterWrapper.hasAttribute('hidden')).toBe(false)
+  expect(document.getElementById('timelineMrn').options.length).toBe(2)
+})
+
+test('keeps notification rows visible when they have no authority list', () => {
+  globalJsdom()
+
+  document.body.innerHTML = `
+    <div id="notification-filters-wrapper" hidden>
+      <form id="notification-filters">
+        <div id="notification-reset"></div>
+      </form>
+    </div>
+    <table class="btms-notification">
+      <thead><tr><th>Item number</th></tr></thead>
+      <tbody><tr id="notification-no-list"><td>No authority list</td></tr></tbody>
+    </table>
+    <div id="notification-levels-result-filters-wrapper" hidden>
+      <form id="notification-levels-result-filters">
+        <div id="notification-levels-result-reset"></div>
+      </form>
+    </div>
+    <table class="btms-notification-levels-result">
+      <thead><tr><th>Item number</th></tr></thead>
+      <tbody><tr id="notification-levels-result-no-list"><td>No authority list</td></tr></tbody>
+    </table>
+  `
+
+  initFilters()
+
+  expect(document.getElementById('notification-no-list').hidden).toBe(false)
+  expect(document.getElementById('notification-levels-result-no-list').hidden).toBe(false)
+})
+
 test('renders results page when only TRACES CHEDs are found and feature flag is enabled', async () => {
   config.set('isTracesChedsEnabled', true)
   const onlyTracesCheds = {
@@ -655,7 +725,7 @@ test('shows the decision on TRACES CHED commodity rows when feature flag is enab
   config.set('isTracesChedsEnabled', true)
 
   const relatedImportDeclarationsWithTracesChed = {
-    customsDeclarations: [],
+    customsDeclarations: [createCustomsDeclaration('24GB0Z8WEJ9ZBTL73B', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z')],
     importPreNotifications: [],
     goodsVehicleMovements: [],
     cheds: [
@@ -820,10 +890,10 @@ describe('Quantity status column (flag on)', () => {
       expectedClass: 'govuk-tag--yellow'
     },
     {
-      name: 'a Consumed reservation renders Finalised in green',
+      name: 'a Consumed reservation renders Consumed in green',
       reservations: [reservation('Consumed')],
       rowName: /FROZEN MSC A COD FILLETS/,
-      expected: 'Finalised',
+      expected: 'Consumed',
       expectedClass: 'govuk-tag--green'
     },
     {
@@ -939,7 +1009,16 @@ test('shows the Quantity status column on all tabs', async () => {
             checkCode: 'H218',
             decisionCode: 'X00',
             documentReference: 'CHEDA.GB.2025.0000001',
-            internalDecisionCode: 'E20'
+            internalDecisionCode: 'E99',
+            mode: 'Active'
+          },
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'X00',
+            documentReference: 'CHEDA.GB.2025.0000001',
+            internalDecisionCode: 'E20',
+            mode: 'Passive'
           }
         ]
       },
@@ -1066,7 +1145,16 @@ const createLevelNoMatchDeclaration = (internalDecisionCode, documentReference) 
         checkCode: 'H218',
         decisionCode: 'X00',
         documentReference,
-        internalDecisionCode
+        internalDecisionCode: 'E99',
+        mode: 'Active'
+      },
+      {
+        itemNumber: 1,
+        checkCode: 'H218',
+        decisionCode: 'X00',
+        documentReference,
+        internalDecisionCode,
+        mode: 'Passive'
       }
     ]
   },
@@ -1505,26 +1593,26 @@ test.each([
 
 test.each([
   {
-    provider: 'entraId',
+    authProvider: 'entraId',
     scope: ['admin'],
     shouldShowBannerAndTab: true
   },
   {
-    provider: 'entraId',
+    authProvider: 'entraId',
     scope: [],
     shouldShowBannerAndTab: false
   },
   {
-    provider: 'defraId',
+    authProvider: 'defraId',
     scope: null,
     shouldShowBannerAndTab: false
   },
   {
-    provider: 'entraId',
+    authProvider: 'entraId',
     scope: ['private_beta'],
     shouldShowBannerAndTab: true
   }
-])('Level Matching banner and Tab only visible to certain user scopes', async (options) => {
+])('Level Matching banner and Tab visibility is "$shouldShowBannerAndTab" when user scopes is "$scope"', async ({ authProvider, scope, shouldShowBannerAndTab}) => {
   const levelNoMatchDeclarations = [
     {
       movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
@@ -1554,7 +1642,16 @@ test.each([
             checkCode: 'H218',
             decisionCode: 'X00',
             documentReference: 'CHEDA.GB.2025.0000001',
-            internalDecisionCode: 'E20'
+            internalDecisionCode: 'E99',
+            mode: 'Active'
+          },
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'X00',
+            documentReference: 'CHEDA.GB.2025.0000001',
+            internalDecisionCode: 'E20',
+            mode: 'Passive'
           }
         ]
       },
@@ -1592,7 +1689,16 @@ test.each([
             checkCode: 'H218',
             decisionCode: 'X00',
             documentReference: 'CHEDA.GB.2025.0000001',
-            internalDecisionCode: 'E30'
+            internalDecisionCode: 'E99',
+            mode: 'Active'
+          },
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'X00',
+            documentReference: 'CHEDA.GB.2025.0000001',
+            internalDecisionCode: 'E30',
+            mode: 'Passive'
           }
         ]
       },
@@ -1619,9 +1725,9 @@ test.each([
     .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const server = await initialiseServer()
-  const authedUser = createAuthedUser(undefined, options.provider)
-  if (options.scope) {
-    authedUser.scope = options.scope
+  const authedUser = createAuthedUser(undefined, authProvider)
+  if (scope) {
+    authedUser.scope = scope
   }
 
   const { payload } = await server.inject({
@@ -1644,7 +1750,7 @@ test.each([
 
   const tabLinks = Array.from(document.body.querySelectorAll('.govuk-tabs__tab')).map(tab => tab.href)
 
-  if (options.shouldShowBannerAndTab) {
+  if (shouldShowBannerAndTab) {
     expect(
       getByRole(document.body, 'region', {
         name: 'Important'
@@ -2029,4 +2135,198 @@ test.each([
 
   const decisionCell = commodityRowCells[8]
   expect(decisionCell.textContent.trim()).toContain(expectedDecision)
+})
+
+test.each([
+  {
+    ruleLevel: 2,
+    ruleName: 'CommodityCodeDecisionRule',
+    activeInternalDecisionCode: 'E20',
+    expectedErrorFieldClass: 'btms-details__commodity-code--no-match',
+    expectedDecision: 'No match - Incorrect commodity code',
+    expectedDecisionTooltip: 'Commodity code 0304719030 cannot be found in IPAFFS. Check that the code is correct.'
+  },
+  {
+    ruleLevel: 3,
+    ruleName: 'CommodityQuantityCheckDecisionRule',
+    activeInternalDecisionCode: 'E30',
+    expectedErrorFieldClass: 'btms-details__commodity-weight-quantity--no-match',
+    expectedDecision: 'No match - Incorrect net weight',
+    expectedDecisionTooltip: 'The declared weight of this item does not match CHED reference CHEDA.GB.2025.0000001'
+  },
+  {
+    ruleLevel: 3,
+    ruleName: 'CommodityQuantityCheckDecisionRule',
+    activeInternalDecisionCode: 'E31',
+    expectedErrorFieldClass: 'btms-details__commodity-weight-quantity--no-match',
+    expectedDecision: 'No match - Incorrect quantity',
+    expectedDecisionTooltip: 'The declared quantity of this item does not match CHED reference CHEDA.GB.2025.0000001'
+  }
+])('should show higher level results on Latest tab if the Active internal decision code is "$activeInternalDecisionCode"', async ({ ruleLevel, ruleName, activeInternalDecisionCode, expectedErrorFieldClass, expectedDecision, expectedDecisionTooltip }) => {
+  const activeHigherLevelNoMatchDeclarations = [
+    {
+      movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
+      clearanceRequest: {
+        declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+        commodities: [
+          {
+            itemNumber: 1,
+            taricCommodityCode: '0304719030',
+            goodsDescription: 'FROZEN MSC A COD FILLETS',
+            netMass: '17088.98',
+            supplementaryUnits: 0,
+            documents: [
+              {
+                documentReference: 'CHEDA.GB.2025.0000001',
+                documentCode: 'N002'
+              }
+            ],
+            checks: [{ checkCode: 'H218', departmentCode: 'HMI' }]
+          }
+        ]
+      },
+      clearanceDecision: {
+        results: [
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'X00',
+            documentReference: 'CHEDA.GB.2025.0000001',
+            internalDecisionCode: activeInternalDecisionCode,
+            mode: 'Active',
+            level: ruleLevel,
+            ruleName
+          }
+        ]
+      },
+      finalisation: {
+        finalState: '0',
+        isManualRelease: false
+      },
+      updated: '2025-05-06T13:11:59.257Z'
+    }
+  ]
+
+  const declarationsWithHigherLevelNoMatch = {
+    customsDeclarations: activeHigherLevelNoMatchDeclarations,
+    importPreNotifications
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: declarationsWithHigherLevelNoMatch })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73A'))
+
+  globalJsdom(payload)
+  initFilters()
+
+  const noMatchStatusField = document.body.querySelector('div#latest-view .btms-declaration tbody tr td strong.govuk-tag--red')
+  expect(noMatchStatusField).toBeInTheDocument()
+  expect(noMatchStatusField.innerHTML).toContain('No')
+
+  const highlightedError = document.body.querySelector(`div#latest-view .btms-declaration tbody tr td span.${expectedErrorFieldClass}`)
+  expect(highlightedError).toBeInTheDocument()
+  expect(queryByText(document.body, expectedDecision)).toBeInTheDocument()
+  expect(queryByText(document.body, expectedDecisionTooltip)).toBeInTheDocument()
+})
+
+test('show only show higher level result against the item document that has failed', async () => {
+  const activeHigherLevelNoMatchDeclarations = [
+    {
+      movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
+      clearanceRequest: {
+        declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+        commodities: [
+          {
+            itemNumber: 1,
+            taricCommodityCode: '0304719030',
+            goodsDescription: 'FROZEN MSC A COD FILLETS',
+            netMass: '17088.98',
+            supplementaryUnits: 0,
+            documents: [
+              {
+                documentReference: 'CHEDA.GB.2025.0000001',
+                documentCode: 'N002'
+              },
+              {
+                documentReference: 'CHEDP.GB.2025.0000002',
+                documentCode: 'N002'
+              }
+            ],
+            checks: [{ checkCode: 'H218', departmentCode: 'HMI' }]
+          }
+        ]
+      },
+      clearanceDecision: {
+        results: [
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'X00',
+            documentReference: 'CHEDA.GB.2025.0000001',
+            internalDecisionCode: 'E20',
+            mode: 'Active',
+            level: 2,
+            ruleName: 'CommodityCodeDecisionRule'
+          },
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'C03',
+            documentReference: 'CHEDP.GB.2025.0000002',
+            internalDecisionCode: null,
+            mode: 'Active'
+          }
+        ]
+      },
+      finalisation: {
+        finalState: '0',
+        isManualRelease: false
+      },
+      updated: '2025-05-06T13:11:59.257Z'
+    }
+  ]
+
+  const higherLevelNoMatchOnOneDocument = {
+    customsDeclarations: activeHigherLevelNoMatchDeclarations,
+    importPreNotifications
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: higherLevelNoMatchOnOneDocument })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73A'))
+
+  globalJsdom(payload)
+  initFilters()
+
+  const noMatchStatusFields = document.body.querySelectorAll('div#latest-view .btms-declaration tbody tr td strong.govuk-tag--red')
+  expect(noMatchStatusFields.length).toBe(1)
+  expect(noMatchStatusFields[0].innerHTML).toContain('No')
+
+  const highlightedErrors = document.body.querySelectorAll(`div#latest-view .btms-declaration tbody tr td span.btms-details__commodity-code--no-match`)
+  expect(highlightedErrors.length).toBe(1)
+
+  const noMatchDecisions = queryAllByText(document.body, 'No match - Incorrect commodity code')
+  expect(noMatchDecisions.length).toBe(1)
+
+  const noMatchTooltips = queryAllByText(document.body, 'Commodity code 0304719030 cannot be found in IPAFFS. Check that the code is correct.')
+  expect(noMatchTooltips.length).toBe(1)
+
+  const matchStatusFields = document.body.querySelectorAll('div#latest-view .btms-declaration tbody tr td strong.govuk-tag--green')
+  expect(matchStatusFields.length).toBe(1)
+  expect(matchStatusFields[0].innerHTML).toContain('Yes')
+
+  const matchDecisions = queryAllByText(document.body, 'Release - Inspection complete')
+  expect(matchDecisions.length).toBe(1)
 })

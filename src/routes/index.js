@@ -3,6 +3,7 @@ import { adminMessages } from './admin-messages.js'
 import { adminDlq } from './admin-dlq.js'
 import { adminDlqActionGet, adminDlqActionPost } from './admin-dlq-action.js'
 import { adminDlqActionComplete } from './admin-dlq-action-complete.js'
+import { adminEnvironmentConfig } from './admin-environment-config.js'
 import { health } from './health.js'
 import { staticAssetRoutes } from './static-assets.js'
 import { home } from './home.js'
@@ -30,6 +31,7 @@ export default [
   adminDlqActionGet,
   adminDlqActionPost,
   adminDlqActionComplete,
+  adminEnvironmentConfig,
   cookiesGet,
   cookiesPost,
   chromeDevtools,

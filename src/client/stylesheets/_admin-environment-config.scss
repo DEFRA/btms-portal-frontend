@@ -1,0 +1,84 @@
+@use "govuk-frontend" as *;
+
+.btms-admin-tabs {
+  .btms-admin-environment-config-tabs__panel {
+    @include govuk-responsive-margin(0, "bottom");
+    padding: govuk-spacing(0) govuk-spacing(4);
+    border-top: 0;
+
+    & > :last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .btms-decision-deriver-config-copy {
+    display: block;
+    float: right;
+  }
+
+  .btms-decision-deriver-config-container {
+    overflow-x: auto;
+    background-color: govuk-colour("light-grey");
+    height: 500px;
+  }
+
+  .btms-decision-deriver-config-container > :last-child {
+    border-bottom: none;
+  }
+
+  .btms-decision-deriver-config {
+    display: block;
+    @include govuk-font-size($size: 16);
+    position: relative;
+    border-bottom: govuk-colour("dark-grey") solid govuk-spacing(1);
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .btms-frontend-flag--name {
+    width: 50%;
+  }
+
+  .btms-frontend-flag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.2;
+    white-space: nowrap;
+    min-width: 50px;
+    text-align: center;
+  }
+
+  .btms-frontend-flag--on {
+    background: govuk-colour("green");
+    color: govuk-colour("white");
+    display: flex;
+    justify-self: flex-start;
+  }
+
+  .btms-frontend-flag--off {
+    background: govuk-tint(govuk-colour("black"), 25%);
+    color: govuk-colour("white");
+  }
+
+  .btms-copy-container {
+    display: block;
+    float: right;
+  }
+
+  .btms-copy-button {
+    margin: 0;
+  }
+
+  .btms-copy-disable-click {
+    pointer-events: none;
+    background-color: transparent;
+    box-shadow: none;
+  }
+}

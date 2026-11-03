@@ -4,6 +4,7 @@ const paths = {
   ADMIN_DLQ: '/admin/dlq',
   ADMIN_DLQ_ACTION: '/admin/dlq/action',
   ADMIN_DLQ_ACTION_COMPLETE: '/admin/dlq/action-complete',
+  ADMIN_ENVIRONMENT_CONFIG: '/admin/environment-config',
   CHROME_DEVTOOLS: '/.well-known/appspecific/com.chrome.devtools.json',
   COOKIES: '/cookies',
   GMR_SEARCH_RESULT: '/gmr-search-result',
@@ -29,6 +30,7 @@ const queryStringParams = {
   RESOURCE_TYPE: 'resourceType',
   SEARCH_TERM: 'searchTerm',
   SEARCH_TYPE: 'searchType',
+  SHOW_TRACES_CHED_INFO: 'showTracesChedInfo',
   QUEUE: 'queue',
   ACTION: 'action'
 }

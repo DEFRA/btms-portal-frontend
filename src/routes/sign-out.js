@@ -1,5 +1,6 @@
 import { paths } from './route-constants.js'
 import { config } from '../config/config.js'
+import { getLogoutUrl } from '../auth/open-id-provider.js'
 import { dropUserSession, getUserSession } from '../auth/user-session.js'
 
 export const signOut = {
@@ -10,23 +11,35 @@ export const signOut = {
   },
   handler: async (request, h) => {
     const authedUser = await getUserSession(request)
+    const postLogoutRedirect = `${config.get('appBaseUrl')}${paths.SIGNED_OUT}?provider=`
 
     if (!authedUser) {
-      return h.redirect(paths.LANDING)
+      const { provider } = request.query
+      const logoutUrl = getLogoutUrl(provider)
+
+      if (!logoutUrl) {
+        return h.redirect(paths.LANDING)
+      }
+
+      request.cookieAuth.clear()
+
+      return h.redirect(
+        encodeURI(
+          `${logoutUrl}?post_logout_redirect_uri=${postLogoutRedirect}${provider}`
+        )
+      )
     }
 
-    const referrer = `${config.get('appBaseUrl')}${paths.SIGNED_OUT}?provider=${
-      authedUser.provider
-    }`
+    const referrer = `${postLogoutRedirect}${authedUser.provider}`
     const idTokenHint = authedUser.idToken
 
-    const logoutUrl = encodeURI(
+    const logoutUrlWithIdTokenHint = encodeURI(
       `${authedUser.logoutUrl}?id_token_hint=${idTokenHint}&post_logout_redirect_uri=${referrer}`
     )
 
     dropUserSession(request)
     request.cookieAuth.clear()
 
-    return h.redirect(logoutUrl)
+    return h.redirect(logoutUrlWithIdTokenHint)
   }
 }

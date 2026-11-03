@@ -97,6 +97,24 @@ export const chedStatusDescriptions = {
   VALIDATED: 'Valid'
 }
 
+export const TRACES_CHED_STATUS = {
+  NEW: '1',
+  AUTHORISED_FOR_ONWARD_TRAVEL: '35',
+  REJECTED: '41',
+  IN_PROGRESS: '42',
+  REPLACED: '44',
+  DRAFT: '47',
+  DELETED: '55',
+  CANCELLED: '64',
+  SPLIT: '68',
+  VALIDATED: '70',
+  AUTHORISED_FOR_ONWARD_TRANSPORTATION: '97',
+  AUTHORISED_FOR_TRANSIT: '99',
+  PARTIALLY_REJECTED: '122',
+  AUTHORISED_FOR_TRANSFER_TO: '124',
+  AUTHORISED_FOR_TRANSHIPMENT: '146'
+}
+
 export const tracesDecisionConclusionDescriptions = {
   ACCEPTABLE_FOR_INTERNAL_MARKET: 'Acceptable for internal market',
   ACCEPTABLE_FOR_FREE_CIRCULATION: 'Acceptable for free circulation',
@@ -134,13 +152,13 @@ export const CDS_STATUSES = {
 export const QUANTITY_STATUSES = {
   UNRESERVED: 'Unreserved',
   RESERVED: 'Reserved',
-  FINALISED: 'Finalised',
+  CONSUMED: 'Consumed',
   UNSUCCESSFUL: 'Unsuccessful'
 }
 
 export const quantityStatusDescriptions = {
   Reserved: QUANTITY_STATUSES.RESERVED,
-  Consumed: QUANTITY_STATUSES.FINALISED,
+  Consumed: QUANTITY_STATUSES.CONSUMED,
   Unsuccessful: QUANTITY_STATUSES.UNSUCCESSFUL
 }
 
@@ -162,6 +180,9 @@ export const iuuDecisionDisplay = {
 
 export const hmiGmsInternalDecisionCodes = new Set(['E87', 'E82'])
 export const noMatchInternalDecisionCodes = new Set([
+  'E20',
+  'E30',
+  'E31',
   'E40',
   'E41',
   'E42',
@@ -182,6 +203,9 @@ export const noMatchInternalDecisionCodes = new Set([
   'E99'
 ])
 export const internalDecisionCodeDescriptions = {
+  E20: 'No match - Incorrect commodity code',
+  E30: 'No match - Incorrect net weight',
+  E31: 'No match - Incorrect quantity',
   E40: 'No match - Unknown reservation error',
   E41: 'No match - reservation commodity code mismatch',
   E42: 'No match - CHED status prevents reservation',

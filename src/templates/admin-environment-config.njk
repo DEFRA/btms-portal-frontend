@@ -1,0 +1,86 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% extends 'layout.njk' %}
+
+{% set pageTitle = 'Admin - Environment Config' %}
+
+{% block content %}
+  <div class="govuk-tabs btms-admin-tabs">
+    <ul class="govuk-tabs__list" role="tablist">
+      <li class="govuk-tabs__list-item govuk-tabs__list-item" role="presentation">
+        <a class="btms-admin-search__tab" href="/admin/dlq">Dead Letter</a>
+      </li>
+      <li class="govuk-tabs__list-item govuk-tabs__list-item" role="presentation">
+        <a class="btms-admin-dlq__tab" href="/admin/messages">Messages</a>
+      </li>
+      <li class="govuk-tabs__list-item govuk-tabs__list-item--selected" role="presentation">
+        <a class="btms-admin-dlq__tab" href="#">Environment Config</a>
+      </li>
+    </ul>
+    <section class="btms-admin-environment-config-tabs__panel" role="tabpanel">
+      <h1 class="govuk-heading-l govuk-!-margin-top-6">Environment Config</h1>
+      <p>
+        Live Decision Deriver rule configuration and frontend display flags for this environment.<br>
+        <strong>Read only</strong> - to change a value, update the underlying app settings, CDP platform config or secret.
+      </p>
+
+      <h2>Frontend display flags</h2>
+      <p>
+        Frontend-owned environment variables - separate from the Decision Deriver config below.
+      </p>
+
+      <table class="govuk-table govuk-table--small-text-until-tablet" aria-label="Frontend display flags">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Flag</th>
+            <th scope="col" class="govuk-table__header">Status</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for flag in frontendFlags %}
+          <tr>
+            <td class="govuk-table__cell btms-frontend-flag--name">{{ flag.flagName }}</td>
+            <td class="govuk-table__cell"><span class="btms-frontend-flag btms-frontend-flag--{{ flag.status | lower }}" aria-label="{{ flag.flagName }} flag {{ flag.status }}">{{ flag.status }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <h2>Decision Deriver
+      {% if decisionDeriverConfig %}
+        <span class="btms-copy-container">
+          <span id="copy-alert" class="govuk-visually-hidden" aria-live="polite"></span>
+          {{ govukButton({
+            id: "copy-json",
+            text: "Copy JSON",
+            classes: "govuk-button--secondary btms-copy-button"
+          }) }}
+        </span>
+      {% endif %}
+      </h2>
+      <p>
+        Raw rule configuration as returned by the Decision Deriver's config endpoint, covering both the IPAFFS and TRACES sources.
+      </p>
+
+      <div class="btms-decision-deriver-config-container">
+        {% if decisionDeriverConfig %}
+          <div class="btms-decision-deriver-config">
+            <pre><code id="decision-deriver-config-json">{{ decisionDeriverConfig | safe }}</code></pre>
+          </div>
+        {% else %}
+          <p>Unable to retrieve Decision Deriver config. Please check that the service is functioning correctly.</p>
+        {% endif %}
+      </div>
+      <p>
+        Level2Mode/Level3Mode/Level4Mode: DryRun = Passive, Live = Active.
+      </p>
+    </section>
+  </div>
+{% endblock %}
+
+{% block bodyEnd %}
+  {{ super() }}
+  <script src="{{ getAssetPath('adminEnvironmentConfig.js') }}"></script>
+  <script nonce="{{ cspNonce }}">
+    BTMS.initCopy('#decision-deriver-config-json','#copy-json', 'Decision Deriver Config JSON copied', 'Copy JSON')
+  </script>
+{% endblock %}

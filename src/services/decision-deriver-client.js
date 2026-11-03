@@ -12,3 +12,6 @@ export const postDecisionDeriverRedrive = async (redriveEndpoint) =>
 
 export const postDecisionDeriverDrain = async (drainEndpoint) =>
   decisionDeriverClient.post(drainEndpoint)
+
+export const getConfig = async () =>
+  decisionDeriverClient.get(decisionDeriverConfig.configEndpoint)

@@ -1,6 +1,6 @@
 import jwt from '@hapi/jwt'
 import { config } from '../../../src/config/config.js'
-import { openIdProvider } from '../../../src/auth/open-id-provider.js'
+import { openIdProvider, getLogoutUrl } from '../../../src/auth/open-id-provider.js'
 import { AUTH_PROVIDERS } from '../../../src/auth/auth-constants.js'
 
 // This is a randomly generated key, only used for these tests
@@ -721,4 +721,14 @@ test.each([
   await provider.profile(credentials, { id_token: idToken }, {})
 
   expect(credentials.scope).toEqual(expectedScopes)
+})
+
+test('getLogoutUrl returns the end session endpoint resolved at registration', async () => {
+  await openIdProvider(AUTH_PROVIDERS.ENTRA_ID, {
+    oidcConfigurationUrl: 'https://test.it/path'
+  })
+
+  expect(getLogoutUrl(AUTH_PROVIDERS.ENTRA_ID)).toBe(
+    'http://some-end-session-endpoint/path'
+  )
 })

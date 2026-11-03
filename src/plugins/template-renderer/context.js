@@ -51,7 +51,7 @@ const getNavigation = (pathname, isAdminUser) => {
     ? commonNavigationItems.concat({
       href: paths.ADMIN_DLQ,
       text: 'Admin',
-      active: pathname === paths.ADMIN_DLQ || pathname === paths.ADMIN_DLQ_ACTION || pathname === paths.ADMIN_DLQ_ACTION_COMPLETE || pathname === paths.ADMIN_MESSAGES
+      active: pathname === paths.ADMIN_DLQ || pathname === paths.ADMIN_DLQ_ACTION || pathname === paths.ADMIN_DLQ_ACTION_COMPLETE || pathname === paths.ADMIN_MESSAGES || pathname === paths.ADMIN_ENVIRONMENT_CONFIG
     })
     : commonNavigationItems
 }
@@ -75,6 +75,7 @@ export async function context(request) {
 
   return {
     assetPath: `${assetPath}/assets`,
+    cspNonce: request.app.cspNonce,
     defaultHeaderOptions: {
       homepageUrl: 'https://www.gov.uk',
       serviceName

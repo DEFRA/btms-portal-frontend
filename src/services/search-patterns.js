@@ -4,6 +4,7 @@ export const searchKeys = {
   CDS_CHED_ID: 'chedId',
   PARTIAL_CHED: 'chedId',
   CHED_LAST_SEVEN_OR_EIGHT_DIGITS: 'chedId',
+  TRACES_CHED_ID: 'tracesChedId',
   DUCR: 'ducr',
   GMR_ID: 'gmrId',
   VRN_TRN: 'vrnOrTrn'

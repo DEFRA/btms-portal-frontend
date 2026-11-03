@@ -13,6 +13,11 @@ const availableScopes = [
   { groupId: entraPrivateBetaSecurityGroupId, scope: APP_SCOPES.PRIVATE_BETA }
 ]
 
+const logoutUrls = {}
+
+export const getLogoutUrl = (provider) =>
+  Object.hasOwn(logoutUrls, provider) ? logoutUrls[provider] : undefined
+
 const setOrigins = (providerEndpoints) => {
   const { origins } = config.get('auth')
 
@@ -73,6 +78,7 @@ const getScopes = (groups) => {
 
 export const openIdProvider = async (name, authConfig) => {
   const oidcConf = await getOpenIdConfig(authConfig.oidcConfigurationUrl)
+  logoutUrls[name] = oidcConf.end_session_endpoint
 
   const providerEndpoints = [
     authConfig.oidcConfigurationUrl,
@@ -97,7 +103,7 @@ export const openIdProvider = async (name, authConfig) => {
         )
       }
 
-      credentials.logoutUrl = oidcConf.end_session_endpoint
+      credentials.logoutUrl = logoutUrls[name]
       credentials.tokenUrl = oidcConf.token_endpoint
 
       if (credentials.provider === AUTH_PROVIDERS.DEFRA_ID) {

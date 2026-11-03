@@ -355,6 +355,12 @@ const config = convict({
       format: String,
       default: '',
       env: 'DECISION_DERIVER_PASSWORD'
+    },
+    configEndpoint: {
+      doc: 'Decision Deriver endpoint for retrieving the environment configuration.',
+      format: String,
+      default: 'admin/config/decision-rules',
+      env: 'DECISION_DERIVER_CONFIG_ENDPOINT'
     }
   },
   auth: authSchema,

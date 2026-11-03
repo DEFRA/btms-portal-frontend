@@ -71,10 +71,26 @@ export const errorPage = {
       const heading =
         titles[statusCode] || 'Sorry, there is a problem with this service'
       const messages = paragraphs[statusCode] || ['Try again later.']
+      const signOutProvider =
+        !request.auth.isAuthenticated && request.auth.credentials?.provider
 
-      return h
-        .view('error', { heading, hideCookieBanner: true, messages })
-        .code(statusCode)
+      const viewContext = {
+        heading,
+        hideCookieBanner: true,
+        messages
+      }
+
+      if (signOutProvider) {
+        viewContext.navigation = []
+        viewContext.accountNavigation = [
+          {
+            text: 'Sign out',
+            href: `${paths.SIGN_OUT}?provider=${signOutProvider}`
+          }
+        ]
+      }
+
+      return h.view('error', viewContext).code(statusCode)
     })
   }
 }

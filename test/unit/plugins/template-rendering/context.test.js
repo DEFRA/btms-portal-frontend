@@ -57,7 +57,7 @@ test('logged in', async () => {
     getAssetPath: expect.any(Function)
   }
 
-  const result = await context({ auth: { isAuthenticated: true }, url: { pathname: '/search' } })
+  const result = await context({ app: {}, auth: { isAuthenticated: true }, url: { pathname: '/search' } })
 
   expect(result).toEqual(expected)
 })
@@ -105,7 +105,7 @@ test('logged in as admin user', async () => {
     getAssetPath: expect.any(Function)
   }
 
-  const result = await context({ auth: { isAuthenticated: true }, url: { pathname: '/search' } })
+  const result = await context({ app: {}, auth: { isAuthenticated: true }, url: { pathname: '/search' } })
 
   expect(result).toEqual(expected)
 })
@@ -114,6 +114,7 @@ test('not logged in', async () => {
   mockGetUserSession.mockReturnValue(null)
 
   const request = {
+    app: {},
     url: { pathname: '/reporting' },
     logger: { error: jest.fn() }
   }
@@ -154,7 +155,7 @@ test('getAssetPath(): returns hashed path', async () => {
   mockGetUserSession.mockReturnValue(null)
   config.set('assetPath', '/test')
 
-  const { getAssetPath } = await context({ url: {} })
+  const { getAssetPath } = await context({ app: {}, url: {} })
 
   expect(getAssetPath('application.js')).toBe(
     '/test/javascripts/application.HASH.js'
@@ -166,6 +167,7 @@ test('getAssetPath(): logs error for unmapped files', async () => {
   config.set('assetPath', '/test')
 
   const request = {
+    app: {},
     url: {},
     logger: { error: jest.fn() }
   }
