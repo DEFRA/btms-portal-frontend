@@ -2407,11 +2407,11 @@ test('IUU with E76 decision should render highlighted display and decision text'
   }
 
   wreck.get
-    .mockResolvedValueOnce({ payload: provider })
-    .mockResolvedValueOnce({ payload: provider })
-    .mockResolvedValueOnce({ payload: searchResults })
-    .mockResolvedValueOnce({ payload: emptyResourceEvents })
-    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: searchResults })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
 
   const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73A'))
 
@@ -2438,6 +2438,29 @@ test('IUU with E76 decision should render highlighted display and decision text'
   const iuuHoverover = declaration.querySelector('span[role=tooltip]')
   expect(iuuHoverover).toBeInTheDocument()
   expect(iuuHoverover.innerHTML).toContain('IUU reference IUU.GB.2026.0000001 cannot be found. Check that the reference is correct and update your customs declaration as required')
+})
+
+test('redirects to search page when IUU search is disabled', async () => {
+  config.set('isIuuSearchEnabled', false)
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { statusCode, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=IUU.GB.2026.0000001`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(302)
+  expect(headers.location).toBe(paths.SEARCH)
 })
 
 test.each([

@@ -142,6 +142,12 @@ const config = convict({
     default: false,
     env: 'SHOW_QUANTITY_STATUS'
   },
+  isIuuSearchEnabled: {
+    doc: 'Enables searching by IUU Reference',
+    format: Boolean,
+    default: false,
+    env: 'ENABLE_IUU_SEARCH'
+  },
   session: {
     cache: {
       engine: {

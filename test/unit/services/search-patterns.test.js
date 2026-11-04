@@ -45,7 +45,8 @@ test.each([
   ['26GB]TEST990800000', false],
   ['26GB^TEST990800000', false],
   ['26GBTEST990800000', false],
-  ['26GBTEST99080000011', false]
+  ['26GBTEST99080000011', false],
+  ['IUU.GB.2026.0000001', false]
 ])('The search pattern test for %s should equal %s', (search, expected) => {
   const searchPattern = searchPatterns.find(({ pattern }) =>
     pattern.test(search)
@@ -67,4 +68,17 @@ describe('The full CHED reference patterns used by the search service', () => {
     expect(fullChedPatterns).toHaveLength(1)
     expect(fullChedPatterns.every(({ key }) => key === 'chedId')).toBe(true)
   })
+})
+
+test('Should match IUU pattern when isIuuSearchEnabled flag is enabled', async () => {
+  const { config } = await import('../../../src/config/config.js')
+  config.set('isIuuSearchEnabled', true)
+
+  const { searchPatterns } = await import('../../../src/services/search-patterns.js')
+
+  const searchPattern = searchPatterns.find(({ pattern }) =>
+    pattern.test('IUU.GB.2026.0000001')
+  )
+
+  expect(searchPattern).toBeDefined()
 })
