@@ -18,6 +18,7 @@
   }
 }
 
+.btms-fis-notification-summary,
 .btms-customs-declaration-summary {
   background-color: govuk-colour("light-grey");
   display: grid;
@@ -55,11 +56,11 @@
     text-decoration: none;
   }
 
-  .govuk-details__summary {
+  .govuk-details__summary,
+  .fis-details__summary {
     width: 100%;
     box-sizing: border-box;
     padding-left: 0;
-    padding-right: 70px;
     text-decoration: none;
     border: 1px solid $btms-light-to-mid-grey;
     margin-bottom: 0;
@@ -74,6 +75,16 @@
       content: none;
       display: none;
     }
+  }
+
+  .fis-details__summary {
+    .govuk-summary-list__row:last-of-type {
+      padding-right: 10px;
+    }
+  }
+
+  .govuk-details__summary {
+    padding-right: 70px;
 
     &::after {
       content: "";
