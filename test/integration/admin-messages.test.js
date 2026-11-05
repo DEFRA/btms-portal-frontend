@@ -492,4 +492,36 @@ describe('FIS Notifications', () => {
 
     expect(getByText(document.body, `${FIS_REFERENCE} cannot be found`)).toBeInTheDocument()
   })
+
+  test('should show the FIS Information tab when isIuuSearchEnabled is on', async () => {
+    // search-patterns reads the flag on load, so a fresh set of modules is needed after setting it
+    const { config } = await import('../../src/config/config.js')
+    config.set('isIuuSearchEnabled', true)
+
+    const { default: freshWreck } = await import('@hapi/wreck')
+    const { initialiseServer: freshInitialiseServer } = await import('../utils/initialise-server.js')
+    const { setupAuthedAdminUserSession: freshSetupSession } = await import('../unit/utils/session-helper.js')
+
+    freshWreck.get
+      .mockResolvedValueOnce({ payload: provider })
+      .mockResolvedValueOnce({ payload: provider })
+      .mockResolvedValueOnce({ payload: { iuuNotification: { reference: FIS_REFERENCE } } })
+
+    const server = await freshInitialiseServer()
+    const credentials = await freshSetupSession(server)
+
+    const { payload } = await server.inject({
+      method: 'get',
+      url: `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=${FIS_REFERENCE}&${queryStringParams.SEARCH_TYPE}=${ADMIN_SEARCH_TYPES.INFORMATION}`,
+      auth: {
+        strategy: 'session',
+        credentials
+      }
+    })
+
+    globalJsdom(payload)
+
+    const tabs = [...document.querySelectorAll('a.btms-admin-search__tab')].map(tab => tab.text)
+    expect(tabs).toContain('FIS Information')
+  })
 })

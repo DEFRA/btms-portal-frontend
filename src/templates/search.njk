@@ -2,17 +2,16 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
+{% set iuuSearchOption = ", IUU" if showIuuSearch else "" %}
+
 {% set errors = {
-  "SEARCH_TERM_REQUIRED": "Enter an MRN, CHED, GMR, VRN or TRN reference",
-  "SEARCH_TERM_INVALID": "Enter an MRN, CHED or GMR reference in the correct format",
+  "SEARCH_TERM_REQUIRED": "Enter an MRN, CHED" ~ iuuSearchOption ~ ", GMR, VRN or TRN reference",
+  "SEARCH_TERM_INVALID": "Enter an MRN, CHED" ~ iuuSearchOption ~ " or GMR reference in the correct format",
   "SEARCH_TERM_NOT_FOUND": searchTerm ~ " cannot be found"
 } %}
 
-{% set pageTitle = "Search for an MRN, CHED, GMR, VRN or TRN" %}
+{% set pageTitle = "Search for an MRN, CHED" ~ iuuSearchOption ~ ", GMR, VRN or TRN" %}
 
-{% set searchHint %}
-  {% include "./includes/search-hint.njk" %}
-{% endset %}
 {% set searchButton %}
   {% include "./includes/button-search.njk" %}
 {% endset %}
@@ -24,7 +23,7 @@
         <h1 class="govuk-heading-l">
             Search
         </h1>
-        <label class="govuk-label" for="search-term">Enter an MRN, CHED, GMR, VRN or TRN</label>
+        <label class="govuk-label" for="search-term">Enter an MRN, CHED{{ iuuSearchOption }}, GMR, VRN or TRN</label>
         {{
           govukInput({
             errorMessage: {
@@ -52,6 +51,9 @@
             <ul class="govuk-list">
               <li>MRN, 26GB3FJBV1UEKBDAR0</li>
               <li>CHED, CHEDP.GB.2026.4433124 or GBCHD2026.4433124</li>
+              {% if showIuuSearch %}
+              <li>IUU, IUU.GB.2026.1234567</li>
+              {% endif %}
               <li>GMR, GMRA00002KW2</li>
               <li>VRN (Vehicle Registration Number) or TRN (Trailer Registration Number), HX66 BVL</li>
             </ul>

@@ -45,7 +45,8 @@ test.each([
   ['26GB]TEST990800000', false],
   ['26GB^TEST990800000', false],
   ['26GBTEST990800000', false],
-  ['26GBTEST99080000011', false]
+  ['26GBTEST99080000011', false],
+  ['IUU.GB.2026.0000001', false]
 ])('The search pattern test for %s should equal %s', (search, expected) => {
   const searchPattern = searchPatterns.find(({ pattern }) =>
     pattern.test(search)
@@ -84,8 +85,21 @@ test.each([
   expect(fisNotificationSearchPattern.pattern.test(search)).toBe(expected)
 })
 
-test('FIS Notification references are not matched by the main search patterns', () => {
+test('FIS Notification references are not matched by the main search patterns when isIuuSearchEnabled is off', () => {
   expect(
     searchPatterns.find(({ pattern }) => pattern.test('IUU.GB.2026.1234567'))
   ).toBeUndefined()
+})
+
+test('Should match IUU pattern when isIuuSearchEnabled flag is enabled', async () => {
+  const { config } = await import('../../../src/config/config.js')
+  config.set('isIuuSearchEnabled', true)
+
+  const { searchPatterns } = await import('../../../src/services/search-patterns.js')
+
+  const searchPattern = searchPatterns.find(({ pattern }) =>
+    pattern.test('IUU.GB.2026.0000001')
+  )
+
+  expect(searchPattern).toBeDefined()
 })
