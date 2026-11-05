@@ -10,7 +10,7 @@ import { createLogger } from '../utils/logger.js'
 import { config } from '../config/config.js'
 import { isInFeatureGroup } from '../auth/check-groups.js'
 import { AUTH_FEATURES } from '../auth/auth-constants.js'
-import { DECISION_MODE } from '../models/model-constants.js'
+import { DECISION_MODE, IUUDocumentCodes } from '../models/model-constants.js'
 import { mapFisNotifications } from '../models/fis-notifications.js'
 
 const NANOSECOND_PRECISION = 7
@@ -58,21 +58,42 @@ const sortCreatedDescending = (a, b) => {
   return bCreatedTime - aCreatedTime
 }
 
-const getQuantityManagementEvents = async (showQuantityStatus, declarationChedGroups, declaration) => {
-  let quantityManagementEvents = []
+const getQuantityManagementEvents = async (declarationChedGroups, declaration) => {
+  const quantityManagementEvents = []
 
-  if (showQuantityStatus) {
-    for (const chedGroup of declarationChedGroups) {
-      const chedReservationEvents = await getResourceEvents(`${chedGroup.chedRef}_${declaration.movementReferenceNumber}`) // NOSONAR - S9382: fetch inside loop is intentional
-      const reservationEvents = mapResourceEvents(undefined, chedGroup.chedRef, chedReservationEvents)
-      quantityManagementEvents = quantityManagementEvents.concat(reservationEvents)
-    }
+  for (const chedGroup of declarationChedGroups) {
+    const chedReservationEvents = await getResourceEvents(`${chedGroup.chedRef}_${declaration.movementReferenceNumber}`) // NOSONAR - S9382: fetch inside loop is intentional
+    quantityManagementEvents.push(...mapResourceEvents(undefined, chedGroup.chedRef, chedReservationEvents))
   }
 
   return quantityManagementEvents
 }
 
-const getEventsFromCustomsDeclarations = async (customsDeclarations, chedGroups, showQuantityStatus) => {
+const getIuuReferences = (declaration) =>
+  [...new Set(
+    declaration.commodities
+      .flatMap(commodity => commodity.documents ?? [])
+      .filter(document => IUUDocumentCodes.includes(document.documentCode))
+      .map(document => document.documentReference)
+      .filter(Boolean)
+  )]
+
+const getFisNotificationEvents = async (declaration) => {
+  const fisNotificationEvents = []
+
+  for (const iuuReference of getIuuReferences(declaration)) {
+    try {
+      const iuuResourceEvents = await getResourceEvents(iuuReference) // NOSONAR - S9382: fetch inside loop is intentional
+      fisNotificationEvents.push(...mapResourceEvents(declaration.movementReferenceNumber, undefined, iuuResourceEvents))
+    } catch (error) {
+      logger.warn(`Unable to retrieve FIS notification resource events for ${iuuReference}. ERROR: ${error.message}`)
+    }
+  }
+
+  return fisNotificationEvents
+}
+
+const getEventsFromCustomsDeclarations = async (customsDeclarations, chedGroups, showQuantityStatus, showFisNotifications) => {
   const customsDeclarationEvents = []
 
   for (const declaration of customsDeclarations) {
@@ -86,9 +107,15 @@ const getEventsFromCustomsDeclarations = async (customsDeclarations, chedGroups,
             extractDocumentReferenceId(document.documentReference?.toUpperCase()) === extractDocumentReferenceId(chedEvent.chedRef.toUpperCase()))))
       const declarationChedEvents = declarationChedGroups.flatMap(({ timelineEvents }) => timelineEvents)
 
-      const quantityManagementEvents = await getQuantityManagementEvents(showQuantityStatus, declarationChedGroups, declaration) // NOSONAR - S9382: fetch inside loop is intentional
+      const quantityManagementEvents = showQuantityStatus ? await getQuantityManagementEvents(declarationChedGroups, declaration) : []
 
-      const mrnEvents = declarationTimelineEvents.concat(declarationChedEvents).concat(quantityManagementEvents).sort(sortCreatedDescending)
+      const fisNotificationEvents = showFisNotifications ? await getFisNotificationEvents(declaration) : []
+
+      const mrnEvents = declarationTimelineEvents
+        .concat(declarationChedEvents)
+        .concat(quantityManagementEvents)
+        .concat(fisNotificationEvents)
+        .sort(sortCreatedDescending)
 
       customsDeclarationEvents.push({
         mrn: declaration.movementReferenceNumber,
@@ -131,7 +158,7 @@ const getTimelineEvents = async (referenceNumbers) => {
   return timelineGroups
 }
 
-const getAllEvents = async (customsDeclarations, preNotifications, tracesCheds, showQuantityStatus) => {
+const getAllEvents = async (customsDeclarations, preNotifications, tracesCheds, showQuantityStatus, showFisNotifications) => {
   const ipaffsChedGroups = await getTimelineEvents(preNotifications.map(({ referenceNumber }) => referenceNumber))
   const tracesChedGroups = await getTimelineEvents(tracesCheds.map(({ reference }) => reference))
   const chedGroups = ipaffsChedGroups.concat(tracesChedGroups)
@@ -140,7 +167,7 @@ const getAllEvents = async (customsDeclarations, preNotifications, tracesCheds, 
     return chedGroups
   }
 
-  return getEventsFromCustomsDeclarations(customsDeclarations, chedGroups, showQuantityStatus)
+  return getEventsFromCustomsDeclarations(customsDeclarations, chedGroups, showQuantityStatus, showFisNotifications)
 }
 
 const includesInternalDecisionCodes = (customsDeclarations, codes) => {
@@ -155,7 +182,7 @@ const hasEmptyResults = (searchResults, showFisNotifications) => {
   return searchResults.customsDeclarations.length === 0 &&
     searchResults.importPreNotifications.length === 0 &&
     searchResults.cheds?.length <= 0 &&
-    (!showFisNotifications || (showFisNotifications && searchResults.iuus.length === 0))
+    (!showFisNotifications || !searchResults.iuus?.length)
 }
 
 export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_RESULT, async (request, h) => {
@@ -178,7 +205,7 @@ export const searchResult = createRouteConfig(searchTermValidator, paths.SEARCH_
   const customsDeclarations = mapCustomsDeclarations(searchResults, searchTerm)
   const preNotifications = mapPreNotifications(searchResults, searchTerm)
   const tracesCheds = showTracesCheds ? mapTracesCheds(searchResults, searchTerm) : []
-  const timelineEvents = await getAllEvents(customsDeclarations, preNotifications, tracesCheds, showQuantityStatus)
+  const timelineEvents = await getAllEvents(customsDeclarations, preNotifications, tracesCheds, showQuantityStatus, showFisNotifications)
   const fisNotifications = showFisNotifications ? mapFisNotifications(searchResults, searchTerm) : []
 
   const showLevelNoMatchBanner = isInFeatureGroup(AUTH_FEATURES.LEVEL_NO_MATCH_SEARCH_RESULTS, request.auth.credentials.scope)
