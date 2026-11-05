@@ -6,7 +6,19 @@ const latestActivityMessage = (type, subtype, timestamp) => ({
   timestamp: timestamp ? format(new Date(timestamp), 'dd MMMM yyyy, HH:mm:ss') : 'No Data Available'
 })
 
-export const mapLatestActivity = (lastCreated, lastSent, lastReceived) => ({
+const tracesService = (lastReceived) => ({
+  name: 'TRACES',
+  direction: 'received',
+  messages: [
+    latestActivityMessage(
+      'Notification',
+      null,
+      lastReceived.tracesChed?.timestamp
+    )
+  ]
+})
+
+export const mapLatestActivity = (lastCreated, lastSent, lastReceived, showTracesCheds = false) => ({
   services: [
     {
       name: 'BTMS',
@@ -42,6 +54,7 @@ export const mapLatestActivity = (lastCreated, lastSent, lastReceived) => ({
           lastReceived.preNotification?.timestamp
         )
       ]
-    }
+    },
+    ...(showTracesCheds ? [tracesService(lastReceived)] : [])
   ]
 })
