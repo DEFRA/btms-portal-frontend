@@ -13,6 +13,9 @@ export const getImportPreNotification = (chedId) =>
 export const getTracesChed = (chedId) =>
   dataApiClient.get(`traces-cheds/${chedId}`)
 
+export const getIuuNotification = (iuuReference) =>
+  dataApiClient.get(`iuu-notifications/${iuuReference}`)
+
 export const getRelatedImportDeclarations = async (query) => {
   const results = await dataApiClient.get(`related-import-declarations?${new URLSearchParams(query)}`)
 
