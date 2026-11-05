@@ -1,5 +1,9 @@
 import { paths } from './route-constants.js'
 import joi from 'joi'
+import { config } from '../config/config.js'
+
+const appBaseUrl = config.get('appBaseUrl')
+const baseOrigin = new URL(appBaseUrl).origin
 
 export const cookiesGet = {
   method: 'get',
@@ -43,7 +47,10 @@ export const cookiesPost = {
 
     request.yar.flash('showCookieConfirmationBanner', true)
 
-    if (previousUrl.startsWith('//') || previousUrl.startsWith('/\\')) {
+    const target = new URL(previousUrl, appBaseUrl)
+
+    if (target.origin !== baseOrigin)
+    {
       return h.redirect(paths.COOKIES).takeover()
     }
 
