@@ -1,4 +1,4 @@
-import { searchPatterns } from '../../../src/services/search-patterns.js'
+import { fisNotificationSearchPattern, searchPatterns } from '../../../src/services/search-patterns.js'
 
 test.each([
   ['CHEDA.GB.2025.0000001', true],
@@ -45,7 +45,8 @@ test.each([
   ['26GB]TEST990800000', false],
   ['26GB^TEST990800000', false],
   ['26GBTEST990800000', false],
-  ['26GBTEST99080000011', false]
+  ['26GBTEST99080000011', false],
+  ['IUU.GB.2026.0000001', false]
 ])('The search pattern test for %s should equal %s', (search, expected) => {
   const searchPattern = searchPatterns.find(({ pattern }) =>
     pattern.test(search)
@@ -67,4 +68,38 @@ describe('The full CHED reference patterns used by the search service', () => {
     expect(fullChedPatterns).toHaveLength(1)
     expect(fullChedPatterns.every(({ key }) => key === 'chedId')).toBe(true)
   })
+})
+
+test.each([
+  ['IUU.GB.2026.1234567', true],
+  ['IUU.FR.2026.0000001', true],
+  ['IUU.G.2026.1234567', false],
+  ['IUU.GBR.2026.1234567', false],
+  ['IUU.gb.2026.1234567', false],
+  ['IUU.GB.1026.1234567', false],
+  ['IUU.GB.2026.123456', false],
+  ['IUU.GB.2026.12345678', false],
+  ['IUUGB20261234567', false],
+  ['CHEDP.GB.2026.1234567', false]
+])('The FIS Notification search pattern test for %s should equal %s', (search, expected) => {
+  expect(fisNotificationSearchPattern.pattern.test(search)).toBe(expected)
+})
+
+test('FIS Notification references are not matched by the main search patterns when isIuuSearchEnabled is off', () => {
+  expect(
+    searchPatterns.find(({ pattern }) => pattern.test('IUU.GB.2026.1234567'))
+  ).toBeUndefined()
+})
+
+test('Should match IUU pattern when isIuuSearchEnabled flag is enabled', async () => {
+  const { config } = await import('../../../src/config/config.js')
+  config.set('isIuuSearchEnabled', true)
+
+  const { searchPatterns } = await import('../../../src/services/search-patterns.js')
+
+  const searchPattern = searchPatterns.find(({ pattern }) =>
+    pattern.test('IUU.GB.2026.0000001')
+  )
+
+  expect(searchPattern).toBeDefined()
 })

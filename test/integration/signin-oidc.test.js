@@ -10,7 +10,7 @@ test('redirects to search when authenticated', async () => {
   const credentials = await setupAuthedUserSession(server)
 
   const { headers, statusCode } = await server.inject({
-    method: 'post',
+    method: 'get',
     url: paths.SIGNIN_DEFRA_ID_CALLBACK,
     auth: {
       strategy: 'defraId',
@@ -26,7 +26,7 @@ test('redirects to auth provider when not authenticated', async () => {
   const server = await initialiseServer()
 
   const { headers, statusCode } = await server.inject({
-    method: 'post',
+    method: 'get',
     url: paths.SIGNIN_DEFRA_ID_CALLBACK
   })
 

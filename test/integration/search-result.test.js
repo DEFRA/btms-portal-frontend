@@ -2,7 +2,7 @@ import globalJsdom from 'global-jsdom'
 import wreck from '@hapi/wreck'
 import {
   getAllByRole,
-  getByRole, queryAllByText,
+  getByRole, getByText, queryAllByText,
   queryByRole,
   queryByText,
   within
@@ -2329,4 +2329,570 @@ test('show only show higher level result against the item document that has fail
 
   const matchDecisions = queryAllByText(document.body, 'Release - Inspection complete')
   expect(matchDecisions.length).toBe(1)
+})
+
+test('IUU with E76 decision should render highlighted display and decision text', async () => {
+  const searchResults = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
+        importPreNotificationIdentifiers: ['0000001'],
+        iuuNotificationIdentifiers: ['IUU.GB.2026.0000001'],
+        clearanceRequest: {
+          declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+          commodities: [
+            {
+              itemNumber: 1,
+              taricCommodityCode: '0304719030',
+              goodsDescription: 'FROZEN MSC A COD FILLETS',
+              netMass: '1',
+              supplementaryUnits: 0,
+              documents: [
+                {
+                  documentReference: 'CHEDP.GB.2026.0000001',
+                  documentCode: 'N853'
+                },
+                {
+                  documentReference: 'IUU.GB.2026.0000001',
+                  documentCode: 'C673'
+                }
+              ],
+              checks: [
+                {
+                  checkCode: 'H222',
+                  departmentCode: 'PHA'
+                },
+                {
+                  checkCode: 'H224',
+                  departmentCode: 'PHA'
+                }
+              ]
+            }
+          ]
+        },
+        clearanceDecision: {
+          results: [
+            {
+              itemNumber: 1,
+              importPreNotification: 'CHEDP.GB.2026.0000001',
+              documentReference: 'CHEDP.GB.2026.0000001',
+              documentCode: 'N853',
+              checkCode: 'H222',
+              decisionCode: 'C03',
+              decisionReason: null,
+              internalDecisionCode: null
+            },
+            {
+              itemNumber: 1,
+              importPreNotification: 'CHEDP.GB.2026.0000001',
+              documentReference: 'CHEDP.GB.2026.0000001',
+              documentCode: 'N853',
+              checkCode: 'H224',
+              decisionCode: 'X00',
+              decisionReason: null,
+              internalDecisionCode: 'E76'
+            },
+          ]
+        },
+        finalisation: {
+          finalState: '0',
+          isManualRelease: false
+        },
+        updated: '2025-05-06T13:11:59.257Z'
+      }
+    ],
+    importPreNotifications: [
+      createImportPreNotification('CHEDP.GB.2026.0000001', 'CVEDP', 'CANCELLED', '2025-04-22T16:55:17.330Z', '1', '0304719030', 'FROZEN MSC A COD FILLETS', '1')
+    ]
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: searchResults })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73A'))
+
+  globalJsdom(payload)
+  initFilters()
+
+  const declaration = getByRole(document.body, 'group', {
+    name: '24GB0Z8WEJ9ZBTL73A'
+  })
+
+  expect(
+    getByRole(declaration, 'row', {
+      name: '1 0304719030 FROZEN MSC A COD FILLETS 1 CHEDP.GB.2026.0000001 Yes POAO Release - CHED cancelled'
+    })
+  ).toBeInTheDocument()
+
+  const iuuRow = getByRole(declaration, 'row', {
+    name: '1 0304719030 FROZEN MSC A COD FILLETS 1 IUU.GB.2026.0000001 IUU reference IUU.GB.2026.0000001 cannot be found. Check that the reference is correct and update your customs declaration as required No IUU No match - No matching IUU notification'
+  })
+  expect(iuuRow).toBeInTheDocument()
+  const redUnderlinesIuuReferenceCell = iuuRow.querySelector('td.btms-no-match')
+  expect(redUnderlinesIuuReferenceCell).toBeInTheDocument()
+
+  const iuuHoverover = declaration.querySelector('span[role=tooltip]')
+  expect(iuuHoverover).toBeInTheDocument()
+  expect(iuuHoverover.innerHTML).toContain('IUU reference IUU.GB.2026.0000001 cannot be found. Check that the reference is correct and update your customs declaration as required')
+})
+
+test('redirects to search page when IUU search is disabled', async () => {
+  config.set('isIuuSearchEnabled', false)
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { statusCode, headers } = await server.inject({
+    method: 'get',
+    url: `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=IUU.GB.2026.0000001`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(302)
+  expect(headers.location).toBe(paths.SEARCH)
+})
+
+test.each([
+  {
+    shouldShowReferenceAndStatus: false,
+    chedType: "IPAFFS",
+    iuuDocRef: "IUU.GBVARIOUS",
+    decisionCode: 'H02',
+    internalDecisionCode: null,
+    iuuDecisionCode: 'H02',
+    iuuInternalDecisionCode: null,
+    expectedMainLineItemRow: '1 0304719030 FROZEN MSC A COD FILLETS 1 CHEDP.GB.2026.1234567 Yes PHSI Hold - To be inspected',
+    expectedIuuRow: '1 0304719030 FROZEN MSC A COD FILLETS 1 IUU Hold - To be inspected'
+  },
+  {
+    shouldShowReferenceAndStatus: false,
+    chedType: "IPAFFS",
+    iuuDocRef: "IUU.GBVARIOUS",
+    decisionCode: 'X00',
+    internalDecisionCode: 'E99',
+    iuuDecisionCode: 'X00',
+    iuuInternalDecisionCode: 'E99',
+    expectedMainLineItemRow: '1 0304719030 FROZEN MSC A COD FILLETS 1 CHEDP.GB.2026.1234567 No PHSI No match - Unknown error',
+    expectedIuuRow: '1 0304719030 FROZEN MSC A COD FILLETS 1 IUU No match - Unknown error'
+  },
+  {
+    shouldShowReferenceAndStatus: true,
+    chedType: "TRACES",
+    iuuDocRef: "IUU.GB.2026.0000001",
+    decisionCode: 'H02',
+    internalDecisionCode: null,
+    iuuDecisionCode: 'X00',
+    iuuInternalDecisionCode: 'E99',
+    expectedMainLineItemRow: '1 0304719030 FROZEN MSC A COD FILLETS 1 CHEDP.GB.2026.1234567 Yes PHSI Hold - To be inspected',
+    expectedIuuRow: '1 0304719030 FROZEN MSC A COD FILLETS 1 IUU.GB.2026.0000001 No IUU No match - Unknown error'
+  },
+  {
+    shouldShowReferenceAndStatus: true,
+    chedType: "TRACES",
+    iuuDocRef: "IUU.GB.2026.0000001",
+    decisionCode: 'H02',
+    internalDecisionCode: null,
+    iuuDecisionCode: 'X00',
+    iuuInternalDecisionCode: 'E76',
+    expectedMainLineItemRow: '1 0304719030 FROZEN MSC A COD FILLETS 1 CHEDP.GB.2026.1234567 Yes PHSI Hold - To be inspected',
+    expectedIuuRow: '1 0304719030 FROZEN MSC A COD FILLETS 1 IUU.GB.2026.0000001 IUU reference IUU.GB.2026.0000001 cannot be found. Check that the reference is correct and update your customs declaration as required No IUU No match - No matching IUU notification'
+  },
+  {
+    shouldShowReferenceAndStatus: true,
+    chedType: "TRACES",
+    iuuDocRef: "IUU.GB.2026.0000001",
+    decisionCode: 'H02',
+    internalDecisionCode: null,
+    iuuDecisionCode: 'H02',
+    iuuInternalDecisionCode: null,
+    expectedMainLineItemRow: '1 0304719030 FROZEN MSC A COD FILLETS 1 CHEDP.GB.2026.1234567 Yes PHSI Hold - To be inspected',
+    expectedIuuRow: '1 0304719030 FROZEN MSC A COD FILLETS 1 IUU.GB.2026.0000001 Yes IUU Hold - To be inspected'
+  }
+])('when declaration is associated to $chedType CHED, then CHED reference and Match status display should be $shouldShowReferenceAndStatus', async ({
+  shouldShowReferenceAndStatus,
+  chedType,
+  iuuDocRef,
+  decisionCode,
+  internalDecisionCode,
+  iuuDecisionCode,
+  iuuInternalDecisionCode,
+  expectedMainLineItemRow,
+  expectedIuuRow
+}) => {
+  config.set('isTracesChedsEnabled', true)
+
+  const searchResults = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
+        clearanceRequest: {
+          declarationUcr: '5GB123456789000-BDOV123456',
+          commodities: [
+            {
+              itemNumber: 1,
+              taricCommodityCode: '0304719030',
+              goodsDescription: 'FROZEN MSC A COD FILLETS',
+              netMass: '1',
+              documents: [
+                {
+                  documentCode: '9115',
+                  documentReference: 'CHEDP.GB.2026.1234567'
+                },
+                {
+                  documentCode: 'C673',
+                  documentReference: iuuDocRef
+                }
+              ],
+              checks: [
+                {
+                  checkCode: 'H219'
+                },
+                {
+                  checkCode: 'H224'
+                }
+              ]
+            }
+          ]
+        },
+        clearanceDecision: {
+          results: [
+            {
+              itemNumber: 1,
+              importPreNotification: 'CHEDP.GB.2026.1234567',
+              documentReference: 'CHEDP.GB.2026.1234567',
+              documentCode: '9115',
+              checkCode: 'H219',
+              decisionCode,
+              decisionReason: null,
+              internalDecisionCode
+            },
+            {
+              itemNumber: 1,
+              importPreNotification: 'CHEDP.GB.2026.1234567',
+              documentReference: 'CHEDP.GB.2026.1234567',
+              documentCode: 'C673',
+              checkCode: 'H224',
+              decisionCode: iuuDecisionCode,
+              decisionReason: null,
+              internalDecisionCode: iuuInternalDecisionCode
+            }
+          ]
+        },
+        finalisation: {
+          isManualRelease: false,
+          finalState: '0'
+        },
+        updated: '2025-05-12T11:13:17.330Z'
+      }
+    ]
+  }
+
+  if (chedType === "IPAFFS") {
+    searchResults.importPreNotifications = [
+      createImportPreNotification('CHEDP.GB.2026.1234567', 'CVEDP', 'IN_PROGRESS', '2025-04-22T16:55:17.330Z', '1', '0304719030', 'FROZEN MSC A COD FILLETS', '1')
+    ]
+    searchResults.cheds = []
+  } else {
+    searchResults.importPreNotifications = []
+    searchResults.cheds = [
+      {
+        ched: {
+          exchangedDocument: {
+            identifier: 'CHEDP.GB.2026.1234567'
+          }
+        }
+      }
+    ]
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: searchResults })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73A'))
+
+  globalJsdom(payload)
+
+  const declaration = getByRole(document.body, 'group', {
+    name: '24GB0Z8WEJ9ZBTL73A'
+  })
+
+  expect(
+    getByRole(declaration, 'row', {
+      name: expectedMainLineItemRow
+    })
+  ).toBeInTheDocument()
+
+  expect(
+    getByRole(declaration, 'row', {
+      name: expectedIuuRow
+    })
+  ).toBeInTheDocument()
+})
+
+test.each([
+  {
+    iuuInternalDecisionCode: 'E99',
+    expectedIuuRow: '1 0304719030 FROZEN MSC A COD FILLETS 1 IUU Reference Not Supplied No IUU No match - Unknown error'
+  },
+  {
+    iuuInternalDecisionCode: 'E76',
+    expectedIuuRow: '1 0304719030 FROZEN MSC A COD FILLETS 1 IUU Reference Not Supplied IUU reference was not supplied. Check that the reference is correct and update your customs declaration as required No IUU No match - No matching IUU notification'
+  }
+])('TRACES CHED IUU with decision code $iuuInternalDecisionCode with missing reference should render relevant IUU row', async ({ iuuInternalDecisionCode, expectedIuuRow }) => {
+  config.set('isTracesChedsEnabled', true)
+
+  const searchResults = {
+    customsDeclarations: [
+      {
+        movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
+        importPreNotificationIdentifiers: ['0000001'],
+        iuuNotificationIdentifiers: ['IUU.GB.2026.0000001'],
+        clearanceRequest: {
+          declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+          commodities: [
+            {
+              itemNumber: 1,
+              taricCommodityCode: '0304719030',
+              goodsDescription: 'FROZEN MSC A COD FILLETS',
+              netMass: '1',
+              supplementaryUnits: 0,
+              documents: [
+                {
+                  documentReference: 'CHEDP.GB.2026.0000001',
+                  documentCode: 'N853'
+                }
+              ],
+              checks: [
+                {
+                  checkCode: 'H222',
+                  departmentCode: 'PHA'
+                },
+                {
+                  checkCode: 'H224',
+                  departmentCode: 'PHA'
+                }
+              ]
+            }
+          ]
+        },
+        clearanceDecision: {
+          results: [
+            {
+              itemNumber: 1,
+              importPreNotification: 'CHEDP.GB.2026.0000001',
+              documentReference: 'CHEDP.GB.2026.0000001',
+              documentCode: 'N853',
+              checkCode: 'H222',
+              decisionCode: 'C03',
+              decisionReason: null,
+              internalDecisionCode: null
+            },
+            {
+              itemNumber: 1,
+              importPreNotification: 'CHEDP.GB.2026.0000001',
+              documentReference: 'CHEDP.GB.2026.0000001',
+              documentCode: 'N853',
+              checkCode: 'H224',
+              decisionCode: 'X00',
+              decisionReason: null,
+              internalDecisionCode: iuuInternalDecisionCode
+            },
+          ]
+        },
+        finalisation: {
+          finalState: '0',
+          isManualRelease: false
+        },
+        updated: '2025-05-06T13:11:59.257Z'
+      }
+    ],
+    importPreNotifications: [],
+    cheds: [
+      {
+        ched: {
+          exchangedDocument: {
+            identifier: 'CHEDP.GB.2026.0000001'
+          }
+        }
+      }
+    ]
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: searchResults })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const { payload } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73A'))
+
+  globalJsdom(payload)
+  initFilters()
+
+  const declaration = getByRole(document.body, 'group', {
+    name: '24GB0Z8WEJ9ZBTL73A'
+  })
+
+  const iuuRow = getByRole(declaration, 'row', {
+    name: expectedIuuRow
+  })
+  expect(iuuRow).toBeInTheDocument()
+})
+
+test('show FIS Notifications when feature flag enabled', async () => {
+  config.set('isFisNotificationsEnabled', true)
+
+  const iuuSearchResults = {
+    customsDeclarations: [],
+    importPreNotifications: [],
+    cheds: [],
+    iuus: [
+      {
+        iuuNotification: {
+          reference: "IUU.GB.2026.0000001",
+          iuuOption: "IUUOK",
+          lastUpdated: "2026-10-27T09:01:00.000Z"
+        }
+      },
+      {
+        iuuNotification: {
+          reference: "IUU.GB.2026.0000002",
+          iuuOption: "IUUNotCompliant",
+          lastUpdated: "2026-10-27T09:02:00.000Z"
+        }
+      }
+    ]
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: iuuSearchResults })
+
+  const { payload, headers } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73A'))
+
+  expect(headers['cache-control']).toBe('no-store')
+
+  globalJsdom(payload)
+  initFilters()
+
+  expect(
+    getByRole(document.body, 'heading', { name: 'Fish Imports Service (FIS) notification details', level: 3 })
+  ).toBeInTheDocument()
+
+  const fisNotificationValues = document.body.querySelectorAll('.fis-details__summary .btms-fis-notification-summary .govuk-summary-list__row')
+  expect(fisNotificationValues.length).toBe(6)
+
+  expect(fisNotificationValues[0].querySelector('.govuk-summary-list__value').innerHTML).toContain('IUU.GB.2026.0000002')
+  expect(fisNotificationValues[1].querySelector('.govuk-summary-list__value span.govuk-tag--red').innerHTML).toContain('Rejected')
+  expect(fisNotificationValues[2].querySelector('.govuk-summary-list__value').innerHTML).toContain('27 October 2026, 09:02')
+
+  expect(fisNotificationValues[3].querySelector('.govuk-summary-list__value').innerHTML).toContain('IUU.GB.2026.0000001')
+  expect(fisNotificationValues[4].querySelector('.govuk-summary-list__value span.govuk-tag--green').innerHTML).toContain('Valid')
+  expect(fisNotificationValues[5].querySelector('.govuk-summary-list__value').innerHTML).toContain('27 October 2026, 09:01')
+})
+
+test('show no matching FIS Notifications message when IUU search results are empty', async () => {
+  config.set('isFisNotificationsEnabled', true)
+
+  const iuuSearchResults = {
+    ...relatedImportDeclarations,
+    cheds: [],
+    iuus: []
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: iuuSearchResults })
+  .mockResolvedValueOnce({ payload: emptyResourceEvents }) //IPAFFS CHED resource events
+  .mockResolvedValueOnce({ payload: emptyResourceEvents }) //TRACES CHED resource events
+  .mockResolvedValueOnce({ payload: emptyResourceEvents }) // Customs Declaration resource events
+
+  const { payload, headers } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73A'))
+
+  expect(headers['cache-control']).toBe('no-store')
+
+  globalJsdom(payload)
+  initFilters()
+
+  expect(
+    getByRole(document.body, 'heading', { name: 'Fish Imports Service (FIS) notification details', level: 3 })
+  ).toBeInTheDocument()
+
+  const noMatchesMessage = getByText(document.body, 'There are no matching Fish Imports Service (FIS) notification details')
+  expect(noMatchesMessage).toBeInTheDocument()
+  expect(noMatchesMessage).toHaveClass('govuk-inset-text')
+})
+
+test.each([
+  {
+    iuuOption: 'IUUOK',
+    expectedStatus: 'Valid',
+    expectedClass: 'govuk-tag--green'
+  },
+  {
+    iuuOption: 'IUUNA',
+    expectedStatus: 'Valid',
+    expectedClass: 'govuk-tag--green'
+  },
+  {
+    iuuOption: 'IUUNotCompliant',
+    expectedStatus: 'Rejected',
+    expectedClass: 'govuk-tag--red'
+  },
+  {
+    iuuOption: null,
+    expectedStatus: 'In Progress',
+    expectedClass: 'govuk-tag--yellow'
+  }
+])('status should be "$expectedStatus" with label class "$expectedClass" when iuuOption is "$iuuOption".', async ({ iuuOption, expectedStatus, expectedClass }) => {
+  config.set('isFisNotificationsEnabled', true)
+
+  const iuuSearchResults = {
+    customsDeclarations: [],
+    importPreNotifications: [],
+    cheds: [],
+    iuus: [
+      {
+        iuuNotification: {
+          reference: "IUU.GB.2026.0000001",
+          iuuOption,
+          lastUpdated: "2026-10-27T09:00:00.000Z"
+        }
+      }
+    ]
+  }
+
+  wreck.get
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: provider })
+  .mockResolvedValueOnce({ payload: iuuSearchResults })
+
+  const { payload, headers } = await injectSearchResult(searchResultUrl('24GB0Z8WEJ9ZBTL73A'))
+
+  expect(headers['cache-control']).toBe('no-store')
+
+  globalJsdom(payload)
+  initFilters()
+
+  const statusField = document.body.querySelector('.fis-details__summary .btms-fis-notification-summary .govuk-summary-list__row .govuk-summary-list__value span')
+  expect(statusField.innerHTML).toContain(expectedStatus)
+  expect(statusField).toHaveClass(expectedClass)
 })

@@ -142,6 +142,18 @@ const config = convict({
     default: false,
     env: 'SHOW_QUANTITY_STATUS'
   },
+  isIuuSearchEnabled: {
+    doc: 'Enables searching by IUU Reference',
+    format: Boolean,
+    default: false,
+    env: 'ENABLE_IUU_SEARCH'
+  },
+  isFisNotificationsEnabled: {
+    doc: 'Show the FIS Notifications section on the search results page',
+    format: Boolean,
+    default: false,
+    env: 'SHOW_FIS_NOTIFICATIONS'
+  },
   session: {
     cache: {
       engine: {
