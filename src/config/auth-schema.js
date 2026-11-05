@@ -29,7 +29,7 @@ const defraIdSchema = {
     doc: 'Defra ID scopes',
     format: Array,
     sensitive: true,
-    env: 'AUTH_DEFRA_ID_SCOPES',
+    env: 'AUTH_DEFRA_ID_SCOPES_TEMP',
     default: ['openid', 'offline_access']
   },
   organisations: {
