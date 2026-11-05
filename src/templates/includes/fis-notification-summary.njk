@@ -1,0 +1,39 @@
+{% set statusIndicators = {
+  "IUUOK": { label: "Valid", className: "govuk-tag--green" },
+  "IUUNA": { label: "Valid", className: "govuk-tag--green" },
+  "IUUNotCompliant": { label: "Rejected", className: "govuk-tag--red" }
+} %}
+{% set statusDisplay = statusIndicators[fisNotification.status] or { label: "In Progress", className: "govuk-tag--yellow" } %}
+
+<div class="govuk-details btms-details" aria-label="">
+  <div class="fis-details__summary">
+    <span class="govuk-details__summary-text">
+      <div class="govuk-summary-list btms-fis-notification-summary">
+        <div class="govuk-summary-list__row">
+          <div class="govuk-summary-list__key">
+            FIS Reference
+          </div>
+          <div class="govuk-summary-list__value">
+            {{ fisNotification.reference }}
+          </div>
+        </div>
+        <div class="govuk-summary-list__row">
+          <div class="govuk-summary-list__key">
+            Status
+          </div>
+          <div class="govuk-summary-list__value">
+            <span class="govuk-!-font-weight-bold govuk-tag {{ statusDisplay.className }}">{{ statusDisplay.label }}</span>
+          </div>
+        </div>
+        <div class="govuk-summary-list__row">
+          <div class="govuk-summary-list__key">
+            Last updated
+          </div>
+          <div class="govuk-summary-list__value">
+            {{ fisNotification.updated }}
+          </div>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
