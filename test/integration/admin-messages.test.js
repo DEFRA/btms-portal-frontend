@@ -165,7 +165,7 @@ test('Should show an error when no search term is supplied', async () => {
   globalJsdom(payload)
 
   expect(
-    getByText(document.body, 'Enter an MRN or CHED')
+    getByText(document.body, 'Enter an MRN, CHED or FIS Notification')
   ).toBeInTheDocument()
 })
 
@@ -191,7 +191,7 @@ test.each([
   globalJsdom(payload)
 
   expect(
-    getByText(document.body, 'Enter an MRN or CHED in the correct format')
+    getByText(document.body, 'Enter an MRN, CHED or FIS Notification in the correct format')
   ).toBeInTheDocument()
 })
 
@@ -428,4 +428,100 @@ test('Should show error if Traces CHED query fails', async () => {
   expect(
     getByText(document.body, 'Sorry, there is a problem with this service')
   ).toBeInTheDocument()
+})
+
+describe('FIS Notifications', () => {
+  const FIS_REFERENCE = 'IUU.GB.2026.1234567'
+
+  const renderAdminMessages = async (query = '') => {
+    const server = await initialiseServer()
+    const credentials = await setupAuthedAdminUserSession(server)
+
+    const { payload } = await server.inject({
+      method: 'get',
+      url: `${paths.ADMIN_MESSAGES}${query}`,
+      auth: {
+        strategy: 'session',
+        credentials
+      }
+    })
+
+    globalJsdom(payload)
+  }
+
+  beforeEach(() => {
+    wreck.get
+      .mockResolvedValueOnce({ payload: provider })
+      .mockResolvedValueOnce({ payload: provider })
+  })
+
+  test('should show the FIS Notification label on the search box', async () => {
+    await renderAdminMessages()
+
+    expect(getByRole(document.body, 'textbox', { name: 'Search for an MRN, CHED or FIS Notification' })).toBeInTheDocument()
+    expect(document.title).toContain('Admin - Search for an MRN, CHED or FIS Notification')
+  })
+
+  test('should show the FIS Information tab and FIS Notification payload', async () => {
+    wreck.get.mockResolvedValueOnce({
+      payload: {
+        iuuNotification: { reference: FIS_REFERENCE, iuuOption: 'IUUOK' },
+        created: '2026-10-25T23:52:49Z',
+        updated: '2026-10-25T23:52:49Z'
+      }
+    })
+
+    await renderAdminMessages(`?${queryStringParams.SEARCH_TERM}=${FIS_REFERENCE}&${queryStringParams.SEARCH_TYPE}=${ADMIN_SEARCH_TYPES.INFORMATION}`)
+
+    expect(wreck.get).toHaveBeenLastCalledWith(
+      expect.stringMatching(new RegExp(`/iuu-notifications/${FIS_REFERENCE}$`)),
+      expect.any(Object)
+    )
+
+    const searchResult = document.querySelector('.btms-admin-search-result > pre > code')
+    expect(getByText(searchResult, new RegExp(`reference": "${FIS_REFERENCE}"`))).toBeInTheDocument()
+
+    const tabs = [...document.querySelectorAll('a.btms-admin-search__tab')].map(tab => tab.text)
+    expect(tabs).toContain('FIS Information')
+  })
+
+  test('should show not found when the FIS Notification does not exist', async () => {
+    wreck.get.mockRejectedValueOnce({ output: { statusCode: 404 } })
+
+    await renderAdminMessages(`?${queryStringParams.SEARCH_TERM}=${FIS_REFERENCE}&${queryStringParams.SEARCH_TYPE}=${ADMIN_SEARCH_TYPES.INFORMATION}`)
+
+    expect(getByText(document.body, `${FIS_REFERENCE} cannot be found`)).toBeInTheDocument()
+  })
+
+  test('should show the FIS Information tab when isIuuSearchEnabled is on', async () => {
+    // search-patterns reads the flag on load, so a fresh set of modules is needed after setting it
+    const { config } = await import('../../src/config/config.js')
+    config.set('isIuuSearchEnabled', true)
+
+    const { default: freshWreck } = await import('@hapi/wreck')
+    const { initialiseServer: freshInitialiseServer } = await import('../utils/initialise-server.js')
+    const { setupAuthedAdminUserSession: freshSetupSession } = await import('../unit/utils/session-helper.js')
+
+    freshWreck.get
+      .mockResolvedValueOnce({ payload: provider })
+      .mockResolvedValueOnce({ payload: provider })
+      .mockResolvedValueOnce({ payload: { iuuNotification: { reference: FIS_REFERENCE } } })
+
+    const server = await freshInitialiseServer()
+    const credentials = await freshSetupSession(server)
+
+    const { payload } = await server.inject({
+      method: 'get',
+      url: `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=${FIS_REFERENCE}&${queryStringParams.SEARCH_TYPE}=${ADMIN_SEARCH_TYPES.INFORMATION}`,
+      auth: {
+        strategy: 'session',
+        credentials
+      }
+    })
+
+    globalJsdom(payload)
+
+    const tabs = [...document.querySelectorAll('a.btms-admin-search__tab')].map(tab => tab.text)
+    expect(tabs).toContain('FIS Information')
+  })
 })

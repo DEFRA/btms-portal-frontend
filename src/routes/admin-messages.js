@@ -1,12 +1,15 @@
 import { constants } from 'node:http2'
 import { paths, queryStringParams, CACHE_CONTROL_NO_STORE } from './route-constants.js'
-import { searchKeys, searchPatterns } from '../services/search-patterns.js'
+import { fisNotificationSearchPattern, searchKeys, searchPatterns } from '../services/search-patterns.js'
 import { ADMIN_SEARCH_TYPES, isValidAdminSearchType, search } from '../services/admin-messages.js'
 import { mapAdminSearchResults } from '../models/admin-search-results.js'
 import { APP_SCOPES } from '../auth/auth-constants.js'
 
 const ADMIN_MESSAGES_TEMPLATE = 'admin-messages'
 const UNSUPPORTED_SEARCH_PATTERNS = new Set([ searchKeys.DUCR, searchKeys.GMR_ID ])
+
+// FIS first so these references are labelled FIS when isIuuSearchEnabled adds an IUU pattern to searchPatterns
+const ADMIN_SEARCH_PATTERNS = [fisNotificationSearchPattern, ...searchPatterns]
 
 const createResultsModel = (searchTerm, searchType, resourceType, results, tracesChedResults, showTracesChedInfo) => {
   const baseLink = `${paths.ADMIN_MESSAGES}?${queryStringParams.SEARCH_TERM}=${searchTerm}`
@@ -99,7 +102,7 @@ export const adminMessages = {
           throw new Error('SEARCH_TERM_REQUIRED')
         }
 
-        const matchingSearchPattern = searchPatterns.find(({ pattern }) =>
+        const matchingSearchPattern = ADMIN_SEARCH_PATTERNS.find(({ pattern }) =>
           pattern.test(searchTerm)
         )
         if (matchingSearchPattern
