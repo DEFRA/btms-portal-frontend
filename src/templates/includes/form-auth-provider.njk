@@ -5,6 +5,12 @@
   {% set errorMessage = { text: 'Choose how you want to sign in' } %}
 {% endif %}
 
+{% if legendText %}
+  {% set legend = { text: legendText, classes: "govuk-visually-hidden" } %}
+{% else %}
+  {% set legend = { text: pageTitle, isPageHeading: LegendIsPageHeading, classes: "govuk-fieldset__legend--l" } %}
+{% endif %}
+
 <form method="post" action="/sign-in-choose" class="btms-sign-in">
   <input type="hidden" name="crumb" value="{{ crumb }}"/>
   {{
@@ -12,11 +18,7 @@
       name: "authProvider",
       value: provider,
       fieldset: {
-        legend: {
-          text: pageTitle,
-          isPageHeading: LegendIsPageHeading,
-          classes: "govuk-fieldset__legend--l"
-        }
+        legend: legend
       },
       items: [
         {

@@ -1,5 +1,5 @@
 import globalJsdom from 'global-jsdom'
-import { getByRole } from '@testing-library/dom'
+import { getAllByRole, getByRole } from '@testing-library/dom'
 import { initialiseServer } from '../utils/initialise-server.js'
 import { paths } from '../../src/routes/route-constants.js'
 
@@ -26,6 +26,11 @@ test('get: renders page', async () => {
   expect(signInFormCrumb).toBeInTheDocument()
   expect(signInFormCrumb.value).toBe('test-crumb')
   expect(signInFormCrumb).toHaveAttribute('type', 'hidden')
+  expect(
+    getAllByRole(document.body, 'heading', {
+      name: 'How do you want to sign in?'
+    })
+  ).toHaveLength(1)
 })
 
 test('get: renders page with error', async () => {

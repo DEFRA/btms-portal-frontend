@@ -41,6 +41,11 @@ test('signed out', async () => {
   expect(document.title).toBe(
     'You are signed out - Border Trade Matching Service'
   )
+
+  expect(document.body.textContent.match(/You are signed out/g)).toHaveLength(1)
+  expect(
+    getByRole(document.body, 'group', { name: 'How do you want to sign in?' })
+  ).toBeInTheDocument()
 })
 
 test('signed out from entraId', async () => {
