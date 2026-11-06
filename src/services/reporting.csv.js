@@ -5,15 +5,21 @@ import { getFromAndTo } from '../utils/dates.js'
 import {
   NO_MATCH_CSV,
   MANUAL_RELEASE_CSV,
-  LEVEL_MATCHING_CSV
+  LEVEL_MATCHING_CSV,
+  CUSTOMS_DECLARATIONS_CSV,
+  IPAFFS_CHEDS_CSV,
+  TRACES_CHEDS_CSV
 } from '../routes/route-constants.js'
 
 const { baseUrl } = config.get('btmsReportingApi')
 
 const paths = {
-  [NO_MATCH_CSV]: 'matches',
-  [MANUAL_RELEASE_CSV]: 'releases',
-  [LEVEL_MATCHING_CSV]: 'matches'
+  [NO_MATCH_CSV]: 'matches/data',
+  [MANUAL_RELEASE_CSV]: 'releases/data',
+  [LEVEL_MATCHING_CSV]: 'matches/data',
+  [CUSTOMS_DECLARATIONS_CSV]: 'extracts/customs-declarations',
+  [IPAFFS_CHEDS_CSV]: 'extracts/ipaffs-cheds',
+  [TRACES_CHEDS_CSV]: 'extracts/traces-cheds'
 }
 const queryParams = {
   [NO_MATCH_CSV]: { match: false },
@@ -32,7 +38,7 @@ export const getReportingCsv = async (request, useV2 = false) => {
   try {
     const res = await wreck.request(
       'get',
-      `${baseUrl}/${apiPath}/data?${query}`,
+      `${baseUrl}/${apiPath}?${query}`,
       {
         headers: { authorization, useV2 }
       }
