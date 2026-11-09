@@ -11,7 +11,8 @@ import {
   getByRole,
   getAllByRole,
   queryByRole,
-  getByText
+  getByText,
+  within
 } from '@testing-library/dom'
 import { format, subDays } from 'date-fns'
 
@@ -1127,4 +1128,121 @@ test.each([
   expect(level3Percentages[3].textContent).toBe("(0%)")
   expect(level3Percentages[4].textContent).toBe("(0%)")
   expect(level3Percentages[5].textContent).toBe("(0%)")
+})
+
+const emptyLevelMatchingSummary = {
+  total: 0,
+  eu: {
+    match: { level1: 0, level2: 0, level3: 0 },
+    noMatch: { level1: 0, level2: 0, level3: 0 }
+  },
+  row: {
+    match: { level1: 0, level2: 0, level3: 0 },
+    noMatch: { level1: 0, level2: 0, level3: 0 }
+  }
+}
+
+test('admin sees the data export tab with downloads using the selected dates', async () => {
+  jest
+    .useFakeTimers({ doNotFake: ['nextTick'] })
+    .setSystemTime(new Date('2026-11-06T12:00:00.000Z'))
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: {} })
+    .mockResolvedValueOnce({ payload: emptyLevelMatchingSummary })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+  const query = new URLSearchParams({
+    startDate: '6/11/2026',
+    endDate: '6/11/2026',
+    tab: 'data-export-view'
+  })
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: `${paths.REPORTING}?${query}`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  const tabLabels = [...document.querySelectorAll('.govuk-tabs__tab')].map(
+    (tab) => tab.textContent.trim()
+  )
+
+  expect(tabLabels).toEqual([
+    'Summary view',
+    'Chart view',
+    'L1, L2 & L3 matching',
+    'Data export'
+  ])
+
+  const panel = document.getElementById('data-export-view')
+  expect(panel).toBeInTheDocument()
+  expect(
+    within(panel).getByText('Download additional reporting data for customs declarations, IPAFFS CHED and TRACES CHED.')
+  ).toBeInTheDocument()
+  expect(
+    within(panel).getByText('This data is only available from 6th November 2026.')
+  ).toBeInTheDocument()
+
+  expect(within(panel).getByText('Customs Declarations data')).toBeInTheDocument()
+  expect(within(panel).getByText('IPAFFS CHED data')).toBeInTheDocument()
+  expect(within(panel).getByText('TRACES CHED data')).toBeInTheDocument()
+
+  const expectedQuery = 'startDate=6%2F11%2F2026&endDate=6%2F11%2F2026'
+  const downloadLinks = within(panel).getAllByRole('button')
+
+  expect(downloadLinks.map((link) => link.getAttribute('href'))).toEqual([
+    `/restricted-reporting/customs-declarations.csv?${expectedQuery}`,
+    `/restricted-reporting/ipaffs-cheds.csv?${expectedQuery}`,
+    `/restricted-reporting/traces-cheds.csv?${expectedQuery}`
+  ])
+
+  expect(document.getElementById('tab').value).toBe('data-export-view')
+  expect(
+    [...document.querySelectorAll('#shortcuts a')].every(
+      (link) => new URL(link.href).searchParams.get('tab') === 'data-export-view'
+    )
+  ).toBe(true)
+})
+
+test.each([
+  ['ordinary user', setupAuthedUserSession],
+  ['private beta user', setupAuthedPrivateBetaUserSession]
+])('%s cannot see the data export tab', async (_, setupUserSession) => {
+  jest
+    .useFakeTimers({ doNotFake: ['nextTick'] })
+    .setSystemTime(new Date('2026-11-06T12:00:00.000Z'))
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: {} })
+
+  const server = await initialiseServer()
+  const credentials = await setupUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: paths.REPORTING,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(queryByRole(document.body, 'link', { name: 'Data export' })).not.toBeInTheDocument()
+  expect(document.getElementById('data-export-view')).not.toBeInTheDocument()
+  expect(
+    document.body.textContent.includes('Download additional reporting data')
+  ).toBe(false)
 })

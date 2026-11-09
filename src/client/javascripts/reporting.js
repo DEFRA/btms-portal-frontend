@@ -6,17 +6,27 @@ createAll(Tabs)
 
 const makeTabActive = (tabId) => {
   const panel = document.getElementById(tabId)
+  const tab = document.getElementById(`tab_${tabId}`)
+
+  if (!panel || !tab) {
+    return
+  }
+
   panel.id = ''
-  document.getElementById(`tab_${tabId}`).click()
+  tab.click()
   panel.id = tabId
   panel.setAttribute('class', 'govuk-tabs__panel')
 }
 
-const preventScroll = () => {
+export const preventScroll = () => {
   const url = new URL(window.location.href)
   const tab = url.searchParams.get('tab')
 
-  if (tab === 'charts-view' || tab === 'level-matching-view') {
+  if (
+    tab === 'charts-view' ||
+    tab === 'level-matching-view' ||
+    tab === 'data-export-view'
+  ) {
     makeTabActive(tab)
   }
 }
@@ -121,14 +131,15 @@ const setLinkHrefs = (href) => {
   }
 }
 
-const initTabsHook = () => {
+export const initTabsHook = () => {
   setLinkHrefs(window.location.href)
 
   const tabs = [
     document.getElementById('tab_summary-view'),
     document.getElementById('tab_charts-view'),
-    document.getElementById('tab_level-matching-view')
-  ]
+    document.getElementById('tab_level-matching-view'),
+    document.getElementById('tab_data-export-view')
+  ].filter(Boolean)
   tabs.forEach((tab) =>
     tab.addEventListener('click', (event) => setLinkHrefs(event.target.href))
   )
