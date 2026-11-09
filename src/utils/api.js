@@ -1,6 +1,8 @@
 import wreck from '@hapi/wreck'
 import { config } from '../config/config.js'
 
+const HTTP_STATUS_OK = 200
+
 export class ApiClient {
   constructor (apiConfig) {
     this.baseUrl = apiConfig.baseUrl
@@ -28,7 +30,7 @@ export class ApiClient {
       headers: this.getHeaders(additionalHeaders)
     })
 
-    if (response.statusCode !== 200) {
+    if (response.statusCode !== HTTP_STATUS_OK) {
       response.destroy()
       throw new Error(`Upstream request failed with status ${response.statusCode}`)
     }
