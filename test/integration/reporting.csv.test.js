@@ -490,6 +490,15 @@ const exportQuery = new URLSearchParams({
   endDate: '1/9/2025'
 })
 
+const exportNames = [
+  CUSTOMS_DECLARATIONS_CSV,
+  IPAFFS_CHEDS_CSV,
+  TRACES_CHEDS_CSV
+]
+
+const exportURL = (name) =>
+  `${paths.RESTRICTED_REPORTING_CSV.replace('{name}', name)}?${exportQuery}`
+
 const requestExport = async (name, payload) => {
   wreck.get
     .mockResolvedValueOnce({ payload: provider })
@@ -501,7 +510,7 @@ const requestExport = async (name, payload) => {
 
   return server.inject({
     method: 'get',
-    url: `${paths.RESTRICTED_REPORTING_CSV.replace('{name}', name)}?${exportQuery}`,
+    url: exportURL(name),
     auth: {
       strategy: 'session',
       credentials
@@ -594,4 +603,106 @@ CHED reference,CHED type,Status,Created,Last updated,Commodity code,Description
     from: '2025-09-01T00:00:00.000Z',
     to: '2025-09-02T00:00:00.000Z'
   })
+})
+
+test.each(exportNames)('rejects %s for a non-admin user', async (name) => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { statusCode } = await server.inject({
+    method: 'get',
+    url: exportURL(name),
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(403)
+  expect(wreck.request).not.toHaveBeenCalled()
+})
+
+test.each(exportNames)('redirects %s for an unauthenticated user', async (name) => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+
+  const { statusCode, headers } = await server.inject({
+    method: 'get',
+    url: exportURL(name)
+  })
+
+  expect(statusCode).toBe(302)
+  expect(headers.location).toBe('/sign-in-choose')
+  expect(wreck.request).not.toHaveBeenCalled()
+})
+
+test('rejects an unrecognised restricted report', async () => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { statusCode } = await server.inject({
+    method: 'get',
+    url: exportURL('not-available.csv'),
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(404)
+  expect(wreck.request).not.toHaveBeenCalled()
+})
+
+test.each(exportNames)('rejects invalid dates for %s', async (name) => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+  const query = new URLSearchParams({ startDate: 'foo', endDate: 'bar' })
+
+  const { statusCode } = await server.inject({
+    method: 'get',
+    url: `${paths.RESTRICTED_REPORTING_CSV.replace('{name}', name)}?${query}`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(400)
+  expect(wreck.request).not.toHaveBeenCalled()
+})
+
+test.each(exportNames)('handles upstream errors for %s', async (name) => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+  wreck.request.mockRejectedValueOnce(new Error('boom'))
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { statusCode } = await server.inject({
+    method: 'get',
+    url: exportURL(name),
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(500)
 })
