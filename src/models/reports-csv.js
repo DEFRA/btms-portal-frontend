@@ -26,19 +26,28 @@ export const mapReportsCsv = (res, name, startDate, endDate, mapRowHandler, repo
   const to = formatReportingDate(endDate)
 
   let firstRow = true
+  const pushHeader = (stream) => {
+    stream.push(`BTMS - ${headings[name]}\n`)
+    stream.push(`Date range: ${from} to ${to}\n`)
+    stream.push('\n')
+    stream.push(reportHeaders)
+  }
   const toCsv = new Transform({
     writableObjectMode: true,
     transform({ value }, _, callback) {
       const row = mapRowHandler(value)
 
       if (firstRow) {
-        this.push(`BTMS - ${headings[name]}\n`)
-        this.push(`Date range: ${from} to ${to}\n`)
-        this.push('\n')
-        this.push(reportHeaders)
+        pushHeader(this)
         firstRow = false
       }
       this.push(row)
+      callback()
+    },
+    flush(callback) {
+      if (firstRow) {
+        pushHeader(this)
+      }
       callback()
     }
   })

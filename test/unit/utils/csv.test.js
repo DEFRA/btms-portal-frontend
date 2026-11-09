@@ -21,3 +21,14 @@ test('stringifies numbers and booleans', () => {
   expect(csvValue(100)).toBe('"100"')
   expect(csvValue(false)).toBe('"false"')
 })
+
+test.each(['=1+1', '+1+1', '-1+1', '@SUM(A1)', '\tcmd', '\rcmd'])(
+  'neutralises a spreadsheet formula beginning with %j',
+  (value) => {
+    expect(csvValue(value)).toBe(`"'${value.replaceAll('"', '""')}"`)
+  }
+)
+
+test('does not prefix a numeric negative value', () => {
+  expect(csvValue(-1)).toBe('"-1"')
+})

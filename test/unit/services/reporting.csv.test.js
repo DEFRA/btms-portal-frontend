@@ -24,7 +24,7 @@ const getReport = (name) =>
   })
 
 beforeEach(() => {
-  wreck.request.mockResolvedValue({})
+  wreck.request.mockResolvedValue({ statusCode: 200 })
 })
 
 test.each([

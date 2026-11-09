@@ -1240,7 +1240,7 @@ test.each([
 
   globalJsdom(payload)
 
-  expect(queryByRole(document.body, 'link', { name: 'Data export' })).not.toBeInTheDocument()
+  expect(queryByRole(document.body, 'tab', { name: 'Data export' })).not.toBeInTheDocument()
   expect(document.getElementById('data-export-view')).not.toBeInTheDocument()
   expect(
     document.body.textContent.includes('Download additional reporting data')

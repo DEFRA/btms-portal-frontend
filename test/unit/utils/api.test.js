@@ -25,7 +25,7 @@ const apiConfig = {
 beforeEach(() => {
   jest.clearAllMocks()
   mockGet.mockResolvedValue({ payload: { data: 'test' } })
-  mockRequest.mockResolvedValue({ res: { statusCode: 200 } })
+  mockRequest.mockResolvedValue({ statusCode: 200 })
 })
 
 test('get() should include x-api-key header when cdpApiKey is configured', async () => {
@@ -110,7 +110,20 @@ test('getStream() should include x-api-key and preserve additional headers', asy
       }
     }
   )
-  expect(response).toEqual({ res: { statusCode: 200 } })
+  expect(response).toEqual({ statusCode: 200 })
+})
+
+test('getStream() should reject a non-200 response', async () => {
+  config.get.mockReturnValue('test-api-key')
+  const response = { statusCode: 302, destroy: jest.fn() }
+  mockRequest.mockResolvedValue(response)
+
+  const client = new ApiClient(apiConfig)
+
+  await expect(client.getStream('test-endpoint')).rejects.toThrow(
+    'Upstream request failed with status 302'
+  )
+  expect(response.destroy).toHaveBeenCalled()
 })
 
 test('getStream() should omit x-api-key when cdpApiKey is not configured', async () => {

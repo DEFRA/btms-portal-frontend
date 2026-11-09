@@ -24,9 +24,16 @@ export class ApiClient {
   }
 
   async getStream (endpoint, additionalHeaders = {}) {
-    return wreck.request('get', `${this.baseUrl}/${endpoint}`, {
+    const response = await wreck.request('get', `${this.baseUrl}/${endpoint}`, {
       headers: this.getHeaders(additionalHeaders)
     })
+
+    if (response.statusCode !== 200) {
+      response.destroy()
+      throw new Error(`Upstream request failed with status ${response.statusCode}`)
+    }
+
+    return response
   }
 
   async post (endpoint) {

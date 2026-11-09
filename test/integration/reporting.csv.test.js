@@ -518,6 +518,35 @@ const requestExport = async (name, payload) => {
   })
 }
 
+test.each([
+  [
+    CUSTOMS_DECLARATIONS_CSV,
+    'Customs Declarations',
+    'MRN,MRN created,Last updated,Release type,Final state,Dispatch country code,Item number,Commodity code,Description,Quantity/Weight,CHED references,Authorities,Check codes,Decisions,Match\n'
+  ],
+  [
+    IPAFFS_CHEDS_CSV,
+    'IPAFFS CHEDs',
+    'CHED reference,CHED type,Status,Created,Last updated,Commodity code,Description\n'
+  ],
+  [
+    TRACES_CHEDS_CSV,
+    'TRACES CHEDs',
+    'CHED reference,CHED type,Status,Created,Last updated,Commodity code,Description\n'
+  ]
+])('still returns the table headers when there are no results for %s', async (name, heading, reportHeaders) => {
+  const { payload, headers, statusCode } = await requestExport(name, {
+    data: []
+  })
+
+  expect(statusCode).toBe(200)
+  expect(payload).toBe(`BTMS - ${heading}
+Date range: 1 September 2025 at 00:00 to 1 September 2025 at 23:59
+
+${reportHeaders}`)
+  expect(headers['content-type']).toBe('text/csv; charset=utf-8')
+})
+
 test('customs declarations data export csv', async () => {
   const { headers, payload } = await requestExport(CUSTOMS_DECLARATIONS_CSV, {
     data: [
@@ -691,6 +720,30 @@ test.each(exportNames)('handles upstream errors for %s', async (name) => {
     .mockResolvedValueOnce({ payload: provider })
     .mockResolvedValueOnce({ payload: provider })
   wreck.request.mockRejectedValueOnce(new Error('boom'))
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { statusCode } = await server.inject({
+    method: 'get',
+    url: exportURL(name),
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(500)
+})
+
+test.each(exportNames)('handles non-success responses for %s', async (name) => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+  wreck.request.mockResolvedValueOnce({
+    statusCode: 403,
+    destroy: jest.fn()
+  })
 
   const server = await initialiseServer()
   const credentials = await setupAuthedAdminUserSession(server)
