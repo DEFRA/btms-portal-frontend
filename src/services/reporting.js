@@ -1,6 +1,4 @@
-import wreck from '@hapi/wreck'
 import { config } from '../config/config.js'
-import { authorization } from './reporting-auth.js'
 import { ApiClient } from '../utils/api.js'
 
 const reportingApiConfig = config.get('btmsReportingApi')
@@ -15,10 +13,7 @@ export const getReports = async (request, from, to, intervals) => {
   }
 
   try {
-    const { payload } = await wreck.get(`${reportingApiConfig.baseUrl}/intervals?${query}`, {
-      headers: { authorization },
-      json: 'strict'
-    })
+    const payload = await reportingApiClient.get(`intervals?${query}`)
 
     return payload
   } catch (error) {
@@ -31,10 +26,7 @@ export const getMatchingReports = async (request, from , to) => {
   const query = new URLSearchParams({ from, to })
 
   try {
-    const { payload } = await wreck.get(`${reportingApiConfig.baseUrl}/matches/summary/levels-by-region?${query}`, {
-      headers: { authorization },
-      json: 'strict'
-    })
+    const payload = await reportingApiClient.get(`matches/summary/levels-by-region?${query}`)
 
     return payload
   } catch (error) {
@@ -46,24 +38,15 @@ export const getMatchingReports = async (request, from , to) => {
 export const getLatestActivity = async (request) => {
   try {
     const [lastCreated, lastSent, lastReceived] = await Promise.all([
-      wreck.get(`${reportingApiConfig.baseUrl}/last-created`, {
-        headers: { authorization },
-        json: 'strict'
-      }),
-      wreck.get(`${reportingApiConfig.baseUrl}/last-sent`, {
-        headers: { authorization },
-        json: 'strict'
-      }),
-      wreck.get(`${reportingApiConfig.baseUrl}/last-received`, {
-        headers: { authorization },
-        json: 'strict'
-      })
+      reportingApiClient.get('last-created'),
+      reportingApiClient.get('last-sent'),
+      reportingApiClient.get('last-received')
     ])
 
     return {
-      lastCreated: lastCreated.payload,
-      lastSent: lastSent.payload,
-      lastReceived: lastReceived.payload
+      lastCreated,
+      lastSent,
+      lastReceived
     }
   } catch (error) {
     request.logger.setBindings({ error })
