@@ -6,13 +6,19 @@ import { formatReportingDate } from '../utils/dates.js'
 import {
   NO_MATCH_CSV,
   MANUAL_RELEASE_CSV,
-  LEVEL_MATCHING_CSV
+  LEVEL_MATCHING_CSV,
+  CUSTOMS_DECLARATIONS_CSV,
+  IPAFFS_CHEDS_CSV,
+  TRACES_CHEDS_CSV
 } from '../routes/route-constants.js'
 
 const headings = {
-  [NO_MATCH_CSV]: 'No matches',
-  [MANUAL_RELEASE_CSV]: 'Manual releases',
-  [LEVEL_MATCHING_CSV]: 'Level No Matches'
+  [NO_MATCH_CSV]: 'No matches MRNs',
+  [MANUAL_RELEASE_CSV]: 'Manual releases MRNs',
+  [LEVEL_MATCHING_CSV]: 'Level No Matches MRNs',
+  [CUSTOMS_DECLARATIONS_CSV]: 'Customs Declarations',
+  [IPAFFS_CHEDS_CSV]: 'IPAFFS CHEDs',
+  [TRACES_CHEDS_CSV]: 'TRACES CHEDs'
 }
 
 export const mapReportsCsv = (res, name, startDate, endDate, mapRowHandler, reportHeaders) => {
@@ -26,7 +32,7 @@ export const mapReportsCsv = (res, name, startDate, endDate, mapRowHandler, repo
       const row = mapRowHandler(value)
 
       if (firstRow) {
-        this.push(`BTMS - ${headings[name]} MRNs\n`)
+        this.push(`BTMS - ${headings[name]}\n`)
         this.push(`Date range: ${from} to ${to}\n`)
         this.push('\n')
         this.push(reportHeaders)

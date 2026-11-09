@@ -6,7 +6,12 @@ import {
   setupAuthedAdminUserSession,
   setupAuthedUserSession
 } from '../unit/utils/session-helper.js'
-import { paths } from '../../src/routes/route-constants.js'
+import {
+  paths,
+  CUSTOMS_DECLARATIONS_CSV,
+  IPAFFS_CHEDS_CSV,
+  TRACES_CHEDS_CSV
+} from '../../src/routes/route-constants.js'
 import { getByRole } from '@testing-library/dom'
 
 const provider = {
@@ -477,5 +482,116 @@ Level,Last updated,MRN,Item number,Commodity code,Check code,Description,Quantit
     from: '2026-06-22T00:00:00.000Z',
     to: '2026-06-23T00:00:00.000Z',
     match: 'false'
+  })
+})
+
+const exportQuery = new URLSearchParams({
+  startDate: '1/9/2025',
+  endDate: '1/9/2025'
+})
+
+const requestExport = async (name, payload) => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+  wreck.request.mockResolvedValueOnce(dataStream(payload))
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  return server.inject({
+    method: 'get',
+    url: `${paths.RESTRICTED_REPORTING_CSV.replace('{name}', name)}?${exportQuery}`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+}
+
+test('customs declarations data export csv', async () => {
+  const { headers, payload } = await requestExport(CUSTOMS_DECLARATIONS_CSV, {
+    data: [
+      {
+        mrn: '24GB12345678901234',
+        mrnCreated: '2025-09-01T09:00:00.000Z',
+        lastUpdated: '2025-09-01T10:00:00.000Z',
+        releaseType: 'Automatic',
+        finalState: null,
+        dispatchCountryCode: 'IT',
+        itemNumber: 1,
+        commodityCode: '0101210000',
+        description: 'Horses, "live"',
+        quantityOrWeight: null,
+        chedReferences: 'GBCHD2025.1; GBCHD2025.2',
+        authorities: 'AHVLA',
+        checkCodes: 'H221',
+        decisions: 'C03; X00',
+        match: 'No'
+      }
+    ]
+  })
+
+  expect(payload).toBe(`BTMS - Customs Declarations
+Date range: 1 September 2025 at 00:00 to 1 September 2025 at 23:59
+
+MRN,MRN created,Last updated,Release type,Final state,Dispatch country code,Item number,Commodity code,Description,Quantity/Weight,CHED references,Authorities,Check codes,Decisions,Match
+"24GB12345678901234","2025-09-01T09:00:00.000Z","2025-09-01T10:00:00.000Z","Automatic","","IT","1","0101210000","Horses, ""live""","","GBCHD2025.1; GBCHD2025.2","AHVLA","H221","C03; X00","No"
+`)
+
+  expect(headers['content-type']).toBe('text/csv; charset=utf-8')
+  expect(headers['content-disposition']).toBe(
+    'attachment; filename="customs-declarations-2025.09.01-2025.09.01.csv"'
+  )
+  expect(headers['cache-control']).toBe('no-store')
+
+  const apiURL = wreck.request.mock.calls.at(-1)[1]
+  const { pathname, searchParams } = new URL(apiURL)
+
+  expect(pathname).toBe('/reporting-api/extracts/customs-declarations')
+  expect(Object.fromEntries(searchParams)).toEqual({
+    from: '2025-09-01T00:00:00.000Z',
+    to: '2025-09-02T00:00:00.000Z'
+  })
+})
+
+test.each([
+  [IPAFFS_CHEDS_CSV, 'IPAFFS CHEDs', '/reporting-api/extracts/ipaffs-cheds'],
+  [TRACES_CHEDS_CSV, 'TRACES CHEDs', '/reporting-api/extracts/traces-cheds']
+])('%s data export csv', async (name, heading, expectedPath) => {
+  const { headers, payload } = await requestExport(name, {
+    data: [
+      {
+        chedReference: 'CHEDA.GB.2025.1234567',
+        chedType: 'ChedA',
+        status: 'SUBMITTED',
+        created: '2025-09-01T09:00:00.000Z',
+        updated: '2025-09-01T10:00:00.000Z',
+        commodityCode: null,
+        description: 'Horses, "live"'
+      }
+    ]
+  })
+
+  expect(payload).toBe(`BTMS - ${heading}
+Date range: 1 September 2025 at 00:00 to 1 September 2025 at 23:59
+
+CHED reference,CHED type,Status,Created,Last updated,Commodity code,Description
+"CHEDA.GB.2025.1234567","ChedA","SUBMITTED","2025-09-01T09:00:00.000Z","2025-09-01T10:00:00.000Z","","Horses, ""live"""
+`)
+
+  expect(headers['content-type']).toBe('text/csv; charset=utf-8')
+  expect(headers['content-disposition']).toBe(
+    `attachment; filename="${name.replace('.csv', '-2025.09.01-2025.09.01.csv')}"`
+  )
+  expect(headers['cache-control']).toBe('no-store')
+
+  const apiURL = wreck.request.mock.calls.at(-1)[1]
+  const { pathname, searchParams } = new URL(apiURL)
+
+  expect(pathname).toBe(expectedPath)
+  expect(Object.fromEntries(searchParams)).toEqual({
+    from: '2025-09-01T00:00:00.000Z',
+    to: '2025-09-02T00:00:00.000Z'
   })
 })
