@@ -59,6 +59,16 @@ export const errorPage = {
         return h.redirect(paths.SIGN_IN_CHOOSE)
       }
 
+      let crumbErrorHeading
+      let crumbErrorMessages
+
+      if (statusCode === HTTP_STATUS_FORBIDDEN) {
+        if (response.stack?.includes('crumb')) {
+          crumbErrorHeading = 'Request validation failed'
+          crumbErrorMessages = ['Your request could not be verified. Please try again.']
+        }
+      }
+
       if (statusCode >= HTTP_STATUS_INTERNAL_SERVER_ERROR) {
         request.logger.error(response.stack)
         if (response.data) {
@@ -69,8 +79,8 @@ export const errorPage = {
       }
 
       const heading =
-        titles[statusCode] || 'Sorry, there is a problem with this service'
-      const messages = paragraphs[statusCode] || ['Try again later.']
+        crumbErrorHeading || titles[statusCode] || 'Sorry, there is a problem with this service'
+      const messages = crumbErrorMessages || paragraphs[statusCode] || ['Try again later.']
       const signOutProvider =
         !request.auth.isAuthenticated && request.auth.credentials?.provider
 
