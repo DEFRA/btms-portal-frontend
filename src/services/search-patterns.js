@@ -15,6 +15,14 @@ export const searchKeys = {
   IUU_REFERENCE: 'iuu'
 }
 
+// The admin messages search always supports FIS Notifications, whereas searchPatterns
+// only includes IUU references when isIuuSearchEnabled is on
+export const fisNotificationSearchPattern = {
+  key: searchKeys.IUU_REFERENCE,
+  pattern: /^IUU\.[A-Z]{2}\.2\d{3}\.\d{7}$/,
+  description: 'FIS'
+}
+
 export const searchPatterns = [
   {
     key: searchKeys.MRN,

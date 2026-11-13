@@ -135,7 +135,7 @@ test.each([
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: provider })
 
-  wreck.read.mockResolvedValue(`{ "confirmActionQueue": "${dlq}", "confirmAction": "Redrive" }`)
+  wreck.read.mockResolvedValue(`{ "confirmActionQueue": "${dlq}", "confirmAction": "Redrive", "crumb": "test-crumb" }`)
 
   const mockPostRedriveResponse = {
     res: { statusCode: 202 }
@@ -153,9 +153,13 @@ test.each([
       strategy: 'session',
       credentials
     },
+    headers: {
+      cookie: 'crumb=test-crumb'
+    },
     payload: {
       confirmActionQueue: dlq,
-      confirmAction: 'Redrive'
+      confirmAction: 'Redrive',
+      crumb: 'test-crumb'
     }
   })
 
@@ -175,7 +179,7 @@ test.each([
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: provider })
 
-  wreck.read.mockResolvedValue(`{ "confirmActionQueue": "${dlq}", "confirmAction": "Drain" }`)
+  wreck.read.mockResolvedValue(`{ "confirmActionQueue": "${dlq}", "confirmAction": "Drain", "crumb": "test-crumb" }`)
 
   const mockPostDrainResponse = {
     res: { statusCode: 200 }
@@ -193,9 +197,13 @@ test.each([
       strategy: 'session',
       credentials
     },
+    headers: {
+      cookie: 'crumb=test-crumb'
+    },
     payload: {
       confirmActionQueue: dlq,
-      confirmAction: 'Drain'
+      confirmAction: 'Drain',
+      crumb: 'test-crumb'
     }
   })
 
@@ -208,7 +216,7 @@ test('Post redrive failure should show error page', async () => {
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: provider })
 
-  wreck.read.mockResolvedValue('{ "confirmActionQueue": "trade_imports_data_upserted_btms-gateway-deadletter", "confirmAction": "Redrive" }')
+  wreck.read.mockResolvedValue('{ "confirmActionQueue": "trade_imports_data_upserted_btms-gateway-deadletter", "confirmAction": "Redrive", "crumb": "test-crumb" }')
 
   wreck.post.mockImplementation(() => {
     throw new Error();
@@ -224,9 +232,13 @@ test('Post redrive failure should show error page', async () => {
       strategy: 'session',
       credentials
     },
+    headers: {
+      cookie: 'crumb=test-crumb'
+    },
     payload: {
       confirmActionQueue: 'trade_imports_data_upserted_btms-gateway-deadletter',
-      confirmAction: 'Redrive'
+      confirmAction: 'Redrive',
+      crumb: 'test-crumb'
     }
   })
 
@@ -244,7 +256,7 @@ test('Post drain failure should show error page', async () => {
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: provider })
 
-  wreck.read.mockResolvedValue('{ "confirmActionQueue": "trade_imports_data_upserted_btms-gateway-deadletter", "confirmAction": "Drain" }')
+  wreck.read.mockResolvedValue('{ "confirmActionQueue": "trade_imports_data_upserted_btms-gateway-deadletter", "confirmAction": "Drain", "crumb": "test-crumb" }')
 
   wreck.post.mockImplementation(() => {
     throw new Error();
@@ -260,9 +272,13 @@ test('Post drain failure should show error page', async () => {
       strategy: 'session',
       credentials
     },
+    headers: {
+      cookie: 'crumb=test-crumb'
+    },
     payload: {
       confirmActionQueue: 'trade_imports_data_upserted_btms-gateway-deadletter',
-      confirmAction: 'Drain'
+      confirmAction: 'Drain',
+      crumb: 'test-crumb'
     }
   })
 
@@ -280,7 +296,7 @@ test('Invalid DLQ action should show error page', async () => {
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: provider })
 
-  wreck.read.mockResolvedValue('{ "confirmActionQueue": "trade_imports_data_upserted_btms-gateway-deadletter", "confirmAction": "Foo" }')
+  wreck.read.mockResolvedValue('{ "confirmActionQueue": "trade_imports_data_upserted_btms-gateway-deadletter", "confirmAction": "Foo", "crumb": "test-crumb" }')
 
   const server = await initialiseServer()
   const credentials = await setupAuthedAdminUserSession(server)
@@ -292,9 +308,13 @@ test('Invalid DLQ action should show error page', async () => {
       strategy: 'session',
       credentials
     },
+    headers: {
+      cookie: 'crumb=test-crumb'
+    },
     payload: {
       confirmActionQueue: 'trade_imports_data_upserted_btms-gateway-deadletter',
-      confirmAction: 'Foo'
+      confirmAction: 'Foo',
+      crumb: 'test-crumb'
     }
   })
 
@@ -322,6 +342,9 @@ test('Should show actions available if queue counts are greater than zero', asyn
     auth: {
       strategy: 'session',
       credentials
+    },
+    headers: {
+      cookie: 'crumb=test-crumb'
     }
   })
 
@@ -335,6 +358,14 @@ test('Should show actions available if queue counts are greater than zero', asyn
   expect(
     getByRole(document.body, 'button', { name: 'Drain messages from queue' })
   ).toBeInTheDocument()
+  const redriveFormCrumb = document.body.querySelector('form.btms-admin-action__confirm input[name="crumb"]')
+  expect(redriveFormCrumb).toBeInTheDocument()
+  expect(redriveFormCrumb.value).toBe('test-crumb')
+  expect(redriveFormCrumb).toHaveAttribute('type', 'hidden')
+  const drainFormCrumb = document.body.querySelector('form.btms-admin-action__confirm input[name="crumb"]')
+  expect(drainFormCrumb).toBeInTheDocument()
+  expect(drainFormCrumb.value).toBe('test-crumb')
+  expect(drainFormCrumb).toHaveAttribute('type', 'hidden')
 })
 
 test('Invalid Redrive response should show error page', async () => {
@@ -342,7 +373,7 @@ test('Invalid Redrive response should show error page', async () => {
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: provider })
 
-  wreck.read.mockResolvedValue('{ "confirmActionQueue": "trade_imports_data_upserted_btms-gateway-deadletter", "confirmAction": "Redrive" }')
+  wreck.read.mockResolvedValue('{ "confirmActionQueue": "trade_imports_data_upserted_btms-gateway-deadletter", "confirmAction": "Redrive", "crumb": "test-crumb" }')
 
   wreck.post.mockImplementation(() => {
     return {
@@ -363,9 +394,13 @@ test('Invalid Redrive response should show error page', async () => {
       strategy: 'session',
       credentials
     },
+    headers: {
+      cookie: 'crumb=test-crumb'
+    },
     payload: {
       confirmActionQueue: 'trade_imports_data_upserted_btms-gateway-deadletter',
-      confirmAction: 'Drain'
+      confirmAction: 'Drain',
+      crumb: 'test-crumb'
     }
   })
 
@@ -383,7 +418,7 @@ test('Invalid Drain response should show error page', async () => {
   .mockResolvedValueOnce({ payload: provider })
   .mockResolvedValueOnce({ payload: provider })
 
-  wreck.read.mockResolvedValue('{ "confirmActionQueue": "trade_imports_data_upserted_btms-gateway-deadletter", "confirmAction": "Drain" }')
+  wreck.read.mockResolvedValue('{ "confirmActionQueue": "trade_imports_data_upserted_btms-gateway-deadletter", "confirmAction": "Drain", "crumb": "test-crumb" }')
 
   wreck.post.mockImplementation(() => {
     return {
@@ -404,9 +439,13 @@ test('Invalid Drain response should show error page', async () => {
       strategy: 'session',
       credentials
     },
+    headers: {
+      cookie: 'crumb=test-crumb'
+    },
     payload: {
       confirmActionQueue: 'trade_imports_data_upserted_btms-gateway-deadletter',
-      confirmAction: 'Drain'
+      confirmAction: 'Drain',
+      crumb: 'test-crumb'
     }
   })
 
@@ -416,5 +455,45 @@ test('Invalid Drain response should show error page', async () => {
 
   expect(
     getByRole(document.body, 'heading', { name: 'Sorry, there is a problem with this service' })
+  ).toBeInTheDocument()
+})
+
+test('Post with invalid crumb is forbidden', async () => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+
+  wreck.read.mockResolvedValue(`{ "confirmActionQueue": "a-deadletter-queue", "confirmAction": "Redrive", "crumb": "invalid-crumb" }`)
+
+  const mockPostRedriveResponse = {
+    res: { statusCode: 202 }
+  };
+
+  wreck.post.mockResolvedValueOnce(mockPostRedriveResponse);
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { payload, statusCode } = await server.inject({
+    method: 'post',
+    url: paths.ADMIN_DLQ_ACTION,
+    auth: {
+      strategy: 'session',
+      credentials
+    },
+    headers: {
+      cookie: 'crumb=generated-crumb'
+    },
+    payload: {
+      confirmActionQueue: 'a-deadletter-queue',
+      confirmAction: 'Redrive',
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(statusCode).toBe(403)
+  expect(
+    getByRole(document.body, 'heading', { name: 'You do not have the correct permissions to access this service' })
   ).toBeInTheDocument()
 })

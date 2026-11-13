@@ -32,11 +32,12 @@ test('active user session', async () => {
   expect(headers.location).toBe(expectedLocation)
   expect(await server.app.cache.get(sessionId)).toBe(null)
 
-  const [setCookie] = headers['set-cookie']
-  const [name, age] = setCookie.split(';')
-
-  expect(name.trim()).toBe('userSession=')
-  expect(age.trim()).toBe('Max-Age=0')
+  expect(headers['set-cookie']).toEqual(
+    expect.arrayContaining([
+      expect.stringContaining('userSession=; Max-Age=0'),
+      expect.stringContaining('crumb=')
+    ])
+  )
 
   await server.stop()
 })
@@ -68,9 +69,12 @@ test('user with no session is sent to the provider end session endpoint', async 
     `post_logout_redirect_uri=${config.get('appBaseUrl')}${paths.SIGNED_OUT}?provider=entraId`
   )
 
-  const [cookie, age] = headers['set-cookie'][0].split(';')
-  expect(cookie.trim()).toBe('userSession=')
-  expect(age.trim()).toBe('Max-Age=0')
+  expect(headers['set-cookie']).toEqual(
+    expect.arrayContaining([
+      expect.stringContaining('userSession=; Max-Age=0'),
+      expect.stringContaining('crumb=')
+    ])
+  )
 })
 
 test.each(['notAProvider', 'constructor', '__proto__'])(

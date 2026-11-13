@@ -11,7 +11,10 @@ test('signed out', async () => {
 
   const { payload } = await server.inject({
     method: 'get',
-    url: paths.SIGNED_OUT
+    url: paths.SIGNED_OUT,
+    headers: {
+      cookie: 'crumb=test-crumb'
+    }
   })
 
   globalJsdom(payload)
@@ -29,11 +32,11 @@ test('signed out', async () => {
 
   await user.click(entraRadio)
   await user.click(submitButton)
-  expect(formdata()).toEqual({ authProvider: 'entraId' })
+  expect(formdata()).toEqual({ authProvider: 'entraId', crumb: 'test-crumb' })
 
   await user.click(defraRadio)
   await user.click(submitButton)
-  expect(formdata()).toEqual({ authProvider: 'defraId' })
+  expect(formdata()).toEqual({ authProvider: 'defraId', crumb: 'test-crumb' })
 
   expect(document.title).toBe(
     'You are signed out - Border Trade Matching Service'
@@ -46,7 +49,10 @@ test('signed out from entraId', async () => {
 
   const { payload } = await server.inject({
     method: 'get',
-    url: `${paths.SIGNED_OUT}?provider=entraId`
+    url: `${paths.SIGNED_OUT}?provider=entraId`,
+    headers: {
+      cookie: 'crumb=test-crumb'
+    }
   })
 
   globalJsdom(payload)
@@ -56,7 +62,7 @@ test('signed out from entraId', async () => {
     name: 'Sign in'
   })
   await user.click(submitButton)
-  expect(formdata()).toEqual({ authProvider: 'entraId' })
+  expect(formdata()).toEqual({ authProvider: 'entraId', crumb: 'test-crumb' })
 })
 
 test('signed out from defraId', async () => {
@@ -65,7 +71,10 @@ test('signed out from defraId', async () => {
 
   const { payload } = await server.inject({
     method: 'get',
-    url: `${paths.SIGNED_OUT}?provider=defraId`
+    url: `${paths.SIGNED_OUT}?provider=defraId`,
+    headers: {
+      cookie: 'crumb=test-crumb'
+    }
   })
 
   globalJsdom(payload)
@@ -75,5 +84,5 @@ test('signed out from defraId', async () => {
     name: 'Sign in'
   })
   await user.click(submitButton)
-  expect(formdata()).toEqual({ authProvider: 'defraId' })
+  expect(formdata()).toEqual({ authProvider: 'defraId', crumb: 'test-crumb' })
 })

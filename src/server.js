@@ -1,6 +1,7 @@
 import path from 'path'
 import hapi from '@hapi/hapi'
 import bell from '@hapi/bell'
+import crumb from '@hapi/crumb'
 import { config } from './config/config.js'
 import plugins from './plugins/index.js'
 import { getCacheEngine } from './utils/caching/cache-engine.js'
@@ -44,6 +45,16 @@ export async function createServer() {
   })
 
   await server.register(bell)
+  await server.register({
+    plugin: crumb,
+    options: {
+      cookieOptions: {
+        isSecure: config.get('isProduction'),
+        isHttpOnly: true,
+        ttl: 14400000
+      }
+    }
+  })
   await server.register(plugins)
 
   return server
