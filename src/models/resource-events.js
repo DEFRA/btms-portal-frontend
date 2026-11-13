@@ -1,5 +1,6 @@
 import { getCustomsDeclarationStatus } from './customs-declarations.js'
 import { getTracesChedStatus } from './traces-cheds.js'
+import { fisNotificationStatus } from './fis-notifications.js'
 import {
   checkCodeToAuthorityMapping,
   checkCodeToAuthorityNameMapping,
@@ -18,7 +19,8 @@ export const RESOURCE_TYPE = {
   CUSTOMS_DECLARATION: 'CustomsDeclaration',
   PROCESSING_ERROR: 'ProcessingError',
   TRACES_CHED: 'TracesChed',
-  CHED_RESERVATION: 'ChedReservation'
+  CHED_RESERVATION: 'ChedReservation',
+  IUU_NOTIFICATION: 'IuuNotification'
 }
 
 const SUB_RESOURCE_TYPE = {
@@ -33,7 +35,8 @@ const EVENT_SOURCE_DESCRIPTIONS = {
   CDS_TO_BTMS: 'CDS to BTMS',
   BTMS_TO_CDS: 'BTMS to CDS',
   TRACES_TO_BTMS: 'TRACES to BTMS',
-  TRACES_QUANTITY_MANAGEMENT: 'TRACES to BTMS'
+  TRACES_QUANTITY_MANAGEMENT: 'TRACES to BTMS',
+  FIS_TO_BTMS: 'FIS to BTMS'
 }
 
 const EVENT_SOURCE = {
@@ -44,7 +47,8 @@ const EVENT_SOURCE = {
   CDS_ERROR: EVENT_SOURCE_DESCRIPTIONS.CDS_TO_BTMS,
   PROCESSING_ERROR: EVENT_SOURCE_DESCRIPTIONS.BTMS_TO_CDS,
   TRACES_CHED: EVENT_SOURCE_DESCRIPTIONS.TRACES_TO_BTMS,
-  TRACES_QUANTITY_MANAGEMENT: EVENT_SOURCE_DESCRIPTIONS.TRACES_QUANTITY_MANAGEMENT
+  TRACES_QUANTITY_MANAGEMENT: EVENT_SOURCE_DESCRIPTIONS.TRACES_QUANTITY_MANAGEMENT,
+  IUU_NOTIFICATION: EVENT_SOURCE_DESCRIPTIONS.FIS_TO_BTMS
 }
 
 const EVENT_TYPE = {
@@ -54,7 +58,8 @@ const EVENT_TYPE = {
   CDS_ERROR: 'CdsError',
   CDS_FINALISATION: 'CdsFinalisation',
   CHED: 'Ched',
-  QUANTITY_MANAGEMENT: 'QuantityManagement'
+  QUANTITY_MANAGEMENT: 'QuantityManagement',
+  FIS_NOTIFICATION: 'FisNotification'
 }
 
 const DECISION = {
@@ -282,6 +287,20 @@ const mapChedReservation = (resourceMessage) => {
   }
 }
 
+const mapIuuNotificationResourceEvent = (resourceMessage) => {
+  const iuuNotification = resourceMessage?.resource?.iuuNotification
+  const status = fisNotificationStatus(iuuNotification?.iuuOption)
+
+  return {
+    eventType: EVENT_TYPE.FIS_NOTIFICATION,
+    eventTitle: iuuNotification?.reference,
+    source: EVENT_SOURCE.IUU_NOTIFICATION,
+    status: status.label,
+    statusClass: status.className,
+    created: iuuNotification?.lastUpdated
+  }
+}
+
 const mapCustomsDeclarationSubResource = (subResourceType, resourceMessage) => {
   switch (subResourceType) {
     case (SUB_RESOURCE_TYPE.CLEARANCE_REQUEST):
@@ -326,6 +345,10 @@ export const mapResourceEvents = (mrn, chedRef, resourceEvents) => {
 
       if (resourceEvent.resourceType === RESOURCE_TYPE.CHED_RESERVATION) {
         mappedResourceEvents.push(mapChedReservation(resourceMessage))
+      }
+
+      if (resourceEvent.resourceType === RESOURCE_TYPE.IUU_NOTIFICATION) {
+        mappedResourceEvents.push(mapIuuNotificationResourceEvent(resourceMessage))
       }
     } catch (error) {
       logger.warn(`Unable to parse and map timeline resource event for resource Id ${mrn || chedRef}. ERROR: ${error.message}`)
