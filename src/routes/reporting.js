@@ -12,7 +12,7 @@ import {
   formatReportingDate
 } from '../utils/dates.js'
 import { isInFeatureGroup } from '../auth/check-groups.js'
-import { AUTH_FEATURES } from '../auth/auth-constants.js'
+import { APP_SCOPES, AUTH_FEATURES } from '../auth/auth-constants.js'
 
 const getQueryString = (startDate, endDate, tab) => {
   const query = new URLSearchParams({
@@ -26,6 +26,10 @@ const getQueryString = (startDate, endDate, tab) => {
 }
 
 const dateFormat = 'd/M/yyyy'
+const dataExportAvailableFrom = '6th November 2026'
+
+const canViewDataExport = (request) =>
+  Boolean(request.auth.credentials.scope?.includes(APP_SCOPES.ADMIN))
 
 const getDateProps = (tab) => {
   const daysToLastWeek = 6
@@ -40,7 +44,7 @@ const getDateProps = (tab) => {
   const lastWeek = getQueryString(lastWeekDate, todaysDate, tab)
   const lastMonthDate = formatDayInPast(daysToLastMonth)
   const lastMonth = getQueryString(lastMonthDate, todaysDate, tab)
-  const earliestReportingDate =formatDayInPast(maxReportingDays)
+  const earliestReportingDate = formatDayInPast(maxReportingDays)
 
   return {
     todaysDate,
@@ -101,6 +105,8 @@ export const reporting = {
           .view('reporting', {
             ...request.query,
             ...dateProps,
+            dataExportAvailableFrom,
+            showDataExport: canViewDataExport(request),
             errors,
             errorList
           })
@@ -129,6 +135,7 @@ export const reporting = {
     const dateProps = getDateProps(tab)
 
     const showLevelMatchingReports = isInFeatureGroup(AUTH_FEATURES.LEVEL_MATCHING_REPORTS, request.auth.credentials.scope)
+    const showDataExport = canViewDataExport(request)
 
     let matchingReports = []
     if (showLevelMatchingReports) {
@@ -147,6 +154,8 @@ export const reporting = {
       endDate: format(endDate, dateFormat),
       tab,
       showLevelMatchingReports,
+      showDataExport,
+      dataExportAvailableFrom,
       matchingReports
     })
   }

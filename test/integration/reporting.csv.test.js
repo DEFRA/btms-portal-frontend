@@ -6,7 +6,12 @@ import {
   setupAuthedAdminUserSession,
   setupAuthedUserSession
 } from '../unit/utils/session-helper.js'
-import { paths } from '../../src/routes/route-constants.js'
+import {
+  paths,
+  CUSTOMS_DECLARATIONS_CSV,
+  IPAFFS_CHEDS_CSV,
+  TRACES_CHEDS_CSV
+} from '../../src/routes/route-constants.js'
 import { getByRole } from '@testing-library/dom'
 
 const provider = {
@@ -478,4 +483,279 @@ Level,Last updated,MRN,Item number,Commodity code,Check code,Description,Quantit
     to: '2026-06-23T00:00:00.000Z',
     match: 'false'
   })
+})
+
+const exportQuery = new URLSearchParams({
+  startDate: '1/9/2025',
+  endDate: '1/9/2025'
+})
+
+const exportNames = [
+  CUSTOMS_DECLARATIONS_CSV,
+  IPAFFS_CHEDS_CSV,
+  TRACES_CHEDS_CSV
+]
+
+const exportURL = (name) =>
+  `${paths.RESTRICTED_REPORTING_CSV.replace('{name}', name)}?${exportQuery}`
+
+const requestExport = async (name, payload) => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+  wreck.request.mockResolvedValueOnce(dataStream(payload))
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  return server.inject({
+    method: 'get',
+    url: exportURL(name),
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+}
+
+test.each([
+  [
+    CUSTOMS_DECLARATIONS_CSV,
+    'Customs Declarations',
+    'MRN,MRN created,Last updated,Release type,Final state,Dispatch country code,Item number,Commodity code,Description,Quantity/Weight,CHED references,Authorities,Check codes,Decisions,Match\n'
+  ],
+  [
+    IPAFFS_CHEDS_CSV,
+    'IPAFFS CHEDs',
+    'CHED reference,CHED type,Status,Created,Last updated,Commodity code,Description\n'
+  ],
+  [
+    TRACES_CHEDS_CSV,
+    'TRACES CHEDs',
+    'CHED reference,CHED type,Status,Created,Last updated,Commodity code,Description\n'
+  ]
+])('still returns the table headers when there are no results for %s', async (name, heading, reportHeaders) => {
+  const { payload, headers, statusCode } = await requestExport(name, {
+    data: []
+  })
+
+  expect(statusCode).toBe(200)
+  expect(payload).toBe(`BTMS - ${heading}
+Date range: 1 September 2025 at 00:00 to 1 September 2025 at 23:59
+
+${reportHeaders}`)
+  expect(headers['content-type']).toBe('text/csv; charset=utf-8')
+})
+
+test('customs declarations data export csv', async () => {
+  const { headers, payload } = await requestExport(CUSTOMS_DECLARATIONS_CSV, {
+    data: [
+      {
+        mrn: '24GB12345678901234',
+        mrnCreated: '2025-09-01T09:00:00.000Z',
+        lastUpdated: '2025-09-01T10:00:00.000Z',
+        releaseType: 'Automatic',
+        finalState: null,
+        dispatchCountryCode: 'IT',
+        itemNumber: 1,
+        commodityCode: '0101210000',
+        description: 'Horses, "live"',
+        quantityOrWeight: null,
+        chedReferences: 'GBCHD2025.1; GBCHD2025.2',
+        authorities: 'AHVLA',
+        checkCodes: 'H221',
+        decisions: 'C03; X00',
+        match: 'No'
+      }
+    ]
+  })
+
+  expect(payload).toBe(`BTMS - Customs Declarations
+Date range: 1 September 2025 at 00:00 to 1 September 2025 at 23:59
+
+MRN,MRN created,Last updated,Release type,Final state,Dispatch country code,Item number,Commodity code,Description,Quantity/Weight,CHED references,Authorities,Check codes,Decisions,Match
+"24GB12345678901234","2025-09-01T09:00:00.000Z","2025-09-01T10:00:00.000Z","Automatic","","IT","1","0101210000","Horses, ""live""","","GBCHD2025.1; GBCHD2025.2","AHVLA","H221","C03; X00","No"
+`)
+
+  expect(headers['content-type']).toBe('text/csv; charset=utf-8')
+  expect(headers['content-disposition']).toBe(
+    'attachment; filename="customs-declarations-2025.09.01-2025.09.01.csv"'
+  )
+  expect(headers['cache-control']).toBe('no-store')
+
+  const apiURL = wreck.request.mock.calls.at(-1)[1]
+  const { pathname, searchParams } = new URL(apiURL)
+
+  expect(pathname).toBe('/reporting-api/extracts/customs-declarations')
+  expect(Object.fromEntries(searchParams)).toEqual({
+    from: '2025-09-01T00:00:00.000Z',
+    to: '2025-09-02T00:00:00.000Z'
+  })
+})
+
+test.each([
+  [IPAFFS_CHEDS_CSV, 'IPAFFS CHEDs', '/reporting-api/extracts/ipaffs-cheds'],
+  [TRACES_CHEDS_CSV, 'TRACES CHEDs', '/reporting-api/extracts/traces-cheds']
+])('%s data export csv', async (name, heading, expectedPath) => {
+  const { headers, payload } = await requestExport(name, {
+    data: [
+      {
+        chedReference: 'CHEDA.GB.2025.1234567',
+        chedType: 'ChedA',
+        status: 'SUBMITTED',
+        created: '2025-09-01T09:00:00.000Z',
+        updated: '2025-09-01T10:00:00.000Z',
+        commodityCode: null,
+        description: 'Horses, "live"'
+      }
+    ]
+  })
+
+  expect(payload).toBe(`BTMS - ${heading}
+Date range: 1 September 2025 at 00:00 to 1 September 2025 at 23:59
+
+CHED reference,CHED type,Status,Created,Last updated,Commodity code,Description
+"CHEDA.GB.2025.1234567","ChedA","SUBMITTED","2025-09-01T09:00:00.000Z","2025-09-01T10:00:00.000Z","","Horses, ""live"""
+`)
+
+  expect(headers['content-type']).toBe('text/csv; charset=utf-8')
+  expect(headers['content-disposition']).toBe(
+    `attachment; filename="${name.replace('.csv', '-2025.09.01-2025.09.01.csv')}"`
+  )
+  expect(headers['cache-control']).toBe('no-store')
+
+  const apiURL = wreck.request.mock.calls.at(-1)[1]
+  const { pathname, searchParams } = new URL(apiURL)
+
+  expect(pathname).toBe(expectedPath)
+  expect(Object.fromEntries(searchParams)).toEqual({
+    from: '2025-09-01T00:00:00.000Z',
+    to: '2025-09-02T00:00:00.000Z'
+  })
+})
+
+test.each(exportNames)('rejects %s for a non-admin user', async (name) => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { statusCode } = await server.inject({
+    method: 'get',
+    url: exportURL(name),
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(403)
+  expect(wreck.request).not.toHaveBeenCalled()
+})
+
+test.each(exportNames)('redirects %s for an unauthenticated user', async (name) => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+
+  const { statusCode, headers } = await server.inject({
+    method: 'get',
+    url: exportURL(name)
+  })
+
+  expect(statusCode).toBe(302)
+  expect(headers.location).toBe('/sign-in-choose')
+  expect(wreck.request).not.toHaveBeenCalled()
+})
+
+test('rejects an unrecognised restricted report', async () => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { statusCode } = await server.inject({
+    method: 'get',
+    url: exportURL('not-available.csv'),
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(404)
+  expect(wreck.request).not.toHaveBeenCalled()
+})
+
+test.each(exportNames)('rejects invalid dates for %s', async (name) => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+  const query = new URLSearchParams({ startDate: 'foo', endDate: 'bar' })
+
+  const { statusCode } = await server.inject({
+    method: 'get',
+    url: `${paths.RESTRICTED_REPORTING_CSV.replace('{name}', name)}?${query}`,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(400)
+  expect(wreck.request).not.toHaveBeenCalled()
+})
+
+test.each(exportNames)('handles upstream errors for %s', async (name) => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+  wreck.request.mockRejectedValueOnce(new Error('boom'))
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { statusCode } = await server.inject({
+    method: 'get',
+    url: exportURL(name),
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(500)
+})
+
+test.each(exportNames)('handles non-success responses for %s', async (name) => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+  wreck.request.mockResolvedValueOnce({
+    statusCode: 403,
+    destroy: jest.fn()
+  })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { statusCode } = await server.inject({
+    method: 'get',
+    url: exportURL(name),
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  expect(statusCode).toBe(500)
 })

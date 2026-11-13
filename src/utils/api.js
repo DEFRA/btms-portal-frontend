@@ -1,6 +1,8 @@
 import wreck from '@hapi/wreck'
 import { config } from '../config/config.js'
 
+const HTTP_STATUS_OK = 200
+
 export class ApiClient {
   constructor (apiConfig) {
     this.baseUrl = apiConfig.baseUrl
@@ -8,22 +10,37 @@ export class ApiClient {
     this.headers = { authorization: `Basic ${this.basicCredentials}` }
   }
 
-  async get (endpoint) {
-    const headers = config.get('cdpApiKey') ? withCdpApiKey(this.headers) : this.headers
+  getHeaders (additionalHeaders = {}) {
+    const headers = { ...this.headers, ...additionalHeaders }
 
+    return config.get('cdpApiKey') ? withCdpApiKey(headers) : headers
+  }
+
+  async get (endpoint) {
     const { payload } = await wreck.get(`${this.baseUrl}/${endpoint}`, {
-      headers,
+      headers: this.getHeaders(),
       json: 'force'
     })
 
     return payload
   }
 
-  async post (endpoint) {
-    const headers = config.get('cdpApiKey') ? withCdpApiKey(this.headers) : this.headers
+  async getStream (endpoint, additionalHeaders = {}) {
+    const response = await wreck.request('get', `${this.baseUrl}/${endpoint}`, {
+      headers: this.getHeaders(additionalHeaders)
+    })
 
+    if (response.statusCode !== HTTP_STATUS_OK) {
+      response.destroy()
+      throw new Error(`Upstream request failed with status ${response.statusCode}`)
+    }
+
+    return response
+  }
+
+  async post (endpoint) {
     const { res } = await wreck.post(`${this.baseUrl}/${endpoint}`, {
-      headers
+      headers: this.getHeaders()
     })
 
     return res
