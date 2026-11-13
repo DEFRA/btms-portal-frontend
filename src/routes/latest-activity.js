@@ -1,3 +1,4 @@
+import { config } from '../config/config.js'
 import { mapLatestActivity } from '../models/latest-activity.js'
 import { getLatestActivity } from '../services/reporting.js'
 import { CACHE_CONTROL_NO_STORE, paths } from './route-constants.js'
@@ -13,7 +14,12 @@ export const latestActivity = {
     const { lastCreated, lastSent, lastReceived } = await getLatestActivity(request)
 
     return h.view('latest-activity', {
-      latestActivity: mapLatestActivity(lastCreated, lastSent, lastReceived)
+      latestActivity: mapLatestActivity(
+        lastCreated,
+        lastSent,
+        lastReceived,
+        config.get('isTracesChedsEnabled')
+      )
     })
   }
 }

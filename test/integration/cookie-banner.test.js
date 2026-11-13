@@ -8,7 +8,10 @@ test('no cookiePolicy, the cookie banner is visible', async () => {
 
   const { payload } = await server.inject({
     method: 'get',
-    url: paths.LANDING
+    url: paths.LANDING,
+    headers: {
+      cookie: 'crumb=test-crumb'
+    }
   })
 
   globalJsdom(payload)
@@ -30,6 +33,11 @@ test('no cookiePolicy, the cookie banner is visible', async () => {
       name: 'Reject analytics cookies'
     })
   ).toHaveValue('no')
+
+  const cookiesFormCrumb = document.body.querySelector('form[action="/cookies"] input[name="crumb"]')
+  expect(cookiesFormCrumb).toBeInTheDocument()
+  expect(cookiesFormCrumb.value).toBe('test-crumb')
+  expect(cookiesFormCrumb).toHaveAttribute('type', 'hidden')
 })
 
 test('cookiePolicy exists, the cookie banner is not visible', async () => {

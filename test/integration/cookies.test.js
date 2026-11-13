@@ -8,7 +8,10 @@ test('get: cookies page renders', async () => {
 
   const { payload } = await server.inject({
     method: 'get',
-    url: paths.COOKIES
+    url: paths.COOKIES,
+    headers: {
+      cookie: 'crumb=test-crumb'
+    }
   })
 
   globalJsdom(payload)
@@ -18,6 +21,11 @@ test('get: cookies page renders', async () => {
     level: 1
   })
   expect(document.title).toBe('Cookies - Border Trade Matching Service')
+
+  const cookiesFormCrumb = document.body.querySelector('form[action="/cookies"] input[name="crumb"]')
+  expect(cookiesFormCrumb).toBeInTheDocument()
+  expect(cookiesFormCrumb.value).toBe('test-crumb')
+  expect(cookiesFormCrumb).toHaveAttribute('type', 'hidden')
 })
 
 test('get: the cookie banner is not rendered', async () => {
@@ -42,9 +50,13 @@ test('post: analytics sets the cookiePolicy & triggers confirmation', async () =
   const { statusCode, request, headers } = await server.inject({
     method: 'post',
     url: paths.COOKIES,
+    headers: {
+      cookie: 'crumb=test-crumb'
+    },
     payload: {
       analytics: 'yes',
-      previousUrl: '/somewhere'
+      previousUrl: '/somewhere',
+      crumb: 'test-crumb'
     }
   })
 
@@ -63,7 +75,13 @@ test('post: no cookie option chosen', async () => {
   const { headers, request, statusCode } = await server.inject({
     method: 'post',
     url: paths.COOKIES,
-    payload: { previousUrl: '/cookies' }
+    headers: {
+      cookie: 'crumb=test-crumb'
+    },
+    payload: {
+      previousUrl: '/cookies',
+      crumb: 'test-crumb'
+    }
   })
 
   expect(statusCode).toBe(302)
@@ -77,7 +95,13 @@ test('post: previous URL not starting with relative path, fails validation and r
   const { headers, request, statusCode } = await server.inject({
     method: 'post',
     url: paths.COOKIES,
-    payload: { previousUrl: 'http://www.phishing.com' }
+    headers: {
+      cookie: 'crumb=test-crumb'
+    },
+    payload: {
+      previousUrl: 'http://www.phishing.com',
+      crumb: 'test-crumb'
+    }
   })
 
   expect(statusCode).toBe(302)
@@ -87,19 +111,48 @@ test('post: previous URL not starting with relative path, fails validation and r
 })
 
 test.each([
- '//',
- '/\\'
+  '//',
+  '/\\',
+  '/\t/'
 ])('post: previous URL starting with %s is redirected to cookies page', async (invalidPathPrefix) => {
   const server = await initialiseServer()
   const { headers, statusCode } = await server.inject({
     method: 'post',
     url: paths.COOKIES,
+    headers: {
+      cookie: 'crumb=test-crumb'
+    },
     payload: {
       analytics: 'yes',
-      previousUrl: `${invalidPathPrefix}phishing`
+      previousUrl: `${invalidPathPrefix}phishing`,
+      crumb: 'test-crumb'
     }
   })
 
   expect(statusCode).toBe(302)
   expect(headers.location).toBe('/cookies')
+})
+
+test('post: with invalid crumb is forbidden', async () => {
+  const server = await initialiseServer()
+
+  const { payload, statusCode } = await server.inject({
+    method: 'post',
+    url: paths.COOKIES,
+    headers: {
+      cookie: 'crumb=test-crumb'
+    },
+    payload: {
+      analytics: 'yes',
+      previousUrl: '/somewhere',
+      crumb: 'invalid-crumb'
+    }
+  })
+
+  globalJsdom(payload)
+
+  expect(statusCode).toBe(403)
+  expect(
+    getByRole(document.body, 'heading', { name: 'You do not have the correct permissions to access this service' })
+  ).toBeInTheDocument()
 })
