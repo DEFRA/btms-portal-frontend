@@ -1,5 +1,5 @@
 import globalJsdom from 'global-jsdom'
-import { getByRole } from '@testing-library/dom'
+import { getByRole, getByText } from '@testing-library/dom'
 import { initialiseServer } from '../utils/initialise-server.js'
 import { paths } from '../../src/routes/route-constants.js'
 
@@ -119,7 +119,11 @@ test('post: with invalid crumb is forbidden', async () => {
   globalJsdom(payload)
 
   expect(statusCode).toBe(403)
+  expect(document.title).toBe('Request validation failed - Border Trade Matching Service')
   expect(
-    getByRole(document.body, 'heading', { name: 'You do not have the correct permissions to access this service' })
+    getByRole(document.body, 'heading', { name: 'Request validation failed' })
+  ).toBeInTheDocument()
+  expect(
+    getByText(document.body, 'Your request could not be verified. Please try again.')
   ).toBeInTheDocument()
 })
