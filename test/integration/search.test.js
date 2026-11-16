@@ -40,7 +40,7 @@ test('renders search page', async () => {
 
   expect(queryByRole(document.body, 'button', { name: 'Clear' })).toBe(null)
 
-  fireEvent.keyUp(searchBox, { target: { value: 'test search' } })
+  fireEvent.input(searchBox, { target: { value: 'test search' } })
   expect(searchBox).toHaveValue('test search')
 
   const resetButton = getByRole(document.body, 'button', { name: 'Clear' })
@@ -52,6 +52,40 @@ test('renders search page', async () => {
   expect(document.title).toBe(
     'Search for an MRN, CHED, GMR, VRN or TRN - Border Trade Matching Service'
   )
+})
+
+test('shows clear button when pasting via Edit > Paste (no key events)', async () => {
+  const user = userEvent.setup()
+  const server = await initialiseServer()
+  const credentials = await setupAuthedUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: paths.SEARCH,
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+  initSearch()
+
+  const searchBox = getByRole(document.body, 'textbox', {
+    name: 'Enter an MRN, CHED, GMR, VRN or TRN'
+  })
+  expect(queryByRole(document.body, 'button', { name: 'Clear' })).toBe(null)
+
+  // A menu paste changes the value and fires 'input' without any key events
+  fireEvent.input(searchBox, {
+    target: { value: '24GBBGBKCDMS895001' },
+    inputType: 'insertFromPaste'
+  })
+
+  const resetButton = getByRole(document.body, 'button', { name: 'Clear' })
+  await user.click(resetButton)
+  expect(searchBox).toHaveValue('')
+  expect(queryByRole(document.body, 'button', { name: 'Clear' })).toBe(null)
 })
 
 test('renders search page with error: no search term', async () => {
