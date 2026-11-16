@@ -48,6 +48,22 @@
       ), reportingTabs) %}
 {% endif %}
 
+{% if showDataExport %}
+  {% set dataExportView %}
+  {% include "./includes/reporting-data-export.njk" %}
+  {% endset %}
+
+  {% set reportingTabs = (reportingTabs.push(
+        {
+          label: 'Data export',
+          id: 'data-export-view',
+          panel: {
+            html: dataExportView
+          }
+        }
+      ), reportingTabs) %}
+{% endif %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">

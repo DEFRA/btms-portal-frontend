@@ -1,0 +1,40 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set downloads = [
+  {
+    label: 'Customs Declarations data',
+    filename: 'customs-declarations.csv'
+  },
+  {
+    label: 'IPAFFS CHED data',
+    filename: 'ipaffs-cheds.csv'
+  },
+  {
+    label: 'TRACES CHED data',
+    filename: 'traces-cheds.csv'
+  }
+] %}
+
+<div class="btms-reports btms-data-export">
+  <h2 class="govuk-heading-l">Data export</h2>
+  <p class="govuk-body">Download additional reporting data for customs declarations, IPAFFS CHED and TRACES CHED.</p>
+  <div class="govuk-inset-text">This data is only available from {{ dataExportAvailableFrom }}.</div>
+
+  <ul class="govuk-list btms-data-export__list">
+    {% for download in downloads %}
+      <li class="btms-data-export__item">
+        <span class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0">{{ download.label }}</span>
+        {{
+          govukButton({
+            text: 'Download as CSV',
+            href: '/restricted-reporting/' ~ download.filename ~ '?' ~ csvQuery,
+            classes: 'govuk-button--secondary',
+            attributes: {
+              'aria-label': 'Download ' ~ download.label ~ ' as CSV'
+            }
+          })
+        }}
+      </li>
+    {% endfor %}
+  </ul>
+</div>

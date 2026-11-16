@@ -2,9 +2,11 @@ import { ApiClient } from '../../../src/utils/api.js'
 import { config } from '../../../src/config/config.js'
 
 const mockGet = jest.fn()
+const mockRequest = jest.fn()
 
 jest.mock('@hapi/wreck', () => ({
-  get: (...args) => mockGet(...args)
+  get: (...args) => mockGet(...args),
+  request: (...args) => mockRequest(...args)
 }))
 
 jest.mock('../../../src/config/config.js', () => ({
@@ -23,6 +25,7 @@ const apiConfig = {
 beforeEach(() => {
   jest.clearAllMocks()
   mockGet.mockResolvedValue({ payload: { data: 'test' } })
+  mockRequest.mockResolvedValue({ statusCode: 200 })
 })
 
 test('get() should include x-api-key header when cdpApiKey is configured', async () => {
@@ -88,4 +91,47 @@ test('get() should construct correct basic auth header', async () => {
       }
     })
   )
+})
+
+test('getStream() should include x-api-key and preserve additional headers', async () => {
+  config.get.mockReturnValue('test-api-key')
+
+  const client = new ApiClient(apiConfig)
+  const response = await client.getStream('test-endpoint', { useV2: true })
+
+  expect(mockRequest).toHaveBeenCalledWith(
+    'get',
+    'https://api.example.com/test-endpoint',
+    {
+      headers: {
+        authorization: expect.stringMatching(/^Basic /),
+        useV2: true,
+        'x-api-key': 'test-api-key'
+      }
+    }
+  )
+  expect(response).toEqual({ statusCode: 200 })
+})
+
+test('getStream() should reject a non-200 response', async () => {
+  config.get.mockReturnValue('test-api-key')
+  const response = { statusCode: 302, destroy: jest.fn() }
+  mockRequest.mockResolvedValue(response)
+
+  const client = new ApiClient(apiConfig)
+
+  await expect(client.getStream('test-endpoint')).rejects.toThrow(
+    'Upstream request failed with status 302'
+  )
+  expect(response.destroy).toHaveBeenCalled()
+})
+
+test('getStream() should omit x-api-key when cdpApiKey is not configured', async () => {
+  config.get.mockReturnValue(null)
+
+  const client = new ApiClient(apiConfig)
+  await client.getStream('test-endpoint')
+
+  const calledHeaders = mockRequest.mock.calls[0][2].headers
+  expect(calledHeaders).not.toHaveProperty('x-api-key')
 })
