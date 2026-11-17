@@ -1,0 +1,10 @@
+{% macro fisNotificationEvent(timelineEvent) %}
+  <div class="timeline-detail-row">
+    <span class="timeline-detail-label">Status</span>
+    <span class="govuk-tag {{ timelineEvent.statusClass }}">{{ timelineEvent.status }}</span>
+  </div>
+  <div class="timeline-detail-row">
+    <span class="timeline-detail-label">Created</span>
+    <time datetime="{{ timelineEvent.created }}">{% if timelineEvent.created %}{{ timelineEvent.created | date("DD MMMM yyyy, HH:mm:ss") }}{% endif %}</time>
+  </div>
+{% endmacro %}
