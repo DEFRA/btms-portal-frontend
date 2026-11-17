@@ -43,5 +43,8 @@ const CACHE_CONTROL_NO_STORE = {
 export const NO_MATCH_CSV = 'no-matches.csv'
 export const MANUAL_RELEASE_CSV = 'manual-releases.csv'
 export const LEVEL_MATCHING_CSV = 'level-matching.csv'
+export const CUSTOMS_DECLARATIONS_CSV = 'customs-declarations.csv'
+export const IPAFFS_CHEDS_CSV = 'ipaffs-cheds.csv'
+export const TRACES_CHEDS_CSV = 'traces-cheds.csv'
 
 export { paths, queryStringParams, CACHE_CONTROL_NO_STORE }
