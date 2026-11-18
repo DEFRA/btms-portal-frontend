@@ -931,6 +931,71 @@ test('timeline can be filtered', async () => {
   expect(mrnTimelines[1].hasAttribute('hidden')).toBeTruthy()
 })
 
+const renderTimelineWithTwoMrns = async (browserQuery) => {
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({
+      payload: {
+        customsDeclarations: [
+          createCustomsDeclaration('24GB0Z8WEJ9ZBTL73A', '1GB126344356000-ABC35932Y1BHX', '2025-05-06T13:11:59.257Z'),
+          createCustomsDeclaration('24GB0Z8WEJ9ZBTL73B', '1GB126344356000-ABC35932Y1BHY', '2025-05-06T13:11:59.257Z')
+        ],
+        importPreNotifications: [
+          createImportPreNotification('CHEDA.GB.2025.0000001', 'CVEDA', 'CANCELLED', '2025-04-22T16:55:17.330Z', '1', '0101', 'Equus asinus', '2')
+        ]
+      }
+    })
+    .mockResolvedValueOnce({ payload: importPreNotificationResourceEvents })
+    .mockResolvedValueOnce({ payload: declarationResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const { payload } = await injectSearchResultWithCookie(searchResultUrl('24GB0Z8WEJ9ZBTL73B'))
+
+  globalJsdom(payload)
+  window.history.pushState({}, 'test', browserQuery)
+  initFilters()
+
+  return {
+    timelineMrnFilter: document.getElementById('timelineMrn'),
+    visibleTimelines: () => [...document.querySelectorAll('.mrn-timeline:not([hidden])')]
+      .map((timeline) => timeline.dataset.timeline_ref)
+  }
+}
+
+test('selecting a timeline MRN keeps the timeline tab in the URL so a refresh returns to it', async () => {
+  const user = userEvent.setup()
+  const searchTerm = `${queryStringParams.SEARCH_TERM}=24GB0Z8WEJ9ZBTL73B`
+  const { timelineMrnFilter } = await renderTimelineWithTwoMrns(`?${searchTerm}#timeline-view`)
+
+  await user.selectOptions(timelineMrnFilter, '24GB0Z8WEJ9ZBTL73A')
+
+  expect(window.location.search).toBe(`?${searchTerm}&timelineMrn=24GB0Z8WEJ9ZBTL73A`)
+  expect(window.location.hash).toBe('#timeline-view')
+})
+
+test('after a refresh the previously selected timeline MRN is shown', async () => {
+  const query = new URLSearchParams({
+    [queryStringParams.SEARCH_TERM]: '24GB0Z8WEJ9ZBTL73B',
+    timelineMrn: '24GB0Z8WEJ9ZBTL73A'
+  })
+  const { timelineMrnFilter, visibleTimelines } = await renderTimelineWithTwoMrns(`?${query}#timeline-view`)
+
+  expect(timelineMrnFilter).toHaveValue('24GB0Z8WEJ9ZBTL73A')
+  expect(visibleTimelines()).toEqual(['24GB0Z8WEJ9ZBTL73A'])
+})
+
+test('an unknown timeline MRN in the URL falls back to the first timeline', async () => {
+  const query = new URLSearchParams({
+    [queryStringParams.SEARCH_TERM]: '24GB0Z8WEJ9ZBTL73B',
+    timelineMrn: 'NOT-ON-THIS-PAGE'
+  })
+  const { timelineMrnFilter, visibleTimelines } = await renderTimelineWithTwoMrns(`?${query}#timeline-view`)
+
+  expect(timelineMrnFilter).toHaveValue('24GB0Z8WEJ9ZBTL73B')
+  expect(visibleTimelines()).toEqual(['24GB0Z8WEJ9ZBTL73B'])
+})
+
 test('shows timeline for unmatched CHED', async () => {
   const customsDeclarations = []
 
