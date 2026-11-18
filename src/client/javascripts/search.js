@@ -5,7 +5,9 @@ export const initSearch = () => {
 
   resetButton.hidden = searchInput.value === ''
 
-  searchInput.addEventListener('keyup', (event) => {
+  // 'input' fires for every value change (typing, keyboard or menu paste,
+  // cut, drag and drop, autofill), unlike 'keyup' which is keyboard only
+  searchInput.addEventListener('input', (event) => {
     resetButton.hidden = event.target.value === ''
   })
 
