@@ -320,20 +320,14 @@ const mapCommodity = (commodity, context) => {
   const uniqueDocumentReferences = [...new Set(clearanceDecisions.map(decision => decision.documentReference).filter(Boolean))]
 
   const decisions = clearanceDecisions.map((decision) => {
-    const relevantDocCodes =
-      checkCodeToDocumentCodeMapping[decision.checkCode] || []
-    const isIuuOutcome = relevantDocCodes.some((code) =>
-      IUUDocumentCodes.includes(code)
-    )
+    const relevantDocCodes = checkCodeToDocumentCodeMapping[decision.checkCode] || []
+    const isIuuOutcome = relevantDocCodes.some((code) => IUUDocumentCodes.includes(code))
 
     const documentReference = isIuuOutcome ? null : getDocumentReference(decision)
     const documentReferenceId = extractDocumentReferenceId(documentReference)
     const notificationStatus = documentReferenceId ? notificationStatuses[documentReferenceId] : null
 
-    const isMatch = Boolean(
-      decision.decisionCode &&
-      !noMatchInternalDecisionCodes.has(decision.internalDecisionCode)
-    )
+    const isMatch = Boolean(decision.decisionCode && !noMatchInternalDecisionCodes.has(decision.internalDecisionCode))
 
     const quantityStatus = getQuantityStatus(tracesChedIds, quantityStatuses, mrn, documentReference)
     const quantityStatusReason = quantityStatus === QUANTITY_STATUSES.UNSUCCESSFUL ? getUnsuccessfulQuantityStatusReason(clearanceDecision, commodity) : undefined
