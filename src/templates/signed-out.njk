@@ -2,6 +2,7 @@
 
 {% set navigationRequired = false %}
 {% set pageTitle = "You are signed out" %}
+{% set legendText = "How do you want to sign in?" %}
 
 {% block content %}
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
@@ -10,6 +11,5 @@
       <p>You will need to sign in again to access Border Trade Matching Service.</p>
     </div>
   </div>
-  <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
   {% include "./includes/form-auth-provider.njk" %}
 {% endblock %}

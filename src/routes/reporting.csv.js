@@ -9,16 +9,20 @@ import {
   CACHE_CONTROL_NO_STORE,
   NO_MATCH_CSV,
   MANUAL_RELEASE_CSV,
-  LEVEL_MATCHING_CSV
+  LEVEL_MATCHING_CSV,
+  CUSTOMS_DECLARATIONS_CSV,
+  IPAFFS_CHEDS_CSV,
+  TRACES_CHEDS_CSV
 } from './route-constants.js'
 import { APP_SCOPES } from '../auth/auth-constants.js'
 import { EU_COUNTRY_CODES } from '../models/model-constants.js'
 import { csvValue } from '../utils/csv.js'
 
-const createHandler = (mapRowHandler, headers, useV2 = false) => {
+const createHandler = (reports) => {
   return async (request, h) => {
     const { name } = request.params
     const { startDate, endDate } = request.query
+    const { mapRowHandler, headers, useV2 = false } = reports[name]
 
     const res = await getReportingCsv(request, useV2)
     const csv = mapReportsCsv(res, name, startDate, endDate, mapRowHandler, headers)
@@ -43,6 +47,17 @@ const reportMapRowHandler = (value) => {
 
 const reportHeaders = 'MRN,Last updated\n'
 
+const reportingReports = {
+  [NO_MATCH_CSV]: {
+    mapRowHandler: reportMapRowHandler,
+    headers: reportHeaders
+  },
+  [MANUAL_RELEASE_CSV]: {
+    mapRowHandler: reportMapRowHandler,
+    headers: reportHeaders
+  }
+}
+
 export const reportingCsv = {
   method: 'get',
   path: paths.REPORTING_CSV,
@@ -63,8 +78,44 @@ export const reportingCsv = {
       }
     }
   },
-  handler: createHandler(reportMapRowHandler, reportHeaders)
+  handler: createHandler(reportingReports)
 }
+
+const customsDeclarationMapRowHandler = (value) => {
+  return [
+    value.mrn,
+    value.mrnCreated,
+    value.lastUpdated,
+    value.releaseType,
+    value.finalState,
+    value.dispatchCountryCode,
+    value.itemNumber,
+    value.commodityCode,
+    value.description,
+    value.quantityOrWeight,
+    value.chedReferences,
+    value.authorities,
+    value.checkCodes,
+    value.decisions,
+    value.match
+  ].map(csvValue).join(',') + '\n'
+}
+
+const customsDeclarationHeaders = 'MRN,MRN created,Last updated,Release type,Final state,Dispatch country code,Item number,Commodity code,Description,Quantity/Weight,CHED references,Authorities,Check codes,Decisions,Match\n'
+
+const chedMapRowHandler = (value) => {
+  return [
+    value.chedReference,
+    value.chedType,
+    value.status,
+    value.created,
+    value.updated,
+    value.commodityCode,
+    value.description
+  ].map(csvValue).join(',') + '\n'
+}
+
+const chedHeaders = 'CHED reference,CHED type,Status,Created,Last updated,Commodity code,Description\n'
 
 const restrictedReportMapRowHandler = (value) => {
   return [
@@ -89,6 +140,26 @@ const restrictedReportMapRowHandler = (value) => {
 
 const restrictedReportHeaders = 'Level,Last updated,MRN,Item number,Commodity code,Check code,Description,Quantity/Weight,CHED reference,Match,Authority,Decision,Decision reason,EORI Number,Country Code,Country Region (EU or RoW)\n'
 
+const restrictedReports = {
+  [LEVEL_MATCHING_CSV]: {
+    mapRowHandler: restrictedReportMapRowHandler,
+    headers: restrictedReportHeaders,
+    useV2: true
+  },
+  [CUSTOMS_DECLARATIONS_CSV]: {
+    mapRowHandler: customsDeclarationMapRowHandler,
+    headers: customsDeclarationHeaders
+  },
+  [IPAFFS_CHEDS_CSV]: {
+    mapRowHandler: chedMapRowHandler,
+    headers: chedHeaders
+  },
+  [TRACES_CHEDS_CSV]: {
+    mapRowHandler: chedMapRowHandler,
+    headers: chedHeaders
+  }
+}
+
 export const restrictedReportingCsv = {
   method: 'get',
   path: paths.RESTRICTED_REPORTING_CSV,
@@ -100,7 +171,12 @@ export const restrictedReportingCsv = {
     cache: CACHE_CONTROL_NO_STORE,
     validate: {
       params: joi.object({
-        name: joi.string().valid(LEVEL_MATCHING_CSV)
+        name: joi.string().valid(
+          LEVEL_MATCHING_CSV,
+          CUSTOMS_DECLARATIONS_CSV,
+          IPAFFS_CHEDS_CSV,
+          TRACES_CHEDS_CSV
+        )
       }),
       query: dateRange,
       failAction: (_, __, error) => {
@@ -112,5 +188,5 @@ export const restrictedReportingCsv = {
       }
     }
   },
-  handler: createHandler(restrictedReportMapRowHandler, restrictedReportHeaders, true)
+  handler: createHandler(restrictedReports)
 }

@@ -1,9 +1,4 @@
-{% set statusIndicators = {
-  "IUUOK": { label: "Valid", className: "govuk-tag--green" },
-  "IUUNA": { label: "Valid", className: "govuk-tag--green" },
-  "IUUNotCompliant": { label: "Rejected", className: "govuk-tag--red" }
-} %}
-{% set statusDisplay = statusIndicators[fisNotification.status] or { label: "In Progress", className: "govuk-tag--yellow" } %}
+{% set statusDisplay = { label: fisNotification.statusLabel, className: fisNotification.statusClass } %}
 
 <div class="govuk-details btms-details" aria-label="">
   <div class="fis-details__summary">
