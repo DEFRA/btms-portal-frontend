@@ -159,9 +159,9 @@
     }
   }
 
-  .btms-details__commodity-code--no-match,
-  .btms-details__commodity-weight-quantity--no-match {
-    color: $govuk-error-colour;
+  .btms-details__tooltip--title {
+    font-weight: 700;
+    padding-bottom: 5px;
   }
 }
 

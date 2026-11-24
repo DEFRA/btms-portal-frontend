@@ -28,10 +28,8 @@
       {% for decision in commodity.decisions %}
 
         {% set matchResult = decision.match %}
-        {% if tabContext === tabContexts.LEVELS_RESULT %}
-          {% if matchResult === true and (decision.level2NoMatch === true or decision.level3NoMatch === true) %}
-            {% set matchResult = false %}
-          {% endif %}
+        {% if tabContext === tabContexts.LEVELS_RESULT and (decision.passiveL2NoMatchDetails or decision.passiveL3NoMatchDetails) %}
+          {% set matchResult = false %}
         {% endif %}
 
         <tr data-match{{ tabContextSuffix }}="{{ matchResult }}" data-authority{{ tabContextSuffix }}="{{ decision.authority.value }}" data-decision{{ tabContextSuffix }}="{{ decision.decision }}">
@@ -42,7 +40,7 @@
           {% if showQuantityStatusColumn %}
             <td class="govuk-table__cell">{{ quantityStatus(decision.quantityStatus, decision.quantityStatusReason, commodity.id) }}</td>
           {% endif %}
-          {{ documentReference(decision) }}
+          {{ documentReference(decision, tabContext, tabContexts) }}
           <td class="govuk-table__cell">{{ decisionMatch(matchResult) }}</td>
           <td class="govuk-table__cell">
             {{ decision.authority.text }}

@@ -1,5 +1,21 @@
-{% if (tabContext === tabContexts.LEVELS_RESULT and decision.level3NoMatch === true) or (tabContext === tabContexts.LATEST_RESULT and decision.activeLevel3NoMatch === true) %}
-  <span class="btms-details__commodity-weight-quantity--no-match">{{ commodity.weightOrQuantity }}</span>
+{% if tabContext === tabContexts.LATEST_RESULT and decision.activeL3NoMatchDetails %}
+  {% set id = 'quantity-weight-tooltip-' + decision.id %}
+  <div class="btms-no-match" tabindex="0" aria-describedby="{{ id }}">
+    {{ commodity.weightOrQuantity }}
+    <div role="tooltip" id="{{ id }}">
+      <div class="btms-details__tooltip--title">{{ decision.activeL3NoMatchDetails.title }}</div>
+      <div class="btms-details__tooltip--description">{{ decision.activeL3NoMatchDetails.description | safe }}</div>
+    </div>
+  </div>
+{% elif tabContext === tabContexts.LEVELS_RESULT and decision.passiveL3NoMatchDetails %}
+  {% set id = 'quantity-weight-tooltip-' + decision.id %}
+  <div class="btms-no-match" tabindex="0" aria-describedby="{{ id }}">
+    {{ commodity.weightOrQuantity }}
+    <div role="tooltip" id="{{ id }}">
+      <div class="btms-details__tooltip--title">{{ decision.passiveL3NoMatchDetails.title }}</div>
+      <div class="btms-details__tooltip--description">{{ decision.passiveL3NoMatchDetails.description | safe }}</div>
+    </div>
+  </div>
 {% else %}
   {{ commodity.weightOrQuantity }}
 {% endif %}

@@ -4,6 +4,11 @@ import {
   getCustomsDeclarationOpenState,
   getDecisionDetail
 } from '../../../src/models/customs-declarations.js'
+import {
+  SHOW_LEVEL_ONE_NO_MATCH_DETAILS_LIST,
+  SHOW_LEVEL_THREE_NO_MATCH_DETAILS_LIST,
+  SHOW_LEVEL_TWO_NO_MATCH_DETAILS_LIST
+} from '../../../src/models/model-constants.js'
 
 test('MRN, open, finalised, using netMass, matched', () => {
   const data = {
@@ -89,15 +94,6 @@ test('MRN, open, finalised, using netMass, matched', () => {
             {
               id: expect.any(String),
               documentReference: 'GBCHD2025.1234567',
-              level2NoMatch: false,
-              level3NoMatch: false,
-              level3NoMatchQuantity: false,
-              level3NoMatchWeight: false,
-              activeLevel2NoMatch: false,
-              activeLevel3NoMatch: false,
-              activeLevel3NoMatchQuantity: false,
-              activeLevel3NoMatchWeight: false,
-              level3DocumentReference: null,
               quantityStatus: undefined,
               match: true,
               decision: 'Release',
@@ -107,21 +103,20 @@ test('MRN, open, finalised, using netMass, matched', () => {
               authority: {
                 text: 'FNAO',
                 value: 'FNAO'
-              }
+              },
+              activeL1NoMatchDetails: null,
+              activeL2NoMatchDetails: null,
+              activeL3NoMatchDetails: null,
+              passiveL1NoMatchDetails: null,
+              passiveL2NoMatchDetails: null,
+              passiveL3NoMatchDetails: null,
+              passiveLevel3NoMatchQuantity: false,
+              passiveLevel3NoMatchWeight: false
             },
             {
               id: expect.any(String),
               checkCode: 'H224',
               documentReference: null,
-              level2NoMatch: false,
-              level3NoMatch: false,
-              level3NoMatchQuantity: false,
-              level3NoMatchWeight: false,
-              activeLevel2NoMatch: false,
-              activeLevel3NoMatch: false,
-              activeLevel3NoMatchQuantity: false,
-              activeLevel3NoMatchWeight: false,
-              level3DocumentReference: null,
               quantityStatus: undefined,
               match: null,
               decision: 'Release',
@@ -130,7 +125,15 @@ test('MRN, open, finalised, using netMass, matched', () => {
               authority: {
                 text: 'IUU',
                 value: 'IUU'
-              }
+              },
+              activeL1NoMatchDetails: null,
+              activeL2NoMatchDetails: null,
+              activeL3NoMatchDetails: null,
+              passiveL1NoMatchDetails: null,
+              passiveL2NoMatchDetails: null,
+              passiveL3NoMatchDetails: null,
+              passiveLevel3NoMatchQuantity: false,
+              passiveLevel3NoMatchWeight: false
             }
           ],
           documents: [
@@ -249,15 +252,6 @@ test('a split consignment with a matching document', () => {
               documentReference: 'GBCHD2025.1234567V',
               id: expect.any(String),
               checkCode: 'H221',
-              level2NoMatch: false,
-              level3NoMatch: false,
-              level3NoMatchQuantity: false,
-              level3NoMatchWeight: false,
-              activeLevel2NoMatch: false,
-              activeLevel3NoMatch: false,
-              activeLevel3NoMatchQuantity: false,
-              activeLevel3NoMatchWeight: false,
-              level3DocumentReference: null,
               quantityStatus: undefined,
               match: true,
               decision: 'Release',
@@ -266,7 +260,15 @@ test('a split consignment with a matching document', () => {
               authority: {
                 text: 'APHA',
                 value: 'APHA'
-              }
+              },
+              activeL1NoMatchDetails: null,
+              activeL2NoMatchDetails: null,
+              activeL3NoMatchDetails: null,
+              passiveL1NoMatchDetails: null,
+              passiveL2NoMatchDetails: null,
+              passiveL3NoMatchDetails: null,
+              passiveLevel3NoMatchQuantity: false,
+              passiveLevel3NoMatchWeight: false
             }
           ],
           documents: [
@@ -387,15 +389,6 @@ test('a split consignment without a matching document', () => {
               documentReference: 'GBCHD2025.1999997V',
               id: expect.any(String),
               checkCode: 'H221',
-              level2NoMatch: false,
-              level3NoMatch: false,
-              level3NoMatchQuantity: false,
-              level3NoMatchWeight: false,
-              activeLevel2NoMatch: false,
-              activeLevel3NoMatch: false,
-              activeLevel3NoMatchQuantity: false,
-              activeLevel3NoMatchWeight: false,
-              level3DocumentReference: null,
               quantityStatus: undefined,
               match: false,
               decision: '',
@@ -404,7 +397,19 @@ test('a split consignment without a matching document', () => {
               authority: {
                 text: 'APHA',
                 value: 'APHA'
-              }
+              },
+              activeL1NoMatchDetails: {
+                description: "Document reference <strong>GBCHD2025.1999997V</strong> cannot be found. Check the reference is correct.",
+                descriptionTemplateHandler: expect.any(Function),
+                title: "Document not found",
+              },
+              activeL2NoMatchDetails: null,
+              activeL3NoMatchDetails: null,
+              passiveL1NoMatchDetails: null,
+              passiveL2NoMatchDetails: null,
+              passiveL3NoMatchDetails: null,
+              passiveLevel3NoMatchQuantity: false,
+              passiveLevel3NoMatchWeight: false
             }
           ],
           documents: [
@@ -488,15 +493,6 @@ test('an MRN, with no CHED, with no documents', () => {
             {
               id: expect.any(String),
               documentReference: null,
-              level2NoMatch: false,
-              level3NoMatch: false,
-              level3NoMatchQuantity: false,
-              level3NoMatchWeight: false,
-              activeLevel2NoMatch: false,
-              activeLevel3NoMatch: false,
-              activeLevel3NoMatchQuantity: false,
-              activeLevel3NoMatchWeight: false,
-              level3DocumentReference: null,
               quantityStatus: undefined,
               match: false,
               checkCode: 'H220',
@@ -506,7 +502,19 @@ test('an MRN, with no CHED, with no documents', () => {
               authority: {
                 text: 'HMI - GMS',
                 value: 'HMI'
-              }
+              },
+              activeL1NoMatchDetails: {
+                description: "Document reference cannot be found. Check the reference is correct.",
+                descriptionTemplateHandler: expect.any(Function),
+                title: "Document not found",
+              },
+              activeL2NoMatchDetails: null,
+              activeL3NoMatchDetails: null,
+              passiveL1NoMatchDetails: null,
+              passiveL2NoMatchDetails: null,
+              passiveL3NoMatchDetails: null,
+              passiveLevel3NoMatchQuantity: false,
+              passiveLevel3NoMatchWeight: false
             }
           ],
           checks: [{ checkCode: 'H220' }],
@@ -671,15 +679,6 @@ test('matches malformed references', () => {
             {
               id: expect.any(String),
               documentReference: 'GB.CHD.2025.0000002',
-              level2NoMatch: false,
-              level3NoMatch: false,
-              level3NoMatchQuantity: false,
-              level3NoMatchWeight: false,
-              activeLevel2NoMatch: false,
-              activeLevel3NoMatch: false,
-              activeLevel3NoMatchQuantity: false,
-              activeLevel3NoMatchWeight: false,
-              level3DocumentReference: null,
               quantityStatus: undefined,
               match: true,
               checkCode: 'H223',
@@ -689,7 +688,15 @@ test('matches malformed references', () => {
               authority: {
                 text: 'FNAO',
                 value: 'FNAO'
-              }
+              },
+              activeL1NoMatchDetails: null,
+              activeL2NoMatchDetails: null,
+              activeL3NoMatchDetails: null,
+              passiveL1NoMatchDetails: null,
+              passiveL2NoMatchDetails: null,
+              passiveL3NoMatchDetails: null,
+              passiveLevel3NoMatchQuantity: false,
+              passiveLevel3NoMatchWeight: false
             }
           ],
           checks: [{ checkCode: 'H223' }],
@@ -837,6 +844,14 @@ test.each([
 
     const result = mapCustomsDeclarations(data)
 
+    const activeL1NoMatchDetails = SHOW_LEVEL_ONE_NO_MATCH_DETAILS_LIST.has(internalDecisionCode)
+      ? {
+        description: "Document reference <strong>GBCHD2025.9710001</strong> cannot be found. Check the reference is correct.",
+        descriptionTemplateHandler: expect.any(Function),
+        title: "Document not found",
+      }
+      : null
+
     const expected = [
       {
         commodities: [
@@ -859,17 +874,16 @@ test.each([
                 },
                 documentReference: documentReference || 'GBCHD2025.9710001',
                 id: expect.any(String),
-                level2NoMatch: false,
-                level3NoMatch: false,
-                level3NoMatchQuantity: false,
-                level3NoMatchWeight: false,
-                activeLevel2NoMatch: false,
-                activeLevel3NoMatch: false,
-                activeLevel3NoMatchQuantity: false,
-                activeLevel3NoMatchWeight: false,
-                level3DocumentReference: null,
                 quantityStatus: undefined,
-                match: false
+                match: false,
+                activeL1NoMatchDetails,
+                activeL2NoMatchDetails: null,
+                activeL3NoMatchDetails: null,
+                passiveL1NoMatchDetails: null,
+                passiveL2NoMatchDetails: null,
+                passiveL3NoMatchDetails: null,
+                passiveLevel3NoMatchQuantity: false,
+                passiveLevel3NoMatchWeight: false
               }
             ],
             documents: [
@@ -1297,15 +1311,6 @@ test.each([
               {
                 id: expect.any(String),
                 documentReference: 'GBCHD2025.1234567',
-                level2NoMatch: false,
-                level3NoMatch: false,
-                level3NoMatchQuantity: false,
-                level3NoMatchWeight: false,
-                activeLevel2NoMatch: false,
-                activeLevel3NoMatch: false,
-                activeLevel3NoMatchQuantity: false,
-                activeLevel3NoMatchWeight: false,
-                level3DocumentReference: null,
                 quantityStatus: undefined,
                 match: true,
                 checkCode: 'H222',
@@ -1315,20 +1320,19 @@ test.each([
                 authority: {
                   text: 'POAO',
                   value: 'POAO'
-                }
+                },
+                activeL1NoMatchDetails: null,
+                activeL2NoMatchDetails: null,
+                activeL3NoMatchDetails: null,
+                passiveL1NoMatchDetails: null,
+                passiveL2NoMatchDetails: null,
+                passiveL3NoMatchDetails: null,
+                passiveLevel3NoMatchQuantity: false,
+                passiveLevel3NoMatchWeight: false
               },
               {
                 id: expect.any(String),
                 documentReference: null,
-                level2NoMatch: false,
-                level3NoMatch: false,
-                level3NoMatchQuantity: false,
-                level3NoMatchWeight: false,
-                activeLevel2NoMatch: false,
-                activeLevel3NoMatch: false,
-                activeLevel3NoMatchQuantity: false,
-                activeLevel3NoMatchWeight: false,
-                level3DocumentReference: null,
                 quantityStatus: undefined,
                 match: null,
                 checkCode: 'H224',
@@ -1338,7 +1342,15 @@ test.each([
                 authority: {
                   text: 'IUU',
                   value: 'IUU'
-                }
+                },
+                activeL1NoMatchDetails: null,
+                activeL2NoMatchDetails: null,
+                activeL3NoMatchDetails: null,
+                passiveL1NoMatchDetails: null,
+                passiveL2NoMatchDetails: null,
+                passiveL3NoMatchDetails: null,
+                passiveLevel3NoMatchQuantity: false,
+                passiveLevel3NoMatchWeight: false
               }
             ],
             documents: [
@@ -1672,15 +1684,6 @@ test('an MRN, with HMI authorities', () => {
             {
               id: expect.any(String),
               documentReference: null,
-              level2NoMatch: false,
-              level3NoMatch: false,
-              level3NoMatchQuantity: false,
-              level3NoMatchWeight: false,
-              activeLevel2NoMatch: false,
-              activeLevel3NoMatch: false,
-              activeLevel3NoMatchQuantity: false,
-              activeLevel3NoMatchWeight: false,
-              level3DocumentReference: null,
               quantityStatus: undefined,
               match: false,
               checkCode: 'H218',
@@ -1690,7 +1693,19 @@ test('an MRN, with HMI authorities', () => {
               authority: {
                 text: 'HMI - SMS',
                 value: 'HMI'
-              }
+              },
+              activeL1NoMatchDetails: {
+                description: "Document reference cannot be found. Check the reference is correct.",
+                descriptionTemplateHandler: expect.any(Function),
+                title: "Document not found",
+              },
+              activeL2NoMatchDetails: null,
+              activeL3NoMatchDetails: null,
+              passiveL1NoMatchDetails: null,
+              passiveL2NoMatchDetails: null,
+              passiveL3NoMatchDetails: null,
+              passiveLevel3NoMatchQuantity: false,
+              passiveLevel3NoMatchWeight: false
             }
           ],
           checks: [{ checkCode: 'H218' }],
@@ -1705,15 +1720,6 @@ test('an MRN, with HMI authorities', () => {
             {
               id: expect.any(String),
               documentReference: null,
-              level2NoMatch: false,
-              level3NoMatch: false,
-              level3NoMatchQuantity: false,
-              level3NoMatchWeight: false,
-              activeLevel2NoMatch: false,
-              activeLevel3NoMatch: false,
-              activeLevel3NoMatchQuantity: false,
-              activeLevel3NoMatchWeight: false,
-              level3DocumentReference: null,
               quantityStatus: undefined,
               match: false,
               checkCode: 'H220',
@@ -1723,7 +1729,19 @@ test('an MRN, with HMI authorities', () => {
               authority: {
                 text: 'HMI - GMS',
                 value: 'HMI'
-              }
+              },
+              activeL1NoMatchDetails: {
+                description: "Document reference cannot be found. Check the reference is correct.",
+                descriptionTemplateHandler: expect.any(Function),
+                title: "Document not found",
+              },
+              activeL2NoMatchDetails: null,
+              activeL3NoMatchDetails: null,
+              passiveL1NoMatchDetails: null,
+              passiveL2NoMatchDetails: null,
+              passiveL3NoMatchDetails: null,
+              passiveLevel3NoMatchQuantity: false,
+              passiveLevel3NoMatchWeight: false
             }
           ],
           checks: [{ checkCode: 'H220' }],
@@ -2341,35 +2359,23 @@ test('CHED ordering: handles decisions with unknown check codes (undefined autho
 
 test.each([
   {
-    level2NoMatch: true,
-    level3NoMatch: false,
-    level3NoMatchWeight: false,
-    level3NoMatchQuantity: false,
     passiveLevel: 2,
     passiveDecisionCode: 'E20',
     passiveRuleName: 'CommodityCodeDecisionRule'
   },
   {
-    level2NoMatch: false,
-    level3NoMatch: true,
-    level3NoMatchWeight: true,
-    level3NoMatchQuantity: false,
     passiveLevel: 3,
     passiveDecisionCode: 'E30',
     passiveRuleName: 'CommodityQuantityCheckDecisionRule'
   },
   {
-    level2NoMatch: false,
-    level3NoMatch: true,
-    level3NoMatchWeight: false,
-    level3NoMatchQuantity: true,
     passiveLevel: 3,
     passiveDecisionCode: 'E31',
     passiveRuleName: 'CommodityQuantityCheckDecisionRule'
   }
 ])(
   'higher level match indicators set based on passive decision code $passiveDecisionCode',
-  ({ level2NoMatch, level3NoMatch, level3NoMatchWeight, level3NoMatchQuantity, passiveLevel, passiveDecisionCode, passiveRuleName }) => {
+  ({ passiveLevel, passiveDecisionCode, passiveRuleName }) => {
     const data = {
       customsDeclarations: [
         {
@@ -2459,6 +2465,19 @@ test.each([
 
     const result = mapCustomsDeclarations(data)
 
+    const passiveL2NoMatchDetails = SHOW_LEVEL_TWO_NO_MATCH_DETAILS_LIST.has(passiveDecisionCode)
+      ? {
+        description: "Commodity code cannot be found on GBCHD2025.9710001. Check that the commodity code is correct.",
+        descriptionTemplateHandler: expect.any(Function),
+        title: "Incorrect commodity code",
+      } : null
+    const passiveL3NoMatchDetails = SHOW_LEVEL_THREE_NO_MATCH_DETAILS_LIST.has(passiveDecisionCode)
+      ? {
+        description: "The declared quantity/weight (<strong>9999</strong>) does not match document reference GBCHD2025.9710001.",
+        descriptionTemplateHandler: expect.any(Function),
+        title: "Incorrect quantity or weight",
+      } : null
+
     const expected = [
       {
         commodities: [
@@ -2481,17 +2500,16 @@ test.each([
                 },
                 documentReference: 'GBCHD2025.9710001',
                 id: expect.any(String),
-                level2NoMatch,
-                level3NoMatch,
-                level3NoMatchQuantity,
-                level3NoMatchWeight,
-                activeLevel2NoMatch: false,
-                activeLevel3NoMatch: false,
-                activeLevel3NoMatchQuantity: false,
-                activeLevel3NoMatchWeight: false,
-                level3DocumentReference: null,
                 quantityStatus: undefined,
-                match: true
+                match: true,
+                activeL1NoMatchDetails: null,
+                activeL2NoMatchDetails: null,
+                activeL3NoMatchDetails: null,
+                passiveL1NoMatchDetails: null,
+                passiveL2NoMatchDetails,
+                passiveL3NoMatchDetails,
+                passiveLevel3NoMatchQuantity: passiveDecisionCode === 'E31',
+                passiveLevel3NoMatchWeight: passiveDecisionCode === 'E30'
               }
             ],
             documents: [
@@ -2925,3 +2943,241 @@ test('when IUU reference is not supplied then relevant reference and tooltip is 
   expect(iuuItemLine.documentReference).toBe('IUU Reference Not Supplied')
   expect(iuuItemLine.decisionReason).toBe('IUU reference was not supplied. Check that the reference is correct and update your customs declaration as required')
 })
+
+test.each([
+  {
+    passiveLevel: 2,
+    passiveDecisionCode: 'E20',
+    passiveRuleName: 'CommodityCodeDecisionRule'
+  },
+  {
+    passiveLevel: 3,
+    passiveDecisionCode: 'E30',
+    passiveRuleName: 'CommodityQuantityCheckDecisionRule'
+  },
+  {
+    passiveLevel: 3,
+    passiveDecisionCode: 'E31',
+    passiveRuleName: 'CommodityQuantityCheckDecisionRule'
+  }
+])(
+  'hover over description should include all document references when item references more than one document reference',
+  ({ passiveLevel, passiveDecisionCode, passiveRuleName }) => {
+    const data = {
+      customsDeclarations: [
+        {
+          movementReferenceNumber: 'GB251234567890ABCD',
+          clearanceRequest: {
+            declarationUcr: '5GB123456789000-BDOV123456',
+            commodities: [
+              {
+                itemNumber: 1,
+                netMass: '9999',
+                documents: [
+                  {
+                    documentCode: 'N851',
+                    documentReference: 'GBCHD2025.9710001',
+                    documentStatus: 'AE',
+                    documentControl: 'P',
+                    documentQuantity: null
+                  },
+                  {
+                    documentCode: 'N851',
+                    documentReference: 'GBCHD2025.9710002',
+                    documentStatus: 'AE',
+                    documentControl: 'P',
+                    documentQuantity: null
+                  }
+                ],
+                checks: [
+                  {
+                    checkCode: 'H219',
+                    departmentCode: 'PHSI'
+                  }
+                ]
+              }
+            ]
+          },
+          clearanceDecision: {
+            items: [
+              {
+                itemNumber: 1,
+                checks: [
+                  {
+                    checkCode: 'H219',
+                    decisionCode: 'H01',
+                    decisionsValidUntil: null,
+                    decisionReasons: [],
+                    decisionInternalFurtherDetail: ['H01']
+                  }
+                ]
+              }
+            ],
+            results: [
+              {
+                itemNumber: 1,
+                importPreNotification: 'CHEDPP.GB.2025.9710001',
+                documentReference: 'GBCHD2025.9710001',
+                checkCode: 'H219',
+                decisionCode: 'H01',
+                decisionReason: null,
+                internalDecisionCode: 'H01',
+                mode: 'Active',
+                level: 1,
+                ruleName: "InspectionRequiredDecisionRule"
+              },
+              {
+                itemNumber: 1,
+                importPreNotification: 'CHEDPP.GB.2025.9710001',
+                documentReference: 'GBCHD2025.9710001',
+                checkCode: 'H219',
+                decisionCode: 'X00',
+                decisionReason: null,
+                internalDecisionCode: passiveDecisionCode,
+                mode: 'Passive',
+                level: passiveLevel,
+                ruleName: passiveRuleName
+              },
+              {
+                itemNumber: 1,
+                importPreNotification: 'CHEDPP.GB.2025.9710002',
+                documentReference: 'GBCHD2025.9710002',
+                checkCode: 'H219',
+                decisionCode: 'H01',
+                decisionReason: null,
+                internalDecisionCode: 'H01',
+                mode: 'Active',
+                level: 1,
+                ruleName: "InspectionRequiredDecisionRule"
+              }
+            ]
+          },
+          finalisation: {
+            isManualRelease: false,
+            finalState: '0'
+          },
+          updated: '2025-05-12T11:13:17.330Z'
+        }
+      ],
+      importPreNotifications: [
+        {
+          importPreNotification: {
+            referenceNumber: 'CHEDP.GB.2025.9710001',
+            status: 'VALIDATED'
+          }
+        },
+        {
+          importPreNotification: {
+            referenceNumber: 'CHEDP.GB.2025.9710002',
+            status: 'VALIDATED'
+          }
+        }
+      ]
+    }
+
+    const result = mapCustomsDeclarations(data)
+
+    const passiveL2NoMatchDetails = SHOW_LEVEL_TWO_NO_MATCH_DETAILS_LIST.has(passiveDecisionCode)
+      ? {
+        description: "Commodity code cannot be found on document references GBCHD2025.9710001, GBCHD2025.9710002. Check that the commodity code is correct.",
+        descriptionTemplateHandler: expect.any(Function),
+        title: "Incorrect commodity code",
+      } : null
+    const passiveL3NoMatchDetails = SHOW_LEVEL_THREE_NO_MATCH_DETAILS_LIST.has(passiveDecisionCode)
+      ? {
+        description: "The declared quantity/weight (<strong>9999</strong>) does not match document references GBCHD2025.9710001, GBCHD2025.9710002.",
+        descriptionTemplateHandler: expect.any(Function),
+        title: "Incorrect quantity or weight",
+      } : null
+
+    const expected = [
+      {
+        commodities: [
+          {
+            checks: [
+              {
+                checkCode: 'H219',
+                departmentCode: 'PHSI'
+              }
+            ],
+            decisions: [
+              {
+                decision: 'Hold',
+                decisionDetail: 'Awaiting decision',
+                decisionReason: null,
+                checkCode: 'H219',
+                authority: {
+                  text: 'PHSI',
+                  value: 'PHSI'
+                },
+                documentReference: 'GBCHD2025.9710001',
+                id: expect.any(String),
+                quantityStatus: undefined,
+                match: true,
+                activeL1NoMatchDetails: null,
+                activeL2NoMatchDetails: null,
+                activeL3NoMatchDetails: null,
+                passiveL1NoMatchDetails: null,
+                passiveL2NoMatchDetails,
+                passiveL3NoMatchDetails,
+                passiveLevel3NoMatchQuantity: passiveDecisionCode === 'E31',
+                passiveLevel3NoMatchWeight: passiveDecisionCode === 'E30'
+              },
+              {
+                decision: 'Hold',
+                decisionDetail: 'Awaiting decision',
+                decisionReason: null,
+                checkCode: 'H219',
+                authority: {
+                  text: 'PHSI',
+                  value: 'PHSI'
+                },
+                documentReference: 'GBCHD2025.9710002',
+                id: expect.any(String),
+                quantityStatus: undefined,
+                match: true,
+                activeL1NoMatchDetails: null,
+                activeL2NoMatchDetails: null,
+                activeL3NoMatchDetails: null,
+                passiveL1NoMatchDetails: null,
+                passiveL2NoMatchDetails: null,
+                passiveL3NoMatchDetails: null,
+                passiveLevel3NoMatchQuantity: false,
+                passiveLevel3NoMatchWeight: false
+              }
+            ],
+            documents: [
+              {
+                documentCode: 'N851',
+                documentControl: 'P',
+                documentQuantity: null,
+                documentReference: 'GBCHD2025.9710001',
+                documentStatus: 'AE'
+              },
+              {
+                documentCode: "N851",
+                documentControl: "P",
+                documentQuantity: null,
+                documentReference: "GBCHD2025.9710002",
+                documentStatus: "AE"
+              }
+            ],
+            id: expect.any(String),
+            itemNumber: 1,
+            netMass: '9999',
+            weightOrQuantity: 9999
+          }
+        ],
+        declarationUcr: '5GB123456789000-BDOV123456',
+        finalState: '0',
+        movementReferenceNumber: 'GB251234567890ABCD',
+        open: true,
+        status: 'Finalised - Released',
+        updated: '12 May 2025, 11:13',
+        hasTracesChed: false
+      }
+    ]
+
+    expect(result).toEqual(expected)
+  }
+)

@@ -368,3 +368,31 @@ export const QUANTITY_RESERVATION_UNSUCCESSFUL_REASON_DECISION = {
   MeasurementUnitMismatch: internalDecisionCodeDescriptions['E46'],
   QuantitiesCannotBeValidated: internalDecisionCodeDescriptions['E47']
 }
+
+export const SHOW_LEVEL_ONE_NO_MATCH_DETAILS_LIST = new Set([
+  'E70'
+])
+
+export const SHOW_LEVEL_TWO_NO_MATCH_DETAILS_LIST = new Set([
+  'E20'
+])
+
+export const SHOW_LEVEL_THREE_NO_MATCH_DETAILS_LIST = new Set([
+  'E30',
+  'E31'
+])
+
+export const NO_MATCH_DETAIL = {
+  E70: { title: 'Document not found', descriptionTemplateHandler: (documentReference) => documentReference
+      ? `Document reference <strong>${documentReference}</strong> cannot be found. Check the reference is correct.`
+      : 'Document reference cannot be found. Check the reference is correct.' },
+  E20: { title: 'Incorrect commodity code', descriptionTemplateHandler: (commodityCode, documentReferences) => commodityCode
+      ? `Commodity code <strong>${commodityCode}</strong> cannot be found on ${documentReferences}. Check that the commodity code is correct.`
+      : `Commodity code cannot be found on ${documentReferences}. Check that the commodity code is correct.` },
+  E30: { title: 'Incorrect quantity or weight', descriptionTemplateHandler: (weightOrQuantity, documentReferences) => weightOrQuantity
+      ? `The declared quantity/weight (<strong>${weightOrQuantity}</strong>) does not match document ${documentReferences}.`
+      : `The declared quantity/weight does not match document ${documentReferences}.` },
+  E31: { title: 'Incorrect quantity or weight', descriptionTemplateHandler: (weightOrQuantity, documentReferences) => weightOrQuantity
+      ? `The declared quantity/weight (<strong>${weightOrQuantity}</strong>) does not match document ${documentReferences}.`
+      : `The declared quantity/weight does not match document ${documentReferences}.` }
+}
