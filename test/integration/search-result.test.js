@@ -236,6 +236,7 @@ const COOKIE_POLICY_HEADER = {
 }
 
 const searchResultUrl = (searchTerm) => `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${searchTerm}`
+const searchResultLevelsViewUrl = (searchTerm) => `${paths.SEARCH_RESULT}?${queryStringParams.SEARCH_TERM}=${searchTerm}#levels-view`
 
 const injectSearchResult = async (url) => {
   const server = await initialiseServer()
@@ -1410,28 +1411,36 @@ test.each([
 
 test.each([
   {
-    level2DecisionCode: 'E20',
     shouldShowLevel2BannerText: true,
-    level3DecisionCode: '',
     shouldShowLevel3BannerText: false,
+    higherLevelDecisionCode: 'X00',
+    higherLevelInternalDecisionCode: 'E20',
+    ruleLevel: 2,
+    ruleName: 'CommodityCodeDecisionRule'
   },
   {
-    level2DecisionCode: 'H01',
     shouldShowLevel2BannerText: false,
-    level3DecisionCode: 'E30',
     shouldShowLevel3BannerText: true,
+    higherLevelDecisionCode: 'X00',
+    higherLevelInternalDecisionCode: 'E30',
+    ruleLevel: 3,
+    ruleName: 'CommodityQuantityCheckDecisionRule'
   },
   {
-    level2DecisionCode: 'H01',
     shouldShowLevel2BannerText: false,
-    level3DecisionCode: 'E31',
     shouldShowLevel3BannerText: true,
+    higherLevelDecisionCode: 'X00',
+    higherLevelInternalDecisionCode: 'E31',
+    ruleLevel: 3,
+    ruleName: 'CommodityQuantityCheckDecisionRule'
   },
   {
-    level2DecisionCode: 'H01',
     shouldShowLevel2BannerText: false,
-    level3DecisionCode: 'H01',
     shouldShowLevel3BannerText: false,
+    higherLevelDecisionCode: 'H01',
+    higherLevelInternalDecisionCode: 'C03',
+    ruleLevel: 3,
+    ruleName: 'CommodityQuantityCheckDecisionRule'
   }
 ])('Should show relevant banner text, Tab link and No Match Results for Levels', async (options) => {
   const levelNoMatchDeclarations = [
@@ -1471,12 +1480,12 @@ test.each([
           {
             itemNumber: 1,
             checkCode: 'H218',
-            decisionCode: 'H01',
+            decisionCode: options.higherLevelDecisionCode,
             documentReference: 'CHEDA.GB.2025.0000001',
-            internalDecisionCode: options.level2DecisionCode,
+            internalDecisionCode: options.higherLevelInternalDecisionCode,
             mode: 'Passive',
-            level: 2,
-            ruleName: "CommodityCodeDecisionRule"
+            level: options.ruleLevel,
+            ruleName: options.ruleName
           }
         ]
       },
@@ -1487,19 +1496,6 @@ test.each([
       updated: '2025-05-06T13:11:59.257Z'
     }
   ]
-
-  if (options.level2DecisionCode !== 'E20') {
-    levelNoMatchDeclarations[0].clearanceDecision.results.push({
-      itemNumber: 1,
-      checkCode: 'H218',
-      decisionCode: 'H01',
-      documentReference: 'CHEDA.GB.2025.0000001',
-      internalDecisionCode: options.level3DecisionCode,
-      mode: 'Passive',
-      level: 3,
-      ruleName: "CommodityQuantityCheckDecisionRule"
-    })
-  }
 
   const declarationsWithLevelNoMatch = {
     customsDeclarations: levelNoMatchDeclarations,
@@ -1557,34 +1553,40 @@ test.each([
 
     const noMatchStatus = document.body.querySelector('.btms-declaration-levels-result tbody tr td strong.govuk-tag--red')
 
-    if (options.level2DecisionCode === 'E20') {
+    if (options.higherLevelInternalDecisionCode === 'E20') {
       expect(noMatchStatus).toBeInTheDocument()
-      const commodityCodeErrorHighlighted = document.body.querySelector('.btms-declaration-levels-result tbody tr td span.btms-details__commodity-code--no-match')
+      expect(noMatchStatus.innerHTML).toContain('No')
+      const commodityCodeErrorHighlighted = document.body.querySelector('.btms-declaration-levels-result tbody tr td div.btms-no-match')
       expect(commodityCodeErrorHighlighted).toBeInTheDocument()
       expect(queryByText(document.body, 'No match - Incorrect commodity code'))
         .toBeInTheDocument()
-      expect(queryByText(document.body, `Commodity code ${levelNoMatchDeclarations[0].clearanceRequest.commodities[0].taricCommodityCode} cannot be found in IPAFFS. Check that the code is correct.`))
-        .toBeInTheDocument()
+      const hoverText = document.body.querySelector('.btms-details__tooltip--description')
+      expect(hoverText).toBeInTheDocument()
+      expect(hoverText.innerHTML).toBe(`Commodity code <strong>${levelNoMatchDeclarations[0].clearanceRequest.commodities[0].taricCommodityCode}</strong> cannot be found on CHEDA.GB.2025.0000001. Check that the commodity code is correct.`)
     }
 
-    if (options.level3DecisionCode === 'E30') {
+    if (options.higherLevelInternalDecisionCode === 'E30') {
       expect(noMatchStatus).toBeInTheDocument()
-      const weightErrorHighlighted = document.body.querySelector('.btms-declaration-levels-result tbody tr td span.btms-details__commodity-weight-quantity--no-match')
+      expect(noMatchStatus.innerHTML).toContain('No')
+      const weightErrorHighlighted = document.body.querySelector('.btms-declaration-levels-result tbody tr td div.btms-no-match')
       expect(weightErrorHighlighted).toBeInTheDocument()
       expect(queryByText(document.body, 'No match - Incorrect net weight'))
         .toBeInTheDocument()
-      expect(queryByText(document.body, `The declared weight of this item does not match CHED reference ${levelNoMatchDeclarations[0].clearanceRequest.commodities[0].documents[0].documentReference}`))
-        .toBeInTheDocument()
+      const hoverText = document.body.querySelector('.btms-details__tooltip--description')
+      expect(hoverText).toBeInTheDocument()
+      expect(hoverText.innerHTML).toBe(`The declared quantity/weight (<strong>17088.98</strong>) does not match document reference ${levelNoMatchDeclarations[0].clearanceRequest.commodities[0].documents[0].documentReference}.`)
     }
 
-    if (options.level3DecisionCode === 'E31') {
+    if (options.higherLevelInternalDecisionCode === 'E31') {
       expect(noMatchStatus).toBeInTheDocument()
-      const quantityErrorHighlighted = document.body.querySelector('.btms-declaration-levels-result tbody tr td span.btms-details__commodity-weight-quantity--no-match')
+      expect(noMatchStatus.innerHTML).toContain('No')
+      const quantityErrorHighlighted = document.body.querySelector('.btms-declaration-levels-result tbody tr td div.btms-no-match')
       expect(quantityErrorHighlighted).toBeInTheDocument()
       expect(queryByText(document.body, 'No match - Incorrect quantity'))
         .toBeInTheDocument()
-      expect(queryByText(document.body, `The declared quantity of this item does not match CHED reference ${levelNoMatchDeclarations[0].clearanceRequest.commodities[0].documents[0].documentReference}`))
-        .toBeInTheDocument()
+      const hoverText = document.body.querySelector('.btms-details__tooltip--description')
+      expect(hoverText).toBeInTheDocument()
+      expect(hoverText.innerHTML).toBe(`The declared quantity/weight (<strong>17088.98</strong>) does not match document reference ${levelNoMatchDeclarations[0].clearanceRequest.commodities[0].documents[0].documentReference}.`)
     }
   } else {
     expect(
@@ -1950,9 +1952,9 @@ test.each(
   globalJsdom(payload)
   initFilters()
 
-  const noMatchDecisions = Array.from(document.body.querySelectorAll('table.btms-declaration-levels-result span.btms-no-match')).map(tableCell => tableCell.innerHTML)
+  const noMatchDecisions = Array.from(document.body.querySelectorAll('table.btms-declaration-levels-result tbody tr td:last-child')).map(tableCell => tableCell.innerHTML)
   expect(noMatchDecisions.length).toBe(2)
-  expect(noMatchDecisions.every(decisionText => decisionText === options.decisionText)).toBeTruthy()
+  expect(noMatchDecisions.every(decisionText => decisionText.includes(options.decisionText))).toBeTruthy()
 })
 
 test.each([
@@ -2147,27 +2149,24 @@ test.each([
     ruleLevel: 2,
     ruleName: 'CommodityCodeDecisionRule',
     activeInternalDecisionCode: 'E20',
-    expectedErrorFieldClass: 'btms-details__commodity-code--no-match',
     expectedDecision: 'No match - Incorrect commodity code',
-    expectedDecisionTooltip: 'Commodity code 0304719030 cannot be found in IPAFFS. Check that the code is correct.'
+    expectedDecisionTooltip: 'Commodity code <strong>0304719030</strong> cannot be found on CHEDA.GB.2025.0000001. Check that the commodity code is correct.'
   },
   {
     ruleLevel: 3,
     ruleName: 'CommodityQuantityCheckDecisionRule',
     activeInternalDecisionCode: 'E30',
-    expectedErrorFieldClass: 'btms-details__commodity-weight-quantity--no-match',
     expectedDecision: 'No match - Incorrect net weight',
-    expectedDecisionTooltip: 'The declared weight of this item does not match CHED reference CHEDA.GB.2025.0000001'
+    expectedDecisionTooltip: 'The declared quantity/weight (<strong>17088.98</strong>) does not match document reference CHEDA.GB.2025.0000001.'
   },
   {
     ruleLevel: 3,
     ruleName: 'CommodityQuantityCheckDecisionRule',
     activeInternalDecisionCode: 'E31',
-    expectedErrorFieldClass: 'btms-details__commodity-weight-quantity--no-match',
     expectedDecision: 'No match - Incorrect quantity',
-    expectedDecisionTooltip: 'The declared quantity of this item does not match CHED reference CHEDA.GB.2025.0000001'
+    expectedDecisionTooltip: 'The declared quantity/weight (<strong>17088.98</strong>) does not match document reference CHEDA.GB.2025.0000001.'
   }
-])('should show higher level results on Latest tab if the Active internal decision code is "$activeInternalDecisionCode"', async ({ ruleLevel, ruleName, activeInternalDecisionCode, expectedErrorFieldClass, expectedDecision, expectedDecisionTooltip }) => {
+])('should show higher level results on Latest tab if the Active internal decision code is "$activeInternalDecisionCode"', async ({ ruleLevel, ruleName, activeInternalDecisionCode, expectedDecision, expectedDecisionTooltip }) => {
   const activeHigherLevelNoMatchDeclarations = [
     {
       movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
@@ -2234,13 +2233,15 @@ test.each([
   expect(noMatchStatusField).toBeInTheDocument()
   expect(noMatchStatusField.innerHTML).toContain('No')
 
-  const highlightedError = document.body.querySelector(`div#latest-view .btms-declaration tbody tr td span.${expectedErrorFieldClass}`)
+  const highlightedError = document.body.querySelector(`div#latest-view .btms-declaration tbody tr td div.btms-no-match`)
   expect(highlightedError).toBeInTheDocument()
   expect(queryByText(document.body, expectedDecision)).toBeInTheDocument()
-  expect(queryByText(document.body, expectedDecisionTooltip)).toBeInTheDocument()
+  const hoverText = document.body.querySelector('.btms-details__tooltip--description')
+  expect(hoverText).toBeInTheDocument()
+  expect(hoverText.innerHTML).toBe(expectedDecisionTooltip)
 })
 
-test('show only show higher level result against the item document that has failed', async () => {
+test('should only show higher level result against the item document that has failed', async () => {
   const activeHigherLevelNoMatchDeclarations = [
     {
       movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
@@ -2319,14 +2320,15 @@ test('show only show higher level result against the item document that has fail
   expect(noMatchStatusFields.length).toBe(1)
   expect(noMatchStatusFields[0].innerHTML).toContain('No')
 
-  const highlightedErrors = document.body.querySelectorAll(`div#latest-view .btms-declaration tbody tr td span.btms-details__commodity-code--no-match`)
+  const highlightedErrors = document.body.querySelectorAll(`div#latest-view .btms-declaration tbody tr td div.btms-no-match`)
   expect(highlightedErrors.length).toBe(1)
 
   const noMatchDecisions = queryAllByText(document.body, 'No match - Incorrect commodity code')
   expect(noMatchDecisions.length).toBe(1)
 
-  const noMatchTooltips = queryAllByText(document.body, 'Commodity code 0304719030 cannot be found in IPAFFS. Check that the code is correct.')
-  expect(noMatchTooltips.length).toBe(1)
+  const hoverText = document.body.querySelector('.btms-details__tooltip--description')
+  expect(hoverText).toBeInTheDocument()
+  expect(hoverText.innerHTML).toBe('Commodity code <strong>0304719030</strong> cannot be found on document references CHEDA.GB.2025.0000001, CHEDP.GB.2025.0000002. Check that the commodity code is correct.')
 
   const matchStatusFields = document.body.querySelectorAll('div#latest-view .btms-declaration tbody tr td strong.govuk-tag--green')
   expect(matchStatusFields.length).toBe(1)
@@ -3068,4 +3070,129 @@ test('escapes markup in FIS notification references', async () => {
 
   expect(document.querySelector('.moj-timeline__title b')).toBeNull()
   expect(timelineLabels().some((label) => label.includes('<b>x</b>'))).toBe(true)
+})
+
+test('should only show passive no match result against the item document that has failed', async () => {
+  const activeHigherLevelNoMatchDeclarations = [
+    {
+      movementReferenceNumber: '24GB0Z8WEJ9ZBTL73A',
+      clearanceRequest: {
+        declarationUcr: '1GB126344356000-ABC35932Y1BHX',
+        commodities: [
+          {
+            itemNumber: 1,
+            taricCommodityCode: '0304719030',
+            goodsDescription: 'FROZEN MSC A COD FILLETS',
+            netMass: '17088.98',
+            supplementaryUnits: 0,
+            documents: [
+              {
+                documentReference: 'CHEDA.GB.2025.0000001',
+                documentCode: 'N002'
+              },
+              {
+                documentReference: 'CHEDP.GB.2025.0000002',
+                documentCode: 'N002'
+              }
+            ],
+            checks: [{ checkCode: 'H218', departmentCode: 'HMI' }]
+          }
+        ]
+      },
+      clearanceDecision: {
+        results: [
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'C03',
+            documentReference: 'CHEDA.GB.2025.0000001',
+            internalDecisionCode: null,
+            mode: 'Active',
+          },
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'X00',
+            documentReference: 'CHEDA.GB.2025.0000001',
+            internalDecisionCode: 'E20',
+            mode: 'Passive',
+            level: 2,
+            ruleName: 'CommodityCodeDecisionRule'
+          },
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'C03',
+            documentReference: 'CHEDP.GB.2025.0000002',
+            internalDecisionCode: null,
+            mode: 'Active'
+          },
+          {
+            itemNumber: 1,
+            checkCode: 'H218',
+            decisionCode: 'C03',
+            documentReference: 'CHEDA.GB.2025.0000002',
+            internalDecisionCode: null,
+            mode: 'Passive',
+            level: 2,
+            ruleName: 'CommodityCodeDecisionRule'
+          }
+        ]
+      },
+      finalisation: {
+        finalState: '0',
+        isManualRelease: false
+      },
+      updated: '2025-05-06T13:11:59.257Z'
+    }
+  ]
+
+  const higherLevelNoMatchOnOneDocument = {
+    customsDeclarations: activeHigherLevelNoMatchDeclarations,
+    importPreNotifications
+  }
+
+  wreck.get
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: provider })
+    .mockResolvedValueOnce({ payload: higherLevelNoMatchOnOneDocument })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+    .mockResolvedValueOnce({ payload: emptyResourceEvents })
+
+  const server = await initialiseServer()
+  const credentials = await setupAuthedAdminUserSession(server)
+
+  const { payload } = await server.inject({
+    method: 'get',
+    url: searchResultLevelsViewUrl('24GB0Z8WEJ9ZBTL73A'),
+    auth: {
+      strategy: 'session',
+      credentials
+    }
+  })
+
+  globalJsdom(payload)
+  initFilters()
+
+  const noMatchStatusFields = document.body.querySelectorAll('div#levels-view .btms-declaration-levels-result tbody tr td strong.govuk-tag--red')
+  expect(noMatchStatusFields.length).toBe(1)
+  expect(noMatchStatusFields[0].innerHTML).toContain('No')
+
+  const highlightedErrors = document.body.querySelectorAll(`div#levels-view .btms-declaration-levels-result tbody tr td div.btms-no-match`)
+  expect(highlightedErrors.length).toBe(1)
+
+  const noMatchDecisions = queryAllByText(document.body, 'No match - Incorrect commodity code')
+  expect(noMatchDecisions.length).toBe(1)
+
+  const hoverText = document.body.querySelector('.btms-details__tooltip--description')
+  expect(hoverText).toBeInTheDocument()
+  expect(hoverText.innerHTML).toBe('Commodity code <strong>0304719030</strong> cannot be found on document references CHEDA.GB.2025.0000001, CHEDP.GB.2025.0000002. Check that the commodity code is correct.')
+
+  const matchStatusFields = document.body.querySelectorAll('div#levels-view .btms-declaration-levels-result tbody tr td strong.govuk-tag--green')
+  expect(matchStatusFields.length).toBe(1)
+  expect(matchStatusFields[0].innerHTML).toContain('Yes')
+
+  const matchDecisions = queryAllByText(document.body, 'Release - Inspection complete')
+  expect(matchDecisions.length).toBe(2)
 })

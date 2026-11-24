@@ -1,5 +1,21 @@
-{% if (tabContext === tabContexts.LEVELS_RESULT and decision.level2NoMatch === true) or (tabContext === tabContexts.LATEST_RESULT and decision.activeLevel2NoMatch === true) %}
-  <span class="btms-details__commodity-code--no-match">{{ commodity.taricCommodityCode }}</span>
+{% if tabContext === tabContexts.LATEST_RESULT and decision.activeL2NoMatchDetails %}
+  {% set id = 'commodity-code-tooltip-' + decision.id %}
+  <div class="btms-no-match" tabindex="0" aria-describedby="{{ id }}">
+    {{ commodity.taricCommodityCode }}
+    <div role="tooltip" id="{{ id }}">
+      <div class="btms-details__tooltip--title">{{ decision.activeL2NoMatchDetails.title }}</div>
+      <div class="btms-details__tooltip--description">{{ decision.activeL2NoMatchDetails.description | safe }}</div>
+    </div>
+  </div>
+{% elif tabContext === tabContexts.LEVELS_RESULT and decision.passiveL2NoMatchDetails %}
+  {% set id = 'commodity-code-tooltip-' + decision.id %}
+  <div class="btms-no-match" tabindex="0" aria-describedby="{{ id }}">
+    {{ commodity.taricCommodityCode }}
+    <div role="tooltip" id="{{ id }}">
+      <div class="btms-details__tooltip--title">{{ decision.passiveL2NoMatchDetails.title }}</div>
+      <div class="btms-details__tooltip--description">{{ decision.passiveL2NoMatchDetails.description | safe }}</div>
+    </div>
+  </div>
 {% else %}
   {{ commodity.taricCommodityCode }}
 {% endif %}

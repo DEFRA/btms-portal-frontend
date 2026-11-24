@@ -18,7 +18,11 @@ import {
   HIGHER_LEVEL_DECISION_CODE,
   QUANTITY_STATUSES,
   quantityStatusDescriptions,
-  UNSUCCESSFUL_QUANTITY_RESERVATION_REASONS
+  UNSUCCESSFUL_QUANTITY_RESERVATION_REASONS,
+  NO_MATCH_DETAIL,
+  SHOW_LEVEL_ONE_NO_MATCH_DETAILS_LIST,
+  SHOW_LEVEL_TWO_NO_MATCH_DETAILS_LIST,
+  SHOW_LEVEL_THREE_NO_MATCH_DETAILS_LIST
 } from './model-constants.js'
 import { sortDescending } from './sort.js'
 import { paths, queryStringParams } from '../routes/route-constants.js'
@@ -282,9 +286,44 @@ const isTracesIuuMatch = (tracesChedIds, decisionDocumentReference) => {
   return tracesChedIds.has(decisionDocumentReference?.toUpperCase())
 }
 
+const applyNoMatchLevelThreeTemplates = (decisions, weightOrQuantity, allDocRefs) => {
+  decisions.forEach(decision => {
+    const docReferencesValue = allDocRefs.length > 1 ? `references ${allDocRefs.join(', ')}` : `reference ${decision?.documentReference}`
+
+    if (decision.activeL3NoMatchDetails) {
+      decision.activeL3NoMatchDetails.description = decision.activeL3NoMatchDetails.descriptionTemplateHandler(weightOrQuantity, docReferencesValue)
+    }
+
+    if (decision.passiveL3NoMatchDetails) {
+      decision.passiveL3NoMatchDetails.description = decision.passiveL3NoMatchDetails.descriptionTemplateHandler(weightOrQuantity, docReferencesValue)
+    }
+  })
+}
+
+const getMatchingPassiveDecision = (clearanceDecision, activeDecision) => {
+  return clearanceDecision?.results.find(result => {
+    return result.itemNumber === activeDecision.itemNumber
+    && result.documentReference === activeDecision.documentReference
+    && result.mode === DECISION_MODE.PASSIVE
+  })
+}
+
+const mapNoMatchDetails = (showDetailsList, decision, templateArgs = null) => {
+  if (!showDetailsList.has(decision?.internalDecisionCode)) return null
+
+  const noMatchDetails = NO_MATCH_DETAIL[decision?.internalDecisionCode]
+
+  if (noMatchDetails && templateArgs) {
+    noMatchDetails.description = noMatchDetails.descriptionTemplateHandler(...templateArgs)
+  }
+
+  return {...noMatchDetails}
+}
+
 const mapCommodity = (commodity, context) => {
   const { notificationStatuses, clearanceDecision, quantityStatuses, tracesChedIds, mrn } = context
   const clearanceDecisions = getActiveDecisions(clearanceDecision, commodity)
+  const uniqueDocumentReferences = [...new Set(clearanceDecisions.map(decision => decision.documentReference).filter(Boolean))]
 
   const level2NoMatch = itemResultsContainPassiveDecisionCode(clearanceDecision, commodity, HIGHER_LEVEL_DECISION_CODE.COMMODITY_CODE_CHECK)
   const level3NoMatchWeight = itemResultsContainPassiveDecisionCode(clearanceDecision, commodity, HIGHER_LEVEL_DECISION_CODE.WEIGHT_CHECK)
@@ -321,6 +360,19 @@ const mapCommodity = (commodity, context) => {
     const missingIuuNotification = isMissingIuuNotification(decision)
     const iuuNotificationReference = getIuuReference(missingIuuNotification, commodity, isTracesIuuDecision)
 
+    const activeL1NoMatchDetails = mapNoMatchDetails(SHOW_LEVEL_ONE_NO_MATCH_DETAILS_LIST, decision, [decision?.documentReference])
+    const activeL2DocumentReferences = uniqueDocumentReferences.length > 1 ? `document references ${uniqueDocumentReferences.join(', ')}` : `${decision?.documentReference}`
+    const activeL2NoMatchDetails = mapNoMatchDetails(SHOW_LEVEL_TWO_NO_MATCH_DETAILS_LIST, decision, [commodity?.taricCommodityCode, activeL2DocumentReferences])
+    const activeL3NoMatchDetails = mapNoMatchDetails(SHOW_LEVEL_THREE_NO_MATCH_DETAILS_LIST, decision)
+
+    const passiveDecision = getMatchingPassiveDecision(clearanceDecision, decision)
+    const passiveL1NoMatchDetails = mapNoMatchDetails(SHOW_LEVEL_ONE_NO_MATCH_DETAILS_LIST, passiveDecision, [passiveDecision?.documentReference])
+    const passiveL2DocumentReferences = uniqueDocumentReferences.length > 1 ? `document references ${uniqueDocumentReferences.join(', ')}` : `${passiveDecision?.documentReference}`
+    const passiveL2NoMatchDetails = mapNoMatchDetails(SHOW_LEVEL_TWO_NO_MATCH_DETAILS_LIST, passiveDecision, [commodity?.taricCommodityCode, passiveL2DocumentReferences])
+    const passiveL3NoMatchDetails = mapNoMatchDetails(SHOW_LEVEL_THREE_NO_MATCH_DETAILS_LIST, passiveDecision)
+    const passiveLevel3NoMatchWeight = passiveDecision?.internalDecisionCode === HIGHER_LEVEL_DECISION_CODE.WEIGHT_CHECK
+    const passiveLevel3NoMatchQuantity = passiveDecision?.internalDecisionCode === HIGHER_LEVEL_DECISION_CODE.QUANTITY_CHECK
+
     return {
       id: randomUUID(),
       checkCode: decision.checkCode,
@@ -353,14 +405,25 @@ const mapCommodity = (commodity, context) => {
       activeLevel3NoMatch,
       activeLevel3NoMatchWeight,
       activeLevel3NoMatchQuantity,
-      level3DocumentReference
+      level3DocumentReference,
+      activeL1NoMatchDetails,
+      activeL2NoMatchDetails,
+      activeL3NoMatchDetails,
+      passiveL1NoMatchDetails,
+      passiveL2NoMatchDetails,
+      passiveL3NoMatchDetails,
+      passiveLevel3NoMatchWeight,
+      passiveLevel3NoMatchQuantity
     }
   })
+
+  const weightOrQuantity = determineWeightOrQuantity(commodity, decisions)
+  applyNoMatchLevelThreeTemplates(decisions, weightOrQuantity, uniqueDocumentReferences)
 
   return {
     id: randomUUID(),
     ...commodity,
-    weightOrQuantity: determineWeightOrQuantity(commodity, decisions),
+    weightOrQuantity,
     decisions
   }
 }

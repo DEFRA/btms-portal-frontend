@@ -1,4 +1,4 @@
-{% macro documentReference(decision) %}
+{% macro documentReference(decision, tabContext, tabContexts) %}
   {% if decision.documentReference and decision.decisionReason %}
     {% set id = 'tooltip-' + decision.id %}
     <td class="govuk-table__cell btms-no-match" tabindex="0" aria-describedby="{{ id }}">
@@ -6,6 +6,15 @@
       <span role="tooltip" id="{{ id }}">
         {{ decision.decisionReason }}
       </span>
+    </td>
+  {% elif tabContext === tabContexts.LATEST_RESULT and decision.activeL1NoMatchDetails %}
+    {% set id = 'doc-ref-tooltip-' + decision.id %}
+    <td class="govuk-table__cell btms-no-match" tabindex="0" aria-describedby="{{ id }}">
+      {{ decision.documentReference }}
+      <div role="tooltip" id="{{ id }}">
+        <div class="btms-details__tooltip--title">{{ decision.activeL1NoMatchDetails.title }}</div>
+        <div class="btms-details__tooltip--description">{{ decision.activeL1NoMatchDetails.description | safe }}</div>
+      </div>
     </td>
   {% else %}
     <td class="govuk-table__cell">{{ decision.documentReference }}</td>
