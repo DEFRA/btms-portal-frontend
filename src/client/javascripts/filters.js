@@ -28,6 +28,10 @@ const noResultsInset = (type) => {
   return div
 }
 
+// Keep the hash: GOV.UK tabs use it to reopen the active tab on refresh
+const buildUrl = (url, params) =>
+  `${url.pathname}?${params.toString()}${url.hash}`
+
 const setState = (event) => {
   const { name, value } = event.target
 
@@ -36,8 +40,7 @@ const setState = (event) => {
 
   value ? params.set(name, value) : params.delete(name)
 
-  const newUrl = `${url.pathname}?${params.toString()}`
-  window.history.replaceState({}, '', newUrl)
+  window.history.replaceState({}, '', buildUrl(url, params))
 }
 
 const getState = (filterKeys) => {
@@ -56,8 +59,7 @@ const resetState = (filterKeys) => {
 
   filterKeys.forEach((name) => params.delete(name))
 
-  const newUrl = `${url.pathname}?${params.toString()}`
-  window.history.replaceState({}, '', newUrl)
+  window.history.replaceState({}, '', buildUrl(url, params))
   return {}
 }
 
@@ -184,6 +186,17 @@ const setUpTimelineFilters = () => {
       const state = getState(filterTypes['timeline'])
       setTimeline(state)
     })
+
+    // Restore the MRN chosen before a refresh, ignoring one not on this page
+    const initialState = getState(filterTypes['timeline'])
+    const mrnSelect = document.getElementById('timelineMrn')
+    const isKnownMrn = [...mrnSelect.options].some(
+      (option) => option.value === initialState.timelineMrn
+    )
+    if (isKnownMrn) {
+      mrnSelect.value = initialState.timelineMrn
+      setTimeline(initialState)
+    }
   }
 }
 
