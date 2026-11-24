@@ -199,14 +199,6 @@ export const getCustomsDeclarationOpenState = (finalisation) =>
     (finalisation.finalState === '1' || finalisation.finalState === '2')
   )
 
-const itemResultsContainPassiveDecisionCode = (clearanceDecision, commodity, decisionCode) => {
-  return clearanceDecision?.results.some(result => {
-    return result.itemNumber === commodity.itemNumber
-      && (result.mode === DECISION_MODE.PASSIVE)
-      && result.internalDecisionCode === decisionCode
-  })
-}
-
 const buildQuantityStatus = (chedReservations = []) =>
   chedReservations.reduce((statuses, { reservation }) => ({
     ...statuses,
@@ -325,11 +317,6 @@ const mapCommodity = (commodity, context) => {
   const clearanceDecisions = getActiveDecisions(clearanceDecision, commodity)
   const uniqueDocumentReferences = [...new Set(clearanceDecisions.map(decision => decision.documentReference).filter(Boolean))]
 
-  const level2NoMatch = itemResultsContainPassiveDecisionCode(clearanceDecision, commodity, HIGHER_LEVEL_DECISION_CODE.COMMODITY_CODE_CHECK)
-  const level3NoMatchWeight = itemResultsContainPassiveDecisionCode(clearanceDecision, commodity, HIGHER_LEVEL_DECISION_CODE.WEIGHT_CHECK)
-  const level3NoMatchQuantity = itemResultsContainPassiveDecisionCode(clearanceDecision, commodity, HIGHER_LEVEL_DECISION_CODE.QUANTITY_CHECK)
-  const level3NoMatch = level3NoMatchWeight || level3NoMatchQuantity
-
   const decisions = clearanceDecisions.map((decision) => {
     const relevantDocCodes =
       checkCodeToDocumentCodeMapping[decision.checkCode] || []
@@ -351,11 +338,6 @@ const mapCommodity = (commodity, context) => {
     const quantityStatus = getQuantityStatus(tracesChedIds, quantityStatuses, mrn, documentReference)
     const quantityStatusReason = quantityStatus === QUANTITY_STATUSES.UNSUCCESSFUL ? getUnsuccessfulQuantityStatusReason(clearanceDecision, commodity) : undefined
 
-    const activeLevel2NoMatch = decision.internalDecisionCode === HIGHER_LEVEL_DECISION_CODE.COMMODITY_CODE_CHECK
-    const activeLevel3NoMatchWeight = decision.internalDecisionCode === HIGHER_LEVEL_DECISION_CODE.WEIGHT_CHECK
-    const activeLevel3NoMatchQuantity = decision.internalDecisionCode === HIGHER_LEVEL_DECISION_CODE.QUANTITY_CHECK
-    const activeLevel3NoMatch = activeLevel3NoMatchWeight || activeLevel3NoMatchQuantity
-    const level3DocumentReference = activeLevel3NoMatch ? getDocumentReference(decision) : null
     const isTracesIuuDecision = isIuuOutcome && isTracesIuuMatch(tracesChedIds, decision.documentReference)
     const missingIuuNotification = isMissingIuuNotification(decision)
     const iuuNotificationReference = getIuuReference(missingIuuNotification, commodity, isTracesIuuDecision)
@@ -397,15 +379,6 @@ const mapCommodity = (commodity, context) => {
       match: determineMatchDisplay(isIuuOutcome, missingIuuNotification, isMatch, isTracesIuuDecision),
       quantityStatus,
       quantityStatusReason,
-      level2NoMatch,
-      level3NoMatch,
-      level3NoMatchWeight,
-      level3NoMatchQuantity,
-      activeLevel2NoMatch,
-      activeLevel3NoMatch,
-      activeLevel3NoMatchWeight,
-      activeLevel3NoMatchQuantity,
-      level3DocumentReference,
       activeL1NoMatchDetails,
       activeL2NoMatchDetails,
       activeL3NoMatchDetails,
