@@ -301,7 +301,9 @@ const getMatchingPassiveDecision = (clearanceDecision, activeDecision) => {
 }
 
 const mapNoMatchDetails = (showDetailsList, decision, templateArgs = null) => {
-  if (!showDetailsList.has(decision?.internalDecisionCode)) return null
+  if (!showDetailsList.has(decision?.internalDecisionCode)) {
+    return null
+  }
 
   const noMatchDetails = NO_MATCH_DETAIL[decision?.internalDecisionCode]
 
@@ -326,9 +328,7 @@ const mapCommodity = (commodity, context) => {
 
     const documentReference = isIuuOutcome ? null : getDocumentReference(decision)
     const documentReferenceId = extractDocumentReferenceId(documentReference)
-    const notificationStatus = documentReferenceId
-      ? notificationStatuses[documentReferenceId]
-      : null
+    const notificationStatus = documentReferenceId ? notificationStatuses[documentReferenceId] : null
 
     const isMatch = Boolean(
       decision.decisionCode &&
@@ -337,16 +337,13 @@ const mapCommodity = (commodity, context) => {
 
     const quantityStatus = getQuantityStatus(tracesChedIds, quantityStatuses, mrn, documentReference)
     const quantityStatusReason = quantityStatus === QUANTITY_STATUSES.UNSUCCESSFUL ? getUnsuccessfulQuantityStatusReason(clearanceDecision, commodity) : undefined
-
     const isTracesIuuDecision = isIuuOutcome && isTracesIuuMatch(tracesChedIds, decision.documentReference)
     const missingIuuNotification = isMissingIuuNotification(decision)
     const iuuNotificationReference = getIuuReference(missingIuuNotification, commodity, isTracesIuuDecision)
-
     const activeL1NoMatchDetails = mapNoMatchDetails(SHOW_LEVEL_ONE_NO_MATCH_DETAILS_LIST, decision, [decision?.documentReference])
     const activeL2DocumentReferences = uniqueDocumentReferences.length > 1 ? `document references ${uniqueDocumentReferences.join(', ')}` : `${decision?.documentReference}`
     const activeL2NoMatchDetails = mapNoMatchDetails(SHOW_LEVEL_TWO_NO_MATCH_DETAILS_LIST, decision, [commodity?.taricCommodityCode, activeL2DocumentReferences])
     const activeL3NoMatchDetails = mapNoMatchDetails(SHOW_LEVEL_THREE_NO_MATCH_DETAILS_LIST, decision)
-
     const passiveDecision = getMatchingPassiveDecision(clearanceDecision, decision)
     const passiveL1NoMatchDetails = mapNoMatchDetails(SHOW_LEVEL_ONE_NO_MATCH_DETAILS_LIST, passiveDecision, [passiveDecision?.documentReference])
     const passiveL2DocumentReferences = uniqueDocumentReferences.length > 1 ? `document references ${uniqueDocumentReferences.join(', ')}` : `${passiveDecision?.documentReference}`
