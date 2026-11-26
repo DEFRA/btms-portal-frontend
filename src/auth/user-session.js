@@ -3,7 +3,6 @@ import { refreshAccessToken } from './refesh-token.js'
 import { config } from '../config/config.js'
 
 const sessionCacheTtl = config.get('session.cache.ttl')
-const tokenSubStringLength = 5
 
 async function setUserSession(request, sessionId) {
   const expiresInSeconds = request.auth.credentials.expiresIn
@@ -21,8 +20,6 @@ async function setUserSession(request, sessionId) {
     userSession,
     sessionCacheTtl
   )
-
-  request.logger.info(`NEW SESSION: Auth Provider: ${request?.auth?.credentials?.provider}. New session refresh token contains: ${request?.auth?.credentials?.refreshToken?.substring(0, tokenSubStringLength)}...`)
 }
 
 function removeUserSession(request) {
@@ -49,8 +46,6 @@ async function updateUserSession(request, refreshedSession) {
     },
     sessionCacheTtl
   )
-
-  request.logger.info(`UPDATED SESSION: Auth Provider: ${authedUser?.provider}. Updated refresh token contains: ${refreshedSession?.refresh_token?.substring(0, tokenSubStringLength)}...`)
 
   return getUserSession(request)
 }
