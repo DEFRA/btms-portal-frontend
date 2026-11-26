@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v6
 
       - name: Build and Publish
-        uses: DEFRA/cdp-build-action/build@3761ef22decf8615b8fd275cd9b7142f8d356a11
+        uses: DEFRA/cdp-build-action/build@10141cebedff360cd6a088f647f7e8be52e20f53
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
